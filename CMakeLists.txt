@@ -73,8 +73,7 @@ if(NOT IS_SUBPROJECT)
 endif()
 
 # Python Support
-option(PythonSupport "Build with Python support" ON)
-if(PythonSupport AND NOT TRIQS_WITH_PYTHON_SUPPORT)
+if(NOT TRIQS_WITH_PYTHON_SUPPORT)
   message(FATAL_ERROR "TRIQS was installed without Python support. Cannot build the Python Interface. Disable the build with -DPythonSupport=OFF")
 endif()
 
@@ -87,63 +86,11 @@ if(Build_Tests)
   enable_testing()
 endif()
 
-# Build static libraries by default
-option(BUILD_SHARED_LIBS "Enable compilation of shared libraries" OFF)
-
-# ############
-# Global Compilation Settings
-
-# Export the list of compile-commands into compile_commands.json
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
-# Disable compiler extensions
-set(CMAKE_CXX_EXTENSIONS OFF)
-
-# Provide additional debugging information for Debug builds
-add_compile_options($<$<CONFIG:Debug>:-ggdb3>)
-
-# Enable Linktime optimizations when available
-cmake_policy(SET CMP0069 NEW)
-include(CheckIPOSupported)
-check_ipo_supported(RESULT ipo_supported)
-if(NOT ipo_supported)
-  message(STATUS "Linktime optimizations could not be enabled!")
-else()
-  message(STATUS "Linktime optimizations enabled!")
-  set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
-endif()
-
-# Create an Interface target for compiler warnings
-add_library(${PROJECT_NAME}_warnings INTERFACE)
-target_compile_options(${PROJECT_NAME}_warnings
-  INTERFACE
-    -Wall
-    -Wextra
-    -Wpedantic
-    -Wno-sign-compare
-    $<$<CXX_COMPILER_ID:GNU>:-Wno-comma-subscript>
-    $<$<CXX_COMPILER_ID:GNU>:-Wshadow=local>
-    $<$<CXX_COMPILER_ID:GNU>:-Wno-attributes>
-    $<$<CXX_COMPILER_ID:Clang>:-Wno-deprecated-comma-subscript>
-    $<$<CXX_COMPILER_ID:Clang>:-Wno-unknown-warning-option>
-    $<$<CXX_COMPILER_ID:Clang>:-Wshadow>
-    $<$<CXX_COMPILER_ID:Clang>:-Wno-gcc-compat>
-    $<$<CXX_COMPILER_ID:Clang>:-Wno-c++20-extensions>
-    $<$<CXX_COMPILER_ID:AppleClang>:-Wno-deprecated-comma-subscript>
-    $<$<CXX_COMPILER_ID:AppleClang>:-Wno-unknown-warning-option>
-    $<$<CXX_COMPILER_ID:AppleClang>:-Wshadow>
-    $<$<CXX_COMPILER_ID:AppleClang>:-Wno-gcc-compat>
-    $<$<CXX_COMPILER_ID:AppleClang>:-Wno-c++20-extensions>
-)
-
 # #############
 # Build Project
 
 # Find / Build dependencies
 add_subdirectory(deps)
-
-# Build and install the library
-add_subdirectory(c++/${PROJECT_NAME})
 
 # Tests
 if(Build_Tests)
@@ -151,9 +98,7 @@ if(Build_Tests)
 endif()
 
 # Python
-if(PythonSupport)
-  add_subdirectory(python/${PROJECT_NAME})
-endif()
+add_subdirectory(python/${PROJECT_NAME})
 
 # Docs
 if(Build_Documentation)

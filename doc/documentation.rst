@@ -21,14 +21,6 @@ Table of Contents
    changelog
    about
 
-C++ reference manual
---------------------
-
-.. toctree::
-   :maxdepth: 5
-
-   cpp2rst_generated/contents
-
 Python reference manual
 -----------------------
 

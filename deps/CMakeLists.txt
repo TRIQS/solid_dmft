@@ -46,22 +46,3 @@ else()
     message(WARNING "For builds with llvm sanitizers (ASAN/UBSAN) it is recommended to use -DBuild_Deps=Always to avoid false positives.")
   endif()
 endif()
-
-# -- Cpp2Py --
-if(PythonSupport OR Build_Documentation)
-  external_dependency(Cpp2Py
-    GIT_REPO https://github.com/TRIQS/cpp2py
-    VERSION 2.0
-    GIT_TAG master
-    BUILD_ALWAYS
-    EXCLUDE_FROM_ALL
-  )
-endif()
-
-# -- GTest --
-external_dependency(GTest
-  GIT_REPO https://github.com/google/googletest
-  GIT_TAG master
-  BUILD_ALWAYS
-  EXCLUDE_FROM_ALL
-)
