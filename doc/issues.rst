@@ -4,7 +4,7 @@ Reporting issues
 ================
 
 Please report all problems and bugs directly at the github issue page
-`<https://github.com/TRIQS/app4triqs/issues>`_.  In order to make it easier for us
+`<https://github.com/TRIQS/solid_dmft/issues>`_.  In order to make it easier for us
 to solve the issue please follow these guidelines:
 
 #. In all cases specify which version of the application you are using. You can

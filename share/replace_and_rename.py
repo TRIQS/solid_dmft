@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 import sys
 import os
@@ -38,7 +38,8 @@ for root, dirs, files in os.walk(app4triqs_root):
                 fpath = new_fpath
 
             # Replace app4triqs and APP4TRIQS in all files
-            with open(fpath, 'r') as f:
+            print(fpath)
+            with open(fpath, 'r', encoding="utf8", errors='ignore') as f:
                 s = f.read()
             if "app4triqs" in s or "APP4TRIQS" in s:
                 with open(fpath, 'w') as f:

@@ -2,7 +2,7 @@
 
 import unittest
 
-import app4triqs
+import solid_dmft
 from triqs.archive import *
 from triqs.utility import mpi
 

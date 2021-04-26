@@ -24,10 +24,10 @@ Table of Contents
 Python reference manual
 -----------------------
 
-.. automodule:: app4triqs 
+.. automodule:: solid_dmft 
    :members:
 
-.. autoclass:: app4triqs.app4triqs_module.Toto
+.. autoclass:: solid_dmft.solid_dmft_module.Toto
    :members:
 
-.. autofunction:: app4triqs.app4triqs_module.chain
+.. autofunction:: solid_dmft.solid_dmft_module.chain

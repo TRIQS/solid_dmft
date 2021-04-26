@@ -1,10 +1,10 @@
 easyblock = 'CMakeMake'
 
-name = 'TRIQS-app4triqs'
+name = 'TRIQS-solid_dmft'
 version = '3.0.0'
 versionsuffix = '-Python-%(pyver)s'
 
-homepage = 'https://triqs.github.io/app4triqs/'
+homepage = 'https://triqs.github.io/solid_dmft/'
 description = """
  TRIQS (Toolbox for Research on Interacting Quantum Systems) is a
  scientific project providing a set of C++ and Python libraries to
@@ -13,14 +13,14 @@ description = """
  PROVIDE HERE A DESCRIPTION OF YOUR APPLICATION
 """
 
-docurls = ['https://triqs.github.io/app4triqs/%(version_major_minor)s.x/']
+docurls = ['https://triqs.github.io/solid_dmft/%(version_major_minor)s.x/']
 software_license = 'LicenseGPLv3'
 
 toolchain = {'name': 'foss', 'version': '2019a'}
 toolchainopts = {'pic': True, 'usempi': True}
 
-source_urls = ['https://github.com/TRIQS/app4triqs/releases/download/%(version)s/']
-sources = ['app4triqs-%(version)s.tar.gz']
+source_urls = ['https://github.com/TRIQS/solid_dmft/releases/download/%(version)s/']
+sources = ['solid_dmft-%(version)s.tar.gz']
 checksums = ['PUT HERE THE SHA256 OF THE RELEASE TARBALL']
 
 dependencies = [
@@ -45,21 +45,21 @@ separate_build_dir = True
 runtest = 'test'
 
 sanity_check_paths = {
-    'files': ['lib/libapp4triqs_c.a'],
-    'dirs': ['include/app4triqs', 'lib', 'share',
-             'lib/python%(pyshortver)s/site-packages/app4triqs'],
+    'files': ['lib/libsolid_dmft_c.a'],
+    'dirs': ['include/solid_dmft', 'lib', 'share',
+             'lib/python%(pyshortver)s/site-packages/solid_dmft'],
 }
 
-sanity_check_commands = ["python -c 'import app4triqs'"]
+sanity_check_commands = ["python -c 'import solid_dmft'"]
 
 modextrapaths = {
     'CPLUS_INCLUDE_PATH': 'include',
     'PYTHONPATH': 'lib/python%(pyshortver)s/site-packages',
-    'CMAKE_PREFIX_PATH': 'lib/cmake/app4triqs',
+    'CMAKE_PREFIX_PATH': 'lib/cmake/solid_dmft',
 }
 modextravars = {
-    'APP4TRIQS_ROOT': '%(installdir)s',
-    'APP4TRIQS_VERSION': '%(version)s',
+    'SOLID_DMFT_ROOT': '%(installdir)s',
+    'SOLID_DMFT_VERSION': '%(version)s',
 }
 
 moduleclass = 'phys'

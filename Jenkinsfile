@@ -1,4 +1,4 @@
-def projectName = "app4triqs" /* set to app/repo name */
+def projectName = "solid_dmft" /* set to app/repo name */
 
 def dockerName = projectName.toLowerCase();
 /* which platform to build documentation on */

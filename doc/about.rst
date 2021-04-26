@@ -1,6 +1,6 @@
 .. _about:
 
-About app4triqs
+About solid_dmft
 ===============
 
 An example application using ``cpp2py`` and TRIQS.
