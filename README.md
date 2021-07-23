@@ -12,7 +12,7 @@ To adapt this skeleton for a new TRIQS application, the following steps are nece
 * Run the following commands in order after replacing **appname** accordingly
 
 ```bash
-git clone https://github.com/triqs/solid_dmft --branch python_only appname
+git clone https://github.com/triqs/app4triqs --branch python_only appname
 cd appname
 ./share/squash_history.sh
 ./share/replace_and_rename.py appname
@@ -36,7 +36,7 @@ You can merge future changes to the solid_dmft skeleton into your project with t
 
 ```bash
 git remote update
-git merge solid_dmft_remote/python_only -m "Merge latest solid_dmft skeleton changes"
+git merge app4triqs_remote/python_only -m "Merge latest app4triqs skeleton changes"
 ```
 
 If you should encounter any conflicts resolve them and `git commit`.
