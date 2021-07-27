@@ -1,8 +1,8 @@
-solid_dmft - An example application using triqs and cpp2py
+solid_dmft - A versatile python wrapper to perform DFT+DMFT calculations utilizing the TRIQS software library
 
-Copyright (C) 2017-2018, N. Wentzell, O. Parcollet
-Copyright (C) 2018-2019, The Simons Foundation
-  authors: N. Wentzell, D. Simons, H. Strand, O. Parcollet
+Copyright (C) 2018-2020, ETH Zurich
+Copyright (C) 2021, The Simons Foundation 
+  authors: A. Hampel, M. Merkel, and S. Beck
 
 solid_dmft is free software: you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software

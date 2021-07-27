@@ -1,19 +1,19 @@
-![logo_soliDMFT](doc/logo_soliDMFT.png)
+![logo_soliDMFT](doc/logo_solid_dmft.png)
 
 This program allows to perform DFT+DMFT ''one-shot'' and CSC
 calculations from h5 archives or VASP input files for multiband systems using
 the TRIQS package, in combination with the CThyb solver and SumkDFT from
 DFT-tools. Runs with triqs 3.x.x
 
-For all calculations the start script is 'uni_dmft.py'.
+For all calculations the start script is 'solid_dmft.py'.
 
-Written by A. Hampel, M. Merkel, S. Beck, and J. S. Casares from
-Materials Theory at ETH Zurich.
+Copyright (C) 2021: A. Hampel, M. Merkel, and S. Beck
+(see LICENSE.txt for details)
 
 
 ## Source code files and their use
 
-- __uni_dmft.py:__ main file that runs the calculation and start a CSC flow by
+- __solid_dmft.py:__ main file that runs the calculation and start a CSC flow by
   invoking  `csc_flow_control` or a one shot calculation directly by invoking
   `dmft_cycle` on a given h5 archive
 - __read_config.py:__ contains the functions to read the dmft config file. Take a
@@ -75,9 +75,9 @@ CHGCAR and preferably a WAVECAR, a set of INCAR, POSCAR, KPOINTS and POTCAR
 files, the PLO cfg file `plo.cfg` and the usual DMFT input file
 `dmft_config.ini`, which specifies the number of ranks for the DFT code and the DFT code executable in the `[dft]` section.
 
-The whole machinery is started by calling `uni_dmft.py` as for one-shot calculations. Importantly the flag `csc = True` has to be set in the general section in the config file. Then:
+The whole machinery is started by calling `solid_dmft.py` as for one-shot calculations. Importantly the flag `csc = True` has to be set in the general section in the config file. Then:
 ```
-mpirun -n 12 /work/uni_dmft.py
+mpirun -n 12 /work/solid_dmft.py
 ```
 The programm will then run the `csc_flow_control` routine, which starts VASP accordingly by spawning a new child process. After VASP is finished it will run the converter, run the dmft_cycle, and then VASP again until the given
 limit of DMFT iterations is reached. This should also work on most HPC systems (tested on slurm with OpenMPI), as the the child mpirun call is performed without the slurm environment variables. This tricks slrum into starting more ranks than it has available. Note, that maybe a slight adaption of the environment variables is needed to make sure VASP is found on the second node. The variables are stored `args` in the function `start_vasp_from_master_node` of the module `csc_flow.py`
@@ -116,16 +116,16 @@ this:
 
 #======START=====
 
-srun sarus run --mpi --mount=type=bind,source=$SCRATCH,destination=$SCRATCH --mount=type=bind,source=/apps,destination=/apps load/library/triqs-2.1-vasp bash -c "cd $PWD ; python /apps/ethz/eth3/dmatl-theory-git/uni-dmft/uni_dmft.py"
+srun sarus run --mpi --mount=type=bind,source=$SCRATCH,destination=$SCRATCH --mount=type=bind,source=/apps,destination=/apps load/library/triqs-2.1-vasp bash -c "cd $PWD ; python /apps/ethz/eth3/dmatl-theory-git/solid_dmft/solid_dmft.py"
 ```
 thats it. This line automatically runs the docker image and executes the
-`uni_dmft.py` script. Unfortunately the new sarus container enginge does not mounts automatically user directories. Therefore, one needs to specify with `--mount` to mount the scratch and apps folder manually. Then, one executes in the container bash to first go into the current dir and then executes python and the dmft script.
+`solid_dmft.py` script. Unfortunately the new sarus container enginge does not mounts automatically user directories. Therefore, one needs to specify with `--mount` to mount the scratch and apps folder manually. Then, one executes in the container bash to first go into the current dir and then executes python and the dmft script.
 
 ### CSC calculations on daint
 
 CSC calculations need the parameter `csc = True` and the mandatory parameters from the group `dft`.
-Then, uni-dmft automatically starts VASP on as many cores as specified.
-Note that VASP runs on cores that are already used by uni-dmft.
+Then, solid_dmft automatically starts VASP on as many cores as specified.
+Note that VASP runs on cores that are already used by solid_dmft.
 This minimizes the time that cores are idle while not harming the performance because these two processes are never active at the same time.
 
 For the latest version in the Dockerfile_MPICH, we need the sarus version >= 1.3.2, which can be loaded from the daint modules as `sarus/1.3.2` but isn't the default version.
@@ -145,8 +145,8 @@ A slurm job script should look like this:
 #SBATCH --output=out.%j
 #SBATCH --error=err.%j
 
-# path to uni_dmft.py script
-SCRIPTDIR=/apps/ethz/eth3/dmatl-theory-git/uni-dmft/uni_dmft.py
+# path to solid_dmft.py script
+SCRIPTDIR=/apps/ethz/eth3/dmatl-theory-git/solid_dmft/solid_dmft.py
 # Sarus image that is utilized
 IMAGE=load/library/triqs_mpich
 
@@ -288,7 +288,7 @@ Remarks:
 ### Speeding up the DFT part by not writing projectors at every step
 This is very important for CSC calculations with W90 but also speeds up the PLO-based ones.
 
-Writing the Wannier projectors is a time consuming step (and to a lesser extent, the PLO projectors) and basically needs only to be done in the DFT iteration right before a DMFT iteration. Therefore, uni-dmft writes the file `vasp.suppress_projs` that tells Vasp when __not__ to compute/write the projectors. This requires two small changes in `electron.F` in the Vasp source code:
+Writing the Wannier projectors is a time consuming step (and to a lesser extent, the PLO projectors) and basically needs only to be done in the DFT iteration right before a DMFT iteration. Therefore, solid_dmft writes the file `vasp.suppress_projs` that tells Vasp when __not__ to compute/write the projectors. This requires two small changes in `electron.F` in the Vasp source code:
 
 - adding the definition of a logical variable where all other variables are defined for `SUBROUTINE ELMIN`, e.g. around line 150, by inserting `LOGICAL :: LSUPPRESS_PROJS_EXISTS`
 - go to the place where you removed the call to `LPRJ_LDApU` (see above, around line 650). This is inside a `IF (MOD(INFO%ICHARG,10)==5) THEN ... ENDIF` block. This whole block has to be disabled when the file `vasp.suppress_projs` exists. So, right under this block's "IF", add the lines
