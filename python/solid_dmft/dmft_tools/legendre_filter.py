@@ -21,9 +21,41 @@
 # <http://www.gnu.org/licenses/>.
 #
 ################################################################################
+import numpy as np
 
-r"""
-DOC
+# triqs
+from triqs.gf import BlockGf
+from triqs.gf.tools import fit_legendre
 
-"""
-__all__ = []
+
+def apply(G_tau, order=100, G_l_cut=1e-19):
+    """ Filter binned imaginary time Green's function
+    using a Legendre filter of given order and coefficient threshold.
+
+    Parameters
+    ----------
+    G_tau : TRIQS imaginary time Block Green's function
+    auto : determines automatically the cut-off nl
+    order : int
+        Legendre expansion order in the filter
+    G_l_cut : float
+        Legendre coefficient cut-off
+    Returns
+    -------
+    G_l : TRIQS Legendre Block Green's function
+        Fitted Green's function on a Legendre mesh
+    """
+
+    l_g_l = []
+
+    for _, g in G_tau:
+
+        g_l = fit_legendre(g, order=order)
+        g_l.data[:] *= (np.abs(g_l.data) > G_l_cut)
+        g_l.enforce_discontinuity(np.identity(g.target_shape[0]))
+
+        l_g_l.append(g_l)
+
+    G_l = BlockGf(name_list=list(G_tau.indices), block_list=l_g_l)
+
+    return G_l
