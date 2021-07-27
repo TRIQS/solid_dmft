@@ -1,3 +1,4 @@
+#!@TRIQS_PYTHON_EXECUTABLE@
 ################################################################################
 #
 # solid_dmft - A versatile python wrapper to perform DFT+DMFT calculations
@@ -42,9 +43,9 @@ from timeit import default_timer as timer
 import triqs.utility.mpi as mpi
 
 # own modules
-from read_config import read_config
-from dmft_cycle import dmft_cycle
-from csc_flow import csc_flow_control
+from solid_dmft.read_config import read_config
+from solid_dmft.dmft_cycle import dmft_cycle
+from solid_dmft.csc_flow import csc_flow_control
 
 
 def main():

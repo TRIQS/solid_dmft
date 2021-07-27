@@ -111,6 +111,9 @@ endif()
 # Additional configuration files
 add_subdirectory(share)
 
+# executable
+add_subdirectory(bin)            # Executables
+
 # #############
 # Debian Package
 
