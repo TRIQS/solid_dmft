@@ -72,7 +72,7 @@ jobs:
         git clone https://github.com/TRIQS/hubbardI hubbardI.src
         mkdir hubbardI.build && cd hubbardI.build
         cmake ../hubbardI.src -DBuild_Tests=OFF
-        make -j1 install VERBOSE=1
+        sudo make -j1 install VERBOSE=1
         cd ../
 
     - name: Build solid_dmft
@@ -82,7 +82,6 @@ jobs:
         CXX: ${{ matrix.cxx }}
         LIBRARY_PATH: /usr/local/opt/llvm/lib
       run: |
-        source $HOME/install/share/triqs/triqsvars.sh
         mkdir build && cd build && cmake ..
         make -j2 || make -j1 VERBOSE=1
 
@@ -90,6 +89,5 @@ jobs:
       env:
         DYLD_FALLBACK_LIBRARY_PATH: /usr/local/opt/llvm/lib
       run: |
-        source $HOME/install/share/triqs/triqsvars.sh
         cd build
         ctest -j2 --output-on-failure
