@@ -27,8 +27,9 @@ jobs:
         sudo apt-get update &&
         sudo apt-get install lsb-release wget software-properties-common &&
         wget -O /tmp/llvm.sh https://apt.llvm.org/llvm.sh && sudo chmod +x /tmp/llvm.sh && sudo /tmp/llvm.sh 12 &&
-        curl -L https://users.flatironinstitute.org/~ccq/triqs3/$DISTRIB_CODENAME/public.gpg | sudo apt-key add - &&
-        sudo add-apt-repository "deb https://users.flatironinstitute.org/~ccq/triqs3/$DISTRIB_CODENAME/ /" &&
+        curl -L https://users.flatironinstitute.org/~ccq/triqs3/focal/public.gpg | sudo apt-key add - &&
+        sudo add-apt-repository "deb https://users.flatironinstitute.org/~ccq/triqs3/focal/ /" &&
+        sudo apt-get update &&
         sudo apt-get install
         clang-12
         g++-10
