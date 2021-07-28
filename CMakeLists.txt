@@ -37,6 +37,10 @@ get_directory_property(IS_SUBPROJECT PARENT_DIRECTORY)
 # Load TRIQS and CPP2PY
 find_package(TRIQS 3.0 REQUIRED)
 
+find_package(Python)
+set(PYTHON_EXECUTABLE ${PYTHON_EXECUTABLE} CACHE FILEPATH "Python Executable")
+set(PYTHON_LIB_DEST_ROOT ${PYTHON_LIB_DEST_ROOT} CACHE FILEPATH "Python module directory")
+
 # Get the git hash & print status
 triqs_get_git_hash_of_source_dir(PROJECT_GIT_HASH)
 message(STATUS "${PROJECT_NAME} version : ${PROJECT_VERSION}")

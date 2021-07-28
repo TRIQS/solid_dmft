@@ -1,4 +1,4 @@
-set(scripts solid_dmft symmetrize_gamma_file update_solid_config update_solid_h5)
+set(scripts solid_dmft) 
 
 foreach(script ${scripts})
     configure_file(${script}.py ${script} @ONLY)
