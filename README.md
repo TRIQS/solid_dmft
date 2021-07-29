@@ -11,8 +11,8 @@ Copyright (C) 2021: A. Hampel, M. Merkel, and S. Beck
 
 ## Source code files and their use
 
-- __solid_dmft:__ main file that runs the DMFT calculation and starts a CSC flow 
-- - __main.py:__ main function that invokes `csc_flow_control` or a one shot 
+- __bin/solid_dmft:__ main file that runs the DMFT calculation and starts a CSC flow 
+- __main.py:__ main function that invokes `csc_flow_control` or a one shot 
   calculation directly by invoking `dmft_cycle` on a given h5 archives
 - __read_config.py:__ contains the functions to read the dmft config file. Take a
   look in `read_config_doc.md` for a detailed list of parameters
