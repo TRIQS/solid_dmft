@@ -28,9 +28,6 @@ or with a pre-defined h5 archive (only one-shot) for
 multiband/many-correlated-shells systems using the TRIQS package,
 in combination with the CThyb solver and SumkDFT from DFT-tools.
 triqs version 3.0 or higher is required
-
-Written by Alexander Hampel, Sophie Beck
-Materials Theory, ETH Zurich,
 """
 
 # system
@@ -157,13 +154,5 @@ def main(args):
         print('overall elapsed time: %10.4f seconds'%(global_end-global_start))
 
 
-# Needed for clean kill of mpi job
-def mpiabort_excepthook(type, value, traceback):
-    sys.__excepthook__(type, value, traceback)
-    mpi.MPI.COMM_WORLD.Abort(1)
-
-
 if __name__ == '__main__':
-    # this sometimes weirdly suppresses error output completely
-    sys.excepthook = mpiabort_excepthook
     main(sys.argv)
