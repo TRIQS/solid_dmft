@@ -62,6 +62,7 @@ jobs:
         triqs
         triqs_dft_tools
         triqs_cthyb
+        triqs_maxent
 
     - name: Build & Install HubbardI
       env:
