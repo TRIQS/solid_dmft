@@ -28,8 +28,9 @@ copyright = '2017-2018 N. Wentzell, O. Parcollet 2018-2019 The Simons Foundation
 mathjax_path = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=default"
 templates_path = ['@CMAKE_CURRENT_SOURCE_DIR@/_templates']
 
-html_theme = 'triqs'
-html_theme_path = ['@CMAKE_CURRENT_SOURCE_DIR@/themes']
+html_theme = 'sphinx_rtd_theme'
+# html_theme = 'triqs'
+# html_theme_path = ['@CMAKE_CURRENT_SOURCE_DIR@/themes']
 html_show_sphinx = False
 html_context = {'header_title': '@PROJECT_NAME@',
                 'header_subtitle': 'An example application using cpp2py and <a class="triqs" style="font-size: 12px" href="https://triqs.github.io">TRIQS</a>',
