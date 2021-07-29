@@ -5,24 +5,22 @@ calculations from h5 archives or VASP input files for multiband systems using
 the TRIQS package, in combination with the CThyb solver and SumkDFT from
 DFT-tools. Runs with triqs 3.x.x
 
-For all calculations the start script is 'solid_dmft.py'.
-
 Copyright (C) 2021: A. Hampel, M. Merkel, and S. Beck
 (see LICENSE.txt for details)
 
 
 ## Source code files and their use
 
-- __solid_dmft.py:__ main file that runs the calculation and start a CSC flow by
-  invoking  `csc_flow_control` or a one shot calculation directly by invoking
-  `dmft_cycle` on a given h5 archive
+- __solid_dmft:__ main file that runs the DMFT calculation and starts a CSC flow 
+- - __main.py:__ main function that invokes `csc_flow_control` or a one shot 
+  calculation directly by invoking `dmft_cycle` on a given h5 archives
 - __read_config.py:__ contains the functions to read the dmft config file. Take a
   look in `read_config_doc.md` for a detailed list of parameters
 - __dmft_cycle.py:__ contains the `dmft_cycle` function that run a predefined
   number of DMFT iterations
 - __csc_flow.py:__ contains the `csc_flow_control` function to steer the CSC
   calculation and call then ones per DFT+DMFT cycle the `dmft_cycle` function
-- __/dmft_essentials.py__
+- __/dmft_tools__
     - __convergence.py:__ contains functions to calculate convergence properties and
       defining definitions for Gf differences. Results will be stored in a dictionary:
       `convergence_obs`
@@ -38,15 +36,10 @@ Copyright (C) 2021: A. Hampel, M. Merkel, and S. Beck
     which in a CSC calculation in running the whole time (in the background,
     if not needed)
     - __qe_manager.py:__ contains all functions to start quantum espresso
-- __/tools:__ non-essential scripts that are independent of the rest of the code
-- __/maxent_scripts:__ different scripts to perform analytical continuations
-  with triqs's MaxEnt
+- __/util:__ non-essential scripts that are independent of the rest of the code
+- __/postprocessing:__ different scripts to perform postprocessing steps like analytical 
+  continuations with triqs's MaxEnt
 
-
-## Introduction to docker
-
-Docker runs containers, which are instances of images.
-For more information, see the README.md in the folder `/docker`.
 
 ## Getting started
 
