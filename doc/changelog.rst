@@ -1,6 +1,6 @@
 .. _changelog:
 
-Changelog
+changelog
 =========
 
 This document describes the main changes in SOLID_DMFT.

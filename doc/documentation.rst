@@ -1,33 +1,35 @@
 .. _documentation:
 
-Documentation
-=============
+***************
+documentation
+***************
 
-
-.. math::
-
-   (a + b)^2  &=  (a + b)(a + b) \\
-              &=  a^2 + 2ab + b^2
-
-Table of Contents
------------------
+module reference manual
+=======================
 
 .. toctree::
-   :maxdepth: 5
+   :maxdepth: 4
 
-   index
-   install
-   issues
-   changelog
-   about
+   reference/csc_flow
+   reference/dft_managers
+   reference/dmft_cycle
+   reference/dmft_tools
+   reference/postprocessing
+   reference/read_config
+   reference/util
 
-Python reference manual
------------------------
 
-.. automodule:: solid_dmft 
-   :members:
+DFT code interfaces
+===================
 
-.. autoclass:: solid_dmft.solid_dmft_module.Toto
-   :members:
+.. toctree::
+   md_notes/w90_interface.md
+   md_notes/vasp_csc.md
 
-.. autofunction:: solid_dmft.solid_dmft_module.chain
+run solid_dmft
+===================
+   
+   .. toctree::
+      md_notes/docker.md
+      md_notes/run_locally.md
+      md_notes/run_cluster.md

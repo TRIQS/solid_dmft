@@ -1,5 +1,5 @@
 Version 3.0.0
-=============
+-------------
 
 solid_dmft version 3.0.0 is a compatibility
 release for TRIQS version 3.0.0 that
@@ -7,14 +7,3 @@ release for TRIQS version 3.0.0 that
 * adds a cmake-based dependency management
 * fixes several application issues
 
-
-Version 2.2.0
-=============
-
-solid_dmft Version 2.2.0 provides a project
-skeleton for TRIQS applications based on
-the TRIQS Library Version 2.2.0.
-It is intended for applications with both
-Python and C++ components.
-
-This is the initial release for this project.

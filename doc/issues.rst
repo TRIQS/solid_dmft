@@ -1,6 +1,6 @@
 .. _issues:
 
-Reporting issues
+reporting issues
 ================
 
 Please report all problems and bugs directly at the github issue page
