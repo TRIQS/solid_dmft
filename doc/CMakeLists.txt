@@ -1,5 +1,5 @@
 # Generate the sphinx config file
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/conf.py.in ${CMAKE_CURRENT_BINARY_DIR}/conf.py @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/conf.py ${CMAKE_CURRENT_BINARY_DIR}/conf.py @ONLY)
 
 # ---------------------------------
 # Top Sphinx target
