@@ -181,23 +181,26 @@ def _calc_alatt(n_orb, mu, eta, e_mat, sigma, solve=False, evecs=np.array([None]
     if not evecs.any() == None:
         sigma_rot = np.zeros(sigma.shape, dtype=complex)
 
+    w_vec = np.array([upscale(w_dict['w_mesh'][w], n_orb) for w in range(w_dict['n_w'])])
     n_k = e_mat.shape[2]
 
     if not solve:
         if trace:
             alatt_k_w = np.zeros((n_k, w_dict['n_w']))
-            invert_and_trace = lambda w, eta, mu, e_mat, sigma: -1.0/np.pi * np.trace( np.linalg.inv( w + eta + mu - e_mat - sigma ).imag )
         else:
             alatt_k_w = np.zeros((n_k, w_dict['n_w'], n_orb))
-            invert_and_trace = lambda w, eta, mu, e_mat, sigma: -1.0/np.pi * np.diagonal( np.linalg.inv( w + eta + mu - e_mat - sigma ).imag )
+        def invert_and_trace(w, eta, mu, e_mat, sigma):
+            # inversion is automatically vectorized over first axis of 3D array (omega first index now)
+            Glatt =  np.linalg.inv(w + eta[None,...] + mu[None,...] - e_mat[None,...] - sigma.transpose(2,0,1) )
+            return -1.0/np.pi * np.trace( Glatt ,axis1=1, axis2=2).imag
 
-        for iw, ik in itertools.product(range(w_dict['n_w']), range(n_k)):
+        for ik in range(n_k):
             # if evecs are given transform sigma into band basis
             if not evecs.any() == None:
-                sigma_rot[:,:,iw] = np.dot(evecs[:,:,ik].conjugate().transpose(), np.dot(sigma[:,:,iw], evecs[:,:,ik]))
-                alatt_k_w[ik, iw] = invert_and_trace(upscale(w_dict['w_mesh'][iw], n_orb), eta, mu, e_mat[:,:,ik], sigma_rot[:,:,iw])
+                sigma_rot = np.einsum('ij,jkw->ikw', e_vecs[:,:,ik].conjugate().transpose(), np.einsum('ijw,jk->ikw', sigma, e_vecs[:,:,ik]))
+                alatt_k_w[ik,:] = invert_and_trace(w_vec, eta, mu, e_mat[:,:,ik], sigma_rot)
             else:
-                alatt_k_w[ik, iw] = invert_and_trace(upscale(w_dict['w_mesh'][iw], n_orb), eta, mu, e_mat[:,:,ik], sigma[:,:,iw])
+                alatt_k_w[ik,:] = invert_and_trace(w_vec, eta, mu, e_mat[:,:,ik], sigma)
 
     else:
         alatt_k_w = np.zeros((n_k, w_dict['n_w'], n_orb))
