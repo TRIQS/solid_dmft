@@ -605,9 +605,9 @@ def _dmft_step(sum_k, solvers, it, general_params,
 
         density_shell_pre[icrsh] = np.real(solvers[icrsh].G_freq.total_density())
         mpi.report('\n *** Correlated Shell type #{:3d} : '.format(icrsh)
-                   + 'Total charge of impurity problem = {:.6f}'.format(density_shell_pre[icrsh]))
+                   + 'Estimated total charge of impurity problem = {:.6f}'.format(density_shell_pre[icrsh]))
         density_mat_pre[icrsh] = solvers[icrsh].G_freq.density()
-        mpi.report('Density matrix:')
+        mpi.report('Estimated density matrix:')
         for key, value in sorted(density_mat_pre[icrsh].items()):
             mpi.report(key)
             mpi.report(np.real(value))
