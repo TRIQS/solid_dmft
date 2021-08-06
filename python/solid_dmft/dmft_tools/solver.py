@@ -24,9 +24,10 @@
 import numpy as np
 from itertools import product
 
-from triqs.gf import GfImTime, GfReTime, GfImFreq, GfReFreq, GfLegendre, BlockGf, make_hermitian, Omega
+from triqs.gf import GfImTime, GfReTime, GfImFreq, GfReFreq, GfLegendre, BlockGf, make_hermitian, Omega, iOmega_n, make_gf_from_fourier, fit_hermitian_tail
 from triqs.gf.tools import inverse, make_zero_tail
 from triqs.gf.descriptors import Fourier
+from triqs.operators import c_dag, c, Operator
 import triqs.utility.mpi as mpi
 from h5 import HDFArchive
 
@@ -159,12 +160,14 @@ class SolverStructure:
             self.git_hash = forktps_hash
 
         elif self.general_params['solver_type'] == 'inchworm':
+            from inchworm import version
 
             # sets up necessary GF objects on ImFreq
             self._init_ImFreq_objects()
             # sets up solver
             self.triqs_solver = self._create_inchworm_solver()
-            self.git_hash = inchworm_hash
+            #self.git_hash = version.show_git_hash()
+            self.git_hash = '123'
 
         elif self.general_params['solver_type'] == 'ctseg':
             from triqs_ctseg.version import triqs_ctseg_hash
@@ -192,6 +195,7 @@ class SolverStructure:
         self.Sigma_freq = self.G_freq.copy()
         self.G0_freq = self.G_freq.copy()
         self.G_freq_unsym = self.G_freq.copy()
+        self.Delta_freq = self.G_freq.copy()
 
         # create all ImTime instances
         self.n_tau = self.general_params['n_tau']
@@ -452,13 +456,57 @@ class SolverStructure:
             self._ftps_postprocessing()
 
         elif self.general_params['solver_type'] == 'inchworm':
+
+            # prepare solver input
+            sumk_eal = self.sum_k.eff_atomic_levels()[self.icrsh]
+            solver_eal = self.sum_k.block_structure.convert_matrix(sumk_eal, space_from='sumk')
+
             # fill Delta_time from Delta_freq sum_k to solver
-            self.triqs_solver.Delta_tau << make_gf_from_fourier(self.Delta_freq).real
+            for name, g0 in self.G0_freq:
+                spin = name.split('_')[0] if not self.sum_k.corr_shells[self.icrsh]['SO'] else name
+                self.Delta_freq[name] << iOmega_n - inverse(g0) - solver_eal[name]
+                known_moments = make_zero_tail(self.Delta_freq[name], 1)
+                tail, err = fit_hermitian_tail(self.Delta_freq[name], known_moments)
+                self.triqs_solver.Delta_tau[name] << make_gf_from_fourier(self.Delta_freq[name], self.triqs_solver.Delta_tau.mesh, tail).real
+
+            # Make noniteracting operator
+            spin_names = [orb[0] for orb in self.sum_k.gf_struct_solver_list[self.icrsh]]
+            orb_names = [0]
+            Hloc_0 = Operator()
+            h_loc_0_offdiag = False
+            for spin in spin_names:
+                for o1 in orb_names:
+                    if h_loc_0_offdiag:
+                        for o2 in orb_names:
+                            Hloc_0 += solver_eal[spin][o1,o2].real * (c_dag(spin,o1) * c(spin,o2) + c_dag(spin,o2) * c(spin,o1))
+                    else:
+                        o2 = o1
+                        Hloc_0 += solver_eal[spin][o1,o2].real * (c_dag(spin,o1) * c(spin,o2) + c_dag(spin,o2) * c(spin,o1))
+            if mpi.is_master_node():
+                print(self.h_int + Hloc_0)
+
+            solve_params = {'n_cycles': self.solver_params['n_cycles_tot'], 'h_imp': self.h_int + Hloc_0,
+                            'measure_order_histogram': True, 'max_order': 15}
+
+            if self.general_params['store_solver'] and mpi.is_master_node():
+                archive = HDFArchive(self.general_params['jobname']+'/'+self.general_params['seedname']+'.h5', 'a')
+                archive['DMFT_input/solver'].create_group('it_-1')
+                archive['DMFT_input/solver/it_-1']['S_'+str(self.icrsh)] = self.triqs_solver
 
             # Solve the impurity problem for icrsh shell
             # *************************************
-            self.triqs_solver.solve(h_int=self.h_int, **self.solver_params)
+            self.triqs_solver.solve_inchworm(solve_params)
+
+            if self.general_params['store_solver'] and mpi.is_master_node():
+                archive = HDFArchive(self.general_params['jobname']+'/'+self.general_params['seedname']+'.h5', 'a')
+                archive['DMFT_input/solver/it_-1']['S_prop_'+str(self.icrsh)] = self.triqs_solver
+
+            self.triqs_solver.solve_green(**solve_params)
             # *************************************
+
+            if self.general_params['store_solver'] and mpi.is_master_node():
+                archive = HDFArchive(self.general_params['jobname']+'/'+self.general_params['seedname']+'.h5', 'a')
+                archive['DMFT_input/solver/it_-1']['S_'+str(self.icrsh)] = self.triqs_solver
 
             # call postprocessing
             self._inchworm_postprocessing()
@@ -564,6 +612,13 @@ class SolverStructure:
         r'''
         Initialize inchworm solver instance
         '''
+        from inchworm import Solver as inchworm_solver
+        from triqs_dft_tools.block_structure import gf_struct_flatten
+
+        gf_struct = gf_struct_flatten(self.sum_k.gf_struct_solver_list[self.icrsh])
+        
+        triqs_solver = inchworm_solver(beta=self.general_params['beta'], gf_struct=gf_struct,
+                                       n_tau_green=10, n_tau_inch=int(7*self.general_params['beta']+1), n_tau=self.general_params['n_tau'])
 
         return triqs_solver
 
@@ -784,6 +839,13 @@ class SolverStructure:
         Organize G_freq, G_time, Sigma_freq and G_l from inchworm solver
         '''
 
+        #self.G0_freq << self.triqs_solver.G0_iw
+        #self.G_freq << make_hermitian(self.triqs_solver.G_iw)
+        #self.G_freq_unsym << self.G_freq
+        #self.Sigma_freq << inverse(self.G0_freq) - inverse(self.G_freq)
+        self.G_time << self.triqs_solver.G_tau
+        self.Delta_time << self.triqs_solver.Delta_tau
+
         return
 
     def _ftps_postprocessing(self):
@@ -803,9 +865,9 @@ class SolverStructure:
                 swap_2()
                 G['ud_0'] = 0.5*(G['ud_0'] + G['ud_1'])
                 G['ud_1'] = G['ud_0']
-                for name , g in G:
-                    g[1,1] = 0.5*(g[1,1]+g[2,2])
-                    g[2,2] = g[1,1]
+                #for name , g in G:
+                #    g[1,1] = 0.5*(g[1,1]+g[2,2])
+                #    g[2,2] = g[1,1]
                 swap_2()
             else:
                 switch = lambda spin: 'dn' if spin == 'down' else 'up'

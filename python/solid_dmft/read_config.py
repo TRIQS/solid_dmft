@@ -85,7 +85,7 @@ cpa_zeta : float or comma separated list of floats
 cpa_x : float or comma separated list of floats
             probability distribution for summing G(tau) in CPA
 solver_type: str
-            'cthyb', 'ctint', 'ftps', 'hubbardI', 'ctseg'
+            'cthyb', 'ctint', 'ftps', 'hubbardI', 'ctseg', 'inchworm'
 n_iw : int, optional, default=1025
             number of Matsubara frequencies
 n_tau : int, optional, default=10001
@@ -375,7 +375,7 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                                  'default': ['none']},
 
                                  'beta': {'converter': float, 'valid for': lambda x, _: x > 0,
-                                          'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint', 'inchworm', 'hubbardI','ctseg']},
+                                          'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint', 'inchworm', 'hubbardI', 'ctseg']},
 
                                  'n_iter_dmft': {'converter': int, 'valid for': lambda x, _: x >= 0, 'used': True},
 
@@ -395,7 +395,7 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                  'cpa_x': {'converter': lambda s: list(map(float, s.split(','))),
                                            'used': lambda params: params['general']['dc'] and params['general']['dc_type'] == 4},
 
-                                 'solver_type': {'valid for': lambda x, _: x in ['cthyb', 'ctint', 'ftps', 'hubbardI','ctseg'],
+                                 'solver_type': {'valid for': lambda x, _: x in ['cthyb', 'ctint', 'ftps', 'hubbardI', 'ctseg', 'inchworm'],
                                                  'used': True},
 
                                  'n_l': {'converter': int, 'valid for': lambda x, _: x > 0,
@@ -588,7 +588,7 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
 
                                 'n_cycles_tot': {'converter': lambda s: int(float(s)),
                                                  'valid for': lambda x, _: x >= 0,
-                                                 'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint','ctseg']},
+                                                 'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint','ctseg', 'inchworm']},
 
                                 'max_time': {'converter': int, 'valid for': lambda x, _: x >= 0,
                                              'default': None,
