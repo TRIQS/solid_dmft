@@ -598,7 +598,7 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                                    'used': lambda params: params['general']['solver_type'] in ['cthyb']},
 
                                 'measure_G_tau': {'converter': BOOL_PARSER, 'default': True,
-                                                  'used': lambda params: params['general']['solver_type'] in ['cthyb', 'hubbardI','ctseg']},
+                                                  'used': lambda params: params['general']['solver_type'] in ['hubbardI','ctseg']},
 
                                 'measure_G_iw': {'converter': BOOL_PARSER, 'default': False,
                                                   'used': lambda params: params['general']['solver_type'] in ['ctseg']},

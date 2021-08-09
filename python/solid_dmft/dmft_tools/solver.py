@@ -211,7 +211,7 @@ class SolverStructure:
             self.G_l = self.sum_k.block_structure.create_gf(ish=self.icrsh, gf_function=GfLegendre, space='solver',
                                                             beta=self.general_params['beta'], n_points=self.n_l)
             # move original G_freq to G_freq_orig
-            self.G_freq_orig = self.G_freq.copy()
+            self.G_time_orig = self.G_time.copy()
 
         if self.general_params['solver_type'] in ['cthyb', 'hubbardI'] and self.solver_params['measure_density_matrix']:
             self.density_matrix = None
@@ -385,7 +385,7 @@ class SolverStructure:
                 # discretizebath
                 gap_interval = self.solver_params['enforce_gap'] if self.solver_params['enforce_gap'] != 'none' else None
                 Delta_discrete = DiscretizeBath(Delta=self.Delta_freq_solver, Nb=self.solver_params['n_bath'], gap=gap_interval,
-						SO=bool(self.sum_k.corr_shells[self.icrsh]['SO']))
+                                                SO=bool(self.sum_k.corr_shells[self.icrsh]['SO']))
 
             # should be done only once after the first iteration
             if self.solver_params['n_bath'] != 0 and self.solver_params['refine_factor'] != 1:
@@ -661,7 +661,8 @@ class SolverStructure:
                 g.enforce_discontinuity(np.identity(g.target_shape[0]))
                 # set G_freq from Legendre and Fouriertransform to get G_time
                 self.G_freq[i].set_from_legendre(g)
-                self.G_time[i] << Fourier(self.G_freq[i])
+                self.G_time[i].set_from_legendre(g)
+
             # Symmetrize
             self.G_freq << make_hermitian(self.G_freq)
             self.G_freq_unsym << self.G_freq
@@ -677,8 +678,8 @@ class SolverStructure:
 
         # if measured in Legendre basis, get G_l from solver too
         if self.solver_params['measure_G_l']:
-            # store original G_freq into G_freq_orig
-            self.G_freq_orig << self.triqs_solver.G_iw
+            # store original G_time into G_time_orig
+            self.G_time_orig << self.triqs_solver.G_tau
             self.G_l << self.triqs_solver.G_l
             # get G_time, G_freq, Sigma_freq from G_l
             set_Gs_from_G_l()
@@ -689,14 +690,12 @@ class SolverStructure:
             self.sum_k.symm_deg_gf(self.G_freq, ish=self.icrsh)
             # obtain Sigma via dyson from symmetrized G_freq
             self.Sigma_freq << inverse(self.G0_freq) - inverse(self.G_freq)
-            if not self.solver_params['measure_G_tau']:
-                self.G_time << Fourier(self.G_freq)
-            else:
-                self.G_time << self.triqs_solver.G_tau
-                self.sum_k.symm_deg_gf(self.G_time, ish=self.icrsh)
+            # set G_time
+            self.G_time << self.triqs_solver.G_tau
+            self.sum_k.symm_deg_gf(self.G_time, ish=self.icrsh)
 
             if not self.solver_params['perform_tail_fit'] and self.general_params['legendre_fit']:
-                self.G_freq_orig << self.triqs_solver.G_iw
+                self.G_time_orig << self.triqs_solver.G_tau
                 # run the filter
                 self.G_l << legendre_filter.apply(self.G_time, self.general_params['n_l'])
                 # get G_time, G_freq, Sigma_freq from G_l
@@ -875,7 +874,7 @@ class SolverStructure:
                 g.enforce_discontinuity(np.identity(g.target_shape[0]))
                 # set G_freq from Legendre and Fouriertransform to get G_time
                 self.G_freq[i].set_from_legendre(g)
-                self.G_time[i] << Fourier(self.G_freq[i])
+                self.G_time[i].set_from_legendre(g)
             # Symmetrize
             self.G_freq << make_hermitian(self.G_freq)
             self.G_freq_unsym << self.G_freq
@@ -913,13 +912,13 @@ class SolverStructure:
 
         # if measured in Legendre basis, get G_l from solver too
         if self.solver_params['measure_gl']:
-            # store original G_freq into G_freq_orig
-            self.G_freq_orig << self.triqs_solver.G_iw
+            # store original G_time into G_time_orig
+            self.G_time_orig << self.triqs_solver.G_tau
             self.G_l << self.triqs_solver.G_l
             # get G_time, G_freq, Sigma_freq from G_l
             set_Gs_from_G_l()
         elif self.general_params['legendre_fit']:
-            self.G_freq_orig << self.triqs_solver.G_iw
+            self.G_time_orig << self.triqs_solver.G_tau
             self.G_l << legendre_filter.apply(self.G_time, self.general_params['n_l'])
             # get G_time, G_freq, Sigma_freq from G_l
             set_Gs_from_G_l()

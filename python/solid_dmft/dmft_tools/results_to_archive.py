@@ -71,7 +71,7 @@ def _compile_information(sum_k, general_params, solver_params, solvers,
             # if legendre was set, that we have both now!
             if (solver_params['measure_G_l']
                 or not solver_params['perform_tail_fit'] and general_params['legendre_fit']):
-                write_to_h5['G_freq_orig_{}'.format(icrsh)] = solvers[icrsh].G_freq_orig
+                write_to_h5['G_time_orig_{}'.format(icrsh)] = solvers[icrsh].G_time_orig
                 write_to_h5['Gimp_l_{}'.format(icrsh)] = solvers[icrsh].G_l
 
         if general_params['solver_type'] == 'ctint' and solver_params['measure_histogram']:
@@ -88,7 +88,7 @@ def _compile_information(sum_k, general_params, solver_params, solvers,
         if general_params['solver_type'] == 'ctseg':
             # if legendre was set, that we have both now!
             if (solver_params['measure_gl'] or general_params['legendre_fit']):
-                write_to_h5['G_freq_orig_{}'.format(icrsh)] = solvers[icrsh].G_freq_orig
+                write_to_h5['G_time_orig_{}'.format(icrsh)] = solvers[icrsh].G_time_orig
                 write_to_h5['Gimp_l_{}'.format(icrsh)] = solvers[icrsh].G_l
             if solver_params['measure_ft']:
                 write_to_h5['F_freq_{}'.format(icrsh)] = solvers[icrsh].F_freq
