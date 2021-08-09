@@ -110,7 +110,7 @@ def test_config_file_1():
                                                          'map_solver_struct': 'none'},
                                             'solver': {'move_double': True, 'measure_G_l': False,
                                                        'move_shift': False, 'store_solver': False,
-                                                       'measure_G_tau': True, 'measure_pert_order': False,
+                                                       'measure_pert_order': False,
                                                        'measure_density_matrix': False, 'perform_tail_fit': False,
                                                        'legendre_fit': False}}
                               )
@@ -159,7 +159,6 @@ n_warmup_cycles = 10000
 n_cycles_tot = 60e+6
 imag_threshold = 1e-5
 measure_G_l = True
-measure_g_tau = False
 
 measure_density_matrix = False
 
@@ -200,6 +199,7 @@ def test_config_file_2():
     invalid_params = _checks_validity_criterion(parameters)
     assert invalid_params == {'dft': [], 'general': [], 'advanced': [], 'solver': []}
 
+    print(parameters)
     assert are_iterables_equal(parameters, {'dft': {},
                                             'general': {'afm_order': True, 'magnetic': True,
                                                         'measure_chi_SzSz': False,
@@ -233,6 +233,6 @@ def test_config_file_2():
                                                        'n_cycles_tot': 60000000, 'store_solver': False,
                                                        'move_double': True, 'measure_pert_order': False,
                                                        'move_shift': False, 'legendre_fit' : False,
-                                                       'measure_G_tau': False, 'measure_density_matrix': False}}
+                                                       'measure_density_matrix': False}}
 
                              )

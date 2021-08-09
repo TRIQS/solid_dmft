@@ -29,7 +29,8 @@ FILE(COPY UIJKL DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 set (integration_tests 
      svo_hubbardI_basic
      lno_hubbardI_mag
-     svo_cthyb_basic
+     svo_cthyb_basic_gl
+     svo_cthyb_basic_tf
      )
 
 foreach(test ${integration_tests})
