@@ -580,6 +580,7 @@ def _dmft_step(sum_k, solvers, it, general_params,
     density_tot = 0.0
     density_shell = np.zeros(sum_k.n_inequiv_shells)
     density_mat = [None] * sum_k.n_inequiv_shells
+    density_mat_unsym = [None] * sum_k.n_inequiv_shells
     density_shell_pre = np.zeros(sum_k.n_inequiv_shells)
     density_mat_pre = [None] * sum_k.n_inequiv_shells
 
@@ -658,8 +659,9 @@ def _dmft_step(sum_k, solvers, it, general_params,
         # some printout of the obtained density matrices and some basic checks from the unsymmetrized solver output
         density_shell[icrsh] = np.real(solvers[icrsh].G_freq_unsym.total_density())
         density_tot += density_shell[icrsh]*shell_multiplicity[icrsh]
-        density_mat[icrsh] = solvers[icrsh].G_freq_unsym.density()
-        formatter.print_local_density(density_shell[icrsh], density_shell_pre[icrsh], density_mat[icrsh])
+        density_mat_unsym[icrsh] = solvers[icrsh].G_freq_unsym.density()
+        density_mat[icrsh] = solvers[icrsh].G_freq.density()
+        formatter.print_local_density(density_shell[icrsh], density_shell_pre[icrsh], density_mat_unsym[icrsh])
 
         # update solver in h5 archive
         if general_params['store_solver'] and mpi.is_master_node():

@@ -95,11 +95,15 @@ def apply(general_params, icrsh, gf_struct_solver, solvers):
 
             solvers[icrsh].Sigma_freq[spin_channel] << solvers[imp_source].Sigma_freq[target_channel]
             solvers[icrsh].G_freq[spin_channel] << solvers[imp_source].G_freq[target_channel]
+            solvers[icrsh].G_freq_unsym[spin_channel] << solvers[imp_source].G_freq_unsym[target_channel]
             solvers[icrsh].G0_freq[spin_channel] << solvers[imp_source].G0_freq[target_channel]
+            solvers[icrsh].G_time[spin_channel] << solvers[imp_source].G_time[target_channel]
 
     else:
         solvers[icrsh].Sigma_freq << solvers[imp_source].Sigma_freq
         solvers[icrsh].G_freq << solvers[imp_source].G_freq
+        solvers[icrsh].G_freq_unsym << solvers[imp_source].G_freq_unsym
         solvers[icrsh].G0_freq << solvers[imp_source].G0_freq
+        solvers[icrsh].G_time << solvers[imp_source].G_time
 
     return solvers
