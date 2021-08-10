@@ -478,15 +478,15 @@ class SolverStructure:
                 for o1 in orb_names:
                     if h_loc_0_offdiag:
                         for o2 in orb_names:
-                            Hloc_0 += solver_eal[spin][o1,o2].real * (c_dag(spin,o1) * c(spin,o2) + c_dag(spin,o2) * c(spin,o1))
+                            Hloc_0 += solver_eal[spin][o1,o2].real/2 * (c_dag(spin,o1) * c(spin,o2) + c_dag(spin,o2) * c(spin,o1))
                     else:
                         o2 = o1
-                        Hloc_0 += solver_eal[spin][o1,o2].real * (c_dag(spin,o1) * c(spin,o2) + c_dag(spin,o2) * c(spin,o1))
+                        Hloc_0 += solver_eal[spin][o1,o2].real * c_dag(spin,o1) * c(spin,o2)
             if mpi.is_master_node():
                 print(self.h_int + Hloc_0)
 
             solve_params = {'n_cycles': self.solver_params['n_cycles_tot'], 'h_imp': self.h_int + Hloc_0,
-                            'measure_order_histogram': True, 'max_order': 15}
+                            'measure_order_histogram': True, 'max_order': 50}
 
             if self.general_params['store_solver'] and mpi.is_master_node():
                 archive = HDFArchive(self.general_params['jobname']+'/'+self.general_params['seedname']+'.h5', 'a')
@@ -539,6 +539,7 @@ class SolverStructure:
         Initialize cthyb solver instance
         '''
         from triqs_cthyb.solver import Solver as cthyb_solver
+        #from triqs_dft_tools.block_structure import gf_struct_flatten
 
         # hotfix for new triqs 2.0 gf_struct_solver is still a dict
         # but cthyb 2.0 expects a list of pairs ####
