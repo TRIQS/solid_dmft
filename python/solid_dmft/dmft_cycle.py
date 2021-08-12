@@ -296,6 +296,23 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
         if not general_params['csc'] and general_params['magnetic'] and general_params['afm_order']:
             raise ValueError('AFM order not supported with SO coupling')
 
+    # need to set sigma immediately here, otherwise mesh in unclear for sumK
+    # Initializes empty Sigma for calculation of DFT density even if block structure changes later
+    if general_params['solver_type'] in ['ftps']:
+        zero_Sigma_w = [sum_k.block_structure.create_gf(ish=iineq, gf_function=GfReFreq,
+                                                        window = general_params['w_range'],
+                                                        n_points = general_params['n_w'])
+                        for iineq in range(sum_k.n_inequiv_shells)]
+        sum_k.put_Sigma(zero_Sigma_w)
+        dft_mu = sum_k.calc_mu(precision=general_params['prec_mu'],
+                               iw_or_w='w', broadening=general_params['eta'])
+    else:
+        zero_Sigma_iw = [sum_k.block_structure.create_gf(ish=iineq,
+                                                         beta=general_params['beta'],
+                                                         n_points = general_params['n_iw'])
+                         for iineq in range(sum_k.n_inequiv_shells)]
+        sum_k.put_Sigma(zero_Sigma_iw)
+
     # Sets the chemical potential of the DFT calculation
     # Either directly from general parameters, if given, ...
     if general_params['dft_mu'] != 'none':
@@ -306,25 +323,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
             mpi.report('\n chemical potential set to {:.3f} eV\n'.format(sum_k.chemical_potential))
     # ... or with sum_k.calc_mu
     else:
-        # need to set sigma immediately here, otherwise mesh in unclear for sumK
-        # Initializes empty Sigma for calculation of DFT density even if block structure changes later
-        if general_params['solver_type'] in ['ftps']:
-            zero_Sigma_w = [sum_k.block_structure.create_gf(ish=iineq, gf_function=GfReFreq,
-                                                            window = general_params['w_range'],
-                                                            n_points = general_params['n_w'])
-                            for iineq in range(sum_k.n_inequiv_shells)]
-            sum_k.put_Sigma(zero_Sigma_w)
-            dft_mu = sum_k.calc_mu(precision=general_params['prec_mu'],
-                                   iw_or_w='w', broadening=general_params['eta'])
-        else:
-            zero_Sigma_iw = [sum_k.block_structure.create_gf(ish=iineq,
-                                                             beta=general_params['beta'],
-                                                             n_points = general_params['n_iw'])
-                             for iineq in range(sum_k.n_inequiv_shells)]
-            sum_k.put_Sigma(zero_Sigma_iw)
-
-            dft_mu = sum_k.calc_mu(precision=general_params['prec_mu'],
-                                   iw_or_w='iw')
+        dft_mu = sum_k.calc_mu(precision=general_params['prec_mu'], iw_or_w='iw')
 
     # calculate E_kin_dft for one shot calculations
     if not general_params['csc'] and general_params['calc_energies']:
