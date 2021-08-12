@@ -31,9 +31,9 @@ Learn how to use solid_dmft in the :ref:`documentation`.
 
 
 .. image:: logos/flatiron.png
-   :width: 48%
+   :width: 300
    :target: https://www.simonsfoundation.org/flatiron/center-for-computational-quantum-physics
 
 .. image:: logos/github.png
-   :width: 48%
+   :width: 300
    :target: https://github.com/flatironinstitute/solid_dmft
