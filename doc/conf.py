@@ -47,6 +47,7 @@ mathjax_path = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?
 templates_path = ['@CMAKE_CURRENT_SOURCE_DIR@/_templates']
 
 html_theme = 'sphinx_rtd_theme'
+html_style = 'css/custom.css'
 
 html_favicon = '@CMAKE_CURRENT_SOURCE_DIR@/logos/favicon.ico'
 html_logo = '@CMAKE_CURRENT_SOURCE_DIR@/logos/logo_no_text.png'
