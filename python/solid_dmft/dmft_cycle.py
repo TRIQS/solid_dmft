@@ -338,7 +338,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
                                                   for _ in range(sum_k.n_inequiv_shells)]
 
     # Generates a rotation matrix to change the basis
-    if general_params['set_rot'] != 'none' and iteration_offset == 0:
+    if general_params['set_rot'] != 'none':
         # calculate new rotation matrices
         sum_k = _calculate_rotation_matrix(general_params, sum_k)
     # Saves rotation matrix to h5 archive:
