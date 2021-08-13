@@ -1,8 +1,7 @@
 .. highlight:: bash
 
-install 
-===============================
-
+Installation 
+#############
 
 Prerequisites
 -------------
