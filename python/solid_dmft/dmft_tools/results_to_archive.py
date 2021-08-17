@@ -134,3 +134,7 @@ def write(archive, sum_k, general_params, solver_params, solvers, it, is_samplin
                 if os.path.isfile('./{}{}'.format(general_params['seedname'], band_elem)):
                     os.rename('./{}{}'.format(general_params['seedname'], band_elem),
                               './{}{}_it{}'.format(general_params['seedname'], band_elem, it))
+            for w90_elem in ['_hr.dat', '.wout']:
+                if os.path.isfile('./{}{}'.format(general_params['seedname'], w90_elem)):
+                    os.rename('./{}{}'.format(general_params['seedname'], w90_elem),
+                              './{}_it{}{}'.format(general_params['seedname'], it, w90_elem))
