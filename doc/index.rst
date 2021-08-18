@@ -3,13 +3,21 @@
 .. module:: solid_dmft
 
 .. image:: logos/logo_solid_dmft.png
-   :width: 600
+   :width: 800
+   :align: center
 
 solid_dmft
 **********
 
-This is the homepage of solid_dmft v3.0.0.
-For changes see the :ref:`changelog page <changelog>`.
+.. sidebar:: solid_dmft 3.0.0
+
+   This is the homepage of solid_dmft v3.0.0.
+   For changes see the :ref:`changelog page <changelog>`.
+      
+      .. image:: _static/logo_github.png
+         :width: 75%
+         :align: center
+         :target: https://github.com/flatironinstitute/solid_dmft
 
 
 This program allows to perform DFT+DMFT ''one-shot'' and CSC
@@ -22,18 +30,17 @@ Learn how to use solid_dmft in the :ref:`documentation`.
 
 .. toctree::
    :maxdepth: 2
+   :hidden:
 
    install
    documentation
    tutorials
    issues
-   changelog
+   ChangeLog.md
 
 
 .. image:: logos/flatiron.png
    :width: 300
+   :align: center
    :target: https://www.simonsfoundation.org/flatiron/center-for-computational-quantum-physics
 
-.. image:: logos/github.png
-   :width: 300
-   :target: https://github.com/flatironinstitute/solid_dmft
