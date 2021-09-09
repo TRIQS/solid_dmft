@@ -203,7 +203,7 @@ def _calc_alatt(n_orb, mu, eta, e_mat, sigma, solve=False, evecs=np.array([None]
                 alatt_k_w[ik,:] = invert_and_trace(w_vec, eta, mu, e_mat[:,:,ik], sigma)
 
     else:
-        alatt_k_w = np.zeros((n_k, w_dict['n_w'], n_orb))
+        alatt_k_w = np.zeros((n_k, n_orb))
         kslice = np.zeros((w_dict['n_w'], n_orb))
         kslice_interp = lambda orb: interp1d(w_dict['w_mesh'], kslice[:, orb])
 
@@ -218,7 +218,7 @@ def _calc_alatt(n_orb, mu, eta, e_mat, sigma, solve=False, evecs=np.array([None]
                 try:
                     x0 = brentq( kslice_interp(orb), w_min, w_max)
                     w_bin = int( (x0 - w_min) / ((w_max - w_min)/ w_dict['n_w']) )
-                    alatt_k_w[ik, w_bin, orb] += 1
+                    alatt_k_w[ik, orb] = w_dict['w_mesh'][w_bin]
                 except ValueError:
                     pass
 
@@ -316,15 +316,15 @@ def _setup_plot_kslice(ax, k_points, w_dict):
     ax.set_xlabel(r'$k_xa/\pi$')
     ax.set_ylabel(r'$k_ya/\pi$')
 
-def plot_bands(fig, ax, alatt_k_w, tb_data, w_dict, n_orb, dft_mu, tb=True, alatt=False, **plot_dict):
+def plot_bands(fig, ax, alatt_k_w, tb_data, w_dict, n_orb, dft_mu, tb=True, alatt=False, solve=False, **plot_dict):
 
     if alatt:
         if alatt_k_w is None: raise ValueError('A(k,w) unknown. Specify "with_sigma = True"')
-        kw_x, kw_y = np.meshgrid(tb_data['k_mesh'], w_dict['w_mesh'])
-        if len(alatt_k_w.shape) > 2:
+        if solve:
             for orb in range(n_orb):
-                ax.contour(kw_x, kw_y, alatt_k_w[:,:,orb].T, colors=np.array([eval('cm.'+plot_dict['colorscheme_solve'])(0.7)]), levels=1, zorder=2.)
+                ax.scatter(tb_data['k_mesh'], alatt_k_w[:,orb].T, c=np.array([eval('cm.'+plot_dict['colorscheme_solve'])(0.7)]), zorder=2., s=1.)
         else:
+            kw_x, kw_y = np.meshgrid(tb_data['k_mesh'], w_dict['w_mesh'])
             graph = ax.pcolormesh(kw_x, kw_y, alatt_k_w.T, cmap=plot_dict['colorscheme_bands'], norm=LogNorm(vmin=plot_dict['vmin'], vmax=np.max(alatt_k_w)))
             colorbar = plt.colorbar(graph)
             colorbar.set_label(r'$A(k, \omega)$')
