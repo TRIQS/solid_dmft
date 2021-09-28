@@ -1,0 +1,34 @@
+# Wannier input file. The .inp file is for the converter
+num_wann = 8
+num_bands = 56
+
+exclude_bands = 1-36, 93-128
+
+guiding_centres = T
+
+begin projections
+Ni:dz2,dx2-y2:x=1,1,0
+end projections
+
+dis_win_min = 4.0
+dis_win_max = 8.0
+
+write_hr = true
+write_u_matrices = true
+
+num_iter = 0
+conv_tol = 1E-9
+conv_window = 10
+
+dis_num_iter = 2000
+dis_conv_tol = 1E-9
+dis_conv_window = 10
+
+bands_plot      =  true
+begin kpoint_path
+G  .0  .0  .0   X  .0  .5  .0
+X  .0  .5  .0   M  .5  .5  .0
+M  .5  .5  .0   G  .0  .0  .0
+end kpoint_path
+bands_num_points 40
+

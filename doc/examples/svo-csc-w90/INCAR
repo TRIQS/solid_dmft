@@ -1,0 +1,22 @@
+SYSTEM = SrVO3
+ENCUT = 400
+ISPIN = 1
+ICHARG = 5 ! 5 for fcsc calculations (communication with python)
+NBANDS = 32
+
+NELM = 1000 ! to prevent VASP from stopping too early (either because EDIFF is reached or 60 iterations were done)
+NELMIN = 1000
+NELMDL = -2 ! first perform 2 iterations. 1 is enough when starting from converged WAVECAR
+
+!! Smearing procedure
+ISMEAR = -5 ! -4 (-5) Tetrahedron (with Bloechl), 0 Gaussian, 1,... Methfessel-Paxton
+SIGMA = 0.01
+
+LMAXMIX = 4
+LOCPROJ = 1 : s : Pr
+
+!! write WAVECAR, CHGCAR
+LWAVE = .FALSE.
+LCHARG = .FALSE.
+
+LWANNIER90 = .TRUE.

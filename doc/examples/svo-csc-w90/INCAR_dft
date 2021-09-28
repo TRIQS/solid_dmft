@@ -1,0 +1,20 @@
+SYSTEM = SrVO3
+ENCUT = 400
+ISPIN = 1
+NBANDS = 32
+
+EDIFF = 1E-08
+NELMIN = 30 ! For good convergence of wave functions
+
+!! Smearing procedure
+ISMEAR = -5 ! -4 (-5) Tetrahedron (with Bloechl), 0 Gaussian, 1,... Methfessel-Paxton
+SIGMA = 0.01
+
+NCORE = 4
+KPAR = 4
+
+LMAXMIX = 4
+
+!! write WAVECAR, CHGCAR
+LWAVE = .TRUE.
+LCHARG = .TRUE.
