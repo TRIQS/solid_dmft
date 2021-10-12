@@ -28,6 +28,7 @@ from triqs.gf import GfImTime, GfReTime, GfImFreq, GfReFreq, GfLegendre, BlockGf
 from triqs.gf.tools import inverse, make_zero_tail
 from triqs.gf.descriptors import Fourier
 import triqs.utility.mpi as mpi
+from triqs_dft_tools.block_structure import gf_struct_flatten
 from h5 import HDFArchive
 
 from . import legendre_filter
@@ -492,10 +493,7 @@ class SolverStructure:
         '''
         from triqs_cthyb.solver import Solver as cthyb_solver
 
-        # hotfix for new triqs 2.0 gf_struct_solver is still a dict
-        # but cthyb 2.0 expects a list of pairs ####
-        #gf_struct = gf_struct_flatten(self.sum_k.gf_struct_solver_list[self.icrsh])
-        gf_struct = self.sum_k.gf_struct_solver_list[self.icrsh]
+        gf_struct = gf_struct_flatten(self.sum_k.gf_struct_solver_list[self.icrsh])
         # Construct the triqs_solver instances
         if self.solver_params['measure_G_l']:
             triqs_solver = cthyb_solver(beta=self.general_params['beta'], gf_struct=gf_struct,
@@ -513,10 +511,7 @@ class SolverStructure:
         '''
         from triqs_ctint import Solver as ctint_solver
 
-        # hotfix for new triqs 2.0 gf_struct_solver is still a dict
-        # but cthyb 2.0 expects a list of pairs ####
-        #gf_struct = gf_struct_flatten(self.sum_k.gf_struct_solver_list[self.icrsh])
-        gf_struct = self.sum_k.gf_struct_solver_list[self.icrsh]
+        gf_struct = gf_struct_flatten(self.sum_k.gf_struct_solver_list[self.icrsh])
 
         if self.general_params['h_int_type'] == 'dynamic':
             self.U_iw = None
@@ -542,9 +537,7 @@ class SolverStructure:
         '''
         from triqs_hubbardI import Solver as hubbardI_solver
 
-        # hotfix for new triqs 2.0 gf_struct_solver is still a dict
-        # but cthyb 2.0 expects a list of pairs ####
-        gf_struct = list(self.sum_k.gf_struct_solver[self.icrsh].items())
+        gf_struct =  gf_struct_flatten(self.sum_k.gf_struct_solver_list[self.icrsh])
         # Construct the triqs_solver instances
         if self.solver_params['measure_G_l']:
             triqs_solver = hubbardI_solver(beta=self.general_params['beta'], gf_struct=gf_struct,
@@ -583,10 +576,7 @@ class SolverStructure:
         else:
             n_w_b_nn = 1001
 
-        # hotfix for new triqs 2.0 gf_struct_solver is still a dict
-        # but cthyb 2.0 expects a list of pairs ####
-        #gf_struct = gf_struct_flatten(self.sum_k.gf_struct_solver_list[self.icrsh])
-        gf_struct = self.sum_k.gf_struct_solver_list[self.icrsh]
+        gf_struct = gf_struct_flatten(self.sum_k.gf_struct_solver_list[self.icrsh])
         # Construct the triqs_solver instances
         if self.solver_params['measure_gl']:
             triqs_solver = ctseg_solver(beta=self.general_params['beta'], gf_struct=gf_struct,
