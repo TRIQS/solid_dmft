@@ -304,8 +304,6 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
                                                         n_points = general_params['n_w'])
                         for iineq in range(sum_k.n_inequiv_shells)]
         sum_k.put_Sigma(zero_Sigma_w)
-        dft_mu = sum_k.calc_mu(precision=general_params['prec_mu'],
-                               iw_or_w='w', broadening=general_params['eta'])
     else:
         zero_Sigma_iw = [sum_k.block_structure.create_gf(ish=iineq,
                                                          beta=general_params['beta'],
@@ -323,7 +321,11 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
             mpi.report('\n chemical potential set to {:.3f} eV\n'.format(sum_k.chemical_potential))
     # ... or with sum_k.calc_mu
     else:
-        dft_mu = sum_k.calc_mu(precision=general_params['prec_mu'], iw_or_w='iw')
+        if general_params['solver_type'] in ['ftps']:
+            dft_mu = sum_k.calc_mu(precision=general_params['prec_mu'],
+                                   iw_or_w='w', broadening=general_params['eta'])
+        else:
+            dft_mu = sum_k.calc_mu(precision=general_params['prec_mu'], iw_or_w='iw')
 
     # calculate E_kin_dft for one shot calculations
     if not general_params['csc'] and general_params['calc_energies']:
