@@ -611,9 +611,7 @@ class SolverStructure:
             calc_me = [[f'ud_{i}',j] for i,j in product(range(2), range(3))]
 
         # create solver
-        if mpi.is_master_node():
-            print(self.gf_struct)
-        triqs_solver = ftps.Solver(gf_struct=self.gf_struct, nw=self.general_params['n_w'],
+        triqs_solver = ftps.Solver(gf_struct=gf_struct_flatten(self.gf_struct), nw=self.general_params['n_w'],
                                    wmin=self.general_params['w_range'][0], wmax=self.general_params['w_range'][1])
 
 
