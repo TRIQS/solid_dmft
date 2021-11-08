@@ -179,8 +179,6 @@ mu_mix_per_occupation_offset : float, optional, default = 0.0
 afm_order : bool, optional, default=False
             copy self energies instead of solving explicitly for afm order
 set_rot : string, optional, default='none'
-            Do NOT use this when your converter gives you a non-identity matrix.
-            Therefore, can't generally be used with Wannier90.
             use density_mat_dft to diagonalize occupations = 'den'
             use hloc_dft to diagonalize occupations = 'hloc'
 oneshot_postproc_gamma_file : bool, optional, default=False

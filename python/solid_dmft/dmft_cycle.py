@@ -158,8 +158,6 @@ def _calculate_rotation_matrix(general_params, sum_k):
     Possible are rotations diagonalizing either the local Hamiltonian or the
     density. Diagonalizing the density has not proven really helpful but
     diagonalizing the local Hamiltonian has.
-    In the current implementation, this cannot be used when there is a
-    non-identity rot_mat already as for example done by the Wannier90 converter.
     Note that the interaction Hamiltonian has to be rotated if it is not fully
     orbital-gauge invariant (only the Kanamori fulfills that).
     """
@@ -177,10 +175,17 @@ def _calculate_rotation_matrix(general_params, sum_k):
     rot_mat = []
     for icrsh in range(sum_k.n_corr_shells):
         ish = sum_k.corr_to_inequiv[icrsh]
-        eigvec = np.linalg.eigh(np.real(q_diag[ish][chnl]))[1]
-        rot_mat.append(np.array(eigvec, dtype=complex))
+        eigvec = np.array(np.linalg.eigh(np.real(q_diag[ish][chnl]))[1], dtype=complex)
+        if sum_k.use_rotations:
+            rot_mat.append( np.dot(sum_k.rot_mat[icrsh], eigvec) )
+        else:
+            rot_mat.append( eigvec )
 
     sum_k.rot_mat = rot_mat
+    # in case sum_k.use_rotations == False before:
+    sum_k.use_rotations = True
+    # sum_k.eff_atomic_levels() needs to be recomputed if rot_mat were changed
+    if hasattr(sum_k, "Hsumk"): delattr(sum_k, "Hsumk")
     mpi.report('Updating rotation matrices using dft {} eigenbasis to maximise sign'.format(general_params['set_rot']))
 
     # Prints matrices
