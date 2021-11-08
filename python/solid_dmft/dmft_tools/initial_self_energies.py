@@ -390,12 +390,13 @@ def determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
                  _, loaded_density_matrix) = _load_sigma_from_h5(sigma_archive, general_params['load_sigma_iter'])
 
             # Recalculate double counting in case U, J or DC formula changed
-            if general_params['dc_dmft']:
-                sum_k = calculate_double_counting(sum_k, loaded_density_matrix,
-                                                   general_params, advanced_params)
-            else:
-                sum_k = calculate_double_counting(sum_k, density_mat_dft,
-                                                   general_params, advanced_params)
+            if general_params['dc']:
+                if general_params['dc_dmft']:
+                    sum_k = calculate_double_counting(sum_k, loaded_density_matrix,
+                                                       general_params, advanced_params)
+                else:
+                    sum_k = calculate_double_counting(sum_k, density_mat_dft,
+                                                       general_params, advanced_params)
 
             start_sigma = _set_loaded_sigma(sum_k, loaded_sigma, loaded_dc_imp, general_params)
 
