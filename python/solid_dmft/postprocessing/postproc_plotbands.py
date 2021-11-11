@@ -142,6 +142,7 @@ def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, block, orbital_orde
             sigma_interpolated[ct,ct] = zeroth_order + w_dict['w_mesh'] * first_order
 
     else:
+        # eta is added on the level of the spectral function!
         eta = 0 * 1j
         # interpolate sigma
         interpolate_sigma = lambda w_mesh, w_mesh_dmft, orb1, orb2: np.interp(w_mesh, w_mesh_dmft, sigma_mat[block_spin][:, orb1, orb2])
@@ -150,7 +151,7 @@ def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, block, orbital_orde
             if ct1 != ct2 and not SOC: continue
             sigma_interpolated[ct1,ct2] = interpolate_sigma(w_mesh, w_mesh_dmft, ct1, ct2)
 
-    return sigma_interpolated, mu, dft_mu, eta, w_dict
+    return sigma_interpolated, mu, dft_mu, w_dict
 
 def _sigma_from_model(n_orb, orbital_order, zeroth_order, first_order, efermi, eta=0.0, **w):
 
@@ -170,15 +171,15 @@ def _sigma_from_model(n_orb, orbital_order, zeroth_order, first_order, efermi, e
     for ct, orb in enumerate(orbital_order):
         sigma_interpolated[ct,ct] = approximate_sigma(zeroth_order, first_order, ct)
 
-    return sigma_interpolated, mu, dft_mu, eta, w_dict
+    return sigma_interpolated, mu, dft_mu, w_dict
 
-def _calc_alatt(n_orb, mu, eta, e_mat, sigma, solve=False, evecs=np.array([None]) ,trace=True,**w_dict):
+def _calc_alatt(n_orb, mu, eta, e_mat, sigma, solve=False, e_vecs=np.array([None]) ,trace=True,**w_dict):
 
     # adjust to system size
     upscale = lambda quantity, n_orb: quantity * np.identity(n_orb)
     mu = upscale(mu, n_orb)
     eta = upscale(eta, n_orb)
-    if not evecs.any() == None:
+    if not e_vecs.any() == None:
         sigma_rot = np.zeros(sigma.shape, dtype=complex)
 
     w_vec = np.array([upscale(w_dict['w_mesh'][w], n_orb) for w in range(w_dict['n_w'])])
@@ -189,18 +190,21 @@ def _calc_alatt(n_orb, mu, eta, e_mat, sigma, solve=False, evecs=np.array([None]
             alatt_k_w = np.zeros((n_k, w_dict['n_w']))
         else:
             alatt_k_w = np.zeros((n_k, w_dict['n_w'], n_orb))
-        def invert_and_trace(w, eta, mu, e_mat, sigma):
+        def invert_and_trace(w, eta, mu, e_mat, sigma, trace):
             # inversion is automatically vectorized over first axis of 3D array (omega first index now)
             Glatt =  np.linalg.inv(w + eta[None,...] + mu[None,...] - e_mat[None,...] - sigma.transpose(2,0,1) )
-            return -1.0/np.pi * np.trace( Glatt ,axis1=1, axis2=2).imag
+            if trace:
+                return -1.0/np.pi * np.trace( Glatt ,axis1=1, axis2=2).imag
+            else: 
+                return -1.0/np.pi * np.diagonal( Glatt ,axis1=1, axis2=2).imag
 
         for ik in range(n_k):
             # if evecs are given transform sigma into band basis
-            if not evecs.any() == None:
+            if not e_vecs.any() == None:
                 sigma_rot = np.einsum('ij,jkw->ikw', e_vecs[:,:,ik].conjugate().transpose(), np.einsum('ijw,jk->ikw', sigma, e_vecs[:,:,ik]))
-                alatt_k_w[ik,:] = invert_and_trace(w_vec, eta, mu, e_mat[:,:,ik], sigma_rot)
+                alatt_k_w[ik,:] = invert_and_trace(w_vec, eta, mu, e_mat[:,:,ik], sigma_rot, trace)
             else:
-                alatt_k_w[ik,:] = invert_and_trace(w_vec, eta, mu, e_mat[:,:,ik], sigma)
+                alatt_k_w[ik,:] = invert_and_trace(w_vec, eta, mu, e_mat[:,:,ik], sigma, trace)
 
     else:
         alatt_k_w = np.zeros((n_k, n_orb))
@@ -370,7 +374,7 @@ def plot_kslice(fig, ax, alatt_k_w, tb_data, w_dict, n_orb, tb_dict, tb=True, al
 
     return ax
 
-def get_dmft_bands(n_orb, w90_path, add_spin, mu, add_local, with_sigma=False, fermi_slice=False, solve=False, orbital_order=['dxz', 'dyz', 'dxy'], band_basis=False, trace=True ,**specs):
+def get_dmft_bands(n_orb, w90_path, add_spin, mu, add_local, with_sigma=False, fermi_slice=False, solve=False, orbital_order=['dxz', 'dyz', 'dxy'], band_basis=False, trace=True , eta=0.0, **specs):
 
     # set up Wannier Hamiltonian
     w90_seedname = w90_path.split('/')[-1]
@@ -380,6 +384,7 @@ def get_dmft_bands(n_orb, w90_path, add_spin, mu, add_local, with_sigma=False, f
     H_add_loc = np.zeros((n_orb_rescale, n_orb_rescale), dtype=complex)
     H_add_loc += np.diag([-mu]*n_orb_rescale)
     if add_spin: H_add_loc += _lambda_matrix_w90_t2g(add_local)
+    eta = eta * 1j
 
     tb = tb_func.get_TBL(path=w90_pathname, name=w90_seedname, extend_to_spin=add_spin, add_local=H_add_loc)
     # print local H(R)
@@ -424,13 +429,13 @@ def get_dmft_bands(n_orb, w90_path, add_spin, mu, add_local, with_sigma=False, f
             raise ValueError('Invalid sigma type. Expected BlockGf.')
 
         # get sigma
-        if with_sigma == 'model': delta_sigma, mu, dft_mu, eta, w_dict = _sigma_from_model(n_orb, orbital_order, **specs)
+        if with_sigma == 'model': delta_sigma, mu, dft_mu, w_dict = _sigma_from_model(n_orb, orbital_order, **specs)
         # else is from dmft or memory:
-        else: delta_sigma, mu, dft_mu, eta, w_dict = _sigma_from_dmft(n_orb, orbital_order, with_sigma, **specs)
+        else: delta_sigma, mu, dft_mu, w_dict = _sigma_from_dmft(n_orb, orbital_order, with_sigma, **specs)
 
         # calculate alatt
         if not fermi_slice:
-            alatt_k_w = _calc_alatt(n_orb, mu, eta, e_mat, delta_sigma, solve, evecs=e_vecs, trace=trace,**w_dict)
+            alatt_k_w = _calc_alatt(n_orb, mu, eta, e_mat, delta_sigma, solve, e_vecs=e_vecs, trace=trace,**w_dict)
         else:
             alatt_k_w = _calc_kslice(n_orb, mu, eta, e_mat, delta_sigma, solve,**w_dict)
     else:
