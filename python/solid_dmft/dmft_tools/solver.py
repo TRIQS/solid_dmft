@@ -24,9 +24,10 @@
 import numpy as np
 from itertools import product
 
-from triqs.gf import GfImTime, GfReTime, GfImFreq, GfReFreq, GfLegendre, BlockGf, make_hermitian, Omega
+from triqs.gf import GfImTime, GfReTime, GfImFreq, GfReFreq, GfLegendre, BlockGf, make_hermitian, Omega, iOmega_n, make_gf_from_fourier, fit_hermitian_tail
 from triqs.gf.tools import inverse, make_zero_tail
 from triqs.gf.descriptors import Fourier
+from triqs.operators import c_dag, c, Operator
 import triqs.utility.mpi as mpi
 from triqs_dft_tools.block_structure import gf_struct_flatten
 from h5 import HDFArchive
@@ -193,6 +194,7 @@ class SolverStructure:
         self.Sigma_freq = self.G_freq.copy()
         self.G0_freq = self.G_freq.copy()
         self.G_freq_unsym = self.G_freq.copy()
+        self.Delta_freq = self.G_freq.copy()
 
         # create all ImTime instances
         self.n_tau = self.general_params['n_tau']
@@ -273,8 +275,34 @@ class SolverStructure:
         '''
 
         if self.general_params['solver_type'] == 'cthyb':
-            # fill G0_freq from sum_k to solver
-            self.triqs_solver.G0_iw << self.G0_freq
+
+            if self.general_params['cthyb_delta_interface']:
+                mpi.report('\n Using the delta interface for cthyb passing Delta(tau) and Hloc0 directly.')
+                 # prepare solver input
+                sumk_eal = self.sum_k.eff_atomic_levels()[self.icrsh]
+                solver_eal = self.sum_k.block_structure.convert_matrix(sumk_eal, space_from='sumk')
+                # fill Delta_time from Delta_freq sum_k to solver
+                for name, g0 in self.G0_freq:
+                    self.Delta_freq[name] << iOmega_n - inverse(g0) - solver_eal[name]
+                    known_moments = make_zero_tail(self.Delta_freq[name], 1)
+                    tail, err = fit_hermitian_tail(self.Delta_freq[name], known_moments)
+                    self.triqs_solver.Delta_tau[name] << make_gf_from_fourier(self.Delta_freq[name], self.triqs_solver.Delta_tau.mesh, tail).real
+
+                # Make non-interacting operator for Hloc0
+                Hloc_0 = Operator()
+                for spin, spin_block in solver_eal.items():
+                    for o1 in range(spin_block.shape[0]):
+                        for o2 in range(spin_block.shape[1]):
+                            # check if off-diag element is larger than threshold
+                            if o1 != o2 and abs(spin_block[o1,o2]) < self.solver_params['off_diag_threshold']:
+                                continue
+                            else:
+                                # TODO: adapt for SOC calculations, which should keep the imag part
+                                Hloc_0 += spin_block[o1,o2].real/2 * (c_dag(spin,o1) * c(spin,o2) + c_dag(spin,o2) * c(spin,o1))
+                self.solver_params['h_loc0'] = Hloc_0
+            else:
+                # fill G0_freq from sum_k to solver
+                self.triqs_solver.G0_iw << self.G0_freq
 
             # Solve the impurity problem for icrsh shell
             # *************************************
@@ -498,10 +526,11 @@ class SolverStructure:
         if self.solver_params['measure_G_l']:
             triqs_solver = cthyb_solver(beta=self.general_params['beta'], gf_struct=gf_struct,
                             n_iw=self.general_params['n_iw'], n_tau=self.general_params['n_tau'],
-                            n_l=self.general_params['n_l'])
+                            n_l=self.general_params['n_l'], delta_interface=self.general_params['cthyb_delta_interface'])
         else:
             triqs_solver = cthyb_solver(beta=self.general_params['beta'], gf_struct=gf_struct,
-                            n_iw=self.general_params['n_iw'], n_tau=self.general_params['n_tau'])
+                            n_iw=self.general_params['n_iw'], n_tau=self.general_params['n_tau'],
+                            delta_interface=self.general_params['cthyb_delta_interface'])
 
         return triqs_solver
 

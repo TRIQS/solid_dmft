@@ -112,7 +112,8 @@ def test_config_file_1():
                                                        'move_shift': False, 'store_solver': False,
                                                        'measure_pert_order': False,
                                                        'measure_density_matrix': False, 'perform_tail_fit': False,
-                                                       'legendre_fit': False}}
+                                                       'legendre_fit': False, 'delta_interface' : False,
+                                                       'off_diag_threshold' : 0.0}}
                               )
 
 
@@ -159,6 +160,8 @@ n_warmup_cycles = 10000
 n_cycles_tot = 60e+6
 imag_threshold = 1e-5
 measure_G_l = True
+delta_interface = True
+off_diag_threshold = 0.1
 
 measure_density_matrix = False
 
@@ -233,6 +236,7 @@ def test_config_file_2():
                                                        'n_cycles_tot': 60000000, 'store_solver': False,
                                                        'move_double': True, 'measure_pert_order': False,
                                                        'move_shift': False, 'legendre_fit' : False,
-                                                       'measure_density_matrix': False}}
+                                                       'measure_density_matrix': False, 'delta_interface': True,
+                                                       'off_diag_threshold' : 0.1}}
 
                              )

@@ -226,6 +226,10 @@ max_time : int, optional, default=-1
             maximum amount the solver is allowed to spend in eacht iteration
 imag_threshold : float, optional, default= 10e-15
             threshold for imag part of G0_tau. be warned if symmetries are off in projection scheme imag parts can occur in G0_tau
+off_diag_threshold : float, optional
+            threshold for off-diag elements in Hloc0
+delta_interface : bool, optional, default=False
+            use new delta interface in cthyb instead of input G0
 move_double : bool, optional, default=True
             double moves in solver
 perform_tail_fit : bool, optional, default=False
@@ -594,6 +598,12 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
 
                                 'imag_threshold': {'converter': float, 'default': None,
                                                    'used': lambda params: params['general']['solver_type'] in ['cthyb']},
+
+                                'off_diag_threshold': {'converter': float, 'default': 0.0,
+                                                   'used': lambda params: params['general']['solver_type'] in ['cthyb']},
+
+                                'delta_interface': {'converter': BOOL_PARSER, 'default': False,
+                                                  'used': lambda params: params['general']['solver_type'] in ['cthyb']},
 
                                 'measure_G_tau': {'converter': BOOL_PARSER, 'default': True,
                                                   'used': lambda params: params['general']['solver_type'] in ['hubbardI','ctseg']},
@@ -1080,6 +1090,10 @@ def read_config(config_file):
     if parameters['general']['solver_type'] in ['cthyb', 'ctint', 'ctseg']:
         parameters['solver']['n_cycles'] = parameters['solver']['n_cycles_tot'] // mpi.size
         del parameters['solver']['n_cycles_tot']
+
+    if parameters['general']['solver_type'] in ['cthyb']:
+        parameters['general']['cthyb_delta_interface'] = parameters['solver']['delta_interface']
+        del parameters['solver']['delta_interface']
 
     if parameters['general']['solver_type'] in ['ctseg']:
         # some parameters have different names for ctseg
