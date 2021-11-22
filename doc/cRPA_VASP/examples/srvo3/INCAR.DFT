@@ -1,0 +1,4 @@
+SYSTEM = SrVO3
+ISMEAR =  0
+SIGMA =  0.05
+EDIFF = 1E-8

@@ -1,0 +1,266 @@
+Current directory is /scratch/snx3000/ahampel/srvo3/crpa/535_test
+The current job ID is 4612844
+Running on 1 nodes (nid00008), 32 tasks/node
+ running on   32 total cores
+ distrk:  each k-point on   32 cores,    1 groups
+ distr:  one band on    1 cores,   32 groups
+ using from now: INCAR     
+ vasp.5.4.4 18Apr17 (build Nov 21 2017 17:37:45) complex                        
+  
+ POSCAR found type information on POSCAR  Sr V  O 
+ POSCAR found :  3 types and       5 ions
+
+ ----------------------------------------------------------------------------- 
+|                                                                             |
+|           W    W    AA    RRRRR   N    N  II  N    N   GGGG   !!!           |
+|           W    W   A  A   R    R  NN   N  II  NN   N  G    G  !!!           |
+|           W    W  A    A  R    R  N N  N  II  N N  N  G       !!!           |
+|           W WW W  AAAAAA  RRRRR   N  N N  II  N  N N  G  GGG   !            |
+|           WW  WW  A    A  R   R   N   NN  II  N   NN  G    G                |
+|           W    W  A    A  R    R  N    N  II  N    N   GGGG   !!!           |
+|                                                                             |
+|      For optimal performance we recommend to set                            |
+|        NCORE= 4 - approx SQRT( number of cores)                             |
+|      NCORE specifies how many cores store one orbital (NPAR=cpu/NCORE).     |
+|      This setting can  greatly improve the performance of VASP for DFT.     |
+|      The default,   NCORE=1            might be grossly inefficient         |
+|      on modern multi-core architectures or massively parallel machines.     |
+|      Do your own testing !!!!                                               |
+|      Unfortunately you need to use the default for GW and RPA calculations. |
+|      (for HF NCORE is supported but not extensively tested yet)             |
+|                                                                             |
+ ----------------------------------------------------------------------------- 
+
+ LDA part: xc-table for Pade appr. of Perdew
+ POSCAR, INCAR and KPOINTS ok, starting setup
+ FFT: planning ...
+ WAVECAR not read
+ entering main loop
+       N       E                     dE             d eps       ncg     rms          rms(c)
+DAV:   1     0.247527961181E+03    0.24753E+03   -0.23815E+04   640   0.125E+03
+DAV:   2    -0.574152496365E+02   -0.30494E+03   -0.30279E+03   992   0.394E+02
+DAV:   3    -0.611647372475E+02   -0.37495E+01   -0.37448E+01   704   0.453E+01
+DAV:   4    -0.612080411451E+02   -0.43304E-01   -0.43299E-01  1216   0.892E+00
+DAV:   5    -0.612080943559E+02   -0.53211E-04   -0.53211E-04   768   0.184E-01    0.256E+01
+DAV:   6    -0.484802140792E+02    0.12728E+02   -0.16193E+02   928   0.100E+02    0.235E+01
+DAV:   7    -0.467054711822E+02    0.17747E+01   -0.56234E+01   928   0.818E+01    0.112E+01
+DAV:   8    -0.459707069929E+02    0.73476E+00   -0.87617E+00   960   0.288E+01    0.596E+00
+DAV:   9    -0.458983422886E+02    0.72365E-01   -0.22068E-01   768   0.526E+00    0.136E+00
+DAV:  10    -0.458700715303E+02    0.28271E-01   -0.35062E-01  1024   0.648E+00    0.422E-01
+DAV:  11    -0.458694679205E+02    0.60361E-03   -0.17995E-02   896   0.154E+00    0.223E-01
+DAV:  12    -0.458698192673E+02   -0.35135E-03   -0.56779E-04   832   0.266E-01    0.170E-01
+DAV:  13    -0.458693633130E+02    0.45595E-03   -0.34656E-03   896   0.665E-01    0.102E-02
+DAV:  14    -0.458693628876E+02    0.42535E-06   -0.10456E-05   800   0.310E-02    0.413E-03
+DAV:  15    -0.458693631747E+02   -0.28703E-06   -0.29724E-07   960   0.375E-03    0.112E-03
+DAV:  16    -0.458693631402E+02    0.34480E-07   -0.21746E-07  1024   0.553E-03    0.106E-03
+DAV:  17    -0.458693631496E+02   -0.93955E-08   -0.17761E-08   736   0.156E-03
+   1 F= -.45869363E+02 E0= -.45863672E+02  d E =-.113817E-01
+ writing wavefunctions
+ running on   32 total cores
+ distrk:  each k-point on   32 cores,    1 groups
+ distr:  one band on    1 cores,   32 groups
+ using from now: INCAR     
+ vasp.5.4.4 18Apr17 (build Nov 21 2017 17:37:45) complex                        
+  
+ POSCAR found type information on POSCAR  Sr V  O 
+ POSCAR found :  3 types and       5 ions
+
+ ----------------------------------------------------------------------------- 
+|                                                                             |
+|           W    W    AA    RRRRR   N    N  II  N    N   GGGG   !!!           |
+|           W    W   A  A   R    R  NN   N  II  NN   N  G    G  !!!           |
+|           W    W  A    A  R    R  N N  N  II  N N  N  G       !!!           |
+|           W WW W  AAAAAA  RRRRR   N  N N  II  N  N N  G  GGG   !            |
+|           WW  WW  A    A  R   R   N   NN  II  N   NN  G    G                |
+|           W    W  A    A  R    R  N    N  II  N    N   GGGG   !!!           |
+|                                                                             |
+|      For optimal performance we recommend to set                            |
+|        NCORE= 4 - approx SQRT( number of cores)                             |
+|      NCORE specifies how many cores store one orbital (NPAR=cpu/NCORE).     |
+|      This setting can  greatly improve the performance of VASP for DFT.     |
+|      The default,   NCORE=1            might be grossly inefficient         |
+|      on modern multi-core architectures or massively parallel machines.     |
+|      Do your own testing !!!!                                               |
+|      Unfortunately you need to use the default for GW and RPA calculations. |
+|      (for HF NCORE is supported but not extensively tested yet)             |
+|                                                                             |
+ ----------------------------------------------------------------------------- 
+
+ LDA part: xc-table for Pade appr. of Perdew
+ found WAVECAR, reading the header
+  number of bands has changed, file:    32 present:    96
+  trying to continue reading WAVECAR, but it might fail
+ POSCAR, INCAR and KPOINTS ok, starting setup
+ FFT: planning ...
+ reading WAVECAR
+ random initialization beyond band           33
+ the WAVECAR file was read successfully
+ initial charge from wavefunction
+ entering main loop
+       N       E                     dE             d eps       ncg     rms          rms(c)
+DIA:   1    -0.458693631571E+02   -0.45869E+02    0.00000E+00     0   0.000E+00
+   1 F= -.45869363E+02 E0= -.45863672E+02  d E =-.113815E-01
+ writing wavefunctions
+ optical routines
+ imaginary and real dielectric function
+ recalculating local potential from charge density
+ direction            1
+ direction            2
+ direction            3
+ running on   32 total cores
+ distrk:  each k-point on   32 cores,    1 groups
+ distr:  one band on    1 cores,   32 groups
+ using from now: INCAR     
+ vasp.5.4.4 18Apr17 (build Nov 21 2017 17:37:45) complex                        
+  
+ POSCAR found type information on POSCAR  Sr V  O 
+ POSCAR found :  3 types and       5 ions
+
+ ----------------------------------------------------------------------------- 
+|                                                                             |
+|           W    W    AA    RRRRR   N    N  II  N    N   GGGG   !!!           |
+|           W    W   A  A   R    R  NN   N  II  NN   N  G    G  !!!           |
+|           W    W  A    A  R    R  N N  N  II  N N  N  G       !!!           |
+|           W WW W  AAAAAA  RRRRR   N  N N  II  N  N N  G  GGG   !            |
+|           WW  WW  A    A  R   R   N   NN  II  N   NN  G    G                |
+|           W    W  A    A  R    R  N    N  II  N    N   GGGG   !!!           |
+|                                                                             |
+|      For optimal performance we recommend to set                            |
+|        NCORE= 4 - approx SQRT( number of cores)                             |
+|      NCORE specifies how many cores store one orbital (NPAR=cpu/NCORE).     |
+|      This setting can  greatly improve the performance of VASP for DFT.     |
+|      The default,   NCORE=1            might be grossly inefficient         |
+|      on modern multi-core architectures or massively parallel machines.     |
+|      Do your own testing !!!!                                               |
+|      Unfortunately you need to use the default for GW and RPA calculations. |
+|      (for HF NCORE is supported but not extensively tested yet)             |
+|                                                                             |
+ ----------------------------------------------------------------------------- 
+
+ Coulomb integrals will be evaluated in MLWF basis
+ Downsampling of WAVECAR forced by CRPA_READER
+ LDA part: xc-table for Pade appr. of Perdew
+ found WAVECAR, reading the header
+ POSCAR, INCAR and KPOINTS ok, starting setup
+ FFT: planning ...
+ reading WAVECAR
+ the WAVECAR file was read successfully
+ initial charge from wavefunction
+
+ The Fermi energy was updated, please check that it is located mid-gap
+ values below the HOMO (VB) or above the LUMO (CB) will cause erroneous energies
+ E-fermi :   7.9757
+
+ the WAVEDER file was read successfully
+energies w= 
+   0.00   0.00
+ responsefunction array rank=     672
+ LDA part: xc-table for Pade appr. of Perdew
+ allocating   1 responsefunctions rank=   672
+ shmem allocating   1 responsefunctions rank=   672
+ response function shared by NCSHMEM nodes    1
+ Doing            1  frequencies on each core in blocks of            1
+ Projection   1 done.
+ Projection   2 done.
+ Projection   3 done.
+MLWF_WANNIER90: WARNING: wannier90.win seems to contains
+a UNIT_CELL_CART block already, I hope it applies to the current setup ...
+
+MLWF_WANNIER90: WARNING: wannier90.win seems to contains
+a ATOMS_CART block already, I hope it applies to the current setup ...
+
+MLWF_WANNIER90: WARNING: wannier90.win seems to contains
+the MP_GRID tag already, I hope it applies to the current setup ...
+
+MLWF_WANNIER90: WARNING: wannier90.win seems to contains
+a KPOINTS block already, I hope it applies to the current setup ...
+
+ CRPA polarizability determined using Kubo formalism
+ Correlated subspace contains the Wannier states #: 
+   1   2   3
+NQ=   1    0.0000    0.0000    0.0000, 
+|.........|.........
+ performed        203000 updates of chi_q(r,r)
+ total number of BLAS operations      622.68 Gflops
+NQ=   2    0.2500    0.0000    0.0000, 
+|.........|.........
+ performed        406000 updates of chi_q(r,r)
+ total number of BLAS operations     1303.00 Gflops
+NQ=   3    0.5000    0.0000    0.0000, 
+|.........|.........
+ performed        609000 updates of chi_q(r,r)
+ total number of BLAS operations     1972.91 Gflops
+NQ=   4    0.2500    0.2500    0.0000, 
+|.........|.........
+ performed        812000 updates of chi_q(r,r)
+ total number of BLAS operations     2626.21 Gflops
+NQ=   5    0.5000    0.2500    0.0000, 
+|.........|.........
+ performed       1015000 updates of chi_q(r,r)
+ total number of BLAS operations     3267.25 Gflops
+NQ=   6    0.5000    0.5000    0.0000, 
+|.........|.........
+ performed       1218000 updates of chi_q(r,r)
+ total number of BLAS operations     3900.18 Gflops
+NQ=   7    0.2500    0.2500    0.2500, 
+|.........|.........
+ performed       1421000 updates of chi_q(r,r)
+ total number of BLAS operations     4545.34 Gflops
+NQ=   8    0.5000    0.2500    0.2500, 
+|.........|.........
+ performed       1624000 updates of chi_q(r,r)
+ total number of BLAS operations     5219.51 Gflops
+NQ=   9    0.5000    0.5000    0.2500, 
+|.........|.........
+ performed       1827000 updates of chi_q(r,r)
+ total number of BLAS operations     5877.05 Gflops
+NQ=  10    0.5000    0.5000    0.5000, 
+|.........|.........
+ performed       2030000 updates of chi_q(r,r)
+ total number of BLAS operations     6510.01 Gflops
+  
+ Will calculate bare V and effective interaction U
+ for the Wannier states:  1 -  3
+  
+ 
+ Calculation of V for high cutoff:    477.87
+                                 
+ Calculation of Coulomb interaction in Wannier basis:
+        I                     K  
+        --->---\   V   /--->---  
+                |~~~~~|          
+        ---<---/       \---<---  
+        J                     L  
+                                 
+allocating two-electron 4 orbital integral table    3    3    3    3
+ 
+NQ=   1    0.0000    0.0000    0.0000, 
+|
+NQ=  33   -0.2500   -0.2500    0.2500, 
+.........| 
+ Calculation of V for small cutoff:    289.62
+allocating two-electron 4 orbital integral table    3    3    3    3
+ 
+NQ=   1    0.0000    0.0000    0.0000, 
+|
+NQ=  33   -0.2500   -0.2500    0.2500, 
+.........|                                 
+ Calculation of screened interaction in Wannier basis:
+ in the constrained random phase approximation:
+        I                     K  
+        --->---\   U   /--->---  
+                |=====|          
+        ---<---/       \---<---  
+        J                     L  
+                                 
+allocating two-electron 4 orbital integral table    3    3    3    3
+ 
+ Caluclating UIJKL for w=    0.0000    0.0000
+ 
+ 
+NQ=   1    0.0000    0.0000    0.0000, 
+ reading now WFULL0001.tmp
+|
+NQ=  33   -0.2500   -0.2500    0.2500, 
+ reading now WFULL0007.tmp
+.........|
