@@ -30,11 +30,12 @@ Contains all functions related to constructing the interaction Hamiltonian.
 # system
 import os
 import numpy as np
+from itertools import product
 
 # triqs
 from h5 import HDFArchive
 import triqs.utility.mpi as mpi
-from triqs.operators import util
+from triqs.operators import util, n, c, c_dag, Operator
 try:
     import forktps as ftps
 except ImportError:
@@ -110,36 +111,36 @@ def _load_crpa_interaction_matrix(sum_k, filename='UIJKL'):
     return u_matrix_four_indices_per_shell
 
 
-def _adapt_U_2index_for_SO(Umat, Upmat):
-    """
-    Changes the two-index U matrices such that for a system consisting of a
-    single block 'ud' with the entries (1, up), (1, down), (2, up), (2, down),
-    ... the matrices are consistent with the case without spin-orbit coupling.
+# def _adapt_U_2index_for_SO(Umat, Upmat):
+#     """
+#     Changes the two-index U matrices such that for a system consisting of a
+#     single block 'ud' with the entries (1, up), (1, down), (2, up), (2, down),
+#     ... the matrices are consistent with the case without spin-orbit coupling.
 
-    Parameters
-    ----------
-    Umat : numpy array
-        The two-index interaction matrix for parallel spins without SO.
-    Upmat : numpy array
-        The two-index interaction matrix for antiparallel spins without SO.
+#     Parameters
+#     ----------
+#     Umat : numpy array
+#         The two-index interaction matrix for parallel spins without SO.
+#     Upmat : numpy array
+#         The two-index interaction matrix for antiparallel spins without SO.
 
-    Returns
-    -------
-    Umat_SO : numpy array
-        The two-index interaction matrix for parallel spins. Because in SO all
-        entries have nominal spin 'ud', this matrix now contains the original
-        Umat and Upmat.
-    Upmat_SO : numpy array
-        The two-index interaction matrix for antiparallel spins. Unused because
-        in SO, all spins have the same nominal spin 'ud'.
-    """
+#     Returns
+#     -------
+#     Umat_SO : numpy array
+#         The two-index interaction matrix for parallel spins. Because in SO all
+#         entries have nominal spin 'ud', this matrix now contains the original
+#         Umat and Upmat.
+#     Upmat_SO : numpy array
+#         The two-index interaction matrix for antiparallel spins. Unused because
+#         in SO, all spins have the same nominal spin 'ud'.
+#     """
 
-    Umat_SO = np.zeros(np.array(Umat.shape)*2, dtype=Umat.dtype)
-    Umat_SO[::2, ::2] = Umat_SO[1::2, 1::2] = Umat
-    Umat_SO[::2, 1::2] = Umat_SO[1::2, ::2] = Upmat
-    Upmat_SO = None
+#     Umat_SO = np.zeros(np.array(Umat.shape)*2, dtype=Umat.dtype)
+#     Umat_SO[::2, ::2] = Umat_SO[1::2, 1::2] = Umat
+#     Umat_SO[::2, 1::2] = Umat_SO[1::2, ::2] = Upmat
+#     Upmat_SO = None
 
-    return Umat_SO, Upmat_SO
+#     return Umat_SO, Upmat_SO
 
 
 def _adapt_U_4index_for_SO(Umat_full):
@@ -180,7 +181,7 @@ def _construct_kanamori(sum_k, general_params):
     for icrsh in range(sum_k.n_inequiv_shells):
         # ish points to the shell representative of the current group
         ish = sum_k.inequiv_to_corr[icrsh]
-        orb_names = range(sum_k.corr_shells[ish]['dim'])
+        orb_names = list(range(sum_k.corr_shells[ish]['dim']))
         if sum_k.SO == 0:
             n_orb = sum_k.corr_shells[ish]['dim']
         else:
@@ -199,19 +200,104 @@ def _construct_kanamori(sum_k, general_params):
                 up = general_params['U'][icrsh] - 2.0 * general_params['J'][icrsh]
                 j = general_params['J'][icrsh]
             h_int[icrsh] = ftps.solver_core.HInt(u=general_params['U'][icrsh], j=j, up=up, dd=False)
-        else:
+        elif sum_k.SO == 0:
             # Constructs U matrix
             Umat, Upmat = util.U_matrix_kanamori(n_orb=n_orb, U_int=general_params['U'][icrsh],
                                                  J_hund=general_params['J'][icrsh])
-
-            if sum_k.SO == 1:
-                Umat, Upmat = _adapt_U_2index_for_SO(Umat, Upmat)
 
             h_int[icrsh] = util.h_int_kanamori(sum_k.spin_block_names[sum_k.SO], orb_names,
                                                map_operator_structure=sum_k.sumk_to_solver[icrsh],
                                                U=Umat, Uprime=Upmat, J_hund=general_params['J'][icrsh],
                                                H_dump=os.path.join(general_params['jobname'], 'H.txt'))
+        else:
+            h_int[icrsh] = _construct_kanamori_soc(general_params['U'][icrsh], general_params['J'][icrsh],
+                                                   orb_names, sum_k.sumk_to_solver[icrsh],
+                                                   os.path.join(general_params['jobname'], 'H.txt'))
     return h_int
+
+
+def _construct_kanamori_soc(U_int, J_hund, orb_names, map_operator_structure, H_dump=None):
+    r"""
+    Adapted from triqs.operators.util.hamiltonians.h_int_kanamori. Assumes
+    that spin_names == ['ud'] and that map_operator_structure is given.
+    """
+
+    if H_dump:
+        H_dump_file = open(H_dump,'w')
+        H_dump_file.write("Kanamori Hamiltonian:" + '\n')
+
+    H = Operator()
+    mkind = util.op_struct.get_mkind(None, map_operator_structure)
+
+    s = 'ud'
+
+    # density terms:
+    # TODO: reformulate in terms of Umat and Upmat for consistency with triqs?
+    if H_dump:
+        H_dump_file.write("Density-density terms:" + '\n')
+    for a1, a2 in product(orb_names, orb_names):
+        if a1 == a2: # same spin and orbital
+            continue
+
+        if a1 // 2 == a2 // 2: # same orbital (, different spins)
+            U_val = U_int
+        elif a1 % 2 != a2 % 2: # different spins (, different orbitals)
+            U_val = U_int - 2*J_hund
+        else: # same spins (, different orbitals)
+            U_val = U_int - 3*J_hund
+
+        H_term = 0.5 * U_val * n(*mkind(s, a1)) * n(*mkind(s, a2))
+        H += H_term
+
+        # Dump terms of H
+        if H_dump and not H_term.is_zero():
+            H_dump_file.write('%s'%(mkind(s, a1), ) + '\t')
+            H_dump_file.write('%s'%(mkind(s, a2), ) + '\t')
+            H_dump_file.write(str(U_val) + '\n')
+
+    # spin-flip terms:
+    if H_dump:
+        H_dump_file.write("Spin-flip terms:" + '\n')
+    for a1, a2, a3, a4 in product(orb_names, orb_names, orb_names, orb_names):
+        if a1 == a2 or a1 == a3 or a1 == a4 or a2 == a3 or a2 == a4 or a3 == a4:
+            continue
+
+        if not (a1//2 == a2//2 and a3//2 == a4//2 and a1//2 != a3//2 and a1%2 != a3%2):
+            continue
+
+        H_term = -0.5 * J_hund * c_dag(*mkind(s, a1)) * c(*mkind(s, a2)) * c_dag(*mkind(s, a3)) * c(*mkind(s, a4))
+        H += H_term
+
+        # Dump terms of H
+        if H_dump and not H_term.is_zero():
+            H_dump_file.write('%s'%(mkind(s, a1), ) + '\t')
+            H_dump_file.write('%s'%(mkind(s, a2), ) + '\t')
+            H_dump_file.write('%s'%(mkind(s, a3), ) + '\t')
+            H_dump_file.write('%s'%(mkind(s, a4), ) + '\t')
+            H_dump_file.write(str(-J_hund) + '\n')
+
+    # pair-hopping terms:
+    if H_dump:
+        H_dump_file.write("Pair-hopping terms:" + '\n')
+    for a1, a2, a3, a4 in product(orb_names, orb_names, orb_names, orb_names):
+        if a1 == a2 or a1 == a3 or a1 == a4 or a2 == a3 or a2 == a4 or a3 == a4:
+            continue
+
+        if not (a1//2 == a2//2 and a3//2 == a4//2 and a1//2 != a3//2 and a1%2 != a3%2):
+            continue
+
+        H_term = 0.5 * J_hund * c_dag(*mkind(s, a1)) * c_dag(*mkind(s, a2)) * c(*mkind(s, a4)) * c(*mkind(s, a3))
+        H += H_term
+
+        # Dump terms of H
+        if H_dump and not H_term.is_zero():
+            H_dump_file.write('%s'%(mkind(s, a1), ) + '\t')
+            H_dump_file.write('%s'%(mkind(s, a2), ) + '\t')
+            H_dump_file.write('%s'%(mkind(s, a3), ) + '\t')
+            H_dump_file.write('%s'%(mkind(s, a4), ) + '\t')
+            H_dump_file.write(str(-J_hund) + '\n')
+
+    return H
 
 
 def _construct_dynamic(sum_k, general_params):
