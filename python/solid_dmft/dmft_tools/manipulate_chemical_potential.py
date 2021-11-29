@@ -34,7 +34,7 @@ import triqs.utility.mpi as mpi
 from triqs.gf import BlockGf, GfImFreq, GfImTime, Fourier
 try:
     if mpi.is_master_node():
-        from solid_dmft.postprocessing import maxent_gf_latt
+        from postprocessing import maxent_gf_latt
     imported_maxent = True
 except ImportError:
     imported_maxent = False

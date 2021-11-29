@@ -43,9 +43,9 @@ try:
 except ImportError:
     pass
 
-from solid_dmft.dmft_cycle import dmft_cycle
-from solid_dmft.dft_managers import vasp_manager as vasp
-from solid_dmft.dft_managers import qe_manager as qe
+from dmft_cycle import dmft_cycle
+from dft_managers import vasp_manager as vasp
+from dft_managers import qe_manager as qe
 
 def _run_plo_converter(general_params):
     if not mpi.is_master_node():

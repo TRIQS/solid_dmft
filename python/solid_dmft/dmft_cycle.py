@@ -41,17 +41,17 @@ from triqs.gf.tools import inverse
 from triqs_dft_tools.sumk_dft import SumkDFT
 
 # own modules
-from solid_dmft.dmft_tools.observables import (calc_dft_kin_en, add_dmft_observables, calc_bandcorr_man, write_obs,
-                                         add_dft_values_as_zeroth_iteration, write_header_to_file, prep_observables)
-from solid_dmft.dmft_tools.solver import SolverStructure
-from solid_dmft.dmft_tools import convergence
-from solid_dmft.dmft_tools import formatter
-from solid_dmft.dmft_tools import interaction_hamiltonian
-from solid_dmft.dmft_tools import results_to_archive
-from solid_dmft.dmft_tools import afm_mapping
-from solid_dmft.dmft_tools import manipulate_chemical_potential as manipulate_mu
-from solid_dmft.dmft_tools import initial_self_energies as initial_sigma
-from solid_dmft.dmft_tools import greens_functions_mixer as gf_mixer
+from dmft_tools.observables import (calc_dft_kin_en, add_dmft_observables, calc_bandcorr_man, write_obs,
+                                    add_dft_values_as_zeroth_iteration, write_header_to_file, prep_observables)
+from dmft_tools.solver import SolverStructure
+from dmft_tools import convergence
+from dmft_tools import formatter
+from dmft_tools import interaction_hamiltonian
+from dmft_tools import results_to_archive
+from dmft_tools import afm_mapping
+from dmft_tools import manipulate_chemical_potential as manipulate_mu
+from dmft_tools import initial_self_energies as initial_sigma
+from dmft_tools import greens_functions_mixer as gf_mixer
 
 
 def _determine_block_structure(sum_k, general_params, advanced_params):
