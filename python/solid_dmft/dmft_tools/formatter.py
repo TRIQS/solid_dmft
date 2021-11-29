@@ -76,12 +76,15 @@ def print_block_sym(sum_k, dm, general_params):
         shlst = [ish for ish, ineq_shell in enumerate(sum_k.corr_to_inequiv) if ineq_shell == icrsh]
         n_orb = sum_k.corr_shells[sum_k.inequiv_to_corr[icrsh]]['dim']
         spins = sum_k.spin_block_names[sum_k.SO]
-        eal_spins = [eal_crsh[spin] for spin in sum_k.spin_block_names[sum_k.SO]]
-        print('H_loc[{:2d}] '.format(icrsh)+2*' '+' '.join([sp.center(9*n_orb) for sp in spins]))
+        if sum_k.SO == 0:
+            eal_blocks = {spin: eal_crsh[spin] for spin in spins}
+        else:
+            eal_blocks = {'ud real': eal_crsh['ud'].real, 'ud imag': eal_crsh['ud'].imag}
+        print('H_loc[{:2d}] '.format(icrsh)+2*' '+' '.join([sp.center(9*n_orb) for sp in eal_blocks.keys()]))
         fmt = '{:9.5f}' * n_orb
-        if sum_k.SO: eal_spins = [*eal_spins, *eal_spins]
-        for spin_1, spin_2 in zip(*eal_spins):
-            row = np.concatenate((spin_1.real, spin_2.real))
+        #if sum_k.SO: eal_spins = [*eal_spins, *eal_spins]
+        for block_1, block_2 in zip(*eal_blocks.values()):
+            row = np.concatenate((block_1.real, block_2.real))
             print((' '*11 + fmt + '  ' + fmt).format(*row))
     print('\n')
 
@@ -97,28 +100,36 @@ def print_block_sym(sum_k, dm, general_params):
                 shlst = [ish for ish, ineq_shell in enumerate(sum_k.corr_to_inequiv) if ineq_shell == icrsh]
             for sh in shlst:
                 n_orb = sum_k.corr_shells[sh]['dim']
-                dm_spins = [dm[sh][spin] for spin in sum_k.spin_block_names[sum_k.SO]]
-                print('rho[{0:2d}] '.format(sh)+4*' '+' '.join([sp.center(9*n_orb) for sp in spins]))
+                if sum_k.SO == 0:
+                    dm_blocks = {spin: dm[sh][spin] for spin in spins}
+                else:
+                    dm_blocks = {'ud real': dm[sh]['ud'].real, 'ud imag': dm[sh]['ud'].imag}
+                print('rho[{0:2d}] '.format(sh)+4*' '+' '.join([sp.center(9*n_orb) for sp in dm_blocks.keys()]))
                 fmt = '{:9.5f}' * n_orb
-                if sum_k.SO: dm_spins = [*dm_spins, *dm_spins]
-                for spin_1, spin_2 in zip(*dm_spins):
-                    row = np.concatenate((spin_1.real, spin_2.real))
+                # if sum_k.SO: dm_spins = [*dm_spins, *dm_spins]
+                for block_1, block_2 in zip(*dm_blocks.values()):
+                    row = np.concatenate((block_1.real, block_2.real))
                     print((' '*11 + fmt + '  ' + fmt).format(*row))
         print('\n')
 
 
-def print_local_density(density, density_pre, density_mat):
+def print_local_density(density, density_pre, density_mat, spin_orbit=False):
     if not mpi.is_master_node():
         return
+
+    if spin_orbit:
+        printed = ((np.real, 'real'), (np.imag, 'imaginary'))
+    else:
+        printed = ((np.real, 'real'), )
 
     print('\nTotal charge of impurity problem: {:7.5f}'.format(density))
     print('Total charge convergency of impurity problem: {:7.5f}'.format(density-density_pre))
     print('\nDensity matrix:')
     for key, value in sorted(density_mat.items()):
-        value = np.real(value)
-        print(key)
-        print(value)
-        eigenvalues = np.linalg.eigvalsh(value)
+        for func, name in printed:
+            print('{}, {} part'.format(key, name))
+            print(func(value))
+        eigenvalues = np.linalg.eigvals(value)
         print('eigenvalues: {}'.format(eigenvalues))
         # check for large off-diagonal elements and write out a warning
         if np.max(np.abs(value - np.diag(np.diag(value)))) >= 0.1:
