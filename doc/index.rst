@@ -21,9 +21,9 @@ solid_dmft
 
 
 This program allows to perform DFT+DMFT ''one-shot'' and CSC
-calculations from h5 archives or VASP input files for multiband systems using
-the TRIQS package, in combination with the CThyb solver and SumkDFT from
-DFT-tools. Runs with triqs 3.x.x
+calculations from h5 archives or VASP/Quantum Espresso input files for
+multiband systems using the TRIQS package, in combination with the CThyb
+solver and SumkDFT from DFT-tools. Runs with triqs 3.x.x
 
 
 Learn how to use solid_dmft in the :ref:`documentation`.
