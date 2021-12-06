@@ -456,7 +456,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
         sum_k.SP = 1
 
         if general_params['afm_order']:
-            general_params = afm_mapping.determine(general_params, archive, sum_k.n_inequiv_shells)
+            general_params = afm_mapping.determine_afm_mapping(general_params, archive, sum_k.n_inequiv_shells)
 
     # Constructs interaction Hamiltonian and writes it to the h5 archive
     h_int = interaction_hamiltonian.construct(sum_k, general_params, advanced_params)
@@ -652,7 +652,7 @@ def _dmft_step(sum_k, solvers, it, general_params,
                 and general_params['afm_order'] and general_params['afm_mapping'][icrsh][0]):
             # If we do a AFM calculation we can use the init magnetic moments to
             # copy the self energy instead of solving it explicitly
-            solvers = afm_mapping.apply(general_params, icrsh, sum_k.gf_struct_solver[icrsh], solvers)
+            solvers = afm_mapping.apply_afm_mapping(general_params, solver_params, icrsh, sum_k.gf_struct_solver[icrsh], solvers)
         else:
             # Solve the impurity problem for this shell
             mpi.report('\nSolving the impurity problem for shell {} ...'.format(icrsh))

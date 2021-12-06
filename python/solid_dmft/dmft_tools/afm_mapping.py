@@ -26,7 +26,7 @@
 import numpy as np
 import triqs.utility.mpi as mpi
 
-def determine(general_params, archive, n_inequiv_shells):
+def determine_afm_mapping(general_params, archive, n_inequiv_shells):
     """
     Determines the symmetries that are used in AFM calculations. These
     symmetries can then be used to copy the self-energies from one impurity to
@@ -80,7 +80,7 @@ def determine(general_params, archive, n_inequiv_shells):
     return general_params
 
 
-def apply(general_params, icrsh, gf_struct_solver, solvers):
+def apply_afm_mapping(general_params, solver_params, icrsh, gf_struct_solver, solvers):
     imp_source = general_params['afm_mapping'][icrsh][1]
     invert_spin = general_params['afm_mapping'][icrsh][2]
     mpi.report('\ncopying the self-energy for shell {} from shell {}'.format(icrsh, imp_source))
@@ -99,11 +99,27 @@ def apply(general_params, icrsh, gf_struct_solver, solvers):
             solvers[icrsh].G0_freq[spin_channel] << solvers[imp_source].G0_freq[target_channel]
             solvers[icrsh].G_time[spin_channel] << solvers[imp_source].G_time[target_channel]
 
+            if solver_params['measure_pert_order']:
+                if not hasattr(solvers[icrsh], 'perturbation_order'):
+                    solvers[icrsh].perturbation_order = {}
+                solvers[icrsh].perturbation_order[spin_channel] = solvers[imp_source].perturbation_order[target_channel]
+                solvers[icrsh].perturbation_order_total = solvers[imp_source].perturbation_order_total
+
     else:
         solvers[icrsh].Sigma_freq << solvers[imp_source].Sigma_freq
         solvers[icrsh].G_freq << solvers[imp_source].G_freq
         solvers[icrsh].G_freq_unsym << solvers[imp_source].G_freq_unsym
         solvers[icrsh].G0_freq << solvers[imp_source].G0_freq
         solvers[icrsh].G_time << solvers[imp_source].G_time
+
+        if solver_params['measure_pert_order']:
+            solvers[icrsh].perturbation_order = solvers[imp_source].perturbation_order
+            solvers[icrsh].perturbation_order_total = solvers[imp_source].perturbation_order_total
+
+    if solver_params['measure_density_matrix']:
+        solvers[icrsh].density_matrix = solvers[imp_source].density_matrix
+
+    if general_params['measure_chi_SzSz']:
+        solvers[icrsh].O_time = solvers[imp_source].O_time
 
     return solvers
