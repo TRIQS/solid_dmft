@@ -1,7 +1,7 @@
 ![logo_soliDMFT](doc/logos/logo_solid_dmft.png)
 
 This program allows to perform DFT+DMFT ''one-shot'' and CSC
-calculations from h5 archives, VASP, ro Quantum Espresso for multiband systems using
+calculations from h5 archives, VASP, or Quantum Espresso for multiband systems using
 the TRIQS package, in combination with various impurity solvers and SumkDFT from
 DFT-tools. 
 
@@ -55,7 +55,7 @@ input data, which is obtained from projection on localized Wannier functions
 Furthermore, there is a `read_config_doc.md` file containing the docstrings from
 the main script in a readable format. If one wishes to do CSC calculations the
 docker container must contain also a installed VASP version >5.4.4 that
-understands the ICHARG=5 flag.
+understands the ICHARG=5 flag, and / or Quantum Espresso >7.0.
 
 To test triqs, you can use the official image from https://hub.docker.com/r/flatironinstitute/triqs/.
 For a full installation including Vasp run our own Docker image (see folder `/docker`).

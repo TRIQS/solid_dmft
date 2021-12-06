@@ -81,12 +81,12 @@ jobs:
           mkdir solid_dmft.build && cd solid_dmft.build && cmake ../solid_dmft.src -DBuild_Documentation=ON
           make -j2 || make -j1 VERBOSE=1
 
-      - name: Test solid_dmft
-        env:
-          DYLD_FALLBACK_LIBRARY_PATH: /usr/local/opt/llvm/lib
-        run: |
-          cd solid_dmft.build
-          ctest --output-on-failure
+      #- name: Test solid_dmft
+        #env:
+          #DYLD_FALLBACK_LIBRARY_PATH: /usr/local/opt/llvm/lib
+        #run: |
+          #cd solid_dmft.build
+          #ctest --output-on-failure
 
       - name: checkout github pages branch
         uses: actions/checkout@v2
