@@ -583,18 +583,18 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                 # cthyb parameters
                                 #
                                 'length_cycle': {'converter': int, 'valid for': lambda x, _: x > 0,
-                                                 'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint','ctseg']},
+                                                 'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint', 'ctseg']},
 
                                 'n_warmup_cycles': {'converter': int, 'valid for': lambda x, _: x > 0,
-                                                    'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint','ctseg']},
+                                                    'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint', 'ctseg']},
 
                                 'n_cycles_tot': {'converter': lambda s: int(float(s)),
                                                  'valid for': lambda x, _: x >= 0,
-                                                 'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint','ctseg']},
+                                                 'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint', 'ctseg']},
 
                                 'max_time': {'converter': int, 'valid for': lambda x, _: x >= 0,
                                              'default': None,
-                                             'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint','ctseg']},
+                                             'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint', 'ctseg']},
 
                                 'imag_threshold': {'converter': float, 'default': None,
                                                    'used': lambda params: params['general']['solver_type'] in ['cthyb']},
@@ -606,13 +606,13 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                                   'used': lambda params: params['general']['solver_type'] in ['cthyb']},
 
                                 'measure_G_tau': {'converter': BOOL_PARSER, 'default': True,
-                                                  'used': lambda params: params['general']['solver_type'] in ['hubbardI','ctseg']},
+                                                  'used': lambda params: params['general']['solver_type'] in ['hubbardI', 'ctseg']},
 
                                 'measure_G_iw': {'converter': BOOL_PARSER, 'default': False,
                                                   'used': lambda params: params['general']['solver_type'] in ['ctseg']},
 
                                 'measure_G_l': {'converter': BOOL_PARSER, 'default': False,
-                                                'used': lambda params: params['general']['solver_type'] in ['cthyb', 'hubbardI','ctseg']},
+                                                'used': lambda params: params['general']['solver_type'] in ['cthyb', 'hubbardI', 'ctseg']},
 
                                 'measure_density_matrix': {'converter': BOOL_PARSER, 'default': False,
                                                            'used': lambda params: params['general']['solver_type'] in ['cthyb', 'hubbardI']},
@@ -621,13 +621,13 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                                 'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint']},
 
                                 'measure_pert_order': {'converter': BOOL_PARSER, 'default': False,
-                                                       'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint','ctseg']},
+                                                       'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint', 'ctseg']},
 
                                 'move_shift': {'converter': BOOL_PARSER, 'default': False,
                                                 'used': lambda params: params['general']['solver_type'] in ['cthyb']},
 
                                 'random_seed': {'converter': int, 'default': None,
-                                                'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint','ctseg']},
+                                                'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint', 'ctseg']},
 
                                 'perform_tail_fit': {'converter': BOOL_PARSER,
                                                      'used': lambda params: params['general']['solver_type'] in ['cthyb']

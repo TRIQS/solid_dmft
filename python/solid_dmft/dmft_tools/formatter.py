@@ -82,7 +82,6 @@ def print_block_sym(sum_k, dm, general_params):
             eal_blocks = {'ud real': eal_crsh['ud'].real, 'ud imag': eal_crsh['ud'].imag}
         print('H_loc[{:2d}] '.format(icrsh)+2*' '+' '.join([sp.center(9*n_orb) for sp in eal_blocks.keys()]))
         fmt = '{:9.5f}' * n_orb
-        #if sum_k.SO: eal_spins = [*eal_spins, *eal_spins]
         for block_1, block_2 in zip(*eal_blocks.values()):
             row = np.concatenate((block_1.real, block_2.real))
             print((' '*11 + fmt + '  ' + fmt).format(*row))
@@ -106,7 +105,6 @@ def print_block_sym(sum_k, dm, general_params):
                     dm_blocks = {'ud real': dm[sh]['ud'].real, 'ud imag': dm[sh]['ud'].imag}
                 print('rho[{0:2d}] '.format(sh)+4*' '+' '.join([sp.center(9*n_orb) for sp in dm_blocks.keys()]))
                 fmt = '{:9.5f}' * n_orb
-                # if sum_k.SO: dm_spins = [*dm_spins, *dm_spins]
                 for block_1, block_2 in zip(*dm_blocks.values()):
                     row = np.concatenate((block_1.real, block_2.real))
                     print((' '*11 + fmt + '  ' + fmt).format(*row))
@@ -129,7 +127,7 @@ def print_local_density(density, density_pre, density_mat, spin_orbit=False):
         for func, name in printed:
             print('{}, {} part'.format(key, name))
             print(func(value))
-        eigenvalues = np.linalg.eigvals(value)
+        eigenvalues = np.linalg.eigvalsh(value)
         print('eigenvalues: {}'.format(eigenvalues))
         # check for large off-diagonal elements and write out a warning
         if np.max(np.abs(value - np.diag(np.diag(value)))) >= 0.1:

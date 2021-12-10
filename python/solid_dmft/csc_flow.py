@@ -88,6 +88,7 @@ def _run_w90converter(seedname):
     #TODO: choose rot_mat_type with general_params['set_rot']
     converter = Wannier90Converter(seedname, rot_mat_type='hloc_diag', bloch_basis=True, w90zero=2.e-6)
     converter.convert_dft_input()
+    mpi.barrier()
 
     # Checks if creating of rot_mat succeeded
     if mpi.is_master_node():
@@ -328,8 +329,11 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
                 _run_plo_converter(general_params)
             elif dft_params['projector_type'] == 'w90':
                 _run_wannier90(general_params, dft_params)
+                mpi.barrier()
                 _run_w90converter(general_params['seedname'])
+                mpi.barrier()
                 irred_indices = _read_irred_kpoints_from_vasp(general_params)
+                mpi.barrier()
 
         # Writes eigenvals to archive if requested
         dft_energy = None
