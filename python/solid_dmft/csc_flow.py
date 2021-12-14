@@ -106,9 +106,9 @@ def _run_qe(general_params, dft_params, iter_dmft):
     for nscf in ['bnd', 'bands', 'proj', 'nscf']:
         qe_nscf = start_qe(dft_params['n_cores'], nscf)
     # w90 parts
-    qe_w90 = start_qe(1, 'win_pp')
+    qe_w90 = start_qe(dft_params['n_cores'], 'win_pp')
     qe_pw2wan = start_qe(dft_params['n_cores'], 'pw2wan')
-    qe_w90 = start_qe(1, 'win')
+    qe_w90 = start_qe(dft_params['n_cores'], 'win')
 
 def read_dft_energy_vasp():
     """
