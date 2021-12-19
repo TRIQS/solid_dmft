@@ -86,14 +86,16 @@ def _run_w90converter(seedname):
         mpi.MPI.COMM_WORLD.Abort(1)
 
     #TODO: choose rot_mat_type with general_params['set_rot']
-    converter = Wannier90Converter(seedname, rot_mat_type='hloc_diag', bloch_basis=True)
+    converter = Wannier90Converter(seedname, rot_mat_type='hloc_diag', bloch_basis=True, w90zero=2.e-6)
     converter.convert_dft_input()
 
     # Checks if creating of rot_mat succeeded
-    with HDFArchive(seedname+'.h5', 'r') as archive:
-        assert archive['dft_input']['use_rotations'], 'Creation of rot_mat failed in W90 converter'
+    if mpi.is_master_node():
+        with HDFArchive(seedname+'.h5', 'r') as archive:
+            assert archive['dft_input']['use_rotations'], 'Creation of rot_mat failed in W90 converter'
+    mpi.barrier()
 
-def _run_qe(general_params, dft_params, iter_dmft):
+def _run_qe(general_params, dft_params, iter_dmft, iteration_offset):
     # runs a full iteration of DFT
     start_qe = lambda n_cores, calc_type: qe.start(n_cores, calc_type, dft_params['dft_exec'],
                                                    dft_params['mpi_env'], general_params['seedname'])
@@ -101,6 +103,13 @@ def _run_qe(general_params, dft_params, iter_dmft):
     if iter_dmft == 1: # scf
         qe_scf = start_qe(dft_params['n_cores'], 'scf')
     else: # use modified scf
+
+        # if calculation is restarted, need to check in first iteration if DFT step needs to be skipped
+        iter_one_shot = (iter_dmft - 1 - general_params['n_iter_dmft_first'])%general_params['n_iter_dmft_per']
+        if iteration_offset > 0 and iter_dmft == iteration_offset + 1 and iter_one_shot > 0:
+            mpi.report('  solid-dmft: ...skipping DFT step')
+            return
+
         qe_scf = start_qe(dft_params['n_cores'], 'mod_scf')
     # nscf
     for nscf in ['bnd', 'bands', 'proj', 'nscf']:
@@ -109,6 +118,9 @@ def _run_qe(general_params, dft_params, iter_dmft):
     qe_w90 = start_qe(dft_params['n_cores'], 'win_pp')
     qe_pw2wan = start_qe(dft_params['n_cores'], 'pw2wan')
     qe_w90 = start_qe(dft_params['n_cores'], 'win')
+
+    # launch Wannier90Converter
+    _run_w90converter(general_params['seedname'])
 
 def read_dft_energy_vasp():
     """
@@ -294,8 +306,7 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
                 time.sleep(1)
         # qe dft run
         elif dft_params['dft_code'] == 'qe':
-            _run_qe(general_params, dft_params, iter_dmft)
-            _run_w90converter(general_params['seedname'])
+            _run_qe(general_params, dft_params, iter_dmft, iteration_offset)
 
         # check if we should do another DFT iteration or go on with DMFT
         iter_dft += 1
@@ -345,6 +356,9 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
         # Determines number of steps
         if iter_dmft == 1:
             iter_one_shot = general_params['n_iter_dmft_first']
+        elif iteration_offset > 0 and iter_dmft == iteration_offset + 1:
+            iter_one_shot = general_params['n_iter_dmft_per'] - (iter_dmft - 1
+                            - general_params['n_iter_dmft_first'])%general_params['n_iter_dmft_per']
         else:
             iter_one_shot = general_params['n_iter_dmft_per']
         # Maximum total number of iterations is n_iter_dmft+iteration_offset
