@@ -4,20 +4,14 @@
 documentation
 ***************
 
-module reference manual
-=======================
+code structure:
+===============
 
-.. toctree::
-   :maxdepth: 4
+.. image:: _static/code_structure.png
+   :width: 100%
+   :align: center
 
-   reference/csc_flow
-   reference/dft_managers
-   reference/dmft_cycle
-   reference/dmft_tools
-   reference/postprocessing
-   reference/read_config
-   reference/util
-
+more details in the reference manual below.
 
 DFT code interfaces
 ===================
@@ -33,3 +27,18 @@ run solid_dmft
       md_notes/docker.md
       md_notes/run_locally.md
       md_notes/run_cluster.md
+
+module reference manual
+=======================
+
+.. toctree::
+   :maxdepth: 4
+
+   reference/csc_flow
+   reference/dft_managers
+   reference/dmft_cycle
+   reference/dmft_tools
+   reference/postprocessing
+   reference/read_config
+   reference/util
+
