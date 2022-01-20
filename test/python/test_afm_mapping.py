@@ -7,7 +7,7 @@ Contains unit tests for dmft_cycle
 import sys
 sys.path.append('./src')
 
-from solid_dmft.dmft_tools.afm_mapping import determine
+from solid_dmft.dmft_tools.afm_mapping import determine_afm_mapping
 from helper import are_iterables_equal
 
 def test_determine_afm_mapping():
@@ -20,7 +20,7 @@ def test_determine_afm_mapping():
     expected_general_params['afm_mapping'] = [[False, 0, False], [True, 0, True],
                                                   [True, 0, False], [True, 0, True]]
 
-    general_params = determine(general_params, archive, n_inequiv_shells)
+    general_params = determine_afm_mapping(general_params, archive, n_inequiv_shells)
 
     assert are_iterables_equal(general_params, expected_general_params)
 
@@ -33,7 +33,7 @@ def test_determine_afm_mapping():
     expected_general_params['afm_mapping'] = [[False, 0, False], [True, 0, True],
                                                   [False, 2, False], [True, 2, False]]
 
-    general_params = determine(general_params, archive, n_inequiv_shells)
+    general_params = determine_afm_mapping(general_params, archive, n_inequiv_shells)
 
     assert are_iterables_equal(general_params, expected_general_params)
 
@@ -48,7 +48,7 @@ def test_determine_afm_mapping():
     expected_general_params['afm_mapping'] = [[False, 0, False], [False, 1, False],
                                                   [False, 2, False]]
 
-    general_params = determine(general_params, archive, n_inequiv_shells)
+    general_params = determine_afm_mapping(general_params, archive, n_inequiv_shells)
 
     assert are_iterables_equal(general_params, expected_general_params)
 
@@ -60,6 +60,6 @@ def test_determine_afm_mapping():
     #                                            copy, source, switch
     expected_general_params['afm_order'] = False
 
-    general_params = determine(general_params, archive, n_inequiv_shells)
+    general_params = determine_afm_mapping(general_params, archive, n_inequiv_shells)
 
     assert are_iterables_equal(general_params, expected_general_params)
