@@ -188,3 +188,5 @@ if __name__ == '__main__':
         function = partial(main, iteration=sys.argv[2])
 
     pool.map(function, files)
+
+    pool.close()

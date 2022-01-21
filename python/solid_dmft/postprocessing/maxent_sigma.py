@@ -139,8 +139,8 @@ def _get_sigma_omega_from_aux_spectral(sigma_continuator, results):
             for i in range(data.shape[0]):
                 for j in range(i):
                     data[i, j] = data[j, i].conjugate()
-            block_sc.set_Gaux_w_from_Aaux_w(data, block_res.omega, np_interp_A=2000,
-                                            np_omega=5000, w_min=-12, w_max=12)
+            block_sc.set_Gaux_w_from_Aaux_w(data, block_res.omega, np_interp_A=4000,
+                                            np_omega=3001, w_min=-12, w_max=12)
 
     sigma_w = [BlockGf(name_list=continuator.keys(),
                        block_list=[c.S_w for c in continuator.values()])
@@ -212,3 +212,5 @@ if __name__ == '__main__':
         function = partial(main, iteration=sys.argv[2])
 
     pool.map(function, files)
+
+    pool.close()
