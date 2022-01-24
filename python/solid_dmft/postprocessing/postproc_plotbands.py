@@ -42,10 +42,11 @@ from scipy.optimize import brentq
 from scipy.interpolate import interp1d
 import numpy as np
 import itertools
+import skimage.measure
 
-import TB_functions as tb_func
 from h5 import HDFArchive
 from triqs.gf import BlockGf
+from triqs.lattice.utils import TB_from_wannier90, k_space_path
 
 
 def _linefit(x, y, interval, spacing=50, addspace=0.0):
@@ -294,9 +295,52 @@ def _get_tb_kslice(tb, dft_mu, **specs):
     final_x, final_y = w90_paths[1]
     Z = np.array(specs['Z'])
 
-    e_val, e_vec = tb_func.get_kx_ky_FS(final_x, final_y, Z, tb, k_trans_back=cart_to_prim, N_kxy=specs['n_k'], kz=specs['kz'], fermi=dft_mu)
+    e_val, e_vec = _get_kx_ky_FS(final_x, final_y, Z, tb, k_trans_back=cart_to_prim, N_kxy=specs['n_k'], kz=specs['kz'], fermi=dft_mu)
 
     return e_val, e_vec
+
+def _fract_ind_to_val(x,ind):
+    ind[ind == len(x)-1] = len(x)-1-1e-6
+    int_ind = [int(indi) for indi in ind]
+    int_ind_p1 = [int(indi)+1 for indi in ind]
+    return x[int_ind] + (x[int_ind_p1] - x[int_ind])*(np.array(ind)-np.array(int_ind))
+
+def _get_kx_ky_FS(X,Y,Z,tbl,k_trans_back,select=None,N_kxy=10,kz=0.0, fermi=0.0):
+
+    kx = np.linspace(0,0.5,N_kxy)
+    ky = np.linspace(0,0.5,N_kxy)
+
+    if select is None: select = np.array(range(tbl.NOrbitalsInUnitCell))
+
+    E_FS = np.zeros((tbl.NOrbitalsInUnitCell,N_kxy,N_kxy))
+    for kyi in range(N_kxy):
+        path_FS = [(Y/(N_kxy-1)*kyi +kz*Z, X+Y/(N_kxy-1)*kyi+kz*Z)]
+        kvecs, k = k_space_path(path_FS, num=N_kxy)
+        E_FS[:,:,kyi] = tbl.dispersion(kvecs).transpose()
+
+    contours = {}
+    FS_kx_ky = {}
+    char = {}
+    for ib in range(np.shape(E_FS)[0]):
+        contours[ib] = skimage.measure.find_contours(E_FS[ib,:,:],fermi)
+
+    i = 0
+    for cb in contours:
+        for ci in range(np.shape(contours[cb])[0]):
+            FS_kx_ky[i] = np.vstack([_fract_ind_to_val(kx,contours[cb][ci][:,0]),
+                                _fract_ind_to_val(ky,contours[cb][ci][:,1]),
+                                kz*Z[2]*np.ones(len(contours[cb][ci][:,0]))]).T.reshape(-1,3)
+            char[i] = {}
+            for n in range(len(FS_kx_ky[i][:,0])):
+                p = np.dot(FS_kx_ky[i][n,:], k_trans_back)
+                MAT = tbl.fourier(p)
+                E, v = np.linalg.eigh(MAT[select[:,np.newaxis],select])
+                idx = np.argmin(np.abs(E))
+
+                char[i][n] = [np.round(np.real(v[ib,idx]*np.conjugate(v[ib,idx])),4) for ib in range(len(select))]
+            i += 1
+
+    return FS_kx_ky, char
 
 def _setup_plot_bands(ax, k_points, k_points_labels, w_dict):
 
@@ -386,6 +430,8 @@ def get_dmft_bands(n_orb, w90_path, add_spin, mu, add_local, with_sigma=False, f
     if add_spin: H_add_loc += _lambda_matrix_w90_t2g(add_local)
     eta = eta * 1j
 
+    # TODO
+    # tb_func no longer defined, doesn't work!
     tb = tb_func.get_TBL(path=w90_pathname, name=w90_seedname, extend_to_spin=add_spin, add_local=H_add_loc)
     # print local H(R)
     h_of_r = tb.hopping_dict()[(0,0,0)][2:5,2:5] if add_spin else tb.hopping_dict()[(0,0,0)]
@@ -399,7 +445,8 @@ def get_dmft_bands(n_orb, w90_path, add_spin, mu, add_local, with_sigma=False, f
 
     # calculate tight-binding eigenvalues
     if not fermi_slice:
-        k_array, k_points, e_mat = tb_func.energy_matrix_on_bz_paths(w90_paths, tb, n_pts=specs['n_k'])
+        k_array, k_points = k_space_path(w90_paths, bz=tb.bz, num=specs['n_k'])
+        e_mat = tb.fourier(k_array)
         if add_spin: e_mat = e_mat[2:5,2:5]
         e_mat = np.einsum('ij, jkl -> ikl', np.linalg.inv(change_of_basis), np.einsum('ijk, jm -> imk', e_mat, change_of_basis))
         if band_basis:
@@ -415,7 +462,8 @@ def get_dmft_bands(n_orb, w90_path, add_spin, mu, add_local, with_sigma=False, f
         Z = np.array(specs['Z'])
         for ik_y in range(specs['n_k']):
             path_along_x = [(final_y/(specs['n_k']-1)*ik_y +specs['kz']*Z, final_x+final_y/(specs['n_k']-1)*ik_y+specs['kz']*Z)]
-            _, _, e_mat[:,:,:,ik_y] = tb_func.energy_matrix_on_bz_paths(path_along_x, tb, n_pts=specs['n_k'])
+            k_vecs, k = k_space_path(path_along_x, bz=tb.bz, num=specs['n_k'])
+            e_mat[:,:,:,ik_y] = tb.fourier(k_vecs).transpose(1,2,0)
         k_array = k_points = [0,1]
         if add_spin: e_mat = e_mat[2:5,2:5]
         e_mat = np.einsum('ij, jklm -> iklm', np.linalg.inv(change_of_basis), np.einsum('ijkl, jm -> imkl', e_mat, change_of_basis))
