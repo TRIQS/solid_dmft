@@ -39,7 +39,7 @@ import sys
 import numpy as np
 
 from triqs.utility import mpi
-#from triqs.gf import BlockGf
+from triqs_dft_tools.sumk_dft import SumkDFT
 from triqs_maxent.sigma_continuator import InversionSigmaContinuator, DirectSigmaContinuator
 from triqs_maxent.elementwise_maxent import PoormanMaxEnt
 from triqs_maxent.omega_meshes import HyperbolicOmegaMesh
@@ -55,15 +55,22 @@ def _read_h5(external_path, iteration=None):
 
     Parameters:
     -----------
-    external_path: string, path to h5 archive
-    iteration: int, the iteration that is being read from, default is 'last_iter'
+    external_path : string
+        path to h5 archive
+    iteration : int
+        The iteration that is being read from, default is 'last_iter'
 
     Returns:
     --------
-    sigma_iw: list, self energy as block Green's function for each impurity
-    dc_potential: list, double counting for each impurity
-    chemical_potential: complex, the chemical potential of the problem. Should be approximately real
+    sigma_iw : list
+        Self energy as block Green's function for each impurity
+    dc_potential : list
+        Double counting for each correlated shell
+    chemical_potential : float
+        The chemical potential of the problem. Should be approximately real
+    block_structure : BlockStructure
     """
+    # TODO: add block_structure explanation
 
     h5_internal_path = 'DMFT_results/' + ('last_iter' if iteration is None
                                           else 'it_{}'.format(iteration))
@@ -75,45 +82,51 @@ def _read_h5(external_path, iteration=None):
         impurity_paths = [impurity_paths[i] for i in np.argsort(impurity_indices)]
         sigma_iw = [archive[h5_internal_path][p] for p in impurity_paths]
 
-        inequiv_to_corr = archive['dft_input']['inequiv_to_corr']
-        dc_potential = [archive[h5_internal_path]['DC_pot'][icrsh] for icrsh in inequiv_to_corr]
+        block_structure = archive['DMFT_input']['block_structure']
+        # Fix for archives from triqs 2 when corr_to_inequiv was in SumkDFT, not in BlockStructure
+        if block_structure.corr_to_inequiv is None:
+            block_structure.corr_to_inequiv = archive['dft_input/corr_to_inequiv']
+
+        dc_potential = archive[h5_internal_path]['DC_pot']
         if 'chemical_potential_post' in archive[h5_internal_path]:
             chemical_potential = archive[h5_internal_path]['chemical_potential_post']
         else:
             # Old name for chemical_potential_post
             chemical_potential = archive[h5_internal_path]['chemical_potential']
 
-    return sigma_iw, dc_potential, chemical_potential
+    return sigma_iw, dc_potential, chemical_potential, block_structure
 
 
-def _create_sigma_continuator(sigma_iw, dc_potential, chemical_potential, continuator_type):
+def _create_sigma_continuator(sum_k, continuator_type):
     """
-    Initializes the inversion and direct sigma continuator from Sigma(i omega) and the DC energy.
-    Returns a dict of three versions of continuators, using different auxiliary Green's functions:
-    * 'inversion_continuator_dc': inversion continuator, constant C = dc_potential for the impurity
-    * 'inversion_continuator_sigmainf': inversion continuator, constant C = Sigma(i infinity) + chemical potential
-    * 'direct_continuator': direct continuator
+    Initializes the inversion and direct sigma continuator. Returns a list of
+    continuators. Types of supported auxiliary Green's functions:
+    * 'inversion_dc': inversion continuator, constant C = dc_potential for the impurity
+    * 'inversion_sigmainf': inversion continuator, constant C = Sigma(i infinity) + chemical potential
+    * 'direct': direct continuator
     """
 
     if continuator_type == 'inversion_dc':
-        # TODO: do with sumk to take care of rotations etc
-        raise NotImplementedError('Inversion continuator with DC not implemented yet.')
-        continuators = [InversionSigmaContinuator(sigma_imp, dc_imp)
-                        for sigma_imp, dc_imp in zip(sigma_iw, dc_potential)]
+        # TODO: can I use the solver block structure for some rot_mats?
+        sigma_minus_dc = sum_k.add_dc()
+        continuators = [InversionSigmaContinuator(sigma_minus_dc[iineq])
+                        for iineq in sum_k.inequiv_to_corr]
     elif continuator_type == 'inversion_sigmainf':
-        shifts = [{key: sigma_block.data[-1].real + chemical_potential
-                   for key, sigma_block in sigma_imp} for sigma_imp in sigma_iw]
+        sigma_all = sum_k.transform_to_solver_blocks(sum_k.Sigma_imp_iw)
+        shifts = [{key: sigma_block.data[-1].real + sum_k.chemical_potential
+                   for key, sigma_block in sigma_imp} for sigma_imp in sigma_all]
         continuators = [InversionSigmaContinuator(sigma_imp, shift)
-                        for sigma_imp, shift in zip(sigma_iw, shifts)]
+                        for sigma_imp, shift in zip(sigma_all, shifts)]
     elif continuator_type == 'direct':
-        # TODO: implement making input diagonal if it is not
-        for sigma_imp in sigma_iw:
+        sigma_all = sum_k.transform_to_solver_blocks(sum_k.Sigma_imp_iw)
+
+        for sigma_imp in sigma_all:
             for block_name, sigma_block in sigma_imp:
                 if sigma_block.data.shape[1] > 1:
+                    # TODO: implement making input diagonal if it is not
                     raise NotImplementedError('Continuing only diagonal elements of non-diagonal '
                                               'matrix not implemented yet')
-        # TODO: test if Linalg error happens all the time
-        continuators = [DirectSigmaContinuator(sigma_imp) for sigma_imp in sigma_iw]
+        continuators = [DirectSigmaContinuator(sigma_imp) for sigma_imp in sigma_all]
     else:
         raise NotImplementedError
 
@@ -125,8 +138,8 @@ def _create_sigma_continuator(sigma_iw, dc_potential, chemical_potential, contin
 def _run_maxent(continuators, error, omega_min, omega_max, n_points_maxent,
                 n_points_alpha, analyzer):
     """
-    Uses maxent to continue the auxiliary Green's function obtained from the continuator.
-    The default range for omega is -12 to +12, for alpha 1e-6 to 1e2. This can be changed in here.
+    Uses maxent to continue the auxiliary Green's function obtained from the
+    continuator. The range for alpha is set to 1e-6 to 1e2.
     Returns the real-frequency auxiliary Green's function
     """
 
@@ -155,7 +168,7 @@ def _run_maxent(continuators, error, omega_min, omega_max, n_points_maxent,
         solver.omega = omega_mesh
         solver.alpha_mesh = LogAlphaMesh(alpha_min=1e-6, alpha_max=1e2, n_points=n_points_alpha)
         # Turns off MaxEnt output, it's far too messy in the parallel mode
-        # For some reason, MaxEnt still prints "appending" a lot
+        # For some reason, MaxEnt still prints "appending"
         solver.maxent_diagonal.logtaker.verbose = VerbosityFlags.Quiet
         solver.maxent_offdiagonal.logtaker.verbose = VerbosityFlags.Quiet
         result = solver.run()
@@ -166,11 +179,7 @@ def _run_maxent(continuators, error, omega_min, omega_max, n_points_maxent,
         for j in range(opt_alphas[i].shape[0]):
             for k in range(j+1):
                 assert result.analyzer_results[k][j][1] == {}, 'Result should not be complex'
-                if analyzer not in result.analyzer_results[k][j][0]:
-                    print(k, j)
-                    print(result.analyzer_results[k][j][0], flush=True)
-                else:
-                    opt_alphas[i][k, j] = result.analyzer_results[k][j][0][analyzer]['alpha_index']
+                opt_alphas[i][k, j] = result.analyzer_results[k][j][0][analyzer]['alpha_index']
 
     # Synchronizes information between branches
     for i in imps_blocks_indices:
@@ -185,9 +194,9 @@ def _run_maxent(continuators, error, omega_min, omega_max, n_points_maxent,
     for (imp, block), val in zip(imps_blocks, spectral_funcs):
         for i in range(val.shape[0]):
             for j in range(i):
-                val[i, j] = val[j, i]
+                val[i, j] = val[j, i].conj()
         assert np.allclose(val.imag, 0), 'Result should not be complex'
-        sorted_spectral_funcs[imp][block] = val
+        sorted_spectral_funcs[imp][block] = val.real
 
     return sorted_spectral_funcs, omega_mesh
 
@@ -204,34 +213,64 @@ def _get_sigma_omega_from_aux_spectral(continuators, aux_spectral_funcs, aux_ome
     return g_aux_w, sigma_w
 
 
-def _write_sigma_omega_to_h5(g_aux_w, sigma_w, external_path, iteration):
+def _write_sigma_omega_to_h5(g_aux_w, sigma_w, external_path, iteration, continuator_type):
     """ Writes real-frequency self energy to h5 archive. """
     h5_internal_path = 'DMFT_results/' + ('last_iter' if iteration is None
                                           else 'it_{}'.format(iteration))
 
     with HDFArchive(external_path, 'a') as archive:
         for i, (g_aux_imp, sigma_imp) in enumerate(zip(g_aux_w, sigma_w)):
-            archive[h5_internal_path][f'Sigma_w_{i}'] = sigma_imp
-            archive[h5_internal_path][f'G_aux_for_Sigma_w_{i}'] = g_aux_imp
+            # TODO: remove continuator in output name and as input parameter
+            archive[h5_internal_path][f'Sigma_w_{i}_{continuator_type}'] = sigma_imp
+            archive[h5_internal_path][f'G_aux_for_Sigma_w_{i}_{continuator_type}'] = g_aux_imp
 
 
 def main(external_path, iteration=None, continuator_type='inversion_sigmainf', maxent_error=.02,
-         omega_min=-12, omega_max=12, n_points_maxent=400, n_points_alpha=50, analyzer='LineFitAnalyzer',
+         omega_min=-12., omega_max=12., n_points_maxent=400, n_points_alpha=50, analyzer='LineFitAnalyzer',
          n_points_interp=2000, n_points_final=1000):
     """
     Main function that reads the Matsubara self-energy from h5, analytically continues it
-    and writes the result back to the h5 archive.
+    and writes the result back to the h5 archive and also returns the results.
 
     Parameters
     ----------
-    external_path: string, path of the h5 archive
-    iteration: int/string, optional, iteration to read from and write to
+    external_path : string
+        Path to the h5 archive to read from and write to
+    iteration : int/string
+        Iteration to read from and write to. Default to last_iter
+    continuator_type : string
+        Type of continuator to use, one of 'inversion_sigmainf', 'inversion_dc', 'direct'
+    maxent_error : float
+        The error that is used for the analyzers.
+    omega_min : float
+        Lower end of range where Sigma is being continued. Range has to comprise
+        all features of the self-energy because the real part of it comes from
+        the Kramers-Kronig relation applied to the auxiliary Green's function
+    omega_max : float
+        Upper end of range where Sigma is being continued. See omega_min.
+    n_points_maxent : int
+        Number of omega points on the hyperbolic mesh used in analytically
+        continuing the auxiliary GF
+    n_points_alpha : int
+        Number of points that the MaxEnt alpha parameter is varied on logarithmically
+    analyzer : string
+        Analyzer used int MaxEnt, one of 'LineFitAnalyzer', 'Chi2CurvatureAnalyzer',
+        'ClassicAnalyzer', 'EntropyAnalyzer', 'BryanAnalyzer'
+    n_points_interp : int
+        Number of points where auxiliary GF is interpolated to integrate over
+        it for the Kramers-Kronig relation
+    n_points_final : int
+        Number of omega points the complex auxiliary GF and therefore the
+        continued self-energy has on a linear grid between omega_min and omega_max
 
     Returns
     -------
-    list of triqs.gf.BlockGf, per impurity: Sigma(omega) as a GF object
+    sigma_w : list of triqs.gf.BlockGf
+        Sigma(omega) per inequivalent shell
+    g_aux_w : list of triqs.gf.BlockGf
+        G_aux(omega) per inequivalent shell
     """
-    # TODO: comment on omega_min and omega_max in maxent and KK relation
+    # TODO: maxent_error in docstring
 
     # Checks on input parameters
     if continuator_type not in ('inversion_sigmainf', 'inversion_dc', 'direct'):
@@ -246,11 +285,16 @@ def main(external_path, iteration=None, continuator_type='inversion_sigmainf', m
     # Reads in data and initializes continuator object
     start_time = time.time()
     continuators = None
+    sum_k = SumkDFT(external_path, use_dft_blocks=False)
     if mpi.is_master_node():
-        sigma_iw, dc_potential, chemical_potential = _read_h5(external_path, iteration)
-        mpi.report('Finished reading h5 archive. Found {} impurities.'.format(len(sigma_iw)))
-        continuators = _create_sigma_continuator(sigma_iw, dc_potential,
-                                                 chemical_potential, continuator_type)
+        sigma_iw, dc_potential, chemical_potential, block_structure = _read_h5(external_path, iteration)
+        sum_k.block_structure = block_structure
+        sum_k.put_Sigma(sigma_iw)
+        sum_k.set_mu(chemical_potential)
+        sum_k.set_dc(dc_potential, None)
+
+        mpi.report('Finished reading h5 archive. Found {} impurities.'.format(sum_k.n_inequiv_shells))
+        continuators = _create_sigma_continuator(sum_k, continuator_type)
     continuators = mpi.bcast(continuators)
     init_end_time = time.time()
 
@@ -271,7 +315,7 @@ def main(external_path, iteration=None, continuator_type='inversion_sigmainf', m
     # Writes results into h5 archive
     mpi.report('Writing results to h5 archive now.')
     if mpi.is_master_node():
-        _write_sigma_omega_to_h5(g_aux_w, sigma_w, external_path, iteration)
+        _write_sigma_omega_to_h5(g_aux_w, sigma_w, external_path, iteration, continuator_type)
     mpi.report('Finished writing Σ(ω) to archive.')
 
     all_end_time = time.time()
@@ -292,14 +336,25 @@ def main(external_path, iteration=None, continuator_type='inversion_sigmainf', m
 
 
 if __name__ == '__main__':
-    # TODO: add help
-    if '-h' in sys.argv[1:] or '--help' in sys.argv[1:]:
-        pass
+    # TODO: test
+    if len(sys.argv) > 2:
+        if sys.argv[2].lower() == 'none':
+            sys.argv[2] = None
+    if len(sys.argv) > 4:
+        sys.argv[4] = float(sys.argv[4])
+    if len(sys.argv) > 5:
+        sys.argv[5] = float(sys.argv[5])
+    if len(sys.argv) > 6:
+        sys.argv[6] = float(sys.argv[6])
+    if len(sys.argv) > 7:
+        sys.argv[7] = int(sys.argv[7])
+    if len(sys.argv) > 8:
+        sys.argv[8] = int(sys.argv[8])
+    if len(sys.argv) > 10:
+        sys.argv[10] = int(sys.argv[10])
+    if len(sys.argv) > 11:
+        sys.argv[11] = int(sys.argv[11])
 
-    # TODO: Adapt to number of valid keywords, change documentation
-    if len(sys.argv) not in (2, 3):
-        mpi.report('Please give the h5 name (and optionally the iteration). Exiting.')
-        sys.exit(2)
-
-    main(*sys.argv[1:], continuator_type='inversion_sigmainf', n_points_maxent=100, n_points_alpha=20,
-         n_points_interp=500, n_points_final=100, analyzer='LineFitAnalyzer')
+    # TODO: remove additional parameters
+    main(*sys.argv[1:]) #, continuator_type='inversion_sigmainf', n_points_maxent=100, n_points_alpha=20,
+         #n_points_interp=500, n_points_final=100, analyzer='LineFitAnalyzer')
