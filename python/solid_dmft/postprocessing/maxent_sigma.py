@@ -320,7 +320,7 @@ def main(external_path, iteration=None, continuator_type='inversion_sigmainf', m
     # Writes results into h5 archive
     mpi.report('Writing results to h5 archive now.')
     if mpi.is_master_node():
-        _write_sigma_omega_to_h5(g_aux_w, sigma_w, external_path, iteration, continuator_type)
+        _write_sigma_omega_to_h5(g_aux_w, sigma_w, external_path, iteration)
     mpi.report('Finished writing Σ(ω) to archive.')
 
     all_end_time = time.time()
