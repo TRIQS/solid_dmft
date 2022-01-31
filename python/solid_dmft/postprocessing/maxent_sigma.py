@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 ################################################################################
 #
 # TRIQS: a Toolbox for Research in Interacting Quantum Systems
@@ -23,47 +21,51 @@
 #
 ################################################################################
 """
-Analytic continuation of the self energy using maxent.
+Analytic continuation of the self-energy using maxent on an auxiliary Green's
+function.
 
-Reads Sigma(i omega) from the h5 archive and writes Sigma(omega) back.
+Reads Sigma(i omega) from the h5 archive and writes Sigma(omega) back. See
+the docstring of main() for more information.
 
-Analytic continuation of selfenergies requires using an auxiliary Green's
-function. This makes the procedure even less exact than it already is so use
-the results with care!
+mpi parallelized for the maxent routine over all blocks and for the continuator
+extraction over omega points.
 
-Author: Max Merkel, 2020
+Author: Maximilian Merkel, Materials Theory Group, ETH Zurich, 2020 - 2022
 """
 
 import time
 import sys
-import glob
-from multiprocessing import Pool
-from functools import partial
 import numpy as np
 
+from triqs.utility import mpi
 from triqs_maxent.sigma_continuator import InversionSigmaContinuator, DirectSigmaContinuator
 from triqs_maxent.elementwise_maxent import PoormanMaxEnt
 from triqs_maxent.omega_meshes import HyperbolicOmegaMesh
 from triqs_maxent.alpha_meshes import LogAlphaMesh
-from triqs.gf import BlockGf
+from triqs_maxent.logtaker import VerbosityFlags
 from h5 import HDFArchive
 
 
 def _read_h5(external_path, iteration=None):
     """
-    Reads the h5 archive to get the Matsubara self energy, the double counting energy
+    Reads the h5 archive to get the Matsubara self energy, the double-counting potential
     and the chemical potential.
 
     Parameters:
     -----------
-    external_path: string, path to h5 archive
-    iteration: int, the iteration that is being read from, default is 'last_iter'
+    external_path : string
+        path to h5 archive
+    iteration : int
+        The iteration that is being read from, default is 'last_iter'
 
     Returns:
     --------
-    sigma_iw: list, self energy as block Green's function for each impurity
-    dc_energy: list, double counting for each impurity
-    chemical_potential: complex, the chemical potential of the problem. Should be approximately real
+    sigma_iw : list
+        Self energy as block Green's function for each impurity
+    dc_potential : list
+        Double counting for each impurity
+    chemical_potential : float
+        The chemical potential of the problem. Should be approximately real
     """
 
     h5_internal_path = 'DMFT_results/' + ('last_iter' if iteration is None
@@ -76,141 +78,286 @@ def _read_h5(external_path, iteration=None):
         impurity_paths = [impurity_paths[i] for i in np.argsort(impurity_indices)]
         sigma_iw = [archive[h5_internal_path][p] for p in impurity_paths]
 
-        dc_energy = archive[h5_internal_path]['DC_energ']
+        inequiv_to_corr = archive['dft_input']['inequiv_to_corr']
+        dc_potential = [archive[h5_internal_path]['DC_pot'][icrsh]
+                        for icrsh in inequiv_to_corr]
+
         if 'chemical_potential_post' in archive[h5_internal_path]:
             chemical_potential = archive[h5_internal_path]['chemical_potential_post']
         else:
             # Old name for chemical_potential_post
             chemical_potential = archive[h5_internal_path]['chemical_potential']
 
-    return sigma_iw, dc_energy, chemical_potential
+    return sigma_iw, dc_potential, chemical_potential
 
 
-def _create_sigma_continuators(sigma_iw, dc_energy, chemical_potential):
+def _create_sigma_continuator(sigma_iw, dc_potential, chemical_potential, continuator_type):
     """
-    Initializes the inversion and direct sigma continuator from Sigma(i omega) and the DC energy.
-    Returns a dict of three versions of continuators, using different auxiliary Green's functions:
-    * 'inversion_continuator_dc': inversion continuator, constant C = dc_energy for the impurity
-    * 'inversion_continuator_mu': inversion continuator, constant C = Sigma(i infinity) + chemical potential
-          (NOT TESTED YET)
-    * 'direct_continuator': direct continuator, not implemented because it makes
-    for non-diagonal Sigma crash even if not used
+    Initializes the inversion and direct sigma continuator. Returns a list of
+    continuators. Types of supported auxiliary Green's functions:
+    * 'inversion_dc': inversion continuator, constant C = dc_potential for the impurity
+    * 'inversion_sigmainf': inversion continuator, constant C = Sigma(i infinity) + chemical potential
+    * 'direct': direct continuator
     """
-    inversion_continuator_dc = [{key: InversionSigmaContinuator(block_GF, imp_dc)
-                                 for key, block_GF in imp_GF}
-                                for imp_GF, imp_dc in zip(sigma_iw, dc_energy)]
-    # TODO: implement inversion sigma continuator using chemical potential and Sigma(i infty) as constant
-    # Implementation might or might not be correct
-    inversion_continuator_mu = [{key: InversionSigmaContinuator(block_GF, block_GF.data[-1].real
-                                                                + chemical_potential)
-                                 for key, block_GF in imp_GF} for imp_GF in sigma_iw]
+    n_inequiv_shells = len(sigma_iw)
 
-    return {'inversion_continuator_dc': inversion_continuator_dc,
-            'inversion_continuator_mu': inversion_continuator_mu}
+    if continuator_type == 'inversion_dc':
+        shifts = [None] * n_inequiv_shells
+        for iineq in range(n_inequiv_shells):
+            for dc_block in dc_potential[iineq].values():
+                # Reads first element from matrix for shift
+                if shifts[iineq] is None:
+                    shifts[iineq] = dc_block[0, 0]
+                # Checks that matrix for up and down is unit matrix * shift
+                if not np.allclose(dc_block, np.eye(dc_block.shape[0])*shifts[iineq]):
+                    raise NotImplementedError('Only scalar dc per impurity supported')
+
+        continuators = [InversionSigmaContinuator(sigma_imp, shift)
+                        for sigma_imp, shift in zip(sigma_iw, shifts)]
+    elif continuator_type == 'inversion_sigmainf':
+        shifts = [{key: sigma_block.data[-1].real + chemical_potential
+                   for key, sigma_block in sigma_imp} for sigma_imp in sigma_iw]
+        continuators = [InversionSigmaContinuator(sigma_imp, shift)
+                        for sigma_imp, shift in zip(sigma_iw, shifts)]
+    elif continuator_type == 'direct':
+        for sigma_imp in sigma_iw:
+            for _, sigma_block in sigma_imp:
+                if sigma_block.data.shape[1] > 1:
+                    # TODO: implement making input diagonal if it is not
+                    raise NotImplementedError('Continuing only diagonal elements of non-diagonal '
+                                              'matrix not implemented yet')
+        continuators = [DirectSigmaContinuator(sigma_imp) for sigma_imp in sigma_iw]
+    else:
+        raise NotImplementedError
+
+    mpi.report(f'Created sigma continuator of type "{continuator_type}"')
+
+    return continuators
 
 
-def _run_maxent(sigma_continuator, error=.03):
+def _run_maxent(continuators, error, omega_min, omega_max, n_points_maxent,
+                n_points_alpha, analyzer):
     """
-    Uses maxent to continue the auxiliary Green's function obtained from the continuator.
-    The default range for omega is -20 to +20, for alpha 1e-4 to 1e2. This can be changed in here.
+    Uses maxent to continue the auxiliary Green's function obtained from the
+    continuator. The range for alpha is set to 1e-6 to 1e2.
     Returns the real-frequency auxiliary Green's function
     """
-    results = [{} for _ in range(len(sigma_continuator))]
-    for i in range(len(sigma_continuator)):
-        print('-'*50 + '\nSolving impurity {}/{}\n'.format(i+1, len(sigma_continuator)) + '-'*50)
-        print('Found blocks {}'.format(list(sigma_continuator[i].keys())))
-        for key, continuator in sigma_continuator[i].items():
-            solver = PoormanMaxEnt(use_complex=True)
-            solver.set_G_iw(continuator.Gaux_iw)
-            solver.set_error(error)
-            solver.omega = HyperbolicOmegaMesh(omega_min=-12, omega_max=12, n_points=400)
-            solver.alpha_mesh = LogAlphaMesh(alpha_min=1e-6, alpha_max=1e2, n_points=50)
-            results[i][key] = solver.run()
-            print(results[i][key].analyzer_results[0][0][0]['LineFitAnalyzer']['info'])
-    return results
+
+    # Finds blocks of impurities and prints summary
+    mpi.report('Continuing impurities with blocks:')
+    imps_blocks = []
+    for i, continuator in enumerate(continuators):
+        blocks = list(continuator.Gaux_iw.indices)
+        mpi.report('- Imp {}: {}'.format(i, blocks))
+        for block in blocks:
+            imps_blocks.append((i, block))
+
+    # Initializes arrays to save results in
+    spectral_funcs = [np.zeros(1)] * len(imps_blocks)
+    opt_alphas = [np.zeros(1)] * len(imps_blocks)
+    omega_mesh = HyperbolicOmegaMesh(omega_min=omega_min, omega_max=omega_max, n_points=n_points_maxent)
+
+    # Runs MaxEnt while parallelizing over impurities and blocks
+    imps_blocks_indices = np.arange(len(imps_blocks))
+    for i in mpi.slice_array(imps_blocks_indices):
+        imp, block = imps_blocks[i]
+        g_aux_block = continuators[imp].Gaux_iw[block]
+        solver = PoormanMaxEnt(use_complex=True)
+        solver.set_G_iw(g_aux_block)
+        solver.set_error(error)
+        solver.omega = omega_mesh
+        solver.alpha_mesh = LogAlphaMesh(alpha_min=1e-6, alpha_max=1e2, n_points=n_points_alpha)
+        # Turns off MaxEnt output, it's far too messy in the parallel mode
+        # For some reason, MaxEnt still prints "appending"
+        solver.maxent_diagonal.logtaker.verbose = VerbosityFlags.Quiet
+        solver.maxent_offdiagonal.logtaker.verbose = VerbosityFlags.Quiet
+        result = solver.run()
+
+        spectral_funcs[i] = result.get_A_out(analyzer)
+
+        opt_alphas[i] = np.full(g_aux_block.data.shape[1:], -1, dtype=int)
+        for j in range(opt_alphas[i].shape[0]):
+            for k in range(j+1):
+                assert result.analyzer_results[k][j][1] == {}, 'Result should not be complex'
+                opt_alphas[i][k, j] = result.analyzer_results[k][j][0][analyzer]['alpha_index']
+
+    # Synchronizes information between branches
+    for i in imps_blocks_indices:
+        spectral_funcs[i] = mpi.all_reduce(mpi.world, spectral_funcs[i], lambda x, y: x+y)
+        opt_alphas[i] = mpi.all_reduce(mpi.world, opt_alphas[i], lambda x, y: x+y)
+
+    mpi.report('Optimal alphas: {}'.format(opt_alphas))
+
+    # Sorts results into original order of impurities and blocks
+    # and adds information from Hermitian conjugate of off-diagonal elements
+    sorted_spectral_funcs = [{} for _ in range(len(continuators))]
+    for (imp, block), val in zip(imps_blocks, spectral_funcs):
+        for i in range(val.shape[0]):
+            for j in range(i):
+                val[i, j] = val[j, i].conj()
+        assert np.allclose(val.imag, 0), 'Result should not be complex'
+        sorted_spectral_funcs[imp][block] = val.real
+
+    return sorted_spectral_funcs, omega_mesh
 
 
-def _get_sigma_omega_from_aux_spectral(sigma_continuator, results):
+def _get_sigma_omega_from_aux(continuators, aux_spectral_funcs, aux_omega_mesh,
+                              omega_min, omega_max, n_points_interp, n_points_final):
     """ Extracts the real-frequency self energy from the auxiliary Green's function. """
-    for imp_sc, imp_res in zip(sigma_continuator, results):
-        for block_sc, block_res in zip(imp_sc.values(), imp_res.values()):
-            # Uses that matrix is Hermitian
-            data = block_res.get_A_out('LineFitAnalyzer')[:]
-            for i in range(data.shape[0]):
-                for j in range(i):
-                    data[i, j] = data[j, i].conjugate()
-            block_sc.set_Gaux_w_from_Aaux_w(data, block_res.omega, np_interp_A=4000,
-                                            np_omega=3001, w_min=-12, w_max=12)
+    for cont_imp, spec_imp in zip(continuators, aux_spectral_funcs):
+        cont_imp.set_Gaux_w_from_Aaux_w(spec_imp, aux_omega_mesh, np_interp_A=n_points_interp,
+                                        np_omega=n_points_final, w_min=omega_min, w_max=omega_max)
 
-    sigma_w = [BlockGf(name_list=continuator.keys(),
-                       block_list=[c.S_w for c in continuator.values()])
-               for continuator in sigma_continuator]
-    return sigma_w
+    g_aux_w = [continuator.Gaux_w for continuator in continuators]
+    sigma_w = [continuator.S_w for continuator in continuators]
+    return g_aux_w, sigma_w
 
 
-def _write_sigma_omega_to_h5(sigma_w, results, external_path, iteration=None):
+def _write_sigma_omega_to_h5(g_aux_w, sigma_w, external_path, iteration):
     """ Writes real-frequency self energy to h5 archive. """
     h5_internal_path = 'DMFT_results/' + ('last_iter' if iteration is None
                                           else 'it_{}'.format(iteration))
 
     with HDFArchive(external_path, 'a') as archive:
-        for i, sigma in enumerate(sigma_w):
-            impurity_path = 'Sigma_w_{}'.format(i)
-            archive[h5_internal_path][impurity_path] = sigma
-            # result_path = 'Sigma_w_ME_res_{}'.format(i)
-            # res = {}
-            # for block_name, block_res in results[i].iteritems():
-                # res[block_name] = block_res.data
-
-            # archive[h5_internal_path][result_path] = res
+        for i, (g_aux_imp, sigma_imp) in enumerate(zip(g_aux_w, sigma_w)):
+            archive[h5_internal_path][f'Sigma_w_{i}'] = sigma_imp
+            archive[h5_internal_path][f'G_aux_for_Sigma_w_{i}'] = g_aux_imp
 
 
-def main(external_path, iteration=None):
+def main(external_path, iteration=None, continuator_type='inversion_sigmainf', maxent_error=.02,
+         omega_min=-12., omega_max=12., n_points_maxent=400, n_points_alpha=50,
+         analyzer='LineFitAnalyzer', n_points_interp=2000, n_points_final=1000):
     """
-    Main function that reads the Matsubara self-energy from h5, analytically continues it
-    and writes the result back to the h5 archive.
+    Main function that reads the Matsubara self-energy from h5, analytically continues it,
+    writes the results back to the h5 archive and also returns the results.
 
     Parameters
     ----------
-    external_path: string, path of the h5 archive
-    iteration: int/string, optional, iteration to read from and write to
+    external_path : string
+        Path to the h5 archive to read from and write to
+    iteration : int/string
+        Iteration to read from and write to. Default to last_iter
+    continuator_type : string
+        Type of continuator to use, one of 'inversion_sigmainf', 'inversion_dc', 'direct'
+    maxent_error : float
+        The error that is used for the analyzers.
+    omega_min : float
+        Lower end of range where Sigma is being continued. Range has to comprise
+        all features of the self-energy because the real part of it comes from
+        the Kramers-Kronig relation applied to the auxiliary spectral function.
+        For example, if the real-frequency self-energy bends at omega_min or
+        omega_max, there are neglegcted features and the range should be extended.
+    omega_max : float
+        Upper end of range where Sigma is being continued. See omega_min.
+    n_points_maxent : int
+        Number of omega points on the hyperbolic mesh used in analytically
+        continuing the auxiliary GF
+    n_points_alpha : int
+        Number of points that the MaxEnt alpha parameter is varied on logarithmically
+    analyzer : string
+        Analyzer used int MaxEnt, one of 'LineFitAnalyzer', 'Chi2CurvatureAnalyzer',
+        'ClassicAnalyzer', 'EntropyAnalyzer', 'BryanAnalyzer'
+    n_points_interp : int
+        Number of points where auxiliary GF is interpolated to integrate over
+        it for the Kramers-Kronig relation
+    n_points_final : int
+        Number of omega points the complex auxiliary GF and therefore the
+        continued self-energy has on a linear grid between omega_min and omega_max
 
     Returns
     -------
-    list of triqs.gf.GfReFreq, per impurity: Sigma(omega) as a GF object
+    sigma_w : list of triqs.gf.BlockGf
+        Sigma(omega) per inequivalent shell
+    g_aux_w : list of triqs.gf.BlockGf
+        G_aux(omega) per inequivalent shell
+
+    Raises
+    ------
+    NotImplementedError
+        -- When a wrong continuator type or maxent analyzer is chose
+        -- For direct continuator: when the self energy contains blocks larger
+        than 1x1 (no off-diagonal continuation possible)
+        -- For inversion_dc continuator: when the DC is not a diagonal matrix with
+        the same entry for all blocks of an impurity. Otherwise, issues like
+        the global frame violating the block structure would come up.
     """
+    # Checks on input parameters
+    if continuator_type not in ('inversion_sigmainf', 'inversion_dc', 'direct'):
+        raise NotImplementedError('Unsupported type of continuator chosen')
+
+    if analyzer not in ('LineFitAnalyzer', 'Chi2CurvatureAnalyzer', 'ClassicAnalyzer',
+                        'EntropyAnalyzer', 'BryanAnalyzer'):
+        raise NotImplementedError('Unsupported type of analyzer chosen')
+
+    assert omega_min < omega_max
+
+    # Reads in data and initializes continuator object
     start_time = time.time()
+    continuators = None
+    if mpi.is_master_node():
+        sigma_iw, dc_potential, chemical_potential = _read_h5(external_path, iteration)
+        mpi.report('Finished reading h5 archive. Found {} impurities.'.format(len(sigma_iw)))
+        continuators = _create_sigma_continuator(sigma_iw, dc_potential,
+                                                 chemical_potential, continuator_type)
+    continuators = mpi.bcast(continuators)
+    init_end_time = time.time()
 
-    sigma_iw, dc_energy, chemical_potential = _read_h5(external_path, iteration)
-    print('Finished reading h5 archive. Found {} impurities.'.format(len(sigma_iw)))
-    sigma_continuator = _create_sigma_continuators(sigma_iw, dc_energy,
-                                                   chemical_potential)['inversion_continuator_dc']
-    print('Starting run of maxent now.')
-    results = _run_maxent(sigma_continuator, error=0.02)
-    print(u'Extracting Σ(ω) now. This might take a while.')
-    sigma_w = _get_sigma_omega_from_aux_spectral(sigma_continuator, results)
-    print('Writing results to h5 archive now.')
-    _write_sigma_omega_to_h5(sigma_w, results, external_path, iteration)
-    print('Finished writing Σ(ω) to archive.')
+    # Runs MaxEnt
+    mpi.report('Starting run of maxent now.')
+    aux_spectral_funcs, aux_omega_mesh = _run_maxent(continuators, maxent_error,
+                                                     omega_min, omega_max,
+                                                     n_points_maxent, n_points_alpha,
+                                                     analyzer)
+    maxent_end_time = time.time()
 
-    total_time = time.time() - start_time
-    print('Run time: {:.0f} s.'.format(total_time))
-    return sigma_w
+    # Extracts Sigma(omega)
+    mpi.report(f'Extracting Σ(ω) now with {mpi.size} process(es).')
+    g_aux_w, sigma_w = _get_sigma_omega_from_aux(continuators, aux_spectral_funcs,
+                                                 aux_omega_mesh, omega_min, omega_max,
+                                                 n_points_interp, n_points_final)
+    extract_end_time = time.time()
+
+    # Writes results into h5 archive
+    mpi.report('Writing results to h5 archive now.')
+    if mpi.is_master_node():
+        _write_sigma_omega_to_h5(g_aux_w, sigma_w, external_path, iteration)
+    mpi.report('Finished writing Σ(ω) to archive.')
+
+    all_end_time = time.time()
+
+    # Prints timing summary
+    run_time_report = '\n{:<8} | {:<10}\n'.format('Task', 'Duration (s)')
+    length_table = len(run_time_report) - 2
+    run_time_report += '-'*length_table + '\n'
+    run_time_report += '{:<8} | {:10.4f}\n'.format('Reading', init_end_time - start_time)
+    run_time_report += '{:<8} | {:10.4f}\n'.format('MaxEnt', maxent_end_time - init_end_time)
+    run_time_report += '{:<8} | {:10.4f}\n'.format('Extract.', extract_end_time - maxent_end_time)
+    run_time_report += '{:<8} | {:10.4f}\n'.format('Writing', all_end_time - extract_end_time)
+    run_time_report += '-'*length_table + '\n'
+    run_time_report += '{:<8} | {:10.4f}\n'.format('Total', all_end_time - start_time)
+
+    mpi.report(run_time_report)
+    return sigma_w, g_aux_w
 
 
 if __name__ == '__main__':
-    if len(sys.argv) not in (2, 3):
-        print('Please give the h5 name (and optionally the iteration). Exiting.')
-        sys.exit(2)
+    # Casts input parameters
+    if len(sys.argv) > 2:
+        if sys.argv[2].lower() == 'none':
+            sys.argv[2] = None
+    if len(sys.argv) > 4:
+        sys.argv[4] = float(sys.argv[4])
+    if len(sys.argv) > 5:
+        sys.argv[5] = float(sys.argv[5])
+    if len(sys.argv) > 6:
+        sys.argv[6] = float(sys.argv[6])
+    if len(sys.argv) > 7:
+        sys.argv[7] = int(sys.argv[7])
+    if len(sys.argv) > 8:
+        sys.argv[8] = int(sys.argv[8])
+    if len(sys.argv) > 10:
+        sys.argv[10] = int(sys.argv[10])
+    if len(sys.argv) > 11:
+        sys.argv[11] = int(sys.argv[11])
 
-    files = glob.glob(sys.argv[1])
-    pool = Pool(processes=min(8, len(files)))
-
-    if len(sys.argv) == 2:
-        function = main
-    elif len(sys.argv) == 3:
-        function = partial(main, iteration=sys.argv[2])
-
-    pool.map(function, files)
-
-    pool.close()
+    main(*sys.argv[1:])
