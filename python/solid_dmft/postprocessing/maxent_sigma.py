@@ -244,8 +244,8 @@ def main(external_path, iteration=None, continuator_type='inversion_sigmainf', m
     omega_min : float
         Lower end of range where Sigma is being continued. Range has to comprise
         all features of the self-energy because the real part of it comes from
-        the Kramers-Kronig relation applied to the auxiliary Green's function.
-        For example, if real-frequency self-energy bends at omega_min or
+        the Kramers-Kronig relation applied to the auxiliary spectral function.
+        For example, if the real-frequency self-energy bends at omega_min or
         omega_max, there are neglegcted features and the range should be extended.
     omega_max : float
         Upper end of range where Sigma is being continued. See omega_min.
