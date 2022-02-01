@@ -285,19 +285,15 @@ def _get_tb_bands(k_mesh, e_mat, **specs):
 
     return e_val, e_vec
 
-def _get_tb_kslice(tb, dft_mu, **specs):
+def get_tb_kslice(tb, dft_mu, **specs):
 
-    prim_to_cart = [[0,1,1],
-                    [1,0,1],
-                    [1,1,0]]
-    cart_to_prim = np.linalg.inv(prim_to_cart)
     w90_paths = list(map(lambda section: (np.array(specs[section[0]]), np.array(specs[section[1]])), specs['bands_path']))
     final_x, final_y = w90_paths[1]
     Z = np.array(specs['Z'])
 
-    e_val, e_vec = _get_kx_ky_FS(final_x, final_y, Z, tb, k_trans_back=cart_to_prim, N_kxy=specs['n_k'], kz=specs['kz'], fermi=dft_mu)
+    FS_kx_ky, band_char = get_kx_ky_FS(final_x, final_y, Z, tb, N_kxy=specs['n_k'], kz=specs['kz'], fermi=dft_mu)
 
-    return e_val, e_vec
+    return FS_kx_ky, band_char
 
 def _fract_ind_to_val(x,ind):
     ind[ind == len(x)-1] = len(x)-1-1e-6
@@ -305,13 +301,17 @@ def _fract_ind_to_val(x,ind):
     int_ind_p1 = [int(indi)+1 for indi in ind]
     return x[int_ind] + (x[int_ind_p1] - x[int_ind])*(np.array(ind)-np.array(int_ind))
 
-def _get_kx_ky_FS(X,Y,Z,tbl,k_trans_back,select=None,N_kxy=10,kz=0.0, fermi=0.0):
+def get_kx_ky_FS(X, Y, Z, tbl, select=None, N_kxy=10, kz=0.0, fermi=0.0):
 
+    assert np.abs(fermi) < 1e-2, 'finite value of Fermi level not implemented. Subtract Fermi level from local Hamiltonian.'
+
+    # create mesh
     kx = np.linspace(0,0.5,N_kxy)
     ky = np.linspace(0,0.5,N_kxy)
 
     if select is None: select = np.array(range(tbl.NOrbitalsInUnitCell))
 
+    # go in horizontal arrays from bottom to top
     E_FS = np.zeros((tbl.NOrbitalsInUnitCell,N_kxy,N_kxy))
     for kyi in range(N_kxy):
         path_FS = [(Y/(N_kxy-1)*kyi +kz*Z, X+Y/(N_kxy-1)*kyi+kz*Z)]
@@ -320,27 +320,34 @@ def _get_kx_ky_FS(X,Y,Z,tbl,k_trans_back,select=None,N_kxy=10,kz=0.0, fermi=0.0)
 
     contours = {}
     FS_kx_ky = {}
-    char = {}
-    for ib in range(np.shape(E_FS)[0]):
-        contours[ib] = skimage.measure.find_contours(E_FS[ib,:,:],fermi)
+    FS_kx_ky_prim = {}
+    band_char = {}
+    # contour for each sheet
+    for idx_sheet in range(tbl.NOrbitalsInUnitCell):
+        contours[idx_sheet] = skimage.measure.find_contours(E_FS[idx_sheet,:,:], fermi)
 
-    i = 0
-    for cb in contours:
-        for ci in range(np.shape(contours[cb])[0]):
-            FS_kx_ky[i] = np.vstack([_fract_ind_to_val(kx,contours[cb][ci][:,0]),
-                                _fract_ind_to_val(ky,contours[cb][ci][:,1]),
-                                kz*Z[2]*np.ones(len(contours[cb][ci][:,0]))]).T.reshape(-1,3)
-            char[i] = {}
-            for n in range(len(FS_kx_ky[i][:,0])):
-                p = np.dot(FS_kx_ky[i][n,:], k_trans_back)
-                MAT = tbl.fourier(p)
-                E, v = np.linalg.eigh(MAT[select[:,np.newaxis],select])
-                idx = np.argmin(np.abs(E))
+    for idx_sheet in contours.keys():
+        band_char[idx_sheet] = {}
+        for ci in range(np.shape(contours[idx_sheet])[0]):
+            # once on 2D cubic mesh
+            FS_kx_ky[idx_sheet] = np.vstack([_fract_ind_to_val(kx,contours[idx_sheet][ci][:,0]),
+                                             _fract_ind_to_val(ky,contours[idx_sheet][ci][:,1]),
+                                             kz*Z[2]*np.ones(len(contours[idx_sheet][ci][:,0]))]).T.reshape(-1,3)
+            # repeat on actual mesh for computing the weights
+            ks_skimage = contours[idx_sheet][ci]/(N_kxy-1)
+            FS_kx_ky_prim[idx_sheet] = (np.einsum('i,j->ij', ks_skimage[:,1], X)
+                                        + np.einsum('i,j->ij', ks_skimage[:,0], Y)
+                                        + np.einsum('i,j->ij', kz * np.ones(ks_skimage.shape[0]), Z))
 
-                char[i][n] = [np.round(np.real(v[ib,idx]*np.conjugate(v[ib,idx])),4) for ib in range(len(select))]
-            i += 1
+            # compute the weight aka band character
+            for ct_k, k_on_sheet in enumerate(FS_kx_ky_prim[idx_sheet]):
+                E_mat = tbl.fourier(k_on_sheet)
+                e_val, e_vec = np.linalg.eigh(E_mat[select[:,np.newaxis],select])
+                orb_on_FS = np.argmin(np.abs(e_val))
 
-    return FS_kx_ky, char
+                band_char[idx_sheet][ct_k] = [np.round(np.real(e_vec[idx_sheet,orb_on_FS]*np.conjugate(e_vec[idx_sheet,orb_on_FS])),4) for idx_sheet in range(len(select))]
+
+    return FS_kx_ky, band_char
 
 def _setup_plot_bands(ax, k_points, k_points_labels, w_dict):
 
@@ -354,7 +361,7 @@ def _setup_plot_bands(ax, k_points, k_points_labels, w_dict):
     k_points_labels = [r'$\Gamma$' if k == 'G' else k for k in k_points_labels]
     ax.set_xticklabels(k_points_labels)
 
-def _setup_plot_kslice(ax, k_points, w_dict):
+def setup_plot_kslice(ax):
 
     ax.set_aspect(1)
     ax.set_xlim(0,1)
@@ -431,10 +438,9 @@ def get_dmft_bands(n_orb, w90_path, add_spin, mu, add_local, with_sigma=False, f
     eta = eta * 1j
 
     # TODO
-    # tb_func no longer defined, doesn't work!
-    tb = tb_func.get_TBL(path=w90_pathname, name=w90_seedname, extend_to_spin=add_spin, add_local=H_add_loc)
+    tb = TB_from_wannier90(path=w90_pathname, seed=w90_seedname, extend_to_spin=add_spin, add_local=H_add_loc)
     # print local H(R)
-    h_of_r = tb.hopping_dict()[(0,0,0)][2:5,2:5] if add_spin else tb.hopping_dict()[(0,0,0)]
+    h_of_r = tb.hoppings[(0,0,0)][2:5,2:5] if add_spin else tb.hoppings[(0,0,0)]
     h_of_r = np.einsum('ij, jk -> ik', np.linalg.inv(change_of_basis), np.einsum('ij, jk -> ik', h_of_r, change_of_basis))
     _print_matrix(h_of_r, n_orb, 'H(R=0)')
 
@@ -447,6 +453,8 @@ def get_dmft_bands(n_orb, w90_path, add_spin, mu, add_local, with_sigma=False, f
     if not fermi_slice:
         k_array, k_points = k_space_path(w90_paths, bz=tb.bz, num=specs['n_k'])
         e_mat = tb.fourier(k_array)
+        # in latest version order as changed kpts is now first Index
+        e_mat = np.moveaxis(e_mat, 0, -1)
         if add_spin: e_mat = e_mat[2:5,2:5]
         e_mat = np.einsum('ij, jkl -> ikl', np.linalg.inv(change_of_basis), np.einsum('ijk, jm -> imk', e_mat, change_of_basis))
         if band_basis:
@@ -494,5 +502,5 @@ def get_dmft_bands(n_orb, w90_path, add_spin, mu, add_local, with_sigma=False, f
         alatt_k_w = None
 
 
-    return {'k_mesh': k_array, 'k_points': k_points, 'k_points_labels': k_points_labels, 'e_mat': e_mat, 'tb': tb}, alatt_k_w, w_dict, dft_mu
+    return {'k_mesh': k_points, 'k_points': k_array, 'k_points_labels': k_points_labels, 'e_mat': e_mat, 'tb': tb}, alatt_k_w, w_dict, dft_mu
 
