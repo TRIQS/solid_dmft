@@ -111,9 +111,12 @@ def _run_qe(general_params, dft_params, iter_dmft, iteration_offset):
             return
 
         qe_scf = start_qe(dft_params['n_cores'], 'mod_scf')
+    # optionally do bnd, bands, proj if files are present
+    for nscf in ['bnd', 'bands', 'proj']:
+        if os.path.isfile(f'{general_params["seedname"]}.{nscf}.in'):
+            qe_nscf = start_qe(dft_params['n_cores'], nscf)
     # nscf
-    for nscf in ['bnd', 'bands', 'proj', 'nscf']:
-        qe_nscf = start_qe(dft_params['n_cores'], nscf)
+    qe_nscf = start_qe(dft_params['n_cores'], 'nscf')
     # w90 parts
     qe_w90 = start_qe(dft_params['n_cores'], 'win_pp')
     qe_pw2wan = start_qe(dft_params['n_cores'], 'pw2wan')
