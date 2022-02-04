@@ -27,7 +27,7 @@ Reads DMFT_ouput observables such as real-frequency Sigma and a Wannier90
 TB Hamiltonian to compute spectral properties. It runs in two modes,
 either calculating the bandstructure or Fermi slice.
 
-Written by Sophie Beck, 2021
+Written by Sophie Beck, 2021-2022
 
 TODO:
 - extend to multi impurity systems
@@ -64,7 +64,7 @@ def _linefit(x, y, interval, spacing=50, addspace=0.0):
 
     return x_cont, f_x(x_cont), fit
 
-def _lambda_matrix_w90_t2g(add_lambda):
+def lambda_matrix_w90_t2g(add_lambda):
 
     lambda_x, lambda_y, lambda_z = add_lambda
 
@@ -79,7 +79,7 @@ def _lambda_matrix_w90_t2g(add_lambda):
 
     return lambda_matrix
 
-def _change_basis(n_orb, orbital_order_to, orbital_order_from):
+def change_basis(n_orb, orbital_order_to, orbital_order_from):
 
     change_of_basis = np.eye(n_orb)
     for ct, orb in enumerate(orbital_order_to):
@@ -88,7 +88,7 @@ def _change_basis(n_orb, orbital_order_to, orbital_order_from):
 
     return change_of_basis
 
-def _print_matrix(matrix, n_orb, text):
+def print_matrix(matrix, n_orb, text):
 
     print('{}:'.format(text))
     fmt = '{:16.4f}' * n_orb
@@ -120,15 +120,15 @@ def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, block, orbital_orde
     sigma_mat = {block_spin: sigma[block_spin].data.real - np.eye(n_orb) * dc + 1j * sigma[block_spin].data.imag}
 
     # rotate sigma from orbital_order_dmft to orbital_order
-    change_of_basis = _change_basis(n_orb, orbital_order, orbital_order_dmft)
+    change_of_basis = change_basis(n_orb, orbital_order, orbital_order_dmft)
     sigma_mat[block_spin] = np.einsum('ij, kjl -> kil', np.linalg.inv(change_of_basis), np.einsum('ijk, kl -> ijl', sigma_mat[block_spin], change_of_basis))
 
     # set up mesh
-    w_dict = specs['w_mesh']
-    w_mesh = np.linspace(*w_dict['window'], w_dict['n_w'])
-    w_dict.update({'w_mesh': w_mesh})
+    freq_dict = specs['w_mesh']
+    w_mesh = np.linspace(*freq_dict['window'], freq_dict['n_w'])
+    freq_dict.update({'w_mesh': w_mesh})
 
-    sigma_interpolated = np.zeros((n_orb, n_orb, w_dict['n_w']), dtype=complex)
+    sigma_interpolated = np.zeros((n_orb, n_orb, freq_dict['n_w']), dtype=complex)
 
     if specs['linearize']:
         print('Linearizing Sigma at zero frequency:')
@@ -140,7 +140,7 @@ def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, block, orbital_orde
             _, _, fit_params = _linefit(w_mesh_dmft, sigma_mat[block_spin][:,ct,ct], specs['linearize']['window'])
             zeroth_order, first_order = fit_params[::-1].real
             print('Zeroth and first order fit parameters: [{0:.4f}, {1:.4f}]'.format(zeroth_order,first_order))
-            sigma_interpolated[ct,ct] = zeroth_order + w_dict['w_mesh'] * first_order
+            sigma_interpolated[ct,ct] = zeroth_order + freq_dict['w_mesh'] * first_order
 
     else:
         # eta is added on the level of the spectral function!
@@ -152,7 +152,7 @@ def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, block, orbital_orde
             if ct1 != ct2 and not SOC: continue
             sigma_interpolated[ct1,ct2] = interpolate_sigma(w_mesh, w_mesh_dmft, ct1, ct2)
 
-    return sigma_interpolated, mu, dft_mu, w_dict
+    return sigma_interpolated, mu, dft_mu, freq_dict
 
 def _sigma_from_model(n_orb, orbital_order, zeroth_order, first_order, efermi, eta=0.0, **w):
 
@@ -162,19 +162,19 @@ def _sigma_from_model(n_orb, orbital_order, zeroth_order, first_order, efermi, e
     eta = eta * 1j
 
     # set up mesh
-    w_dict = w['w_mesh']
-    w_mesh = np.linspace(*w_dict['window'], w_dict['n_w'])
-    w_dict.update({'w_mesh': w_mesh})
+    freq_dict = w['w_mesh']
+    w_mesh = np.linspace(*freq_dict['window'], freq_dict['n_w'])
+    freq_dict.update({'w_mesh': w_mesh})
 
     # interpolate sigma
-    sigma_interpolated = np.zeros((n_orb, n_orb, w_dict['n_w']), dtype=complex)
-    approximate_sigma = lambda zeroth_order, first_order, orb: zeroth_order[orb] + w_dict['w_mesh'] * first_order[orb]
+    sigma_interpolated = np.zeros((n_orb, n_orb, freq_dict['n_w']), dtype=complex)
+    approximate_sigma = lambda zeroth_order, first_order, orb: zeroth_order[orb] + freq_dict['w_mesh'] * first_order[orb]
     for ct, orb in enumerate(orbital_order):
         sigma_interpolated[ct,ct] = approximate_sigma(zeroth_order, first_order, ct)
 
-    return sigma_interpolated, mu, dft_mu, w_dict
+    return sigma_interpolated, mu, dft_mu, freq_dict
 
-def _calc_alatt(n_orb, mu, eta, e_mat, sigma, solve=False, e_vecs=np.array([None]) ,trace=True,**w_dict):
+def _calc_alatt(n_orb, mu, eta, e_mat, sigma, qp_bands=False, e_vecs=np.array([None]) ,trace=True,**freq_dict):
 
     # adjust to system size
     upscale = lambda quantity, n_orb: quantity * np.identity(n_orb)
@@ -183,14 +183,14 @@ def _calc_alatt(n_orb, mu, eta, e_mat, sigma, solve=False, e_vecs=np.array([None
     if not e_vecs.any() == None:
         sigma_rot = np.zeros(sigma.shape, dtype=complex)
 
-    w_vec = np.array([upscale(w_dict['w_mesh'][w], n_orb) for w in range(w_dict['n_w'])])
+    w_vec = np.array([upscale(freq_dict['w_mesh'][w], n_orb) for w in range(freq_dict['n_w'])])
     n_k = e_mat.shape[2]
 
-    if not solve:
+    if not qp_bands:
         if trace:
-            alatt_k_w = np.zeros((n_k, w_dict['n_w']))
+            alatt_k_w = np.zeros((n_k, freq_dict['n_w']))
         else:
-            alatt_k_w = np.zeros((n_k, w_dict['n_w'], n_orb))
+            alatt_k_w = np.zeros((n_k, freq_dict['n_w'], n_orb))
         def invert_and_trace(w, eta, mu, e_mat, sigma, trace):
             # inversion is automatically vectorized over first axis of 3D array (omega first index now)
             Glatt =  np.linalg.inv(w + eta[None,...] + mu[None,...] - e_mat[None,...] - sigma.transpose(2,0,1) )
@@ -209,44 +209,44 @@ def _calc_alatt(n_orb, mu, eta, e_mat, sigma, solve=False, e_vecs=np.array([None
 
     else:
         alatt_k_w = np.zeros((n_k, n_orb))
-        kslice = np.zeros((w_dict['n_w'], n_orb))
-        kslice_interp = lambda orb: interp1d(w_dict['w_mesh'], kslice[:, orb])
+        kslice = np.zeros((freq_dict['n_w'], n_orb))
+        kslice_interp = lambda orb: interp1d(freq_dict['w_mesh'], kslice[:, orb])
 
         for ik in range(n_k):
-            for iw, w in enumerate(w_dict['w_mesh']):
+            for iw, w in enumerate(freq_dict['w_mesh']):
                 np.fill_diagonal(sigma[:,:,iw], np.diag(sigma[:,:,iw]).real)
                 #sigma[:,:,iw] = sigma[:,:,iw].real
                 kslice[iw], _ = np.linalg.eigh( upscale(w, n_orb) + eta + mu - e_mat[:,:,ik] - sigma[:,:,iw])
 
             for orb in range(n_orb):
-                w_min, w_max = w_dict['window']
+                w_min, w_max = freq_dict['window']
                 try:
                     x0 = brentq( kslice_interp(orb), w_min, w_max)
-                    w_bin = int( (x0 - w_min) / ((w_max - w_min)/ w_dict['n_w']) )
-                    alatt_k_w[ik, orb] = w_dict['w_mesh'][w_bin]
+                    w_bin = int( (x0 - w_min) / ((w_max - w_min)/ freq_dict['n_w']) )
+                    alatt_k_w[ik, orb] = freq_dict['w_mesh'][w_bin]
                 except ValueError:
                     pass
 
     return alatt_k_w
 
-def _calc_kslice(n_orb, mu, eta, e_mat, sigma, solve, **w_dict):
+def _calc_kslice(n_orb, mu, eta, e_mat, sigma, qp_bands, **freq_dict):
 
     # adjust to system size
     upscale = lambda quantity, n_orb: quantity * np.identity(n_orb)
     mu = upscale(mu, n_orb)
     eta = upscale(eta, n_orb)
 
-    iw0 = np.where(np.sign(w_dict['w_mesh']) == True)[0][0]-1
-    _print_matrix(sigma[:,:,iw0], n_orb, 'Zero-frequency Sigma')
+    iw0 = np.where(np.sign(freq_dict['w_mesh']) == True)[0][0]-1
+    print_matrix(sigma[:,:,iw0], n_orb, 'Zero-frequency Sigma')
 
     n_kx, n_ky = e_mat.shape[2:4]
 
-    if not solve:
+    if not qp_bands:
         alatt_k_w = np.zeros((n_kx, n_ky))
         invert_and_trace = lambda w, eta, mu, e_mat, sigma: -1.0/np.pi * np.trace( np.linalg.inv( w + eta + mu - e_mat - sigma ).imag )
 
         for ikx, iky in itertools.product(range(n_kx), range(n_ky)):
-            alatt_k_w[ikx, iky] = invert_and_trace(upscale(w_dict['w_mesh'][iw0], n_orb), eta, mu, e_mat[:,:,ikx,iky], sigma[:,:,iw0])
+            alatt_k_w[ikx, iky] = invert_and_trace(upscale(freq_dict['w_mesh'][iw0], n_orb), eta, mu, e_mat[:,:,ikx,iky], sigma[:,:,iw0])
     else:
         assert n_kx == n_ky, 'Not implemented for N_kx != N_ky'
         alatt_k_w = np.zeros((n_kx, n_ky, n_orb))
@@ -285,13 +285,14 @@ def _get_tb_bands(k_mesh, e_mat, **specs):
 
     return e_val, e_vec
 
-def get_tb_kslice(tb, dft_mu, **specs):
+def get_tb_kslice(tb, **specs):
 
     w90_paths = list(map(lambda section: (np.array(specs[section[0]]), np.array(specs[section[1]])), specs['bands_path']))
-    final_x, final_y = w90_paths[1]
+    upper_left = np.diff(w90_paths[0][::-1], axis=0)[0]
+    lower_right = np.diff(w90_paths[1], axis=0)[0]
     Z = np.array(specs['Z'])
 
-    FS_kx_ky, band_char = get_kx_ky_FS(final_x, final_y, Z, tb, N_kxy=specs['n_k'], kz=specs['kz'], fermi=dft_mu)
+    FS_kx_ky, band_char = get_kx_ky_FS(lower_right, upper_left, Z, tb, N_kxy=specs['n_k'], kz=specs['kz'], fermi=0.0)
 
     return FS_kx_ky, band_char
 
@@ -349,15 +350,15 @@ def get_kx_ky_FS(X, Y, Z, tbl, select=None, N_kxy=10, kz=0.0, fermi=0.0):
 
     return FS_kx_ky, band_char
 
-def _setup_plot_bands(ax, k_points, k_points_labels, w_dict):
+def _setup_plot_bands(ax, special_k, k_points_labels, freq_dict):
 
     ax.axhline(y=0,c='gray',ls='--',lw=0.8, zorder=0)
     ax.set_ylabel(r'$\omega - \mu$ (eV)')
-#     ax.set_ylim(*w_dict['window'])
-    for ik in k_points:
+#     ax.set_ylim(*freq_dict['window'])
+    for ik in special_k:
         ax.axvline(x=ik, linewidth=0.7, color='k',zorder=0.5)
-    ax.set_xticks(k_points)
-    ax.set_xlim(k_points[0], k_points[-1])
+    ax.set_xticks(special_k)
+    ax.set_xlim(special_k[0], special_k[-1])
     k_points_labels = [r'$\Gamma$' if k == 'G' else k for k in k_points_labels]
     ax.set_xticklabels(k_points_labels)
 
@@ -371,15 +372,15 @@ def setup_plot_kslice(ax):
     ax.set_xlabel(r'$k_xa/\pi$')
     ax.set_ylabel(r'$k_ya/\pi$')
 
-def plot_bands(fig, ax, alatt_k_w, tb_data, w_dict, n_orb, dft_mu, tb=True, alatt=False, solve=False, **plot_dict):
+def plot_bands(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb, dft_mu, tb=True, alatt=False, qp_bands=False, **plot_dict):
 
     if alatt:
         if alatt_k_w is None: raise ValueError('A(k,w) unknown. Specify "with_sigma = True"')
-        if solve:
+        if qp_bands:
             for orb in range(n_orb):
-                ax.scatter(tb_data['k_mesh'], alatt_k_w[:,orb].T, c=np.array([eval('cm.'+plot_dict['colorscheme_solve'])(0.7)]), zorder=2., s=1.)
+                ax.scatter(tb_data['k_mesh'], alatt_k_w[:,orb].T, c=np.array([eval('cm.'+plot_dict['colorscheme_qpbands'])(1.0)]), zorder=2., s=1.)
         else:
-            kw_x, kw_y = np.meshgrid(tb_data['k_mesh'], w_dict['w_mesh'])
+            kw_x, kw_y = np.meshgrid(tb_data['k_mesh'], freq_dict['w_mesh'])
             graph = ax.pcolormesh(kw_x, kw_y, alatt_k_w.T, cmap=plot_dict['colorscheme_bands'], norm=LogNorm(vmin=plot_dict['vmin'], vmax=np.max(alatt_k_w)))
             colorbar = plt.colorbar(graph)
             colorbar.set_label(r'$A(k, \omega)$')
@@ -387,12 +388,16 @@ def plot_bands(fig, ax, alatt_k_w, tb_data, w_dict, n_orb, dft_mu, tb=True, alat
     if tb:
         eps_nuk, evec_nuk = _get_tb_bands(**tb_data)
         for band in range(n_orb):
-            orbital_projected = [0] if not plot_dict['proj_on_orb'] else np.real(evec_nuk[plot_dict['proj_on_orb'], band] * evec_nuk[plot_dict['proj_on_orb'], band].conjugate())
-            ax.scatter(tb_data['k_mesh'], eps_nuk[band].real - dft_mu, c=cm.plasma(orbital_projected), s=1, label=r'tight-binding', zorder=1.)
+            if not plot_dict['proj_on_orb'] is not None:
+                color = eval('cm.'+plot_dict['colorscheme_bands'])(1.0)
+                ax.plot(tb_data['k_mesh'], eps_nuk[band].real - dft_mu, c=color, label=r'tight-binding', zorder=1.)
+            else:
+                color = eval('cm.'+plot_dict['colorscheme_bands'])(np.real(evec_nuk[plot_dict['proj_on_orb'], band] * evec_nuk[plot_dict['proj_on_orb'], band].conjugate()))
+                ax.scatter(tb_data['k_mesh'], eps_nuk[band].real - dft_mu, c=color, s=1, label=r'tight-binding', zorder=1.)
 
-    _setup_plot_bands(ax, tb_data['k_points'], tb_data['k_points_labels'], w_dict)
+    _setup_plot_bands(ax, tb_data['special_k'], tb_data['k_points_labels'], freq_dict)
 
-def plot_kslice(fig, ax, alatt_k_w, tb_data, w_dict, n_orb, tb_dict, tb=True, alatt=False, quarter=0, dft_mu=0.0, **plot_dict):
+def plot_kslice(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb, tb_dict, tb=True, alatt=False, quarter=0, **plot_dict):
 
     sign = [1,-1]
     quarters = np.array([sign,sign])
@@ -404,7 +409,7 @@ def plot_kslice(fig, ax, alatt_k_w, tb_data, w_dict, n_orb, tb_dict, tb=True, al
         for qrt in list(itertools.product(*quarters))[quarter:quarter+1]:
             if len(alatt_k_w.shape) > 2:
                 for orb in range(n_orb):
-                    ax.contour(qrt[0] * kx/(n_kx-1), qrt[1] * ky/(n_ky-1), alatt_k_w[:,:,orb].T, colors=np.array([eval('cm.'+plot_dict['colorscheme_solve'])(0.7)]), levels=1, zorder=2)
+                    ax.contour(qrt[0] * kx/(n_kx-1), qrt[1] * ky/(n_ky-1), alatt_k_w[:,:,orb].T, colors=np.array([eval('cm.'+plot_dict['colorscheme_qpbands'])(0.7)]), levels=1, zorder=2)
             else:
                 graph = ax.pcolormesh(qrt[0] * kx/(n_kx-1), qrt[1] * ky/(n_ky-1), alatt_k_w.T, cmap=plot_dict['colorscheme_kslice'],
                                       norm=LogNorm(vmin=plot_dict['vmin'], vmax=np.max(alatt_k_w)))
@@ -413,52 +418,50 @@ def plot_kslice(fig, ax, alatt_k_w, tb_data, w_dict, n_orb, tb_dict, tb=True, al
 
     if tb:
         quarters *= 2
-        eps_nuk, evec_nuk = _get_tb_kslice(tb_data['tb'], dft_mu, **tb_dict)
+        FS_kx_ky, band_char = get_tb_kslice(tb_data['tb'], **tb_dict)
         for qrt in list(itertools.product(*quarters))[quarter:quarter+1]:
-            for band in range(len(eps_nuk)):
-                for segment in range(eps_nuk[band].shape[0]):
-                    #orbital_projected = evec_nuk[band][segment][plot_dict['proj_on_orb']]
-                    ax.plot(qrt[0] * eps_nuk[band][segment:segment+2,0], qrt[1] * eps_nuk[band][segment:segment+2,1], '-',
-                            solid_capstyle='round', c=eval('cm.'+plot_dict['colorscheme_kslice'])(1.0), lw=1., zorder=1.)
+            for sheet in range(len(FS_kx_ky)):
+                for k_on_sheet in range(FS_kx_ky[sheet].shape[0]):
+                    if not plot_dict['proj_on_orb'] is not None:
+                        color = eval('cm.'+plot_dict['colorscheme_kslice'])(1.0)
+                    else:
+                        color = eval('cm.'+plot_dict['colorscheme_kslice'])(band_char[sheet][k_on_sheet][plot_dict['proj_on_orb']])
+                    ax.plot(qrt[0] * FS_kx_ky[sheet][k_on_sheet:k_on_sheet+2,0], qrt[1] * FS_kx_ky[sheet][k_on_sheet:k_on_sheet+2,1], '-',
+                            solid_capstyle='round', c=color, lw=1., zorder=1.)
 
-    _setup_plot_kslice(ax, tb_data['k_points'], w_dict)
+    setup_plot_kslice(ax)
 
     return ax
 
-def get_dmft_bands(n_orb, w90_path, add_spin, mu, add_local, with_sigma=False, fermi_slice=False, solve=False, orbital_order=['dxz', 'dyz', 'dxy'], band_basis=False, trace=True , eta=0.0, **specs):
+def get_dmft_bands(n_orb, w90_path, w90_seed, add_spin, mu, add_lambda, with_sigma=False, fermi_slice=False, qp_bands=False, orbital_order_to=['dxz', 'dyz', 'dxy'], band_basis=False, trace=True , eta=0.0, **specs):
 
     # set up Wannier Hamiltonian
-    w90_seedname = w90_path.split('/')[-1]
-    w90_pathname = w90_path.rsplit(w90_seedname,1)[0]
     n_orb_rescale = 2 * n_orb if add_spin else n_orb
-    change_of_basis = _change_basis(n_orb, orbital_order, specs['orbital_order_w90'])
+    change_of_basis = change_basis(n_orb, orbital_order_to, specs['orbital_order_w90'])
     H_add_loc = np.zeros((n_orb_rescale, n_orb_rescale), dtype=complex)
     H_add_loc += np.diag([-mu]*n_orb_rescale)
-    if add_spin: H_add_loc += _lambda_matrix_w90_t2g(add_local)
+    if add_spin: H_add_loc += lambda_matrix_w90_t2g(add_lambda)
     eta = eta * 1j
 
-    # TODO
-    tb = TB_from_wannier90(path=w90_pathname, seed=w90_seedname, extend_to_spin=add_spin, add_local=H_add_loc)
+    tb = TB_from_wannier90(path=w90_path, seed=w90_seed, extend_to_spin=add_spin, add_local=H_add_loc)
     # print local H(R)
     h_of_r = tb.hoppings[(0,0,0)][2:5,2:5] if add_spin else tb.hoppings[(0,0,0)]
     h_of_r = np.einsum('ij, jk -> ik', np.linalg.inv(change_of_basis), np.einsum('ij, jk -> ik', h_of_r, change_of_basis))
-    _print_matrix(h_of_r, n_orb, 'H(R=0)')
+    print_matrix(h_of_r, n_orb, 'H(R=0)')
 
     # bands info
     w90_paths = list(map(lambda section: (np.array(specs[section[0]]), np.array(specs[section[1]])), specs['bands_path']))
-    if not fermi_slice: w90_paths.append((w90_paths[-1][1], w90_paths[-1][1]))
     k_points_labels = [k[0] for k in specs['bands_path']] + [specs['bands_path'][-1][1]]
 
     # calculate tight-binding eigenvalues
     if not fermi_slice:
-        k_array, k_points = k_space_path(w90_paths, bz=tb.bz, num=specs['n_k'])
-        e_mat = tb.fourier(k_array)
-        # in latest version order as changed kpts is now first Index
-        e_mat = np.moveaxis(e_mat, 0, -1)
+        k_vec, k_1d = k_space_path(w90_paths, bz=tb.bz, num=specs['n_k'])
+        special_k = np.append(k_1d[0::specs['n_k']], k_1d[-1::])
+        e_mat = tb.fourier(k_vec).transpose(1, 2, 0)
         if add_spin: e_mat = e_mat[2:5,2:5]
         e_mat = np.einsum('ij, jkl -> ikl', np.linalg.inv(change_of_basis), np.einsum('ijk, jm -> imk', e_mat, change_of_basis))
         if band_basis:
-            e_vals, e_vecs = _get_tb_bands(k_array, e_mat)
+            e_vals, e_vecs = _get_tb_bands(k_vec, e_mat)
             for ik in range(np.shape(e_mat)[2]):
                 e_mat[:,:,ik] = np.zeros(e_mat[:,:,ik].shape)
                 np.fill_diagonal(e_mat[:,:,ik],e_vals[:,ik])
@@ -466,13 +469,14 @@ def get_dmft_bands(n_orb, w90_path, add_spin, mu, add_local, with_sigma=False, f
             e_vecs = np.array([None])
     else:
         e_mat = np.zeros((n_orb_rescale, n_orb_rescale, specs['n_k'], specs['n_k']), dtype=complex)
-        final_x, final_y = w90_paths[1]
+        upper_left = np.diff(w90_paths[0][::-1], axis=0)[0]
+        lower_right = np.diff(w90_paths[1], axis=0)[0]
         Z = np.array(specs['Z'])
         for ik_y in range(specs['n_k']):
-            path_along_x = [(final_y/(specs['n_k']-1)*ik_y +specs['kz']*Z, final_x+final_y/(specs['n_k']-1)*ik_y+specs['kz']*Z)]
-            k_vecs, k = k_space_path(path_along_x, bz=tb.bz, num=specs['n_k'])
-            e_mat[:,:,:,ik_y] = tb.fourier(k_vecs).transpose(1,2,0)
-        k_array = k_points = [0,1]
+            path_along_x = [(upper_left/(specs['n_k']-1)*ik_y +specs['kz']*Z, lower_right+upper_left/(specs['n_k']-1)*ik_y+specs['kz']*Z)]
+            k_vec, k_1d = k_space_path(path_along_x, bz=tb.bz, num=specs['n_k'])
+            special_k = np.append(k_1d[0::specs['n_k']], k_1d[-1::])
+            e_mat[:,:,:,ik_y] = tb.fourier(k_vec).transpose(1,2,0)
         if add_spin: e_mat = e_mat[2:5,2:5]
         e_mat = np.einsum('ij, jklm -> iklm', np.linalg.inv(change_of_basis), np.einsum('ijkl, jm -> imkl', e_mat, change_of_basis))
 
@@ -485,22 +489,24 @@ def get_dmft_bands(n_orb, w90_path, add_spin, mu, add_local, with_sigma=False, f
             raise ValueError('Invalid sigma type. Expected BlockGf.')
 
         # get sigma
-        if with_sigma == 'model': delta_sigma, mu, dft_mu, w_dict = _sigma_from_model(n_orb, orbital_order, **specs)
+        if with_sigma == 'model': delta_sigma, mu, dft_mu, freq_dict = _sigma_from_model(n_orb, orbital_order_to, **specs)
         # else is from dmft or memory:
-        else: delta_sigma, mu, dft_mu, w_dict = _sigma_from_dmft(n_orb, orbital_order, with_sigma, **specs)
+        else: delta_sigma, mu, dft_mu, freq_dict = _sigma_from_dmft(n_orb, orbital_order_to, with_sigma, **specs)
+        #TODO: smarter way to compute this, might be incorrect
+        corrected_mu = mu + np.abs(np.abs(mu) - np.abs(dft_mu))
 
         # calculate alatt
         if not fermi_slice:
-            alatt_k_w = _calc_alatt(n_orb, mu, eta, e_mat, delta_sigma, solve, e_vecs=e_vecs, trace=trace,**w_dict)
+            alatt_k_w = _calc_alatt(n_orb, corrected_mu, eta, e_mat, delta_sigma, qp_bands, e_vecs=e_vecs, trace=trace, **freq_dict)
         else:
-            alatt_k_w = _calc_kslice(n_orb, mu, eta, e_mat, delta_sigma, solve,**w_dict)
+            alatt_k_w = _calc_kslice(n_orb, corrected_mu, eta, e_mat, delta_sigma, qp_bands, **freq_dict)
     else:
         dft_mu = mu
-        w_dict = {}
-        w_dict['w_mesh'] = None
-        w_dict['window'] = None
+        freq_dict = {}
+        freq_dict['w_mesh'] = None
+        freq_dict['window'] = None
         alatt_k_w = None
 
 
-    return {'k_mesh': k_points, 'k_points': k_array, 'k_points_labels': k_points_labels, 'e_mat': e_mat, 'tb': tb}, alatt_k_w, w_dict, dft_mu
+    return {'k_mesh': k_1d, 'special_k': special_k, 'k_points': k_vec, 'k_points_labels': k_points_labels, 'e_mat': e_mat, 'tb': tb}, alatt_k_w, freq_dict, dft_mu
 

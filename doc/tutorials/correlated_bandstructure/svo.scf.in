@@ -1,0 +1,47 @@
+&control
+   calculation        = 'scf',
+   restart_mode       = 'from_scratch',
+   wf_collect         = .false.,
+   prefix             = 'svo', 
+   tstress            = .true., 
+   tprnfor            = .true., 
+   pseudo_dir         = '/mnt/home/sbeck/work/pseudo/gbrv_v1.5/',
+   outdir             = '/mnt/ceph/users/sbeck/QE_tmp/',
+/ 
+&system 
+   ibrav              = 0,
+   celldm(1)          = 7.2612,
+   nat                = 5,
+   ntyp               = 3,
+   ecutwfc            = 60.0,
+   ecutrho            = 720.0,
+   occupations        = 'tetrahedra',
+!   degauss            = 0.02,
+!   smearing           = 'm-p',
+/ 
+&electrons 
+   conv_thr           = 1.0d-10,
+   mixing_beta        = 0.7,
+   mixing_mode        = 'local-TF'
+   startingpot        = 'file',
+/
+
+ATOMIC_SPECIES 
+   Sr	87.62		sr_pbe_v1.uspp.F.UPF
+   V	50.9415		v_pbe_v1.4.uspp.F.UPF
+   O	15.9994		o_pbe_v1.2.uspp.F.UPF 
+
+CELL_PARAMETERS (alat=  7.26120000)
+   1.004189551   0.000000000   0.000000000
+   0.000000000   1.004189551   0.000000000
+   0.000000000   0.000000000   1.004189551
+
+ATOMIC_POSITIONS (crystal)
+Sr       0.000000000   0.000000000   0.000000000
+V        0.500000000   0.500000000   0.500000000
+O        0.500000000   0.500000000   0.000000000
+O        0.500000000   0.000000000   0.500000000
+O        0.000000000   0.500000000   0.500000000
+
+K_POINTS automatic
+ 17 17 17 0 0 0 
