@@ -302,7 +302,7 @@ def _fract_ind_to_val(x,ind):
     int_ind_p1 = [int(indi)+1 for indi in ind]
     return x[int_ind] + (x[int_ind_p1] - x[int_ind])*(np.array(ind)-np.array(int_ind))
 
-def get_kx_ky_FS(X, Y, Z, tbl, select=None, N_kxy=10, kz=0.0, fermi=0.0):
+def get_kx_ky_FS(lower_right, upper_left, Z, tb, select=None, N_kxy=10, kz=0.0, fermi=0.0):
 
     assert np.abs(fermi) < 1e-2, 'finite value of Fermi level not implemented. Subtract Fermi level from local Hamiltonian.'
 
@@ -310,43 +310,44 @@ def get_kx_ky_FS(X, Y, Z, tbl, select=None, N_kxy=10, kz=0.0, fermi=0.0):
     kx = np.linspace(0,0.5,N_kxy)
     ky = np.linspace(0,0.5,N_kxy)
 
-    if select is None: select = np.array(range(tbl.NOrbitalsInUnitCell))
+    if select is None: select = np.array(range(tb.NOrbitalsInUnitCell))
 
     # go in horizontal arrays from bottom to top
-    E_FS = np.zeros((tbl.NOrbitalsInUnitCell,N_kxy,N_kxy))
+    E_FS = np.zeros((tb.NOrbitalsInUnitCell,N_kxy,N_kxy))
     for kyi in range(N_kxy):
-        path_FS = [(Y/(N_kxy-1)*kyi +kz*Z, X+Y/(N_kxy-1)*kyi+kz*Z)]
-        kvecs, k = k_space_path(path_FS, num=N_kxy)
-        E_FS[:,:,kyi] = tbl.dispersion(kvecs).transpose()
+        path_FS = [(upper_left/(N_kxy-1)*kyi +kz*Z, lower_right+upper_left/(N_kxy-1)*kyi+kz*Z)]
+        k_vec, _ = k_space_path(path_FS, num=N_kxy)
+        E_FS[:,:,kyi] = tb.dispersion(k_vec).transpose()
 
     contours = {}
     FS_kx_ky = {}
     FS_kx_ky_prim = {}
     band_char = {}
     # contour for each sheet
-    for idx_sheet in range(tbl.NOrbitalsInUnitCell):
-        contours[idx_sheet] = skimage.measure.find_contours(E_FS[idx_sheet,:,:], fermi)
+    for sheet in range(tb.NOrbitalsInUnitCell):
+        contours[sheet] = skimage.measure.find_contours(E_FS[sheet,:,:], fermi)
 
-    for idx_sheet in contours.keys():
-        band_char[idx_sheet] = {}
-        for ci in range(np.shape(contours[idx_sheet])[0]):
+    sheet_ct = 0
+    for sheet in contours.keys():
+        for sec_per_sheet in range(np.shape(contours[sheet])[0]):
             # once on 2D cubic mesh
-            FS_kx_ky[idx_sheet] = np.vstack([_fract_ind_to_val(kx,contours[idx_sheet][ci][:,0]),
-                                             _fract_ind_to_val(ky,contours[idx_sheet][ci][:,1]),
-                                             kz*Z[2]*np.ones(len(contours[idx_sheet][ci][:,0]))]).T.reshape(-1,3)
+            FS_kx_ky[sheet_ct] = np.vstack([_fract_ind_to_val(kx,contours[sheet][sec_per_sheet][:,0]),
+                                            _fract_ind_to_val(ky,contours[sheet][sec_per_sheet][:,1]),
+                                             kz*np.ones(len(contours[sheet][sec_per_sheet][:,0]))]).T.reshape(-1,3)
             # repeat on actual mesh for computing the weights
-            ks_skimage = contours[idx_sheet][ci]/(N_kxy-1)
-            FS_kx_ky_prim[idx_sheet] = (np.einsum('i,j->ij', ks_skimage[:,1], X)
-                                        + np.einsum('i,j->ij', ks_skimage[:,0], Y)
-                                        + np.einsum('i,j->ij', kz * np.ones(ks_skimage.shape[0]), Z))
-
+            ks_skimage = contours[sheet][sec_per_sheet]/(N_kxy-1)
+            FS_kx_ky_prim[sheet_ct] = (+ np.einsum('i,j->ij', ks_skimage[:,1], lower_right)
+                                       + np.einsum('i,j->ij', ks_skimage[:,0], upper_left)
+                                       + np.einsum('i,j->ij', kz * np.ones(ks_skimage.shape[0]), Z))
+            band_char[sheet_ct] = {}
             # compute the weight aka band character
-            for ct_k, k_on_sheet in enumerate(FS_kx_ky_prim[idx_sheet]):
-                E_mat = tbl.fourier(k_on_sheet)
+            for ct_k, k_on_sheet in enumerate(FS_kx_ky_prim[sheet_ct]):
+                E_mat = tb.fourier(k_on_sheet)
                 e_val, e_vec = np.linalg.eigh(E_mat[select[:,np.newaxis],select])
                 orb_on_FS = np.argmin(np.abs(e_val))
 
-                band_char[idx_sheet][ct_k] = [np.round(np.real(e_vec[idx_sheet,orb_on_FS]*np.conjugate(e_vec[idx_sheet,orb_on_FS])),4) for idx_sheet in range(len(select))]
+                band_char[sheet_ct][ct_k] = [np.round(np.real(e_vec[orb,orb_on_FS]*np.conjugate(e_vec[orb,orb_on_FS])),4) for orb in range(len(select))]
+            sheet_ct += 1
 
     return FS_kx_ky, band_char
 
@@ -420,14 +421,14 @@ def plot_kslice(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb, tb_dict, tb=True,
         quarters *= 2
         FS_kx_ky, band_char = get_tb_kslice(tb_data['tb'], **tb_dict)
         for qrt in list(itertools.product(*quarters))[quarter:quarter+1]:
-            for sheet in range(len(FS_kx_ky)):
+            for sheet in FS_kx_ky.keys():
                 for k_on_sheet in range(FS_kx_ky[sheet].shape[0]):
                     if not plot_dict['proj_on_orb'] is not None:
                         color = eval('cm.'+plot_dict['colorscheme_kslice'])(1.0)
                     else:
                         color = eval('cm.'+plot_dict['colorscheme_kslice'])(band_char[sheet][k_on_sheet][plot_dict['proj_on_orb']])
                     ax.plot(qrt[0] * FS_kx_ky[sheet][k_on_sheet:k_on_sheet+2,0], qrt[1] * FS_kx_ky[sheet][k_on_sheet:k_on_sheet+2,1], '-',
-                            solid_capstyle='round', c=color, lw=1., zorder=1.)
+                            solid_capstyle='round', c=color, zorder=1.)
 
     setup_plot_kslice(ax)
 
