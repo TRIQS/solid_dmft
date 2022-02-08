@@ -42,7 +42,7 @@ foreach(test ${integration_tests})
   
   add_test(NAME ${test} 
            #COMMAND bash ${test}.sh
-           COMMAND ${MPIEXEC_EXECUTABLE} ${TRIQS_PYTHON_EXECUTABLE} test.py
+           COMMAND ${MPIEXEC_EXECUTABLE} ${MPIEXEC_PREFLAGS} ${TRIQS_PYTHON_EXECUTABLE} test.py
            WORKING_DIRECTORY ${test_dir}
           )
   
