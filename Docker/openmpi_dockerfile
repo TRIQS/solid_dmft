@@ -81,13 +81,13 @@ RUN jupyter-lab build
 
 ENV OMP_NUM_THREADS=1
 ENV MKL_NUM_THREADS=1
-ARG NCORES=96
+ARG NCORES=24
 
 # create source dirs
 RUN cd / && mkdir -p triqs && mkdir -p source
 
 # W90
-RUN cd /source && git clone -b v3.1.0 --depth 1 https://github.com/wannier-developers/wannier90.git wannier90 \
+RUN cd /source && git clone -b develop --depth 1 https://github.com/wannier-developers/wannier90.git wannier90 \
     && cd wannier90 \
     # Using gfortran compiler 
     && echo "F90 = mpif90 \n COMMS  = mpi \n MPIF90 = mpif90 \n FCOPTS = -O3 -fallow-argument-mismatch \n LIBS = -Wl,--no-as-needed -lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lpthread -lm -ldl \n" > make.inc \
@@ -161,7 +161,6 @@ RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hubba
 # download solid_dmft and install
 RUN cd /source && git clone -b unstable --depth 1 https://github.com/flatironinstitute/solid_dmft.git solid_dmft.src \
     && mkdir -p solid_dmft.build && cd solid_dmft.build \
-    && sed -i 's/3.0.9/3.1.0/g' ../solid_dmft.src/CMakeLists.txt \
     && cmake ../solid_dmft.src -DMPIEXEC_PREFLAGS='--allow-run-as-root' \
     && make test && make install
 
