@@ -6,5 +6,5 @@ postprocessing tools
     postprocessing/maxent_gf_imp.rst
     postprocessing/maxent_gf_latt.rst
     postprocessing/maxent_sigma.rst
-    postprocessing/postproc_plotbands.rst
+    postprocessing/plot_correlated_bands.rst
   
