@@ -11,82 +11,25 @@ jobs:
 
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - {os: ubuntu-20.04, cc: gcc-10, cxx: g++-10}
 
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
+    container: 
+      image: materialstheory/solid_dmft_ci
 
     steps:
       - uses: actions/checkout@v2
         with: 
           path: 'solid_dmft.src'
 
-      - name: Install ubuntu dependencies
-        run: >
-          sudo apt-get update &&
-          sudo apt-get install lsb-release wget software-properties-common &&
-          curl -L https://users.flatironinstitute.org/~ccq/triqs3/focal/public.gpg | sudo apt-key add - &&
-          sudo add-apt-repository "deb https://users.flatironinstitute.org/~ccq/triqs3/focal/ /" &&
-          sudo apt-get update &&
-          sudo apt-get install
-          g++-10
-          gfortran
-          hdf5-tools
-          libblas-dev
-          libboost-dev
-          libfftw3-dev
-          libgfortran5
-          libgmp-dev
-          libhdf5-dev
-          liblapack-dev
-          libopenmpi-dev
-          openmpi-bin
-          openmpi-common
-          openmpi-doc
-          python3-dev
-          python3-mako
-          python3-matplotlib
-          python3-mpi4py
-          python3-numpy
-          python3-pip
-          python3-scipy
-          python3-sphinx
-          python3-nbsphinx
-          triqs
-          triqs_dft_tools
-          triqs_cthyb
-          triqs_maxent &&
-          pip3 install --upgrade sphinx myst-parser sphinx_rtd_theme linkify-it-py
-
-      - name: Build & Install HubbardI
-        env:
-          CPLUS_INCLUDE_PATH: /usr/include/openmpi:/usr/include/hdf5/serial/:$CPLUS_INCLUDE_PATH
-          CC: ${{ matrix.cc }}
-          CXX: ${{ matrix.cxx }}
-        run: |
-          git clone https://github.com/TRIQS/hubbardI hubbardI.src
-          mkdir hubbardI.build && cd hubbardI.build
-          cmake ../hubbardI.src -DBuild_Tests=OFF
-          sudo make -j1 install VERBOSE=1
-          cd ../
-
       - name: Build solid_dmft
-        env:
-          CPLUS_INCLUDE_PATH: /usr/include/openmpi:/usr/include/hdf5/serial/:$CPLUS_INCLUDE_PATH
-          CC: ${{ matrix.cc }}
-          CXX: ${{ matrix.cxx }}
-          LIBRARY_PATH: /usr/local/opt/llvm/lib
         run: |
-          mkdir solid_dmft.build && cd solid_dmft.build && cmake ../solid_dmft.src -DBuild_Documentation=ON
-          make -j2 || make -j1 VERBOSE=1
+          mkdir solid_dmft.build && cd solid_dmft.build && cmake ../solid_dmft.src -DBuild_Documentation=ON -DMPIEXEC_PREFLAGS='--allow-run-as-root' 
+          make
 
-      #- name: Test solid_dmft
-        #env:
-          #DYLD_FALLBACK_LIBRARY_PATH: /usr/local/opt/llvm/lib
-        #run: |
-          #cd solid_dmft.build
-          #ctest --output-on-failure
+      - name: Test solid_dmft
+        run: |
+          cd solid_dmft.build
+          ctest --output-on-failure
 
       - name: checkout github pages branch
         uses: actions/checkout@v2

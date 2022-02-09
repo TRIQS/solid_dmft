@@ -30,7 +30,7 @@ endif()
 
 # ############
 # Define Project
-project(solid_dmft VERSION 3.0.9 LANGUAGES C CXX)
+project(solid_dmft VERSION 3.1.0 LANGUAGES C CXX)
 get_directory_property(IS_SUBPROJECT PARENT_DIRECTORY)
 
 # ############
