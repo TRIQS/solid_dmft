@@ -27,6 +27,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
       python3-pip \
       python3-sphinx \
       python3-nbsphinx \
+      python3-skimage \ 
       python3-notebook \
       libpython3-dev \
       curl \
@@ -97,6 +98,12 @@ RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/cthyb
 RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hubbardI.git hubbardI.src \
     && mkdir -p hubbardI.build && cd hubbardI.build \
     && cmake ../hubbardI.src \ 
+    && make -j$NCORES && ctest -j$NCORES && make install
+
+# maxent needed for doc build
+RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/maxent.git maxent.src \
+    && mkdir -p maxent.build && cd maxent.build \
+    && cmake ../maxent.src \ 
     && make -j$NCORES && ctest -j$NCORES && make install
 
 # remove source
