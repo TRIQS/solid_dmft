@@ -220,8 +220,8 @@ def _write_sigma_omega_to_h5(g_aux_w, sigma_w, external_path, iteration):
 
     with HDFArchive(external_path, 'a') as archive:
         for i, (g_aux_imp, sigma_imp) in enumerate(zip(g_aux_w, sigma_w)):
-            archive[h5_internal_path][f'Sigma_w_{i}'] = sigma_imp
-            archive[h5_internal_path][f'G_aux_for_Sigma_w_{i}'] = g_aux_imp
+            archive[h5_internal_path][f'Sigma_maxent_{i}'] = sigma_imp
+            archive[h5_internal_path][f'G_aux_for_Sigma_maxent_{i}'] = g_aux_imp
 
 
 def main(external_path, iteration=None, continuator_type='inversion_sigmainf', maxent_error=.02,

@@ -49,7 +49,7 @@ def _read_h5(external_path, iteration=None):
     h5_internal_path = 'DMFT_results/' + ('last_iter' if iteration is None else 'it_{}'.format(iteration))
 
     with HDFArchive(external_path, 'r') as archive:
-        impurity_paths = [key for key in archive[h5_internal_path].keys() if 'Sigma_w_' in key]
+        impurity_paths = [key for key in archive[h5_internal_path].keys() if 'Sigma_maxent_' in key]
         # Sorts impurity paths by their indices, not sure if necessary
         impurity_indices = [int(s[s.rfind('_')+1:]) for s in impurity_paths]
         impurity_paths = [impurity_paths[i] for i in np.argsort(impurity_indices)]
