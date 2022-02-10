@@ -71,6 +71,10 @@ RUN pip3 install --no-cache-dir \
     zmq \
     notebook \
     tk \
+    myst_parser \ 
+    sphinx_rtd_theme  \
+    linkify-it-py \ 
+    Pandoc \
     # Jupyter lab packages
     jupyterlab \
     descartes \
