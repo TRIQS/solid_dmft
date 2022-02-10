@@ -36,7 +36,7 @@ TODO:
 
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
-from matplotlib.colors import LogNorm
+from matplotlib.colors import Normalize
 from matplotlib import cm
 from scipy.optimize import brentq
 from scipy.interpolate import interp1d
@@ -45,7 +45,7 @@ import itertools
 import skimage.measure
 
 from h5 import HDFArchive
-from triqs.gf import BlockGf
+from triqs.gf import BlockGf, MeshReFreq
 from triqs.lattice.utils import TB_from_wannier90, k_space_path
 
 
@@ -101,7 +101,14 @@ def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, block, orbital_orde
         print('Setting Sigma from {}'.format(specs['dmft_path']))
 
         with HDFArchive(specs['dmft_path'],'r') as ar:
-            sigma = ar['DMFT_results'][specs['it']]['Sigma_freq_0']
+            try:
+                sigma = ar['DMFT_results'][specs['it']]['Sigma_freq_0']
+                assert isinstance(sigma.mesh, MeshReFreq), 'Imported Greens function must be real frequency'
+            except(KeyError, AssertionError):
+                try:
+                    sigma = ar['DMFT_results'][specs['it']]['Sigma_maxent_0']
+                except KeyError:
+                    raise KeyError('Provide either "Sigma_freq_0" in real frequency or "Sigma_maxent_0".')
             dc = ar['DMFT_results'][specs['it']]['DC_pot'][0][spin][0,0]
             mu = ar['DMFT_results'][specs['it']]['chemical_potential_post']
             dft_mu = ar['DMFT_results']['it_1']['chemical_potential_pre']
@@ -336,8 +343,8 @@ def get_kx_ky_FS(lower_right, upper_left, Z, tb, select=None, N_kxy=10, kz=0.0, 
                                              kz*np.ones(len(contours[sheet][sec_per_sheet][:,0]))]).T.reshape(-1,3)
             # repeat on actual mesh for computing the weights
             ks_skimage = contours[sheet][sec_per_sheet]/(N_kxy-1)
-            FS_kx_ky_prim[sheet_ct] = (+ np.einsum('i,j->ij', ks_skimage[:,1], lower_right)
-                                       + np.einsum('i,j->ij', ks_skimage[:,0], upper_left)
+            FS_kx_ky_prim[sheet_ct] = (+ np.einsum('i,j->ij', ks_skimage[:,0], lower_right)
+                                       + np.einsum('i,j->ij', ks_skimage[:,1], upper_left)
                                        + np.einsum('i,j->ij', kz * np.ones(ks_skimage.shape[0]), Z))
             band_char[sheet_ct] = {}
             # compute the weight aka band character
@@ -366,14 +373,37 @@ def _setup_plot_bands(ax, special_k, k_points_labels, freq_dict):
 def setup_plot_kslice(ax):
 
     ax.set_aspect(1)
-    ax.set_xlim(0,1)
-    ax.set_ylim(0,1)
+    #ax.set_xlim(0,1)
+    #ax.set_ylim(0,1)
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))
     ax.yaxis.set_major_locator(MaxNLocator(integer=True))
     ax.set_xlabel(r'$k_xa/\pi$')
-    ax.set_ylabel(r'$k_ya/\pi$')
+    ax.set_ylabel(r'$k_yb/\pi$')
+
+def check_and_convert_plotting(quarter=None, **specs):
+
+    # proj_on_orb
+    assert isinstance(specs['proj_on_orb'], (int, type(None))) or all(isinstance(x, (int, type(None))) for x in specs['proj_on_orb']), 'proj_on_orb should be '\
+            f'an integer or list of integers, but is {type(specs["proj_on_orb"])}.'
+
+    if isinstance(specs['proj_on_orb'], (int, type(None))):
+        proj_on_orb = [specs['proj_on_orb']]
+    else:
+        proj_on_orb = specs['proj_on_orb']
+
+    # quarter
+    if quarter:
+        assert isinstance(quarter, int) or all(isinstance(x, int) for x in quarter), 'quarter should be'\
+                f'an integer or list of integers, but is {type(quarter)}.'
+
+    if isinstance(quarter, int):
+        quarter = [quarter]
+
+    return (proj_on_orb, quarter) if quarter else proj_on_orb
 
 def plot_bands(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb, dft_mu, tb=True, alatt=False, qp_bands=False, **plot_dict):
+
+    proj_on_orb = check_and_convert_plotting(**plot_dict, quarter=None)
 
     if alatt:
         if alatt_k_w is None: raise ValueError('A(k,w) unknown. Specify "with_sigma = True"')
@@ -382,35 +412,42 @@ def plot_bands(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb, dft_mu, tb=True, a
                 ax.scatter(tb_data['k_mesh'], alatt_k_w[:,orb].T, c=np.array([eval('cm.'+plot_dict['colorscheme_qpbands'])(1.0)]), zorder=2., s=1.)
         else:
             kw_x, kw_y = np.meshgrid(tb_data['k_mesh'], freq_dict['w_mesh'])
-            graph = ax.pcolormesh(kw_x, kw_y, alatt_k_w.T, cmap=plot_dict['colorscheme_bands'], norm=LogNorm(vmin=plot_dict['vmin'], vmax=np.max(alatt_k_w)))
+            graph = ax.pcolormesh(kw_x, kw_y, alatt_k_w.T, cmap=plot_dict['colorscheme_bands'], norm=Normalize(vmin=plot_dict['vmin'], vmax=np.max(alatt_k_w)))
             colorbar = plt.colorbar(graph)
             colorbar.set_label(r'$A(k, \omega)$')
 
     if tb:
         eps_nuk, evec_nuk = _get_tb_bands(**tb_data)
         for band in range(n_orb):
-            if not plot_dict['proj_on_orb'] is not None:
+            if not proj_on_orb[0] is not None:
                 color = eval('cm.'+plot_dict['colorscheme_bands'])(1.0)
                 ax.plot(tb_data['k_mesh'], eps_nuk[band].real - dft_mu, c=color, label=r'tight-binding', zorder=1.)
             else:
-                color = eval('cm.'+plot_dict['colorscheme_bands'])(np.real(evec_nuk[plot_dict['proj_on_orb'], band] * evec_nuk[plot_dict['proj_on_orb'], band].conjugate()))
+                total_proj = np.zeros(np.shape(evec_nuk[0, band]))
+                for orb in proj_on_orb:
+                    total_proj += np.real(evec_nuk[orb, band] * evec_nuk[orb, band].conjugate())
+                color = eval('cm.'+plot_dict['colorscheme_bands'])(total_proj)
                 ax.scatter(tb_data['k_mesh'], eps_nuk[band].real - dft_mu, c=color, s=1, label=r'tight-binding', zorder=1.)
 
     _setup_plot_bands(ax, tb_data['special_k'], tb_data['k_points_labels'], freq_dict)
 
 def plot_kslice(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb, tb_dict, tb=True, alatt=False, quarter=0, **plot_dict):
 
+    proj_on_orb, quarter = check_and_convert_plotting(**plot_dict, quarter=quarter)
+
     sign = [1,-1]
     quarters = np.array([sign,sign])
+    four_quarters = list(itertools.product(*quarters))
+    used_quarters = [four_quarters[x] for x in quarter]
 
     if alatt:
         if alatt_k_w is None: raise ValueError('A(k,w) unknown. Specify "with_sigma = True"')
         n_kx, n_ky = tb_data['e_mat'].shape[2:4]
         kx, ky = np.meshgrid(range(n_kx), range(n_ky))
-        for qrt in list(itertools.product(*quarters))[quarter:quarter+1]:
+        for (qx, qy) in used_quarters:
             if len(alatt_k_w.shape) > 2:
                 for orb in range(n_orb):
-                    ax.contour(qrt[0] * kx/(n_kx-1), qrt[1] * ky/(n_ky-1), alatt_k_w[:,:,orb].T, colors=np.array([eval('cm.'+plot_dict['colorscheme_qpbands'])(0.7)]), levels=1, zorder=2)
+                    ax.contour(qx * kx/(n_kx-1), qy * ky/(n_ky-1), alatt_k_w[:,:,orb].T, colors=np.array([eval('cm.'+plot_dict['colorscheme_qpbands'])(0.7)]), levels=1, zorder=2)
             else:
                 graph = ax.pcolormesh(qrt[0] * kx/(n_kx-1), qrt[1] * ky/(n_ky-1), alatt_k_w.T, cmap=plot_dict['colorscheme_kslice'],
                                       norm=LogNorm(vmin=plot_dict['vmin'], vmax=np.max(alatt_k_w)))
@@ -418,16 +455,21 @@ def plot_kslice(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb, tb_dict, tb=True,
                 #colorbar.set_label(r'$A(k, 0$)')
 
     if tb:
-        quarters *= 2
         FS_kx_ky, band_char = get_tb_kslice(tb_data['tb'], **tb_dict)
-        for qrt in list(itertools.product(*quarters))[quarter:quarter+1]:
-            for sheet in FS_kx_ky.keys():
-                for k_on_sheet in range(FS_kx_ky[sheet].shape[0]):
-                    if not plot_dict['proj_on_orb'] is not None:
+        for sheet in FS_kx_ky.keys():
+            for k_on_sheet in range(FS_kx_ky[sheet].shape[0]):
+                if not proj_on_orb[0] is not None:
+                    if isinstance(plot_dict['colorscheme_kslice'], str):
                         color = eval('cm.'+plot_dict['colorscheme_kslice'])(1.0)
                     else:
-                        color = eval('cm.'+plot_dict['colorscheme_kslice'])(band_char[sheet][k_on_sheet][plot_dict['proj_on_orb']])
-                    ax.plot(qrt[0] * FS_kx_ky[sheet][k_on_sheet:k_on_sheet+2,0], qrt[1] * FS_kx_ky[sheet][k_on_sheet:k_on_sheet+2,1], '-',
+                        color = plot_dict['colorscheme_kslice']
+                else:
+                    total_proj = 0
+                    for orb in proj_on_orb:
+                        total_proj += band_char[sheet][k_on_sheet][orb]
+                    color = eval('cm.'+plot_dict['colorscheme_kslice'])(total_proj)
+                for (qx, qy) in used_quarters:
+                    ax.plot(2*qx * FS_kx_ky[sheet][k_on_sheet:k_on_sheet+2,0], 2*qy * FS_kx_ky[sheet][k_on_sheet:k_on_sheet+2,1], '-',
                             solid_capstyle='round', c=color, zorder=1.)
 
     setup_plot_kslice(ax)
@@ -435,6 +477,12 @@ def plot_kslice(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb, tb_dict, tb=True,
     return ax
 
 def get_dmft_bands(n_orb, w90_path, w90_seed, add_spin, mu, add_lambda, with_sigma=False, fermi_slice=False, qp_bands=False, orbital_order_to=['dxz', 'dyz', 'dxy'], band_basis=False, trace=True , eta=0.0, **specs):
+
+    # checks
+    assert len(set(orbital_order_to)) == len(orbital_order_to), 'Please provide a unique identifier for each orbital.'
+    assert set(specs['orbital_order_w90']) == set(orbital_order_to), f'Identifiers of orbital_order_to and orbital_order_w90'\
+            f'do not match! orbital_order_to is {orbital_order_to}, but orbital_order_w90 is {specs["orbital_order_w90"]}.'
+
 
     # set up Wannier Hamiltonian
     n_orb_rescale = 2 * n_orb if add_spin else n_orb
