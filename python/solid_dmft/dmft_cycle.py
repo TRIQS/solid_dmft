@@ -36,7 +36,7 @@ from triqs.operators.util.observables import S_op
 from triqs.version import git_hash as triqs_hash
 from h5 import HDFArchive
 import triqs.utility.mpi as mpi
-from triqs.gf import BlockGf, GfImFreq, GfReFreq, make_hermitian
+from triqs.gf import BlockGf, GfReFreq, make_hermitian
 from triqs.gf.tools import inverse
 from triqs_dft_tools.sumk_dft import SumkDFT
 

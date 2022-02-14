@@ -274,7 +274,7 @@ def main(external_path, iteration=None, continuator_type='inversion_sigmainf', m
     Raises
     ------
     NotImplementedError
-        -- When a wrong continuator type or maxent analyzer is chose
+        -- When a wrong continuator type or maxent analyzer is chosen
         -- For direct continuator: when the self energy contains blocks larger
         than 1x1 (no off-diagonal continuation possible)
         -- For inversion_dc continuator: when the DC is not a diagonal matrix with
