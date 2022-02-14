@@ -260,11 +260,14 @@ def _set_mu_to_gap_middle_with_maxent(general_params, sum_k, gf_lattice_iw, arch
 def set_initial_mu(general_params, sum_k, iteration_offset, archive, shell_multiplicity):
     """
     Handles the different ways of setting the initial chemical potential mu:
-    - Chemical potential set to fixed value: uses this value
-    - New calculation: determines mu from dichotomy method
-    - Resuming calculation and chemical potential not updated this iteration:
+    * Chemical potential set to fixed value: uses this value
+
+    * New calculation: determines mu from dichotomy method
+
+    * Resuming calculation and chemical potential not updated this iteration:
        loads calculation before previous iteration.
-    - Resuming calculation and chemical potential is updated:
+
+    * Resuming calculation and chemical potential is updated:
         checks if the system is gapped and potentially run MaxEnt to find gap
         middle. Otherwise, gets mu from dichotomy and applies mu mixing to result.
 
@@ -359,9 +362,11 @@ def set_initial_mu(general_params, sum_k, iteration_offset, archive, shell_multi
 def update_mu(general_params, sum_k, it, archive):
     """
     Handles the different ways of updating the chemical potential mu:
-    - Chemical potential set to fixed value: uses this value
-    - Chemical potential not updated this iteration: nothing happens.
-    - Chemical potential is updated: checks if the system is gapped and
+    * Chemical potential set to fixed value: uses this value
+
+    * Chemical potential not updated this iteration: nothing happens.
+
+    * Chemical potential is updated: checks if the system is gapped and
         potentially run MaxEnt to find gap middle. Otherwise, gets mu from
         dichotomy and applies mu mixing to result.
 

@@ -24,7 +24,6 @@
 
 
 r"""
-DOC
-
+DMFT routine helper functions used during solid_dmft run
 """
 __all__ = []

@@ -24,7 +24,6 @@
 
 
 r"""
-DOC
-
+DFT code driver modules
 """
 __all__ = []

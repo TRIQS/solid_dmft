@@ -51,7 +51,8 @@ def prep_observables(h5_archive, sum_k):
         hdf archive for calculation
     sum_k : SumK Object instances
 
-    __Returns:__
+    Returns
+    -------
     observables : dict
         observable array for calculation
     """
@@ -138,7 +139,8 @@ def write_header_to_file(general_params, sum_k):
         number of impurities for calculations
 
 
-    __Returns:__
+    Returns
+    -------
     nothing
     """
 
@@ -171,7 +173,8 @@ def add_dft_values_as_zeroth_iteration(observables, general_params, dft_mu, dft_
 
     shell_multiplicity : degeneracy of impurities
 
-    __Returns:__
+    Returns
+    -------
 
     observables: list of dicts
     """
@@ -290,8 +293,8 @@ def add_dmft_observables(observables, general_params, solver_params, dft_energy,
 
     E_bandcorr : E_kin_dmft - E_kin_dft, either calculated man or from sum_k method if CSC
 
-    __Returns:__
-
+    Returns
+    -------
     observables: list of dicts
     """
 
@@ -414,8 +417,8 @@ def write_obs(observables, sum_k, general_params):
 
     general_params : dict
 
-    __Returns:__
-
+    Returns
+    -------
     nothing
 
     """
@@ -506,7 +509,8 @@ def calc_dft_kin_en(general_params, sum_k, dft_mu):
         DFT fermi energy
 
 
-    __Returns:__
+    Returns
+    -------
     E_kin_dft: float
         kinetic energy from DFT
 
@@ -555,7 +559,8 @@ def calc_bandcorr_man(general_params, sum_k, E_kin_dft):
         kinetic energy from DFT
 
 
-    __Returns:__
+    Returns
+    -------
     E_bandcorr: float
         band energy correction E_kin_dmft - E_kin_dft
 
@@ -602,7 +607,8 @@ def calc_Z(Sigma):
         self-energy in Matsubara
 
 
-    __Returns:__
+    Returns
+    -------
     orb_Z: 1d numpy array
         list of Z values per orbital in Sigma
 

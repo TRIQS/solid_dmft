@@ -8,6 +8,8 @@ import sys
 sys.path.insert(0, "@CMAKE_CURRENT_SOURCE_DIR@/sphinxext")
 sys.path.insert(0, "@CMAKE_CURRENT_SOURCE_DIR@/sphinxext/numpydoc")
 
+exclude_patterns = ['_templates', 'examples']
+
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.mathjax',
               'sphinx.ext.intersphinx',
@@ -36,7 +38,16 @@ myst_enable_extensions = [
     "tasklist",
 ]
 
+autodoc_default_options = {
+    'members': None, # Include all members (methods).
+    'special-members': None,
+    'exclude-members': '__dict__,__weakref__',
+    'undoc-members' : None,
+    }
+
 source_suffix = '.rst'
+
+autosummary_generate = True  # Turn on sphinx.ext.autosummary
 
 project = '@PROJECT_NAME@'
 version = '@PROJECT_VERSION@'
@@ -112,7 +123,7 @@ class PatchedHTMLTranslator(HTMLTranslator):
         if 'target' in node:
             atts['target'] = node['target']
         self.body.append(self.starttag(node, 'a', '', **atts))
- 
+
         if node.get('secnumber'):
             self.body.append(('%s' + self.secnumber_suffix) %
                              '.'.join(map(str, node['secnumber'])))

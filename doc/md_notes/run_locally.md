@@ -1,6 +1,6 @@
-## run on your machine
+# run on your machine
 
-### CSC calculations locally
+## CSC calculations locally
 
 Here one needs a special docker image with vasp included. This can be done by
 building the Dockerfile in `/Docker`.

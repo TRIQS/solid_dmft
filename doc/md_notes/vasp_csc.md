@@ -1,7 +1,7 @@
-## interface to VASP
+# interface to VASP
 
 
-### General remarks
+## General remarks
 
 One can use the official Vasp 5.4.4 patch 1 version with a few modifications:
 
@@ -27,7 +27,7 @@ print *, ' '
 - this one is __essential__ for the current version of the DMFT code. Vasp spends a very long time in the function `LPRJ_LDApU` and this function is not needed! It is used for some basic checks and a manual LDA+U implementation. Removing the call to this function in `electron.F` in line 644 speeds up the calculation by up to 30%! If this is not done, Vasp will create a GAMMA file each iteration which needs to be removed manually to not overwrite the DMFT GAMMA file!
 - make sure that mixing in VASP stays turned on. Don't set IMIX or the DFT steps won't converge!
 
-### LOCPROJ bug for individual projections:
+## LOCPROJ bug for individual projections:
 
 
 Example use of LOCPROJ for t2g manifold of SrVO3 (the order of the orbitals seems to be mixed up... this example leads to x^2 -y^2, z^2, yz... )
@@ -50,7 +50,7 @@ However, if the complete d manifold is chosen, the usual VASP order (xy, yz, z2,
 LOCPROJ = 2 : d : Pr 1
 ```
 
-### convergence of projectors with Vasp
+## convergence of projectors with Vasp
 
 
 for a good convergence of the projectors it is important to convergence the wavefunctions to high accuracy. Otherwise this often leads to off-diagonal elements in the the local Green's function. To check convergence pay attention to the rms and rms(c) values in the Vasp output. The former specifies the convergence of the KS wavefunction and the latter is difference of the input and out charge density. Note, this does not necessarily coincide with good convergence of the total energy in DFT! Here an example of two calculations for the same system, both converged down to `EDIFF= 1E-10` and Vasp stopped. First run:
@@ -69,7 +69,7 @@ DAV:  31    -0.394760088659E+02    0.39472E-09    0.35516E-13 132366   0.110E-10
 ```
 The total energy is lower as well. But more importantly the second calculation produces well converged projectors preserving symmetries way better, with less off-diagonal elements in Gloc, making it way easier for the solver. Always pay attention to rms.
 
-### Enabling CSC calculations with Wannier90 projectors
+## Enabling CSC calculations with Wannier90 projectors
 
 
 You basically only need to add two things to have W90 run in Vasp's CSC mode, all in `electron.F`:
@@ -89,7 +89,7 @@ Remarks:
 - W90-CSC requires Wannier90 v3, in v2 the tag write_u_matrices does not work correctly. Until now, linking W90 v3 to Vasp with the `DVASP2WANNIER90v2` has worked without any problems even though it is not officially supported
 - symmetries in Vasp should remain turned on, otherwise the determination of rotation matrices in dft_tools' wannier converter will most likely fail
 
-### Speeding up by not writing projectors at every step
+## Speeding up by not writing projectors at every step
 
 
 This is very important for CSC calculations with W90 but also speeds up the PLO-based ones.

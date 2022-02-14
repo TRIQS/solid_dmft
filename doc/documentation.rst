@@ -19,6 +19,7 @@ DFT code interfaces
 .. toctree::
    md_notes/w90_interface.md
    md_notes/vasp_csc.md
+   cRPA_VASP/README.md
 
 run solid_dmft
 ===================
@@ -31,14 +32,19 @@ run solid_dmft
 module reference manual
 =======================
 
-.. toctree::
-   :maxdepth: 4
+.. autosummary::
+   :toctree: _autosummary
+   :template: autosummary_module_template.rst
+   :recursive:
 
-   reference/csc_flow
-   reference/dft_managers
-   reference/dmft_cycle
-   reference/dmft_tools
-   reference/postprocessing
-   reference/read_config
-   reference/util
+    csc_flow
+    dft_managers
+    dmft_cycle
+    dmft_tools
+    postprocessing
+    read_config
+    util
+    
+
+   
 

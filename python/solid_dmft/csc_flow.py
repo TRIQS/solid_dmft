@@ -22,7 +22,7 @@
 #
 ################################################################################
 """
-contains the CSC flow control functions
+contains the charge self-consistency flow control functions
 """
 
 import time

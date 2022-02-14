@@ -23,7 +23,7 @@
 ################################################################################
 
 r"""
-DOC
+external helper functions, not used by any DMFT routine
 
 """
 __all__ = []

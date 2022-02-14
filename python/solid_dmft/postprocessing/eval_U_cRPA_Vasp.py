@@ -24,7 +24,8 @@ def read_uijkl(path_to_uijkl,n_sites,n_orb):
     n_orb : int
         number of orbitals per atom
 
-    __Returns:__
+    Returns
+    -------
     uijkl : numpy array
         uijkl Coulomb tensor
 
@@ -51,6 +52,7 @@ def red_to_2ind(uijkl,n_sites,n_orb,out=False):
     U_par = U_mm'^oo = U_mm'mm' - U_mm'm'm (for intersite interaction)
     U_ijij (Hunds coupling)
     the indices in VASP are switched: U_ijkl ---VASP--> U_ikjl
+
     Parameters
     ----------
     uijkl : numpy array
@@ -61,7 +63,9 @@ def red_to_2ind(uijkl,n_sites,n_orb,out=False):
         number of orbitals per atom
     out : bool
         verbose mode
-    __Returns:__
+
+    Returns
+    -------
     Uij_anti : numpy array
         red 2 index matrix U_mm'mm'
     Uiijj : numpy array
@@ -104,6 +108,7 @@ def calc_kan_params(uijkl,n_sites,n_orb,out=False):
     given Uijkl matrix. Follows the procedure given in
     PHYSICAL REVIEW B 86, 165105 (2012) Vaugier,Biermann
     formula 30,31,32
+
     Parameters
     ----------
     uijkl : numpy array
@@ -114,7 +119,9 @@ def calc_kan_params(uijkl,n_sites,n_orb,out=False):
         number of orbitals per atom
     out : bool
         verbose mode
-    __Returns:__
+
+    Returns
+    -------
     int_params : direct
         kanamori parameters
     '''
@@ -165,6 +172,7 @@ def calc_u_avg_fulld(uijkl,n_sites,n_orb,out=False):
     works atm only for full d shell (l=2)
 
     Returns F0=U, and J=(F2+F4)/2
+
     Parameters
     ----------
     uijkl : numpy array
@@ -175,7 +183,9 @@ def calc_u_avg_fulld(uijkl,n_sites,n_orb,out=False):
         number of orbitals per atom
     out : bool
         verbose mode
-    __Returns:__
+
+    Returns
+    -------
     int_params : direct
         Slater parameters
     '''
@@ -244,7 +254,9 @@ def calculate_interaction_from_averaging(uijkl, n_sites, n_orb, out=False):
         number of orbitals per atom
     out : bool
         verbose mode
-    __Returns:__
+
+    Returns
+    -------
     U, J: tuple
         Slater parameters
     '''

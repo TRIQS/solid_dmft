@@ -12,7 +12,7 @@ endif()
 add_custom_target(${PROJECT_NAME}_docs_sphinx ALL)
 add_custom_command(
   TARGET ${PROJECT_NAME}_docs_sphinx
-  COMMAND PYTHONPATH=${PROJECT_BINARY_DIR}/python:$ENV{PYTHONPATH} ${SPHINXBUILD_EXECUTABLE} -c . -j8 -b html ${CMAKE_CURRENT_SOURCE_DIR} html
+  COMMAND PYTHONPATH=${PROJECT_BINARY_DIR}/python:${PROJECT_BINARY_DIR}/python/solid_dmft:$ENV{PYTHONPATH} ${SPHINXBUILD_EXECUTABLE} -c . -b html ${CMAKE_CURRENT_SOURCE_DIR} html
 )
 
 # ---------------------------------

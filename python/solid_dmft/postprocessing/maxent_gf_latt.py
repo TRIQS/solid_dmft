@@ -29,9 +29,10 @@ function using maxent.
 Reads G_latt(i omega) from the h5 archive and writes A_latt(omega) back.
 
 Known problems:
-    - when using parameter `energy_shift_orbitals` in soliDMFT, this is not
-    accounted for in this routine. It requires a similar modification of the
-    hopping matrix of SumkDFT as in dmft_cycle.py.
+    * when using parameter `energy_shift_orbitals` in soliDMFT, this is not
+      accounted for in this routine. It requires a similar modification of the
+      hopping matrix of SumkDFT as in dmft_cycle.py.
+
 
 Author: Max Merkel, 2020
 """

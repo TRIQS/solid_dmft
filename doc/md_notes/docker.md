@@ -1,9 +1,9 @@
 
-## Docker
+# Docker
 
 There are Dockerfiles for images based on Ubuntu 20 ("focal") with OpenMPI (for non-Cray clusters) or MPICH (for Cray clusters like Daint), IntelMKL, VASP, wannier90 2.1, triqs 3.x.x, and Triqs MaxEnt included.
 
-### Building the docker image
+## Building the docker image
 The Dockerfile is built with this command, where `<version name>` could be `3.0.0`:
 ```
 docker build -t triqs_mpich:<version name> -f mpich_dockerfile ./
@@ -11,7 +11,7 @@ docker build -t triqs_openmpi:<version name> -f openmpi_dockerfile ./
 ```
 Note that you need a working, modified vasp version as archive (csc_vasp.tar.gz) in this directory to make the CSC calculation work.
 
-### Pulling a docker image
+## Pulling a docker image
 Alternatively, you can pull an already-compiled image from the ETH gitlab container registry.
 First [log in with a personal access token](https://gitlab.ethz.ch/help/user/packages/container_registry/index#authenticating-to-the-gitlab-container-registry).
 This token you can save into a file and then log in into the registry with
@@ -24,7 +24,7 @@ docker pull registry.ethz.ch/d-matl-theory/uni-dmft/<image name>:<version name>
 ```
 Just make sure that the version is the one that you want to have, it might not yet contain recent changes or bug fixes. Alternatively, there is the [official triqs docker image](https://hub.docker.com/r/flatironinstitute/triqs/), which however is not optimized for use on Daint.
 
-### Getting docker images onto CSCS daint
+## Getting docker images onto CSCS daint
 First, you load the desired docker images with [sarus on daint](https://user.cscs.ch/tools/containers/sarus/).
 Then there are two ways of getting the image on daint:
 

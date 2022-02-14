@@ -1,12 +1,12 @@
-## Running solid_dmft on a cluster
+# Running solid_dmft on a cluster
 
-### Running on CSCS daint
+## Running on CSCS daint
 
 in some directories one can also find example job files to run everything on
 daint. Note, that one has to first load the desired docker images with sarus
 on daint: https://user.cscs.ch/tools/containers/sarus/, see the README.md in the `/Docker` folder.
 
-### one shot job on daint
+## one shot job on daint
 
 one shot is quite straight forward. Just get the newest version of these
 scripts, go to a working directory and then create job file that looks like
@@ -31,7 +31,7 @@ srun sarus run --mpi --mount=type=bind,source=$SCRATCH,destination=$SCRATCH --mo
 thats it. This line automatically runs the docker image and executes the
 `solid_dmft.py` script. Unfortunately the new sarus container enginge does not mounts automatically user directories. Therefore, one needs to specify with `--mount` to mount the scratch and apps folder manually. Then, one executes in the container bash to first go into the current dir and then executes python and the dmft script.
 
-### CSC calculations on daint
+## CSC calculations on daint
 
 CSC calculations need the parameter `csc = True` and the mandatory parameters from the group `dft`.
 Then, solid_dmft automatically starts VASP on as many cores as specified.
