@@ -65,6 +65,7 @@ RUN pip3 install --no-cache-dir \
     monty \
     mpi4py \
     pymatgen \
+    ase \ 
     Jinja2 \
     Mako \
     tornado \
@@ -85,7 +86,7 @@ RUN jupyter-lab build
 
 ENV OMP_NUM_THREADS=1
 ENV MKL_NUM_THREADS=1
-ARG NCORES=24
+ARG NCORES=12
 
 # create source dirs
 RUN cd / && mkdir -p triqs && mkdir -p source
@@ -96,7 +97,7 @@ RUN cd /source && git clone -b develop --depth 1 https://github.com/wannier-deve
     # Using gfortran compiler 
     && echo "F90 = mpif90 \n COMMS  = mpi \n MPIF90 = mpif90 \n FCOPTS = -O3 -fallow-argument-mismatch \n LIBS = -Wl,--no-as-needed -lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lpthread -lm -ldl \n" > make.inc \
     && cd /source/wannier90 \
-    && make -j$NCORES default lib \
+    && make default lib \
     && make install
 
 # install qe
@@ -155,6 +156,12 @@ RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/maxen
     && mkdir -p maxent.build && cd maxent.build \
     && cmake ../maxent.src \ 
     && make -j$NCORES && ctest -j$NCORES && make install
+
+# TPRF
+RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/tprf.git tprf.src \
+    && mkdir -p tprf.build && cd tprf.build \
+    && cmake ../tprf.src -DMPIEXEC_PREFLAGS='--allow-run-as-root'  \
+    && make -j$NCORES && make test && make install
 
 # hubbardI
 RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hubbardI.git hubbardI.src \

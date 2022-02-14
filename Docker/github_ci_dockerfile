@@ -53,6 +53,7 @@ RUN pip3 install --no-cache-dir \
     mpi4py \
     Jinja2 \
     Mako \
+    ase \ 
     tornado \
     zmq \
     tk  \ 
