@@ -26,7 +26,7 @@
 import numpy as np
 import triqs.utility.mpi as mpi
 
-def determine_afm_mapping(general_params, archive, n_inequiv_shells):
+def determine(general_params, archive, n_inequiv_shells):
     """
     Determines the symmetries that are used in AFM calculations. These
     symmetries can then be used to copy the self-energies from one impurity to
@@ -80,7 +80,7 @@ def determine_afm_mapping(general_params, archive, n_inequiv_shells):
     return general_params
 
 
-def apply_afm_mapping(general_params, solver_params, icrsh, gf_struct_solver, solvers):
+def apply(general_params, solver_params, icrsh, gf_struct_solver, solvers):
     imp_source = general_params['afm_mapping'][icrsh][1]
     invert_spin = general_params['afm_mapping'][icrsh][2]
     mpi.report('\ncopying the self-energy for shell {} from shell {}'.format(icrsh, imp_source))

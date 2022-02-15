@@ -36,7 +36,7 @@ from triqs.operators.util.observables import S_op
 from triqs.version import git_hash as triqs_hash
 from h5 import HDFArchive
 import triqs.utility.mpi as mpi
-from triqs.gf import BlockGf, GfImFreq, GfReFreq, make_hermitian
+from triqs.gf import BlockGf, GfReFreq, make_hermitian
 from triqs.gf.tools import inverse
 from triqs_dft_tools.sumk_dft import SumkDFT
 
@@ -456,7 +456,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
         sum_k.SP = 1
 
         if general_params['afm_order']:
-            general_params = afm_mapping.determine_afm_mapping(general_params, archive, sum_k.n_inequiv_shells)
+            general_params = afm_mapping.determine(general_params, archive, sum_k.n_inequiv_shells)
 
     # Constructs interaction Hamiltonian and writes it to the h5 archive
     h_int = interaction_hamiltonian.construct(sum_k, general_params, advanced_params)
@@ -592,6 +592,11 @@ def _dmft_step(sum_k, solvers, it, general_params,
 
     mpi.barrier()
 
+    if sum_k.SO:
+        printed = ((np.real, 'real'), (np.imag, 'imaginary'))
+    else:
+        printed = ((np.real, 'real'), )
+
     # Extracts G local
     if general_params['solver_type'] in ['ftps']:
         G_loc_all = sum_k.extract_G_loc(iw_or_w='w', broadening=general_params['eta'])
@@ -616,8 +621,9 @@ def _dmft_step(sum_k, solvers, it, general_params,
         density_mat_pre[icrsh] = solvers[icrsh].G_freq.density()
         mpi.report('Estimated density matrix:')
         for key, value in sorted(density_mat_pre[icrsh].items()):
-            mpi.report(key)
-            mpi.report(np.real(value))
+            for func, name in printed:
+                mpi.report('{}, {} part'.format(key, name))
+                mpi.report(func(value))
 
         # dyson equation to extract G0_freq, using Hermitian symmetry
         solvers[icrsh].G0_freq << inverse(solvers[icrsh].Sigma_freq + inverse(solvers[icrsh].G_freq))
@@ -652,7 +658,7 @@ def _dmft_step(sum_k, solvers, it, general_params,
                 and general_params['afm_order'] and general_params['afm_mapping'][icrsh][0]):
             # If we do a AFM calculation we can use the init magnetic moments to
             # copy the self energy instead of solving it explicitly
-            solvers = afm_mapping.apply_afm_mapping(general_params, solver_params, icrsh, sum_k.gf_struct_solver[icrsh], solvers)
+            solvers = afm_mapping.apply(general_params, solver_params, icrsh, sum_k.gf_struct_solver[icrsh], solvers)
         else:
             # Solve the impurity problem for this shell
             mpi.report('\nSolving the impurity problem for shell {} ...'.format(icrsh))
@@ -667,7 +673,8 @@ def _dmft_step(sum_k, solvers, it, general_params,
         density_tot += density_shell[icrsh]*shell_multiplicity[icrsh]
         density_mat_unsym[icrsh] = solvers[icrsh].G_freq_unsym.density()
         density_mat[icrsh] = solvers[icrsh].G_freq.density()
-        formatter.print_local_density(density_shell[icrsh], density_shell_pre[icrsh], density_mat_unsym[icrsh])
+        formatter.print_local_density(density_shell[icrsh], density_shell_pre[icrsh],
+                                      density_mat_unsym[icrsh], sum_k.SO)
 
         # update solver in h5 archive
         if general_params['store_solver'] and mpi.is_master_node():

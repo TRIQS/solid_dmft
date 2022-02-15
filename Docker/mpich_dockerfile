@@ -15,6 +15,8 @@ RUN apt-get update && \
     build-essential \
 # Vasp, doesn't work with newer gfortran versions
     gfortran-7 \
+    gcc-10 \
+    g++-10 \
     git \
     rsync \
 # TODO: add scaLAPACK
@@ -48,10 +50,12 @@ RUN apt-get update && \
 # Necessary to install cmake through pip. There is a bug in the apt version (status 2020/09/11)
 RUN pip3 install --no-cache-dir cmake==3.14.3
 ENV PATH=/usr/local/bin:${PATH}
-# TODO: replace by update-alternatives
+
 RUN ln -sf $(which gfortran-7) /usr/bin/gfortran
 RUN ln -sf /usr/lib/gcc/x86_64-linux-gnu/7/f951 /usr/local/bin/.
 RUN ln -sf /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /usr/lib/x86_64-linux-gnu/libstdc++.so
+RUN ln -sf /usr/bin/gcc-10 /usr/bin/gcc
+RUN ln -sf /usr/bin/g++-10 /usr/bin/g++
 
 # For old sarus version, needs to remove ligfortran5. ligfortran5 needed for previous
 # MKL installation but two different libgfortran versions (libgfortran4 comes from gfortran7
@@ -110,7 +114,7 @@ ENV FFLAGS="-m64 -O3"
 # triqs
 RUN cd / && mkdir -p triqs && mkdir -p source
 
-RUN cd /source && git clone -b 3.0.x --depth 1 https://github.com/TRIQS/triqs triqs.src \
+RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/triqs triqs.src \
     && mkdir -p triqs.build && cd triqs.build \
     && cmake ../triqs.src -DCMAKE_INSTALL_PREFIX=/triqs \
        -DBLAS_LIBRARIES=/lib/x86_64-linux-gnu/libmkl_rt.so \
@@ -126,20 +130,19 @@ ENV CMAKE_PREFIX_PATH=/triqs/share/cmake:${CMAKE_PREFIX_PATH}
 ENV TRIQS_ROOT=/triqs
 
 # dft_tools
-RUN cd /source && git clone -b unstable https://github.com/TRIQS/dft_tools.git dft_tools.src \
-    && cd dft_tools.src && git checkout 3122ab2a832d2825cdad06117bf57b92288c8aa4 && cd .. \
+RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/dft_tools.git dft_tools.src \
     && mkdir -p dft_tools.build && cd dft_tools.build \
     && cmake ../dft_tools.src -DCMAKE_INSTALL_PREFIX=/triqs \
     && make && make -j$(nproc) test && make install
 
 # cthyb
-RUN cd /source && git clone -b 3.0.x --depth 1 https://github.com/TRIQS/cthyb.git cthyb.src \
+RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/cthyb.git cthyb.src \
     && mkdir -p cthyb.build && cd cthyb.build \
     && cmake ../cthyb.src -DCMAKE_INSTALL_PREFIX=/triqs \
     && make -j$(nproc) && make -j$(nproc) test && make install
 
 # maxent
-RUN cd /source && git clone -b 1.0.0 --depth 1 https://github.com/TRIQS/maxent.git maxent.src \
+RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/maxent.git maxent.src \
     && mkdir -p maxent.build && cd maxent.build \
     && cmake ../maxent.src -DCMAKE_INSTALL_PREFIX=/triqs \
     && make -j$(nproc) && make -j$(nproc) test && make install
@@ -151,10 +154,17 @@ RUN cd /source && git clone -b 1.0.0 --depth 1 https://github.com/TRIQS/maxent.g
 #     && make -j$(nproc) && make -j$(nproc) test && make install
 
 # hubbardI
-RUN cd /source && git clone -b 3.0.x --depth 1 https://github.com/TRIQS/hubbardI hubbardI.src \
+RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hubbardI hubbardI.src \
     && mkdir -p hubbardI.build && cd hubbardI.build \
     && cmake ../hubbardI.src -DCMAKE_INSTALL_PREFIX=/triqs \
     && make -j$(nproc) && make -j$(nproc) test && make install
+
+# solid_dmft
+RUN cd /source && git clone -b unstable --depth 1 https://github.com/flatironinstitute/solid_dmft.git solid_dmft.src \
+    && mkdir -p solid_dmft.build && cd solid_dmft.build \
+    && cmake ../solid_dmft.src -DCMAKE_INSTALL_PREFIX=/triqs \
+    && make -j$(nproc) && make -j$(nproc) test && make install
+
 
 ##################################################
 # Wannier90 and VASP                             #
