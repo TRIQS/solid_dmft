@@ -72,7 +72,7 @@ it says: low cutoff result for V_ijkl. Here ENCUT was used and for the one above
 * usually a converged ENCUT gives also a reasonably high VCUTOFF, so that explicitly setting VCUTOFF is not necessary. Moreover, the effect of the VCUTOFF convergence is included by subtracting the constant shift between LOW and HIGH VCUTOFF test output in the OUTCAR
 * One can see in the convergence plot "examples/LaTiO3/VCUTOFF_convergence.png" the effect of ENCUT and VCUTOFF:
 
-![vcutoff_test](examples/LaTiO3/VCUTOFF_convergence.png)
+![vcutoff_test](VCUTOFF_convergence.png)
 
 ## convergency tests:
 $`E_{corr}^{RPA}`$  converges for NBANDS,ENCUT to $`\infty`$, where the asymptotic

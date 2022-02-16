@@ -3,10 +3,11 @@
 # TRIQS documentation build configuration file
 
 import sys
-
-
 sys.path.insert(0, "@CMAKE_CURRENT_SOURCE_DIR@/sphinxext")
 sys.path.insert(0, "@CMAKE_CURRENT_SOURCE_DIR@/sphinxext/numpydoc")
+
+# exclude these folders from scanning by sphinx
+exclude_patterns = ['_templates', 'examples']
 
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.mathjax',
@@ -36,7 +37,13 @@ myst_enable_extensions = [
     "tasklist",
 ]
 
+# The name of the Pygments (syntax highlighting) style to use.
+pygments_style = 'sphinx'
+
 source_suffix = '.rst'
+
+# Turn on sphinx.ext.autosummary
+autosummary_generate = True
 
 project = '@PROJECT_NAME@'
 version = '@PROJECT_VERSION@'
@@ -112,7 +119,7 @@ class PatchedHTMLTranslator(HTMLTranslator):
         if 'target' in node:
             atts['target'] = node['target']
         self.body.append(self.starttag(node, 'a', '', **atts))
- 
+
         if node.get('secnumber'):
             self.body.append(('%s' + self.secnumber_suffix) %
                              '.'.join(map(str, node['secnumber'])))

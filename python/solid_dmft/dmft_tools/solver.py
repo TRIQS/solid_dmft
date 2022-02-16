@@ -78,6 +78,14 @@ class SolverStructure:
 
     r'''
     Handles all soliDMFT solver objects and contains TRIQS solver instance.
+
+    Attributes
+    ----------
+
+    Methods
+    -------
+    solve(self)
+        solve impurity problem
     '''
 
     def __init__(self, general_params, solver_params, sum_k, icrsh, h_int, iteration_offset, solver_struct_ftps):
@@ -271,7 +279,7 @@ class SolverStructure:
 
     def solve(self):
         r'''
-        solve command
+        solve impurity problem with current solver
         '''
 
         if self.general_params['solver_type'] == 'cthyb':

@@ -22,8 +22,9 @@
 #
 ################################################################################
 """
-Defines the dmft_cycle which works for one-shot and csc equally
+main DMFT cycle, DMFT step, and helper functions
 """
+
 
 # system
 import os
@@ -65,7 +66,8 @@ def _determine_block_structure(sum_k, general_params, advanced_params):
     ----------
     sum_k : SumK Object instances
 
-    __Returns:__
+    Returns
+    -------
     sum_k : SumK Object instances
         updated sum_k Object
     """
@@ -251,7 +253,8 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
         If given, writes density correction for csc calculations only for
         irreducible kpoints
 
-    __Returns:__
+    Returns
+    ---------
     observables : dict
         updated observable array for calculation
     """

@@ -27,9 +27,10 @@ Script to combine the information from maxent_sigma.py and the dft_bands_input
 to generate the DMFT spectral function and DMFT band structure from Sigma(omega).
 
 Known problems:
-    - when using parameter `energy_shift_orbitals` in soliDMFT, this is not
-    accounted for in this routine. It requires a similar modification of the
-    hopping matrix of SumkDFT as in dmft_cycle.py.
+    * when using parameter `energy_shift_orbitals` in soliDMFT, this is not
+      accounted for in this routine. It requires a similar modification of the
+      hopping matrix of SumkDFT as in dmft_cycle.py.
+
 
 Author: Max Merkel, 2020-2021
 """

@@ -53,7 +53,8 @@ def calculate_double_counting(sum_k, density_matrix, general_params, advanced_pa
     advanced_params : dict
         advanced parameters as a dict
 
-    __Returns:__
+    Returns
+    --------
     sum_k : SumKDFT object
         The SumKDFT object containing the updated double counting
     """
@@ -169,7 +170,8 @@ def _load_sigma_from_h5(h5_archive, iteration):
     iteration : int
         at which iteration will sigma be loaded
 
-    __Returns:__
+    Returns
+    --------
     self_energies : list of green functions
 
     dc_imp : numpy array
@@ -329,19 +331,20 @@ def determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
                                    archive, iteration_offset, density_mat_dft, solvers):
     """
     Determines the double counting (DC) and the initial Sigma. This can happen
-    in five different ways.
-    - Calculation resumed: use the previous DC and the Sigma of the last
-        complete calculation.
-    - Calculation started from previous_file: use the DC and Sigma from the
-        previous file.
-    - Calculation initialized with load_sigma: same as for previous_file.
-        Additionally, if the DC changed (and therefore the Hartree shift), the
-        initial Sigma is adjusted by that.
-    - New calculation, with DC: calculate the DC, then initialize the Sigma as
-        the DC, effectively starting the calculation from the DFT Green's
-        function. Also breaks magnetic symmetry if calculation is magnetic.
-    - New calculation, without DC: Sigma is initialized as 0, starting the
-        calculation from the DFT Green's function.
+    in five different ways:
+    * Calculation resumed: use the previous DC and the Sigma of the last complete calculation.
+
+    * Calculation started from previous_file: use the DC and Sigma from the previous file.
+
+    * Calculation initialized with load_sigma: same as for previous_file. Additionally,
+      if the DC changed (and therefore the Hartree shift), the initial Sigma is adjusted by that.
+
+    * New calculation, with DC: calculate the DC, then initialize the Sigma as the DC,
+      effectively starting the calculation from the DFT Green's function.
+      Also breaks magnetic symmetry if calculation is magnetic.
+
+    * New calculation, without DC: Sigma is initialized as 0,
+      starting the calculation from the DFT Green's function.
 
     Parameters
     ----------

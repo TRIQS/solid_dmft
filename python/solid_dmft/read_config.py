@@ -173,7 +173,7 @@ mu_mix_per_occupation_offset : float, optional, default = 0.0
             Mu mixing proportional to the occupation offset.
             Mixing between the dichotomy result and the previous mu,
             mu_next = factor * mu_dichotomy + (1-factor) * mu_previous, with
-            factor = mu_mix_per_occupation_offset * |n - n_target| + mu_mix_const.
+            factor = mu_mix_per_occupation_offset * abs(n - n\_target) + mu_mix_const.
             The program ensures that 0 <= factor <= 1.
             mu_mix_const = 1.0 and mu_mix_per_occupation_offset = 0.0 means no mixing.
 afm_order : bool, optional, default=False
@@ -203,7 +203,8 @@ solver
 store_solver: bool, optional default = False
             store the whole solver object under DMFT_input in h5 archive
 
-# cthyb parameters
+cthyb parameters
+================
 length_cycle : int
             length of each cycle; number of sweeps before measurement is taken
 n_warmup_cycles : int
@@ -250,7 +251,8 @@ random_seed: int, optional default by triqs
 legendre_fit: bool, optional default = False
             filter noise of G(tau) with G_l, cutoff is taken from n_l
 
-# ftps parameters
+ftps parameters
+===============
 n_bath:     int
             number of bath sites
 bath_fit:   bool, default=False
@@ -291,7 +293,8 @@ dmrg_maxmB: int, optional, default = 100
 dmrg_tw:    float, default 1E-9
             truncated weight for every link
 
-# ctseg parameters
+ctseg parameters
+================
 measure_hist : bool, optional, default=False
                measure perturbation_order histograms
 improved_estimator  : bool, optional, default=False

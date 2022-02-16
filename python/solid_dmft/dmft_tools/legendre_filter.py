@@ -40,6 +40,7 @@ def apply(G_tau, order=100, G_l_cut=1e-19):
         Legendre expansion order in the filter
     G_l_cut : float
         Legendre coefficient cut-off
+
     Returns
     -------
     G_l : TRIQS Legendre Block Green's function

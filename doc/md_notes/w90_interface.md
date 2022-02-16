@@ -1,6 +1,6 @@
-## Wannier90 interface
+# Wannier90 interface
 
-### orbital order in the W90 converter
+## orbital order in the W90 converter
 
 Some interaction Hamiltonians are sensitive to the order of orbitals (i.e. density-density or Slater Hamiltonian), others are invariant under rotations in orbital space (i.e. the Kanamori Hamiltonian).
 For the former class and W90-based DMFT calculations, we need to be careful because the order of W90 (z^2, xz, yz, x^2-y^2, xy) is different from the order expected by TRIQS (xy, yz, z^2, xz, x^2-y^2).
