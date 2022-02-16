@@ -269,7 +269,8 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
     advanced_params : dict
         advanced parameters as a dict
 
-    __Returns:__
+    Returns
+    -------
     nothing
 
     """

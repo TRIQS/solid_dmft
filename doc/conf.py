@@ -3,11 +3,10 @@
 # TRIQS documentation build configuration file
 
 import sys
-
-
 sys.path.insert(0, "@CMAKE_CURRENT_SOURCE_DIR@/sphinxext")
 sys.path.insert(0, "@CMAKE_CURRENT_SOURCE_DIR@/sphinxext/numpydoc")
 
+# exclude these folders from scanning by sphinx
 exclude_patterns = ['_templates', 'examples']
 
 extensions = ['sphinx.ext.autodoc',
@@ -38,16 +37,13 @@ myst_enable_extensions = [
     "tasklist",
 ]
 
-autodoc_default_options = {
-    'members': None, # Include all members (methods).
-    'special-members': None,
-    'exclude-members': '__dict__,__weakref__',
-    'undoc-members' : None,
-    }
+# The name of the Pygments (syntax highlighting) style to use.
+pygments_style = 'sphinx'
 
 source_suffix = '.rst'
 
-autosummary_generate = True  # Turn on sphinx.ext.autosummary
+# Turn on sphinx.ext.autosummary
+autosummary_generate = True
 
 project = '@PROJECT_NAME@'
 version = '@PROJECT_VERSION@'
