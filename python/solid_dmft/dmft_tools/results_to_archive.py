@@ -65,7 +65,7 @@ def _compile_information(sum_k, general_params, solver_params, solvers,
                 write_to_h5['pert_order_imp_{}'.format(icrsh)] = solvers[icrsh].perturbation_order
                 write_to_h5['pert_order_total_imp_{}'.format(icrsh)] = solvers[icrsh].perturbation_order_total
 
-            if general_params['measure_chi_SzSz']:
+            if general_params['measure_chi'] != 'none':
                 write_to_h5['O_time_{}'.format(icrsh)] = solvers[icrsh].O_time
 
             # if legendre was set, that we have both now!

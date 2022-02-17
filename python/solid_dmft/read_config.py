@@ -183,8 +183,9 @@ set_rot : string, optional, default='none'
             use hloc_dft to diagonalize occupations = 'hloc'
 oneshot_postproc_gamma_file : bool, optional, default=False
             write the GAMMA file for vasp after completed one-shot calculations
-measure_chi_SzSz: bool, optional, default=False
-            measure the dynamic spin suszeptibility chi(sz,sz(tau))
+measure_chi: string, optional, default=None
+            measure dynamic suszeptibility <Op(tau) Op(0)> , can be either
+            'SzSz': < Sz(tau) Sz(0) > , or 'NN': < N(tau) N(0) >
             triqs.github.io/cthyb/unstable/guide/dynamic_susceptibility_notebook.html
 measure_chi_insertions: int, optional, default=100
             number of insertation for measurement of chi
@@ -539,7 +540,7 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                  'oneshot_postproc_gamma_file': {'converter': BOOL_PARSER,
                                                                  'used': lambda params: not params['general']['csc'], 'default': False},
 
-                                 'measure_chi_SzSz': {'converter': BOOL_PARSER, 'used': True, 'default': False},
+                                 'measure_chi': {'valid for': lambda x, _: x in ('SzSz', 'NN', 'none'), 'used': True, 'default': 'none'},
 
                                  'measure_chi_insertions': {'converter': int, 'used': True, 'default': 100},
 

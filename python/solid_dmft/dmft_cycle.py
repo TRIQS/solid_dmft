@@ -33,7 +33,7 @@ from timeit import default_timer as timer
 import numpy as np
 
 # triqs
-from triqs.operators.util.observables import S_op
+from triqs.operators.util.observables import S_op, N_op
 from triqs.version import git_hash as triqs_hash
 from h5 import HDFArchive
 import triqs.utility.mpi as mpi
@@ -197,7 +197,7 @@ def _calculate_rotation_matrix(general_params, sum_k):
     return sum_k
 
 
-def _chi_SzSz_setup(sum_k, general_params, solver_params):
+def _chi_setup(sum_k, general_params, solver_params):
     """
 
     Parameters
@@ -211,25 +211,33 @@ def _chi_SzSz_setup(sum_k, general_params, solver_params):
     -------
     solver_params :  dict
         solver_paramters for the QMC solver
-    Sz_list : list of S_op operators to measure per impurity
+    Op_list : list of one-particle operators to measure per impurity
     """
 
-    mpi.report('setting up Chi(Sz,Sz(tau)) measurement')
+    if general_params['measure_chi'] == 'SzSz':
+        mpi.report('\nSetting up Chi(S_z(tau),S_z(0)) measurement')
+    elif general_params['measure_chi'] == 'NN':
+        mpi.report('\nSetting up Chi(n(tau),n(0)) measurement')
 
-    Sz_list = [None] * sum_k.n_inequiv_shells
+    Op_list = [None] * sum_k.n_inequiv_shells
 
     for icrsh in range(sum_k.n_inequiv_shells):
         n_orb = sum_k.corr_shells[icrsh]['dim']
         orb_names = list(range(n_orb))
 
-        Sz_list[icrsh] = S_op('z',
-                              spin_names=sum_k.spin_block_names[sum_k.SO],
-                              orb_names=orb_names,
-                              map_operator_structure=sum_k.sumk_to_solver[icrsh])
+        if general_params['measure_chi'] == 'SzSz':
+            Op_list[icrsh] = S_op('z',
+                                  spin_names=sum_k.spin_block_names[sum_k.SO],
+                                  orb_names=orb_names,
+                                  map_operator_structure=sum_k.sumk_to_solver[icrsh])
+        elif general_params['measure_chi'] == 'NN':
+            Op_list[icrsh] = N_op(spin_names=sum_k.spin_block_names[sum_k.SO],
+                                  orb_names=orb_names,
+                                  map_operator_structure=sum_k.sumk_to_solver[icrsh])
 
     solver_params['measure_O_tau_min_ins'] = general_params['measure_chi_insertions']
 
-    return solver_params, Sz_list
+    return solver_params, Op_list
 
 
 def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
@@ -499,10 +507,10 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
     sum_k = manipulate_mu.set_initial_mu(general_params, sum_k, iteration_offset, archive, shell_multiplicity)
 
     # setup of measurement of chi(SzSz(tau) if requested
-    if general_params['measure_chi_SzSz']:
-        solver_params, Sz_list = _chi_SzSz_setup(sum_k, general_params, solver_params)
+    if general_params['measure_chi'] != 'none':
+        solver_params, Op_list = _chi_setup(sum_k, general_params, solver_params)
     else:
-        Sz_list = None
+        Op_list = None
 
     mpi.report('\n {} DMFT cycles requested. Starting with iteration  {}.\n'.format(n_iter, iteration_offset+1))
 
@@ -532,7 +540,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
          observables, is_converged) = _dmft_step(sum_k, solvers, it, general_params,
                                                  solver_params, advanced_params, dft_params,
                                                  h_int, archive, shell_multiplicity, E_kin_dft,
-                                                 observables, conv_obs, Sz_list, dft_irred_kpt_indices, dft_energy,
+                                                 observables, conv_obs, Op_list, dft_irred_kpt_indices, dft_energy,
                                                  is_converged, is_sampling=False)
 
         if is_converged:
@@ -556,7 +564,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
             sum_k, solvers, observables, _ = _dmft_step(sum_k, solvers, it, general_params,
                                                         solver_params, advanced_params, dft_params,
                                                         h_int, archive, shell_multiplicity, E_kin_dft,
-                                                        observables, conv_obs, Sz_list, dft_irred_kpt_indices, dft_energy,
+                                                        observables, conv_obs, Op_list, dft_irred_kpt_indices, dft_energy,
                                                         is_converged=True, is_sampling=True)
 
         mpi.report('** Sampling finished ***')
@@ -579,7 +587,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
 def _dmft_step(sum_k, solvers, it, general_params,
                solver_params, advanced_params, dft_params,
                h_int, archive, shell_multiplicity, E_kin_dft,
-               observables, conv_obs, Sz_list, dft_irred_kpt_indices, dft_energy,
+               observables, conv_obs, Op_list, dft_irred_kpt_indices, dft_energy,
                is_converged, is_sampling):
     """
     Contains the actual dmft steps when all the preparation is done
@@ -654,8 +662,8 @@ def _dmft_step(sum_k, solvers, it, general_params,
             archive['DMFT_results/last_iter']['G0_freq_{}'.format(icrsh)] = solvers[icrsh].G0_freq
 
         # setup of measurement of chi(SzSz(tau) if requested
-        if general_params['measure_chi_SzSz']:
-            solver_params['measure_O_tau'] = (Sz_list[icrsh], Sz_list[icrsh])
+        if general_params['measure_chi'] != 'none':
+            solvers[icrsh].solver_params['measure_O_tau'] = (Op_list[icrsh], Op_list[icrsh])
 
         if (not general_params['csc'] and general_params['magnetic']
                 and general_params['afm_order'] and general_params['afm_mapping'][icrsh][0]):

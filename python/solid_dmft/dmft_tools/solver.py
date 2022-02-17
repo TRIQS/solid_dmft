@@ -227,7 +227,7 @@ class SolverStructure:
             self.density_matrix = None
             self.h_loc_diagonalization = None
 
-        if self.general_params['solver_type'] in ['cthyb'] and self.general_params['measure_chi_SzSz']:
+        if self.general_params['solver_type'] in ['cthyb'] and self.general_params['measure_chi'] != 'none':
             self.O_time = None
 
     def _init_ReFreq_objects(self):
@@ -734,7 +734,7 @@ class SolverStructure:
             self.perturbation_order = self.triqs_solver.perturbation_order
             self.perturbation_order_total = self.triqs_solver.perturbation_order_total
 
-        if self.general_params['measure_chi_SzSz']:
+        if self.general_params['measure_chi'] != 'none':
             self.O_time = self.triqs_solver.O_tau
 
         return
