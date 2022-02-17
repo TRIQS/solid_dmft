@@ -173,7 +173,7 @@ def _adapt_U_4index_for_SO(Umat_full):
     return Umat_full_SO
 
 
-def _construct_kanamori(sum_k, general_params, icrsh):
+def _construct_kanamori(sum_k, general_params, icrsh, advanced_params):
     """
     Constructs the Kanamori interaction Hamiltonian. Only Kanamori does not
     need the full four-index matrix. Therefore, we can construct it directly
@@ -190,7 +190,7 @@ def _construct_kanamori(sum_k, general_params, icrsh):
                    + 'outside the t2g or eg manifold?')
 
     if general_params['solver_type'] == 'ftps':
-        # 1-band modell requires J and U' equals zero
+        # 1-band model requires J and U' equals zero
         if n_orb == 1:
             up, j = 0.0, 0.0
         else:
@@ -209,12 +209,14 @@ def _construct_kanamori(sum_k, general_params, icrsh):
     else:
         h_int = _construct_kanamori_soc(general_params['U'][icrsh], general_params['J'][icrsh],
                                         n_orb, sum_k.sumk_to_solver[icrsh],
-                                        os.path.join(general_params['jobname'], 'H.txt'))
+                                        os.path.join(general_params['jobname'], 'H.txt'),
+                                        advanced_params['soc_make_real'])
     return h_int
 
 
-def _construct_kanamori_soc(U_int, J_hund, n_orb, map_operator_structure, H_dump=None):
-    r"""
+def _construct_kanamori_soc(U_int, J_hund, n_orb, map_operator_structure,
+                            H_dump=None, soc_make_real=None):
+    """
     Adapted from triqs.operators.util.hamiltonians.h_int_kanamori. Assumes
     that spin_names == ['ud'] and that map_operator_structure is given.
     """
@@ -229,6 +231,9 @@ def _construct_kanamori_soc(U_int, J_hund, n_orb, map_operator_structure, H_dump
     mkind = util.op_struct.get_mkind(None, map_operator_structure)
 
     s = 'ud'
+
+    if soc_make_real != 'none':
+        mat_iscomplex = np.kron(np.iscomplex(soc_make_real), np.ones((1,2)))[0]
 
     # density terms:
     # TODO: reformulate in terms of Umat and Upmat for consistency with triqs?
@@ -286,6 +291,10 @@ def _construct_kanamori_soc(U_int, J_hund, n_orb, map_operator_structure, H_dump
             continue
 
         H_term = 0.5 * J_hund * c_dag(*mkind(s, a1)) * c_dag(*mkind(s, a2)) * c(*mkind(s, a4)) * c(*mkind(s, a3))
+        # if soc_make_real apply minus sign for specified combination of pairs
+        if soc_make_real != 'none' and np.sum([mat_iscomplex[x] for x in (a1, a2, a3, a4)]) == 2.0:
+            H_term *= -1
+
         H += H_term
 
         # Dump terms of H
@@ -360,7 +369,7 @@ def _generate_four_index_u_matrix(sum_k, general_params, icrsh):
     # the order for the cubic orbitals is given by the convention. The TRIQS
     # convention is as follows ("xy","yz","z^2","xz","x^2-y^2")
     # this is consistent with the order of orbitals in the VASP interface
-    # but not necessarily with wannier90, qe, and wien2k! 
+    # but not necessarily with wannier90, qe, and wien2k!
     # This is also true for the f-shell.
     Umat_full = util.U_matrix(l=sum_k.corr_shells[ish]['l'],
                               radial_integrals=slater_integrals, basis='spherical')
@@ -477,7 +486,7 @@ def construct(sum_k, general_params, advanced_params):
 
         # Kanamori
         if general_params['h_int_type'][icrsh] == 'kanamori':
-            h_int[icrsh] = _construct_kanamori(sum_k, general_params, icrsh)
+            h_int[icrsh] = _construct_kanamori(sum_k, general_params, icrsh, advanced_params)
             continue
 
         # for density density or full slater get full four-index U matrix
@@ -529,7 +538,7 @@ def construct(sum_k, general_params, advanced_params):
 
             # Rotates the interaction matrix
             Umat_full_rotated = _rotate_four_index_matrix(sum_k, general_params, Umat_full, icrsh)
-    
+
             # construct slater / density density from U tensor
             if general_params['h_int_type'][icrsh] == 'crpa':
                 h_int[icrsh] = _construct_slater(sum_k, general_params, Umat_full_rotated, icrsh)

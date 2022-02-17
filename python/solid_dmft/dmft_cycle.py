@@ -153,7 +153,7 @@ def _determine_block_structure(sum_k, general_params, advanced_params):
     return sum_k, original_dens_mat, solver_struct_ftps
 
 
-def _calculate_rotation_matrix(general_params, sum_k):
+def _calculate_rotation_matrix(general_params, sum_k, soc_make_real):
     """
     Applies rotation matrix to make the DMFT calculations easier for the solver.
     Possible are rotations diagonalizing either the local Hamiltonian or the
@@ -168,6 +168,12 @@ def _calculate_rotation_matrix(general_params, sum_k):
         q_diag = sum_k.eff_atomic_levels()
     elif general_params['set_rot'] == 'den':
         q_diag = sum_k.density_matrix(method='using_gf')
+    elif general_params['set_rot'] == 'soc_real':
+        if isinstance(soc_make_real, list):
+            assert len(soc_make_real) == 3, 'soc_make_real only implemented for t2g subspace'
+            rot_mat_soc = np.kron(soc_make_real, np.ones((1,2))) * np.eye(6)
+        else:
+            raise TypeError(f'soc_make_real should be a list, but is {type(soc_make_real)}')
     else:
         raise ValueError('Parameter set_rot set to wrong value.')
 
@@ -176,7 +182,10 @@ def _calculate_rotation_matrix(general_params, sum_k):
     rot_mat = []
     for icrsh in range(sum_k.n_corr_shells):
         ish = sum_k.corr_to_inequiv[icrsh]
-        eigvec = np.array(np.linalg.eigh(np.real(q_diag[ish][chnl]))[1], dtype=complex)
+        if general_params['set_rot'] == 'soc_real':
+            eigvec = rot_mat_soc
+        else:
+            eigvec = np.array(np.linalg.eigh(np.real(q_diag[ish][chnl]))[1], dtype=complex)
         if sum_k.use_rotations:
             rot_mat.append( np.dot(sum_k.rot_mat[icrsh], eigvec) )
         else:
@@ -187,7 +196,7 @@ def _calculate_rotation_matrix(general_params, sum_k):
     sum_k.use_rotations = True
     # sum_k.eff_atomic_levels() needs to be recomputed if rot_mat were changed
     if hasattr(sum_k, "Hsumk"): delattr(sum_k, "Hsumk")
-    mpi.report('Updating rotation matrices using dft {} eigenbasis to maximise sign'.format(general_params['set_rot']))
+    mpi.report('Updating rotation matrices using dft {} eigenbasis to optimize basis'.format(general_params['set_rot']))
 
     # Prints matrices
     mpi.report('\nNew rotation matrices')
@@ -357,7 +366,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
     # Generates a rotation matrix to change the basis
     if general_params['set_rot'] != 'none':
         # calculate new rotation matrices
-        sum_k = _calculate_rotation_matrix(general_params, sum_k)
+        sum_k = _calculate_rotation_matrix(general_params, sum_k, advanced_params['soc_make_real'])
     # Saves rotation matrix to h5 archive:
     if mpi.is_master_node() and iteration_offset == 0:
         archive['DMFT_input']['rot_mat'] = sum_k.rot_mat
