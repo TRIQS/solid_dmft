@@ -181,6 +181,7 @@ afm_order : bool, optional, default=False
 set_rot : string, optional, default='none'
             use density_mat_dft to diagonalize occupations = 'den'
             use hloc_dft to diagonalize occupations = 'hloc'
+            use advanced_param 'make_soc_real' with 'soc_real'
 oneshot_postproc_gamma_file : bool, optional, default=False
             write the GAMMA file for vasp after completed one-shot calculations
 measure_chi_SzSz: bool, optional, default=False
@@ -342,6 +343,9 @@ map_solver_struct : dict, optional, default=no additional mapping
 mapped_solver_struct_degeneracies : list, optional, default=none
             Degeneracies applied when using map_solver_struct, same for all inmpurities.
             If not given and map_solver_struct is used, no symmetrization will happen.
+soc_make_real : list, optional, default=none
+            Make impurity Hamiltonian with spin-orbit coupling purely real.
+            List should be of the form of [1,1j,1j]. Currently only implemented with t2g.
 """
 
 from configparser import ConfigParser
@@ -531,7 +535,7 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                                                   'used': lambda params: params['general']['fixed_mu_value'] == 'none',
                                                                   'default': 0.},
 
-                                 'set_rot': {'valid for': lambda x, _: x in ('none', 'den', 'hloc'),
+                                 'set_rot': {'valid for': lambda x, _: x in ('none', 'den', 'hloc', 'soc_real'),
                                              'used': True, 'default': 'none'},
 
                                  'oneshot_postproc_gamma_file': {'converter': BOOL_PARSER,
@@ -753,6 +757,11 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                             'valid for': lambda x, _: x=='none' or isinstance(x, list),
                                             'used': lambda params: params['advanced']['map_solver_struct'] != 'none',
                                             'default': 'none'},
+
+                                  'soc_make_real': {'converter': lambda s: list(map(complex, s.split(','))),
+                                                    'used': lambda params: params['general']['solver_type'] not in ['ftps']
+                                                    and params['general']['set_rot'] in ['soc_real'],
+                                                    'default': 'none'},
                                  }
                     }
 

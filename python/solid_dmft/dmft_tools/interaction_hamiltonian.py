@@ -169,7 +169,7 @@ def _adapt_U_4index_for_SO(Umat_full):
     return Umat_full_SO
 
 
-def _construct_kanamori(sum_k, general_params):
+def _construct_kanamori(sum_k, general_params, advanced_params):
     """
     Constructs the Kanamori interaction Hamiltonian. Only Kanamori does not
     need the full four-index matrix. Therefore, we can construct it directly
@@ -212,11 +212,13 @@ def _construct_kanamori(sum_k, general_params):
         else:
             h_int[icrsh] = _construct_kanamori_soc(general_params['U'][icrsh], general_params['J'][icrsh],
                                                    orb_names, sum_k.sumk_to_solver[icrsh],
-                                                   os.path.join(general_params['jobname'], 'H.txt'))
+                                                   os.path.join(general_params['jobname'], 'H.txt'),
+                                                   advanced_params['soc_make_real'])
     return h_int
 
 
-def _construct_kanamori_soc(U_int, J_hund, orb_names, map_operator_structure, H_dump=None):
+def _construct_kanamori_soc(U_int, J_hund, orb_names, map_operator_structure, H_dump=None,
+                            soc_make_real=None):
     r"""
     Adapted from triqs.operators.util.hamiltonians.h_int_kanamori. Assumes
     that spin_names == ['ud'] and that map_operator_structure is given.
@@ -230,6 +232,9 @@ def _construct_kanamori_soc(U_int, J_hund, orb_names, map_operator_structure, H_
     mkind = util.op_struct.get_mkind(None, map_operator_structure)
 
     s = 'ud'
+
+    if soc_make_real != 'none':
+        mat_iscomplex = np.kron(np.iscomplex(soc_make_real), np.ones((1,2)))[0]
 
     # density terms:
     # TODO: reformulate in terms of Umat and Upmat for consistency with triqs?
@@ -287,6 +292,10 @@ def _construct_kanamori_soc(U_int, J_hund, orb_names, map_operator_structure, H_
             continue
 
         H_term = 0.5 * J_hund * c_dag(*mkind(s, a1)) * c_dag(*mkind(s, a2)) * c(*mkind(s, a4)) * c(*mkind(s, a3))
+        # if soc_make_real apply minus sign for specified combination of pairs
+        if soc_make_real != 'none' and np.sum([mat_iscomplex[x] for x in (a1, a2, a3, a4)]) == 2.0:
+            H_term *= -1
+
         H += H_term
 
         # Dump terms of H
@@ -492,7 +501,7 @@ def construct(sum_k, general_params, advanced_params):
     # Constructs the interaction Hamiltonian. Needs to come after setting sum_k.rot_mat
     mpi.report('\nConstructing the interaction Hamiltonians')
     if general_params['h_int_type'] == 'kanamori':
-        return _construct_kanamori(sum_k, general_params)
+        return _construct_kanamori(sum_k, general_params, advanced_params)
 
     if general_params['h_int_type'] == 'dynamic':
         return _construct_dynamic(sum_k, general_params)
