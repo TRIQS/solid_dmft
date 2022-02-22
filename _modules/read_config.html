@@ -516,6 +516,8 @@
 <span class="sd">            w90: uses Wannier90, requires LWANNIER90 in the INCAR</span>
 <span class="sd">w90_exec :  string, default=&#39;wannier90.x&#39;</span>
 <span class="sd">            the command to start a single-core wannier run</span>
+<span class="sd">w90_tolerance :  float, default=1e-6</span>
+<span class="sd">            threshold for mapping of shells and checks of the Hamiltonian</span>
 
 <span class="sd">advanced</span>
 <span class="sd">--------</span>
@@ -772,6 +774,11 @@
                              <span class="s1">&#39;w90_exec&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;used&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">params</span><span class="p">:</span> <span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">][</span><span class="s1">&#39;csc&#39;</span><span class="p">]</span>
                                                                   <span class="ow">and</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;dft&#39;</span><span class="p">][</span><span class="s1">&#39;projector_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;w90&#39;</span><span class="p">),</span>
                                                 <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;wannier90.x&#39;</span><span class="p">},</span>
+
+                             <span class="s1">&#39;w90_tolerance&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;converter&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="p">),</span>
+                                                <span class="s1">&#39;used&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">params</span><span class="p">:</span> <span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">][</span><span class="s1">&#39;csc&#39;</span><span class="p">]</span>
+                                                                      <span class="ow">and</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;dft&#39;</span><span class="p">][</span><span class="s1">&#39;projector_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;w90&#39;</span><span class="p">),</span>
+                                                <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">},</span>
                             <span class="p">},</span>
                      <span class="s1">&#39;solver&#39;</span><span class="p">:</span> <span class="p">{</span>
                                 <span class="c1">#</span>
