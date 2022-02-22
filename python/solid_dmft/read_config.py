@@ -322,6 +322,8 @@ projector_type : string, optional, default = 'plo'
             w90: uses Wannier90, requires LWANNIER90 in the INCAR
 w90_exec :  string, default='wannier90.x'
             the command to start a single-core wannier run
+w90_tolerance :  float, default=1e-6
+            threshold for mapping of shells and checks of the Hamiltonian
 
 advanced
 --------
@@ -578,6 +580,11 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                              'w90_exec': {'used': lambda params: (params['general']['csc']
                                                                   and params['dft']['projector_type'] == 'w90'),
                                                 'default': 'wannier90.x'},
+
+                             'w90_tolerance': {'converter': lambda s: float(s),
+                                                'used': lambda params: (params['general']['csc']
+                                                                      and params['dft']['projector_type'] == 'w90'),
+                                                'default': 1e-6},
                             },
                      'solver': {
                                 #

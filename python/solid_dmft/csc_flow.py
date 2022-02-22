@@ -78,7 +78,7 @@ def _run_wannier90(general_params, dft_params):
     subprocess.check_call(command + ['-pp', general_params['seedname']], shell=False)
     subprocess.check_call(command + [general_params['seedname']], shell=False)
 
-def _run_w90converter(seedname):
+def _run_w90converter(seedname, tolerance):
     if (not os.path.exists(seedname + '.win')
         or not os.path.exists(seedname + '.inp')):
         print('*** Wannier input/converter config file not found! '
@@ -86,7 +86,7 @@ def _run_w90converter(seedname):
         mpi.MPI.COMM_WORLD.Abort(1)
 
     #TODO: choose rot_mat_type with general_params['set_rot']
-    converter = Wannier90Converter(seedname, rot_mat_type='hloc_diag', bloch_basis=True, w90zero=2.e-6)
+    converter = Wannier90Converter(seedname, rot_mat_type='hloc_diag', bloch_basis=True, w90zero=tolerance)
     converter.convert_dft_input()
     mpi.barrier()
 
@@ -124,7 +124,7 @@ def _run_qe(general_params, dft_params, iter_dmft, iteration_offset):
     qe_w90 = start_qe(dft_params['n_cores'], 'win')
 
     # launch Wannier90Converter
-    _run_w90converter(general_params['seedname'])
+    _run_w90converter(general_params['seedname'], dft_params['w90_tolerance'])
 
 def read_dft_energy_vasp():
     """
@@ -331,7 +331,7 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
             elif dft_params['projector_type'] == 'w90':
                 _run_wannier90(general_params, dft_params)
                 mpi.barrier()
-                _run_w90converter(general_params['seedname'])
+                _run_w90converter(general_params['seedname'], dft_params['w90_tolerance'])
                 mpi.barrier()
                 irred_indices = _read_irred_kpoints_from_vasp(general_params)
                 mpi.barrier()
