@@ -1,0 +1,1618 @@
+Reading the config file dmft_config.ini
+-------------------------
+General parameters:
+seedname             ['vasp']
+h_int_type           kanamori
+U                    [2.5]
+J                    [0.5]
+beta                 40.0
+n_iter_dmft          10  
+dc                   True
+dc_type              1   
+prec_mu              0.001
+dc_dmft              True
+solver_type          cthyb
+n_l                  30  
+csc                  True
+n_iter_dmft_first    5   
+n_iter_dmft_per      3   
+plo_cfg              plo.cfg
+h5_save_freq         5   
+calc_energies        True
+enforce_off_diag     True
+set_rot              hloc
+mu_gap_gb2_threshold 0.05
+mu_gap_occ_deviation 0.4 
+n_iw                 1025
+n_tau                10001
+diag_delta           False
+jobname              ['vasp']
+h_field              0.0 
+sigma_mix            1.0 
+g0_mix               1.0 
+g0_mix_type          linear
+block_threshold      1e-05
+load_sigma           False
+noise_level_initial_sigma 0.0 
+occ_conv_crit        -1  
+gimp_conv_crit       -1  
+g0_conv_crit         -1  
+sigma_conv_crit      -1  
+fixed_mu_value       none
+mu_update_freq       1   
+dft_mu               none
+mu_mix_const         1.0 
+mu_mix_per_occupation_offset 0.0 
+measure_chi_SzSz     False
+measure_chi_insertions 100 
+cthyb_delta_interface False
+legendre_fit         False
+store_solver         False
+config_file          dmft_config.ini
+-------------------------
+Solver parameters:
+length_cycle         200 
+n_warmup_cycles      10000
+imag_threshold       1e-05
+measure_G_l          True
+measure_density_matrix True
+measure_pert_order   True
+off_diag_threshold   0.0 
+move_double          True
+move_shift           False
+n_cycles             312500
+use_norm_as_weight   True
+-------------------------
+DFT parameters:
+dft_code             vasp
+n_cores              32  
+n_iter               15  
+dft_exec             vasp_std
+store_eigenvals      True
+mpi_env              local
+projector_type       plo 
+-------------------------
+Advanced parameters, don't change them unless you know what you are doing:
+dc_factor            none
+dc_fixed_value       none
+dc_fixed_occ         none
+dc_nominal           False
+dc_U                 [2.5]
+dc_J                 [0.5]
+map_solver_struct    none
+  solid-dmft: Waiting for VASP to start (lock appears)...
+  solid-dmft: Running VASP...
+ running on   32 total cores
+ distrk:  each k-point on   32 cores,    1 groups
+ distr:  one band on    4 cores,    8 groups
+ using from now: INCAR     
+ vasp.5.4.4.18Apr17-6-g9f103f2a35 (build Dec 17 2021 11:40:50) complex           
+ POSCAR found type information on POSCAR  Pr Ni O 
+ POSCAR found :  3 types and      20 ions
+
+ ----------------------------------------------------------------------------- 
+|                                                                             |
+|  ADVICE TO THIS USER RUNNING 'VASP/VAMP'   (HEAR YOUR MASTER'S VOICE ...):  |
+|                                                                             |
+|      You have a (more or less) 'large supercell' and for larger cells       |
+|      it might be more efficient to use real space projection opertators     |
+|      So try LREAL= Auto  in the INCAR   file.                               |
+|      Mind:          For very  accurate calculation you might also keep the  |
+|      reciprocal projection scheme          (i.e. LREAL=.FALSE.)             |
+|                                                                             |
+ ----------------------------------------------------------------------------- 
+
+ LDA part: xc-table for Pade appr. of Perdew
+ POSCAR, INCAR and KPOINTS ok, starting setup
+ FFT: planning ...
+ WAVECAR not read
+ charge-density read from file: PrNiO3                                  
+ entering main loop
+       N       E                     dE             d eps       ncg     rms          rms(c)
+DAV:   1     0.233248738492E+04    0.23325E+04   -0.84134E+04 70696   0.144E+03  
+
+DAV:   2     0.162168136512E+03   -0.21703E+04   -0.19737E+04 69784   0.493E+02  
+
+DAV:   3    -0.125982558927E+03   -0.28815E+03   -0.26870E+03 71920   0.190E+02  
+
+DAV:   4    -0.141406202573E+03   -0.15424E+02   -0.15213E+02 77752   0.418E+01  
+
+DAV:   5    -0.142293239404E+03   -0.88704E+00   -0.88160E+00 95472   0.746E+00  
+
+DAV:   6    -0.142302622931E+03   -0.93835E-02   -0.93764E-02 76552   0.923E-01  
+
+DAV:   7    -0.142302799877E+03   -0.17695E-03   -0.17675E-03 84040   0.131E-01  
+
+DAV:   8    -0.142302802747E+03   -0.28701E-05   -0.28689E-05 48552   0.167E-02  
+
+DAV:   9    -0.142302803231E+03   -0.48413E-06   -0.48413E-06 42728   0.785E-03  
+
+DAV:  10    -0.142302803402E+03   -0.17121E-06   -0.17108E-06 39936   0.480E-03  
+
+DAV:  11    -0.142302803473E+03   -0.71176E-07   -0.71200E-07 37920   0.311E-03  
+
+DAV:  12    -0.142302803504E+03   -0.30659E-07   -0.30643E-07 37424   0.202E-03  
+  solid-dmft: Writing suppress projectors file
+  solid-dmft: Running VASP...
+ reading the density matrix from GAMMA
+    0.293E+00
+DAV:  13    -0.142378112975E+03   -0.75309E-01   -0.86859E-02 73176   0.106E+00  
+  solid-dmft: Writing suppress projectors file
+  solid-dmft: Running VASP...
+ reading the density matrix from GAMMA
+    0.508E+00
+DAV:  14    -0.142320582772E+03    0.57530E-01   -0.88278E-02 71392   0.110E+00  
+  solid-dmft: Writing suppress projectors file
+  solid-dmft: Running VASP...
+ reading the density matrix from GAMMA
+    0.258E+00
+DAV:  15    -0.142323542326E+03   -0.29596E-02   -0.76783E-02 69104   0.101E+00  
+  solid-dmft: Writing suppress projectors file
+  solid-dmft: Running VASP...
+ reading the density matrix from GAMMA
+    0.153E+00
+DAV:  16    -0.142325767885E+03   -0.22256E-02   -0.40660E-02 68648   0.744E-01  
+  solid-dmft: Writing suppress projectors file
+  solid-dmft: Running VASP...
+ reading the density matrix from GAMMA
+    0.641E-01
+DAV:  17    -0.142325235271E+03    0.53261E-03   -0.29427E-03 62408   0.200E-01  
+  solid-dmft: Writing suppress projectors file
+  solid-dmft: Running VASP...
+ reading the density matrix from GAMMA
+    0.404E-01
+DAV:  18    -0.142323772675E+03    0.14626E-02   -0.69023E-04 60176   0.988E-02  
+  solid-dmft: Writing suppress projectors file
+  solid-dmft: Running VASP...
+ reading the density matrix from GAMMA
+    0.409E-01
+DAV:  19    -0.142323627560E+03    0.14512E-03   -0.81282E-05 43936   0.421E-02  
+  solid-dmft: Writing suppress projectors file
+  solid-dmft: Running VASP...
+ reading the density matrix from GAMMA
+    0.200E-01
+DAV:  20    -0.142323584501E+03    0.43059E-04   -0.37526E-05 37240   0.291E-02  
+  solid-dmft: Writing suppress projectors file
+  solid-dmft: Running VASP...
+ reading the density matrix from GAMMA
+    0.274E-01
+DAV:  21    -0.142323347441E+03    0.23706E-03   -0.36452E-06 36632   0.252E-02  
+  solid-dmft: Writing suppress projectors file
+  solid-dmft: Running VASP...
+ reading the density matrix from GAMMA
+    0.256E-01
+DAV:  22    -0.142323292086E+03    0.55355E-04    0.13534E-05 36264   0.995E-03  
+  solid-dmft: Writing suppress projectors file
+  solid-dmft: Running VASP...
+ reading the density matrix from GAMMA
+    0.150E-01
+DAV:  23    -0.142323248714E+03    0.43372E-04    0.70062E-06 35816   0.121E-02  
+  solid-dmft: Writing suppress projectors file
+  solid-dmft: Running VASP...
+ reading the density matrix from GAMMA
+    0.402E-01
+DAV:  24    -0.142323243468E+03    0.52458E-05    0.97185E-06 35488   0.102E-02  
+  solid-dmft: Writing suppress projectors file
+  solid-dmft: Running VASP...
+ reading the density matrix from GAMMA
+    0.270E-01
+DAV:  25    -0.142323226598E+03    0.16870E-04    0.81220E-06 35072   0.885E-03  
+  solid-dmft: Writing suppress projectors file
+  solid-dmft: Running VASP...
+ reading the density matrix from GAMMA
+    0.259E-01
+DAV:  26    -0.142323194793E+03    0.31805E-04    0.62942E-06 34968   0.102E-02  
+  solid-dmft: Removing suppress projectors file
+  solid-dmft: Running VASP...
+ reading the density matrix from GAMMA
+    0.307E-01
+DAV:  27    -0.142323171346E+03    0.23447E-04    0.51919E-06 34744   0.106E-02  
+  solid-dmft: DFT cycle took  2596.9695 seconds
+Read parameters:
+0  ->  {'label': 'dxy', 'isite': 5, 'l': 2, 'm': 0}
+1  ->  {'label': 'dyz', 'isite': 5, 'l': 2, 'm': 1}
+2  ->  {'label': 'dz2', 'isite': 5, 'l': 2, 'm': 2}
+3  ->  {'label': 'dxz', 'isite': 5, 'l': 2, 'm': 3}
+4  ->  {'label': 'dx2-y2', 'isite': 5, 'l': 2, 'm': 4}
+5  ->  {'label': 'dxy', 'isite': 6, 'l': 2, 'm': 0}
+6  ->  {'label': 'dyz', 'isite': 6, 'l': 2, 'm': 1}
+7  ->  {'label': 'dz2', 'isite': 6, 'l': 2, 'm': 2}
+8  ->  {'label': 'dxz', 'isite': 6, 'l': 2, 'm': 3}
+9  ->  {'label': 'dx2-y2', 'isite': 6, 'l': 2, 'm': 4}
+10  ->  {'label': 'dxy', 'isite': 7, 'l': 2, 'm': 0}
+11  ->  {'label': 'dyz', 'isite': 7, 'l': 2, 'm': 1}
+12  ->  {'label': 'dz2', 'isite': 7, 'l': 2, 'm': 2}
+13  ->  {'label': 'dxz', 'isite': 7, 'l': 2, 'm': 3}
+14  ->  {'label': 'dx2-y2', 'isite': 7, 'l': 2, 'm': 4}
+15  ->  {'label': 'dxy', 'isite': 8, 'l': 2, 'm': 0}
+16  ->  {'label': 'dyz', 'isite': 8, 'l': 2, 'm': 1}
+17  ->  {'label': 'dz2', 'isite': 8, 'l': 2, 'm': 2}
+18  ->  {'label': 'dxz', 'isite': 8, 'l': 2, 'm': 3}
+19  ->  {'label': 'dx2-y2', 'isite': 8, 'l': 2, 'm': 4}
+  Found POSCAR, title line: PrNiO3
+  Total number of ions: 20
+  Number of types: 3
+  Number of ions for each type: [4, 4, 12]
+
+    Total number of k-points: 245
+   Total number of tetrahedra: 1470
+!!! WARNING !!!: Error reading from EIGENVAL, trying LOCPROJ
+!!! WARNING !!!: Error reading from Efermi from DOSCAR, trying LOCPROJ
+eigvals from LOCPROJ
+
+  Unorthonormalized density matrices and overlaps:
+  Spin: 1
+  Site: 5
+  Density matrix                                                  Overlap
+   1.1726303  -0.1159776  -0.0068612   0.0133647   0.1357826       0.9368744   0.0028787   0.0000985  -0.0003316  -0.0031236
+  -0.1159776   1.7978768   0.0184087  -0.0059108   0.0277801       0.0028787   0.9250772  -0.0004431   0.0000941  -0.0006955
+  -0.0068612   0.0184087   1.1884211   0.1961705  -0.0128317       0.0000985  -0.0004431   0.9365940  -0.0046100   0.0003752
+   0.0133647  -0.0059108   0.1961705   1.7524571   0.0012289      -0.0003316   0.0000941  -0.0046100   0.9261270   0.0000337
+   0.1357826   0.0277801  -0.0128317   0.0012289   1.7937322      -0.0031236  -0.0006955   0.0003752   0.0000337   0.9249834
+  Site: 6
+  Density matrix                                                  Overlap
+   1.1693567   0.1248065   0.0119810   0.0137644  -0.1428856       0.9371946  -0.0028884  -0.0001005  -0.0003789   0.0030565
+   0.1248065   1.7993574   0.0209984   0.0061339   0.0307126      -0.0028884   0.9257086  -0.0004403  -0.0000554  -0.0006903
+   0.0119810   0.0209984   1.1878718  -0.2070553  -0.0143050      -0.0001005  -0.0004403   0.9369189   0.0045676   0.0004043
+   0.0137644   0.0061339  -0.2070553   1.7506131  -0.0013540      -0.0003789  -0.0000554   0.0045676   0.9268382  -0.0000546
+  -0.1428856   0.0307126  -0.0143050  -0.0013540   1.7946341       0.0030565  -0.0006903   0.0004043  -0.0000546   0.9256759
+  Site: 7
+  Density matrix                                                  Overlap
+   1.1697205   0.1242992  -0.0058033  -0.0146509   0.1435668       0.9371915  -0.0028878   0.0000903   0.0003758  -0.0030591
+   0.1242992   1.7992080  -0.0200699  -0.0063195  -0.0307381      -0.0028878   0.9257118   0.0004398   0.0000549   0.0006924
+  -0.0058033  -0.0200699   1.1881717  -0.2074905  -0.0144559       0.0000903   0.0004398   0.9369204   0.0045659   0.0004067
+  -0.0146509  -0.0063195  -0.2074905   1.7507856  -0.0015639       0.0003758   0.0000549   0.0045659   0.9268428  -0.0000548
+   0.1435668  -0.0307381  -0.0144559  -0.0015639   1.7947370      -0.0030591   0.0006924   0.0004067  -0.0000548   0.9256714
+  Site: 8
+  Density matrix                                                  Overlap
+   1.1713122  -0.1164616   0.0129193  -0.0115211  -0.1353339       0.9368767   0.0028806  -0.0000941   0.0003267   0.0031245
+  -0.1164616   1.7978900  -0.0194291   0.0057930  -0.0278368       0.0028806   0.9250755   0.0004448  -0.0000943   0.0006972
+   0.0129193  -0.0194291   1.1879926   0.1956975  -0.0131568      -0.0000941   0.0004448   0.9365953  -0.0046092   0.0003777
+  -0.0115211   0.0057930   0.1956975   1.7522744   0.0011523       0.0003267  -0.0000943  -0.0046092   0.9261286   0.0000369
+  -0.1353339  -0.0278368  -0.0131568   0.0011523   1.7936191       0.0031245   0.0006972   0.0003777   0.0000369   0.9249808
+
+  Generating 1 shell...
+
+    Shell         : 1
+    Orbital l     : 2
+    Number of ions: 4
+    Dimension     : 2
+    Correlated    : True
+    Ion sort      : [1, 2, 2, 1]
+Density matrix:
+  Shell 1
+    Site 1
+     0.4767272     0.0007396
+     0.0007396     0.4876844
+      trace:  0.9644115488072991
+    Site 2
+     0.3886957     0.0036461
+     0.0036461     0.4153959
+      trace:  0.8040916220321466
+    Site 3
+     0.3957578    -0.0024656
+    -0.0024656     0.4085472
+      trace:  0.8043050677507462
+    Site 4
+     0.4671803     0.0068510
+     0.0068510     0.4950866
+      trace:  0.9622668997214021
+
+  Impurity density: 3.535075138311594
+
+Overlap:
+  Site 1
+[[1. 0.]
+ [0. 1.]]
+
+Local Hamiltonian:
+  Shell 1
+    Site 1 (real | complex part)
+     0.7586776     0.0039398 |    -0.0000000     0.0000000
+     0.0039398     0.7116569 |    -0.0000000     0.0000000
+    Site 2 (real | complex part)
+     0.9125950     0.0115565 |     0.0000000     0.0000000
+     0.0115565     0.8647778 |    -0.0000000    -0.0000000
+    Site 3 (real | complex part)
+     0.9133673     0.0074184 |     0.0000000    -0.0000000
+     0.0074184     0.8636254 |     0.0000000     0.0000000
+    Site 4 (real | complex part)
+     0.7564319     0.0106371 |    -0.0000000    -0.0000000
+     0.0106371     0.7143364 |     0.0000000    -0.0000000
+
+Evaluating DOS...
+  Shell 1
+    Total number of states: [[[1.99964241 2.00228579]
+  [2.00228408 2.00097414]
+  [1.99952955 2.00341912]
+  [2.00190179 2.00015698]]]
+  Storing ctrl-file...
+  Storing PLO-group file 'vasp.pg1'...
+  Density within window: 4.000000000040817
+Reading input from vasp.ctrl...
+{
+    "ngroups": 1,
+    "nk": 245,
+    "ns": 1,
+    "kvec1": [
+        0.18381370220745474,
+        3.3915740597604596e-18,
+        0.0
+    ],
+    "kvec2": [
+        -1.017472217928138e-17,
+        0.18451149283379764,
+        0.0
+    ],
+    "kvec3": [
+        0.0,
+        0.0,
+        0.13009665879357812
+    ],
+    "nc_flag": 0
+}
+
+  No. of inequivalent shells: 2
+Read parameters:
+0  ->  {'label': 'dxy', 'isite': 5, 'l': 2, 'm': 0}
+1  ->  {'label': 'dyz', 'isite': 5, 'l': 2, 'm': 1}
+2  ->  {'label': 'dz2', 'isite': 5, 'l': 2, 'm': 2}
+3  ->  {'label': 'dxz', 'isite': 5, 'l': 2, 'm': 3}
+4  ->  {'label': 'dx2-y2', 'isite': 5, 'l': 2, 'm': 4}
+5  ->  {'label': 'dxy', 'isite': 6, 'l': 2, 'm': 0}
+6  ->  {'label': 'dyz', 'isite': 6, 'l': 2, 'm': 1}
+7  ->  {'label': 'dz2', 'isite': 6, 'l': 2, 'm': 2}
+8  ->  {'label': 'dxz', 'isite': 6, 'l': 2, 'm': 3}
+9  ->  {'label': 'dx2-y2', 'isite': 6, 'l': 2, 'm': 4}
+10  ->  {'label': 'dxy', 'isite': 7, 'l': 2, 'm': 0}
+11  ->  {'label': 'dyz', 'isite': 7, 'l': 2, 'm': 1}
+12  ->  {'label': 'dz2', 'isite': 7, 'l': 2, 'm': 2}
+13  ->  {'label': 'dxz', 'isite': 7, 'l': 2, 'm': 3}
+14  ->  {'label': 'dx2-y2', 'isite': 7, 'l': 2, 'm': 4}
+15  ->  {'label': 'dxy', 'isite': 8, 'l': 2, 'm': 0}
+16  ->  {'label': 'dyz', 'isite': 8, 'l': 2, 'm': 1}
+17  ->  {'label': 'dz2', 'isite': 8, 'l': 2, 'm': 2}
+18  ->  {'label': 'dxz', 'isite': 8, 'l': 2, 'm': 3}
+19  ->  {'label': 'dx2-y2', 'isite': 8, 'l': 2, 'm': 4}
+  Found POSCAR, title line: PrNiO3
+  Total number of ions: 20
+  Number of types: 3
+  Number of ions for each type: [4, 4, 12]
+
+    Total number of k-points: 245
+   Total number of tetrahedra: 1470
+!!! WARNING !!!: Error reading from EIGENVAL, trying LOCPROJ
+!!! WARNING !!!: Error reading from Efermi from DOSCAR, trying LOCPROJ
+DFT energy read from OSZICAR
+
+================================================================================
+Calling dmft_cycle
+DMFT iteration 12 / 21
+================================================================================
+
+previous iteration count of 11 will be added to total number of iterations
+Dichotomy adjustment of Chemical Potential to obtain Total Density = 4.000000 +/- 0.001000
+Warning: Imaginary part in density will be ignored (9.69933852006993e-13)
+Warning: Imaginary part in density will be ignored (9.692153687045686e-13)
+    Chemical Potential = 0.275987  
+    Total Density = 5.863395
+    -0.224013 < Chemical Potential < 0.275987
+    1.813094 < Total Density < 5.863395
+Warning: Imaginary part in density will be ignored (9.70470287117245e-13)
+    -0.224013 < Chemical Potential < 0.045955
+    1.813094 < Total Density < 4.538257
+Warning: Imaginary part in density will be ignored (9.727955073852964e-13)
+    -0.224013 < Chemical Potential < -0.007367
+    1.813094 < Total Density < 4.087674
+Warning: Imaginary part in density will be ignored (9.71559534800337e-13)
+    -0.224013 < Chemical Potential < -0.015718
+    1.813094 < Total Density < 4.018190
+Warning: Imaginary part in density will be ignored (9.732218939349171e-13)
+    -0.224013 < Chemical Potential < -0.017436
+    1.813094 < Total Density < 4.003742
+Warning: Imaginary part in density will be ignored (9.709720939271221e-13)
+    -0.224013 < Chemical Potential < -0.017789
+    1.813094 < Total Density < 4.000767
+    Chemical Potential found in 6 iterations : 
+    Total Density = 4.000767;Chemical Potential = -0.017789
+Updating rotation matrices using dft hloc eigenbasis to maximise sign
+
+New rotation matrices
+rot_mat[ 0]     real part         imaginary part  
+             0.08292 -0.99656    0.00000  0.00000
+            -0.99656 -0.08292    0.00000  0.00000
+rot_mat[ 1]     real part         imaginary part  
+             0.22323 -0.97477    0.00000  0.00000
+            -0.97477 -0.22323    0.00000  0.00000
+rot_mat[ 2]     real part         imaginary part  
+             0.22323 -0.97477    0.00000  0.00000
+            -0.97477 -0.22323    0.00000  0.00000
+rot_mat[ 3]     real part         imaginary part  
+             0.08292 -0.99656    0.00000  0.00000
+            -0.99656 -0.08292    0.00000  0.00000
+
+
+WARNING: rot_mat in current step is different from previous step.
+
+ number of ineq. correlated shells: 2
+
+ block structure summary
+ -- Shell type #  0: [0, 3]
+  | shell multiplicity 2
+  | block struct. sum_k : [('up', [0, 1]), ('down', [0, 1])]
+  | block struct. solver: {'down_0': [0, 1], 'up_0': [0, 1]}
+  | deg. orbitals : [['up_0', 'down_0']]
+ -- Shell type #  1: [1, 2]
+  | shell multiplicity 2
+  | block struct. sum_k : [('up', [0, 1]), ('down', [0, 1])]
+  | block struct. solver: {'down_0': [0, 1], 'up_0': [0, 1]}
+  | deg. orbitals : [['up_0', 'down_0']]
+
+Rotation matrices
+rot_mat[ 0]     real part         imaginary part  
+             0.08292 -0.99656    0.00000  0.00000
+            -0.99656 -0.08292    0.00000  0.00000
+rot_mat[ 1]     real part         imaginary part  
+             0.22323 -0.97477    0.00000  0.00000
+            -0.97477 -0.22323    0.00000  0.00000
+rot_mat[ 2]     real part         imaginary part  
+             0.22323 -0.97477    0.00000  0.00000
+            -0.97477 -0.22323    0.00000  0.00000
+rot_mat[ 3]     real part         imaginary part  
+             0.08292 -0.99656    0.00000  0.00000
+            -0.99656 -0.08292    0.00000  0.00000
+
+
+
+Effective atomic levels
+H_loc[ 0]           up                down       
+             0.72912  0.00000    0.72912  0.00000
+             0.00000  0.77679    0.00000  0.77679
+H_loc[ 1]           up                down       
+             0.87992  0.00000    0.87992  0.00000
+             0.00000  0.93303    0.00000  0.93303
+
+
+total density for imp 0 from DFT:   0.966594
+total density for imp 1 from DFT:   0.804016
+*** interaction parameters ***
+Assuming U = 2.50 for all correlated shells
+Assuming J = 0.50 for all correlated shells
+Assuming dc_U = 2.50 for all correlated shells
+Assuming dc_J = 0.50 for all correlated shells
+
+Constructing the interaction Hamiltonians
+
+From previous calculation: Loaded Sigma_imp0...imp1 at last it 
+Lattice Gf: occupation = 4.18318-0.00000j
+            G(beta/2)  = -0.08083-0.00000j
+Dichotomy adjustment of Chemical Potential to obtain Total Density = 4.000000 +/- 0.001000
+Warning: Imaginary part in density will be ignored (2.3592779747255786e-11)
+Warning: Imaginary part in density will be ignored (2.348501599432335e-11)
+    Chemical Potential = -0.638367  
+    Total Density = 2.674543
+    -0.638367 < Chemical Potential < -0.138367
+    2.674543 < Total Density < 4.183179
+Warning: Imaginary part in density will be ignored (2.3586761919420176e-11)
+    -0.638367 < Chemical Potential < -0.199077
+    2.674543 < Total Density < 4.018160
+Warning: Imaginary part in density will be ignored (2.3583465100359744e-11)
+    -0.638367 < Chemical Potential < -0.205014
+    2.674543 < Total Density < 4.001751
+Warning: Imaginary part in density will be ignored (2.3589314437432974e-11)
+    -0.638367 < Chemical Potential < -0.205586
+    2.674543 < Total Density < 4.000168
+    Chemical Potential found in 4 iterations : 
+    Total Density = 4.000168;Chemical Potential = -0.205586
+Mixing dichotomy mu with previous iteration by factor 1.000
+New chemical potential: -0.206
+
+ 3 DMFT cycles requested. Starting with iteration  12.
+
+################################################################################
+Running iteration: 12 / 14
+
+ *** Correlated Shell type #  0 : Estimated total charge of impurity problem = 1.714744
+Estimated density matrix:
+down_0, real part
+[[0.42938227 0.00078352]
+ [0.00078352 0.42798963]]
+up_0, real part
+[[0.42938227 0.00078352]
+ [0.00078352 0.42798963]]
+
+Solving the impurity problem for shell 0 ...
+
+╔╦╗╦═╗╦╔═╗ ╔═╗  ┌─┐┌┬┐┬ ┬┬ ┬┌┐ 
+ ║ ╠╦╝║║═╬╗╚═╗  │   │ ├─┤└┬┘├┴┐
+ ╩ ╩╚═╩╚═╝╚╚═╝  └─┘ ┴ ┴ ┴ ┴ └─┘
+
+The local Hamiltonian of the problem:
+0.000219664*c_dag('down_0',0)*c('down_0',1) + -0.993513*c_dag('down_0',0)*c('down_0',0) + -0.945755*c_dag('down_0',1)*c('down_0',1) + 0.000219664*c_dag('down_0',1)*c('down_0',0) + 0.000219664*c_dag('up_0',0)*c('up_0',1) + -0.993513*c_dag('up_0',0)*c('up_0',0) + -0.945755*c_dag('up_0',1)*c('up_0',1) + 0.000219664*c_dag('up_0',1)*c('up_0',0) + 1*c_dag('down_0',0)*c_dag('down_0',1)*c('down_0',1)*c('down_0',0) + 0.5*c_dag('down_0',0)*c_dag('up_0',0)*c('up_0',1)*c('down_0',1) + 2.5*c_dag('down_0',0)*c_dag('up_0',0)*c('up_0',0)*c('down_0',0) + 1.5*c_dag('down_0',0)*c_dag('up_0',1)*c('up_0',1)*c('down_0',0) + 0.5*c_dag('down_0',0)*c_dag('up_0',1)*c('up_0',0)*c('down_0',1) + 0.5*c_dag('down_0',1)*c_dag('up_0',0)*c('up_0',1)*c('down_0',0) + 1.5*c_dag('down_0',1)*c_dag('up_0',0)*c('up_0',0)*c('down_0',1) + 2.5*c_dag('down_0',1)*c_dag('up_0',1)*c('up_0',1)*c('down_0',1) + 0.5*c_dag('down_0',1)*c_dag('up_0',1)*c('up_0',0)*c('down_0',0) + 1*c_dag('up_0',0)*c_dag('up_0',1)*c('up_0',1)*c('up_0',0)
+Using autopartition algorithm to partition the local Hilbert space
+Found 9 subspaces.
+
+Warming up ...
+16:16:44   1% ETA 00:00:09 cycle 109 of 10000
+16:16:46  21% ETA 00:00:07 cycle 2197 of 10000
+16:16:48  48% ETA 00:00:05 cycle 4815 of 10000
+16:16:51  81% ETA 00:00:01 cycle 8101 of 10000
+
+
+
+Accumulating ...
+16:16:53   0% ETA 00:05:36 cycle 92 of 312500
+16:16:55   0% ETA 00:06:19 cycle 1738 of 312500
+16:16:58   1% ETA 00:07:02 cycle 3404 of 312500
+16:17:01   1% ETA 00:06:34 cycle 6070 of 312500
+16:17:05   3% ETA 00:06:19 cycle 9418 of 312500
+16:17:10   4% ETA 00:06:06 cycle 13641 of 312500
+16:17:16   6% ETA 00:05:47 cycle 19338 of 312500
+16:17:24   8% ETA 00:05:34 cycle 26239 of 312500
+16:17:34  10% ETA 00:05:26 cycle 34368 of 312500
+16:17:46  14% ETA 00:05:01 cycle 46280 of 312500
+16:18:01  19% ETA 00:04:41 cycle 60365 of 312500
+16:18:20  25% ETA 00:04:15 cycle 78948 of 312500
+16:18:43  32% ETA 00:03:46 cycle 102177 of 312500
+16:19:13  42% ETA 00:03:12 cycle 131294 of 312500
+16:19:49  53% ETA 00:02:33 cycle 166898 of 312500
+16:20:36  67% ETA 00:01:47 cycle 210443 of 312500
+16:21:33  84% ETA 00:00:49 cycle 265280 of 312500
+
+
+[Rank 0] Collect results: Waiting for all mpi-threads to finish accumulating...
+[Rank 0] Timings for all measures:
+Measure                                    | seconds   
+Auto-correlation time                      | 0.10674   
+Average order                              | 0.0356293 
+Average sign                               | 0.0297604 
+Density Matrix for local static observable | 2.41748   
+G_l measure                                | 58.7977   
+G_tau measure                              | 7.2647    
+Perturbation order                         | 0.0775431 
+Perturbation order (down_0)                | 0.0604551 
+Perturbation order (up_0)                  | 0.0482253 
+Total measure time                         | 68.8382   
+[Rank 0] Acceptance rate for all moves:
+Move set Insert two operators: 0.0185237
+  Move  Insert Delta_down_0: 0.0183004
+  Move  Insert Delta_up_0: 0.0187471
+Move set Remove two operators: 0.0185221
+  Move  Remove Delta_down_0: 0.0182987
+  Move  Remove Delta_up_0: 0.0187456
+Move set Insert four operators: 0.000740602
+  Move  Insert Delta_down_0_down_0: 0.000895149
+  Move  Insert Delta_down_0_up_0: 0.000575681
+  Move  Insert Delta_up_0_down_0: 0.000570436
+  Move  Insert Delta_up_0_up_0: 0.000921153
+Move set Remove four operators: 0.000740529
+  Move  Remove Delta_down_0_down_0: 0.000897075
+  Move  Remove Delta_down_0_up_0: 0.000571798
+  Move  Remove Delta_up_0_down_0: 0.000572416
+  Move  Remove Delta_up_0_up_0: 0.000920808
+[Rank 0] Warmup lasted: 9.60017 seconds [00:00:09]
+[Rank 0] Simulation lasted: 328.595 seconds [00:05:28]
+[Rank 0] Number of measures: 312500
+Total number of measures: 10000000
+Average sign: 0.999535
+Average order: 23.7012
+Auto-correlation time: 2.54967
+Actual time for solver: 339.60 s
+
+Total charge of impurity problem: 1.70439
+Total charge convergency of impurity problem: -0.01035
+
+Density matrix:
+down_0, real part
+[[0.45369472 0.00056091]
+ [0.00056091 0.44746909]]
+eigenvalues: [0.44741896 0.45374485]
+up_0, real part
+[[0.40250217 0.00179208]
+ [0.00179208 0.40072573]]
+eigenvalues: [0.39961383 0.40361408]
+
+ *** Correlated Shell type #  1 : Estimated total charge of impurity problem = 0.193779
+Estimated density matrix:
+down_0, real part
+[[0.04858316 0.00024117]
+ [0.00024117 0.04830615]]
+up_0, real part
+[[0.04858316 0.00024117]
+ [0.00024117 0.04830615]]
+
+Solving the impurity problem for shell 1 ...
+
+╔╦╗╦═╗╦╔═╗ ╔═╗  ┌─┐┌┬┐┬ ┬┬ ┬┌┐ 
+ ║ ╠╦╝║║═╬╗╚═╗  │   │ ├─┤└┬┘├┴┐
+ ╩ ╩╚═╩╚═╝╚╚═╝  └─┘ ┴ ┴ ┴ ┴ └─┘
+
+The local Hamiltonian of the problem:
+-0.00109997*c_dag('down_0',0)*c('down_0',1) + 1.53451*c_dag('down_0',0)*c('down_0',0) + 1.5829*c_dag('down_0',1)*c('down_0',1) + -0.00109997*c_dag('down_0',1)*c('down_0',0) + -0.00109997*c_dag('up_0',0)*c('up_0',1) + 1.53451*c_dag('up_0',0)*c('up_0',0) + 1.5829*c_dag('up_0',1)*c('up_0',1) + -0.00109997*c_dag('up_0',1)*c('up_0',0) + 1*c_dag('down_0',0)*c_dag('down_0',1)*c('down_0',1)*c('down_0',0) + 0.5*c_dag('down_0',0)*c_dag('up_0',0)*c('up_0',1)*c('down_0',1) + 2.5*c_dag('down_0',0)*c_dag('up_0',0)*c('up_0',0)*c('down_0',0) + 1.5*c_dag('down_0',0)*c_dag('up_0',1)*c('up_0',1)*c('down_0',0) + 0.5*c_dag('down_0',0)*c_dag('up_0',1)*c('up_0',0)*c('down_0',1) + 0.5*c_dag('down_0',1)*c_dag('up_0',0)*c('up_0',1)*c('down_0',0) + 1.5*c_dag('down_0',1)*c_dag('up_0',0)*c('up_0',0)*c('down_0',1) + 2.5*c_dag('down_0',1)*c_dag('up_0',1)*c('up_0',1)*c('down_0',1) + 0.5*c_dag('down_0',1)*c_dag('up_0',1)*c('up_0',0)*c('down_0',0) + 1*c_dag('up_0',0)*c_dag('up_0',1)*c('up_0',1)*c('up_0',0)
+Using autopartition algorithm to partition the local Hilbert space
+Found 9 subspaces.
+
+Warming up ...
+16:22:23   1% ETA 00:00:07 cycle 127 of 10000
+16:22:25  26% ETA 00:00:05 cycle 2674 of 10000
+16:22:28  58% ETA 00:00:03 cycle 5850 of 10000
+16:22:31  99% ETA 00:00:00 cycle 9901 of 10000
+
+
+
+Accumulating ...
+16:22:31   0% ETA 00:04:24 cycle 118 of 312500
+16:22:33   0% ETA 00:04:26 cycle 2473 of 312500
+16:22:36   1% ETA 00:04:27 cycle 5340 of 312500
+16:22:39   2% ETA 00:04:25 cycle 8947 of 312500
+16:22:43   4% ETA 00:04:22 cycle 13421 of 312500
+16:22:48   6% ETA 00:04:18 cycle 19018 of 312500
+16:22:54   8% ETA 00:04:11 cycle 26074 of 312500
+16:23:02  11% ETA 00:04:04 cycle 34775 of 312500
+16:23:11  14% ETA 00:03:55 cycle 45731 of 312500
+16:23:24  19% ETA 00:03:42 cycle 59460 of 312500
+16:23:39  24% ETA 00:03:27 cycle 76601 of 312500
+16:23:57  31% ETA 00:03:08 cycle 98035 of 312500
+16:24:21  39% ETA 00:02:45 cycle 124885 of 312500
+16:24:51  50% ETA 00:02:15 cycle 158611 of 312500
+16:25:27  64% ETA 00:01:38 cycle 200586 of 312500
+16:26:13  80% ETA 00:00:52 cycle 252962 of 312500
+
+
+[Rank 0] Collect results: Waiting for all mpi-threads to finish accumulating...
+[Rank 0] Timings for all measures:
+Measure                                    | seconds   
+Auto-correlation time                      | 0.103132  
+Average order                              | 0.0336931 
+Average sign                               | 0.032163  
+Density Matrix for local static observable | 2.55587   
+G_l measure                                | 22.035    
+G_tau measure                              | 3.54438   
+Perturbation order                         | 0.0678108 
+Perturbation order (down_0)                | 0.0563083 
+Perturbation order (up_0)                  | 0.0452816 
+Total measure time                         | 28.4737   
+[Rank 0] Acceptance rate for all moves:
+Move set Insert two operators: 0.0204503
+  Move  Insert Delta_down_0: 0.0204456
+  Move  Insert Delta_up_0: 0.0204551
+Move set Remove two operators: 0.0204545
+  Move  Remove Delta_down_0: 0.0204464
+  Move  Remove Delta_up_0: 0.0204626
+Move set Insert four operators: 0.00090051
+  Move  Insert Delta_down_0_down_0: 0.00115794
+  Move  Insert Delta_down_0_up_0: 0.000642507
+  Move  Insert Delta_up_0_down_0: 0.000642831
+  Move  Insert Delta_up_0_up_0: 0.00115878
+Move set Remove four operators: 0.000897334
+  Move  Remove Delta_down_0_down_0: 0.00116024
+  Move  Remove Delta_down_0_up_0: 0.000637117
+  Move  Remove Delta_up_0_down_0: 0.000638086
+  Move  Remove Delta_up_0_up_0: 0.00115385
+[Rank 0] Warmup lasted: 7.89984 seconds [00:00:07]
+[Rank 0] Simulation lasted: 273.962 seconds [00:04:33]
+[Rank 0] Number of measures: 312500
+Total number of measures: 10000000
+Average sign: 0.999995
+Average order: 17.6438
+Auto-correlation time: 2.34824
+Actual time for solver: 283.25 s
+
+Total charge of impurity problem: 0.19887
+Total charge convergency of impurity problem: 0.00509
+
+Density matrix:
+down_0, real part
+[[0.05268735 0.00010501]
+ [0.00010501 0.04827077]]
+eigenvalues: [0.04826827 0.05268985]
+up_0, real part
+[[0.04836168 0.0002422 ]
+ [0.0002422  0.04954702]]
+eigenvalues: [0.0483141 0.0495946]
+
+ *** Post-processing the solver output ***
+Total charge of all correlated shells : 3.806517
+
+
+*** DC determination ***
+DC for shell 0 and block up = 2.007320
+DC for shell 0 and block down = 2.007320
+DC energy for shell 0 = 1.0004661734147442
+DC for shell 3 and block up = 2.007320
+DC for shell 3 and block down = 2.007320
+DC energy for shell 3 = 1.0004661734147442
+DC for shell 1 and block up = -0.501889
+DC for shell 1 and block down = -0.501889
+DC energy for shell 1 = -0.13276567815715667
+DC for shell 2 and block up = -0.501889
+DC for shell 2 and block down = -0.501889
+DC energy for shell 2 = -0.13276567815715667
+Lattice Gf: occupation = 4.13211-0.00000j
+            G(beta/2)  = -0.04233+0.00000j
+Found blocks ['total']
+Calling MaxEnt with omega in +- 20.000 eV
+2022-02-21 16:27:11.796487
+MaxEnt run
+TRIQS application maxent
+Copyright(C) 2018 Gernot J. Kraberger
+Copyright(C) 2018 Simons Foundation
+Authors: Gernot J. Kraberger and Manuel Zingl
+This program comes with ABSOLUTELY NO WARRANTY.
+This is free software, and you are welcome to redistributeit under certain conditions; see file LICENSE.
+Please cite this code and the appropriate original papers (see documentation).
+
+Minimal chi2: 0.02122514245683196
+scaling alpha by a factor 6151 (number of data points)
+alpha[ 0] =   6.15100000e+05, chi2 =   9.32635414e+06, n_iter=       5 
+alpha[ 1] =   4.63977315e+05, chi2 =   8.95573904e+06, n_iter=       4 
+alpha[ 2] =   3.49983659e+05, chi2 =   8.33038990e+06, n_iter=       5 
+alpha[ 3] =   2.63996876e+05, chi2 =   7.41469398e+06, n_iter=       5 
+alpha[ 4] =   1.99136013e+05, chi2 =   6.25408850e+06, n_iter=       5 
+alpha[ 5] =   1.50210686e+05, chi2 =   4.96286236e+06, n_iter=       5 
+alpha[ 6] =   1.13305724e+05, chi2 =   3.71268954e+06, n_iter=       5 
+alpha[ 7] =   8.54678679e+04, chi2 =   2.64376754e+06, n_iter=       5 
+alpha[ 8] =   6.44694389e+04, chi2 =   1.81070555e+06, n_iter=       5 
+alpha[ 9] =   4.86300718e+04, chi2 =   1.20302921e+06, n_iter=       5 
+alpha[10] =   3.66822470e+04, chi2 =   7.80881821e+05, n_iter=       5 
+alpha[11] =   2.76698593e+04, chi2 =   4.98330084e+05, n_iter=       5 
+alpha[12] =   2.08717071e+04, chi2 =   3.14504248e+05, n_iter=       5 
+alpha[13] =   1.57437793e+04, chi2 =   1.97379518e+05, n_iter=       5 
+alpha[14] =   1.18757217e+04, chi2 =   1.23797100e+05, n_iter=       4 
+alpha[15] =   8.95799949e+03, chi2 =   7.79277793e+04, n_iter=       4 
+alpha[16] =   6.75712656e+03, chi2 =   4.93868806e+04, n_iter=       4 
+alpha[17] =   5.09698170e+03, chi2 =   3.15615006e+04, n_iter=       4 
+alpha[18] =   3.84471449e+03, chi2 =   2.03325106e+04, n_iter=       4 
+alpha[19] =   2.90011430e+03, chi2 =   1.31793174e+04, n_iter=       5 
+alpha[20] =   2.18759104e+03, chi2 =   8.57639459e+03, n_iter=       5 
+alpha[21] =   1.65012618e+03, chi2 =   5.59548084e+03, n_iter=       4 
+alpha[22] =   1.24470999e+03, chi2 =   3.65930650e+03, n_iter=       4 
+alpha[23] =   9.38899692e+02, chi2 =   2.40011285e+03, n_iter=       4 
+alpha[24] =   7.08223310e+02, chi2 =   1.58000296e+03, n_iter=       4 
+alpha[25] =   5.34221346e+02, chi2 =   1.04439603e+03, n_iter=       4 
+alpha[26] =   4.02969575e+02, chi2 =   6.93180596e+02, n_iter=       4 
+alpha[27] =   3.03964789e+02, chi2 =   4.61904740e+02, n_iter=       4 
+alpha[28] =   2.29284290e+02, chi2 =   3.09192328e+02, n_iter=       4 
+alpha[29] =   1.72951893e+02, chi2 =   2.08365610e+02, n_iter=       4 
+alpha[30] =   1.30459689e+02, chi2 =   1.42020739e+02, n_iter=       4 
+alpha[31] =   9.84073098e+01, chi2 =   9.86328330e+01, n_iter=       4 
+alpha[32] =   7.42298153e+01, chi2 =   7.04768632e+01, n_iter=       4 
+alpha[33] =   5.59924409e+01, chi2 =   5.23486424e+01, n_iter=       4 
+alpha[34] =   4.22357705e+01, chi2 =   4.07523250e+01, n_iter=       4 
+alpha[35] =   3.18589488e+01, chi2 =   3.33604607e+01, n_iter=       4 
+alpha[36] =   2.40315876e+01, chi2 =   2.86419009e+01, n_iter=       4 
+alpha[37] =   1.81273150e+01, chi2 =   2.56016418e+01, n_iter=       4 
+alpha[38] =   1.36736514e+01, chi2 =   2.36003036e+01, n_iter=       4 
+alpha[39] =   1.03141994e+01, chi2 =   2.22317350e+01, n_iter=       4 
+alpha[40] =   7.78012444e+00, chi2 =   2.12424841e+01, n_iter=       7 
+alpha[41] =   5.86864128e+00, chi2 =   2.04798022e+01, n_iter=       8 
+alpha[42] =   4.42678657e+00, chi2 =   1.98570595e+01, n_iter=      10 
+alpha[43] =   3.33917826e+00, chi2 =   1.93286807e+01, n_iter=      12 
+alpha[44] =   2.51878225e+00, chi2 =   1.88711648e+01, n_iter=      14 
+alpha[45] =   1.89994770e+00, chi2 =   1.84701479e+01, n_iter=      16 
+alpha[46] =   1.43315336e+00, chi2 =   1.81145536e+01, n_iter=      19 
+alpha[47] =   1.08104479e+00, chi2 =   1.77962581e+01, n_iter=      23 
+alpha[48] =   8.15445061e-01, chi2 =   1.75101383e+01, n_iter=      26 
+alpha[49] =   6.15100000e-01, chi2 =   1.72527168e+01, n_iter=      32 
+MaxEnt loop finished in 0:00:13.641500
+Starting at index 80 with A(omega=0.001)=0.419
+Peak at index 69 with A(omega=-0.419)=9.334
+Band edge at index 74 with A(omega=-0.115)=1.044
+Starting at index 80 with A(omega=0.001)=0.419
+Peak at index 100 with A(omega=1.579)=5.513
+Band edge at index 90 with A(omega=0.419)=1.094
+New chemical potential in the gap: -0.054 eV
+
+ *** calculation of observables ***
+
+extracting the impurity density matrix
+*** iteration finished ***
+============================================================
+summary of impurity observables:
+total occupany of impurity 0:  1.7044
+total occupany of impurity 1:  0.1989
+G(beta/2) occ of impurity 0:  -0.0238
+G(beta/2) occ of impurity 1:  -0.0057
+Z (simple estimate) of impurity 0 per orb:
+   up:  0.143  0.163
+ down:  0.143  0.163
+Z (simple estimate) of impurity 1 per orb:
+   up:  0.986  0.985
+ down:  0.986  0.985
+============================================================
+
+
+============================================================
+summary of energetics:
+total energy:  -140.88758702287683
+DFT energy:  -142.323171346
+correlation energy:  -0.24177491843457938
+DFT band correction:  1.677359241557743
+============================================================
+
+============================================================
+convergence:
+δμ:      6.7219e-02
+δE_tot:  2.1823e-02
+---
+Impurity 0:
+δn imp : 5.1443e-02
+δn orb : 2.9414e-02  2.2029e-02
+δ Gimp : 5.0115e+00
+δ G0   : 2.2307e+00
+δ Σ    : 6.2541e+01
+Impurity 1:
+δn imp : 2.6854e-02
+δn orb : 1.2283e-02  1.4571e-02
+δ Gimp : 7.4006e-01
+δ G0   : 6.3012e+00
+δ Σ    : 4.5438e+01
+============================================================
+
+
+################################################################################
+Running iteration: 13 / 14
+
+ *** Correlated Shell type #  0 : Estimated total charge of impurity problem = 1.930361
+Estimated density matrix:
+down_0, real part
+[[0.48424402 0.00091722]
+ [0.00091722 0.48093652]]
+up_0, real part
+[[0.48424402 0.00091722]
+ [0.00091722 0.48093652]]
+
+Solving the impurity problem for shell 0 ...
+
+╔╦╗╦═╗╦╔═╗ ╔═╗  ┌─┐┌┬┐┬ ┬┬ ┬┌┐ 
+ ║ ╠╦╝║║═╬╗╚═╗  │   │ ├─┤└┬┘├┴┐
+ ╩ ╩╚═╩╚═╝╚╚═╝  └─┘ ┴ ┴ ┴ ┴ └─┘
+
+The local Hamiltonian of the problem:
+0.000524822*c_dag('down_0',0)*c('down_0',1) + -1.23234*c_dag('down_0',0)*c('down_0',0) + -1.18406*c_dag('down_0',1)*c('down_0',1) + 0.000524822*c_dag('down_0',1)*c('down_0',0) + 0.000524822*c_dag('up_0',0)*c('up_0',1) + -1.23234*c_dag('up_0',0)*c('up_0',0) + -1.18406*c_dag('up_0',1)*c('up_0',1) + 0.000524822*c_dag('up_0',1)*c('up_0',0) + 1*c_dag('down_0',0)*c_dag('down_0',1)*c('down_0',1)*c('down_0',0) + 0.5*c_dag('down_0',0)*c_dag('up_0',0)*c('up_0',1)*c('down_0',1) + 2.5*c_dag('down_0',0)*c_dag('up_0',0)*c('up_0',0)*c('down_0',0) + 1.5*c_dag('down_0',0)*c_dag('up_0',1)*c('up_0',1)*c('down_0',0) + 0.5*c_dag('down_0',0)*c_dag('up_0',1)*c('up_0',0)*c('down_0',1) + 0.5*c_dag('down_0',1)*c_dag('up_0',0)*c('up_0',1)*c('down_0',0) + 1.5*c_dag('down_0',1)*c_dag('up_0',0)*c('up_0',0)*c('down_0',1) + 2.5*c_dag('down_0',1)*c_dag('up_0',1)*c('up_0',1)*c('down_0',1) + 0.5*c_dag('down_0',1)*c_dag('up_0',1)*c('up_0',0)*c('down_0',0) + 1*c_dag('up_0',0)*c_dag('up_0',1)*c('up_0',1)*c('up_0',0)
+Using autopartition algorithm to partition the local Hilbert space
+Found 9 subspaces.
+
+Warming up ...
+16:27:31   1% ETA 00:00:09 cycle 109 of 10000
+16:27:33  21% ETA 00:00:07 cycle 2172 of 10000
+16:27:36  47% ETA 00:00:05 cycle 4720 of 10000
+16:27:39  79% ETA 00:00:02 cycle 7931 of 10000
+
+
+
+Accumulating ...
+16:27:41   0% ETA 00:05:30 cycle 94 of 312500
+16:27:43   0% ETA 00:05:28 cycle 2008 of 312500
+16:27:45   1% ETA 00:05:18 cycle 4505 of 312500
+16:27:48   2% ETA 00:05:11 cycle 7662 of 312500
+16:27:52   3% ETA 00:05:15 cycle 11236 of 312500
+16:27:57   4% ETA 00:05:18 cycle 15588 of 312500
+16:28:04   6% ETA 00:05:16 cycle 21067 of 312500
+16:28:11   8% ETA 00:05:13 cycle 27859 of 312500
+16:28:21  11% ETA 00:05:05 cycle 36464 of 312500
+16:28:33  15% ETA 00:04:54 cycle 47218 of 312500
+16:28:48  19% ETA 00:04:39 cycle 60831 of 312500
+16:29:07  25% ETA 00:04:14 cycle 79146 of 312500
+16:29:31  32% ETA 00:03:47 cycle 101788 of 312500
+16:30:00  41% ETA 00:03:15 cycle 130173 of 312500
+16:30:37  52% ETA 00:02:37 cycle 165206 of 312500
+16:31:23  66% ETA 00:01:50 cycle 208733 of 312500
+16:32:21  83% ETA 00:00:55 cycle 260604 of 312500
+
+
+[Rank 0] Collect results: Waiting for all mpi-threads to finish accumulating...
+[Rank 0] Timings for all measures:
+Measure                                    | seconds   
+Auto-correlation time                      | 0.103056  
+Average order                              | 0.042746  
+Average sign                               | 0.0402329 
+Density Matrix for local static observable | 2.36659   
+G_l measure                                | 52.5576   
+G_tau measure                              | 6.67081   
+Perturbation order                         | 0.0765652 
+Perturbation order (down_0)                | 0.0674322 
+Perturbation order (up_0)                  | 0.0501272 
+Total measure time                         | 61.9752   
+[Rank 0] Acceptance rate for all moves:
+Move set Insert two operators: 0.0184693
+  Move  Insert Delta_down_0: 0.0184483
+  Move  Insert Delta_up_0: 0.0184903
+Move set Remove two operators: 0.0184699
+  Move  Remove Delta_down_0: 0.0184511
+  Move  Remove Delta_up_0: 0.0184887
+Move set Insert four operators: 0.000736287
+  Move  Insert Delta_down_0_down_0: 0.000914112
+  Move  Insert Delta_down_0_up_0: 0.00055707
+  Move  Insert Delta_up_0_down_0: 0.000559372
+  Move  Insert Delta_up_0_up_0: 0.000914629
+Move set Remove four operators: 0.000735131
+  Move  Remove Delta_down_0_down_0: 0.0009126
+  Move  Remove Delta_down_0_up_0: 0.000560326
+  Move  Remove Delta_up_0_down_0: 0.000554008
+  Move  Remove Delta_up_0_up_0: 0.000913565
+[Rank 0] Warmup lasted: 9.78727 seconds [00:00:09]
+[Rank 0] Simulation lasted: 333.354 seconds [00:05:33]
+[Rank 0] Number of measures: 312500
+Total number of measures: 10000000
+Average sign: 0.99927
+Average order: 23.2078
+Auto-correlation time: 2.69781
+Actual time for solver: 344.53 s
+
+Total charge of impurity problem: 1.74049
+Total charge convergency of impurity problem: -0.18988
+
+Density matrix:
+down_0, real part
+[[0.43876221 0.00003251]
+ [0.00003251 0.4387212 ]]
+eigenvalues: [0.43870327 0.43878014]
+up_0, real part
+[[0.43288515 0.00013983]
+ [0.00013983 0.43011694]]
+eigenvalues: [0.4301099  0.43289219]
+
+ *** Correlated Shell type #  1 : Estimated total charge of impurity problem = 0.217387
+Estimated density matrix:
+down_0, real part
+[[0.05532707 0.00019012]
+ [0.00019012 0.05336644]]
+up_0, real part
+[[0.05532707 0.00019012]
+ [0.00019012 0.05336644]]
+
+Solving the impurity problem for shell 1 ...
+
+╔╦╗╦═╗╦╔═╗ ╔═╗  ┌─┐┌┬┐┬ ┬┬ ┬┌┐ 
+ ║ ╠╦╝║║═╬╗╚═╗  │   │ ├─┤└┬┘├┴┐
+ ╩ ╩╚═╩╚═╝╚╚═╝  └─┘ ┴ ┴ ┴ ┴ └─┘
+
+The local Hamiltonian of the problem:
+-0.000880881*c_dag('down_0',0)*c('down_0',1) + 1.42601*c_dag('down_0',0)*c('down_0',0) + 1.47512*c_dag('down_0',1)*c('down_0',1) + -0.000880881*c_dag('down_0',1)*c('down_0',0) + -0.000880881*c_dag('up_0',0)*c('up_0',1) + 1.42601*c_dag('up_0',0)*c('up_0',0) + 1.47512*c_dag('up_0',1)*c('up_0',1) + -0.000880881*c_dag('up_0',1)*c('up_0',0) + 1*c_dag('down_0',0)*c_dag('down_0',1)*c('down_0',1)*c('down_0',0) + 0.5*c_dag('down_0',0)*c_dag('up_0',0)*c('up_0',1)*c('down_0',1) + 2.5*c_dag('down_0',0)*c_dag('up_0',0)*c('up_0',0)*c('down_0',0) + 1.5*c_dag('down_0',0)*c_dag('up_0',1)*c('up_0',1)*c('down_0',0) + 0.5*c_dag('down_0',0)*c_dag('up_0',1)*c('up_0',0)*c('down_0',1) + 0.5*c_dag('down_0',1)*c_dag('up_0',0)*c('up_0',1)*c('down_0',0) + 1.5*c_dag('down_0',1)*c_dag('up_0',0)*c('up_0',0)*c('down_0',1) + 2.5*c_dag('down_0',1)*c_dag('up_0',1)*c('up_0',1)*c('down_0',1) + 0.5*c_dag('down_0',1)*c_dag('up_0',1)*c('up_0',0)*c('down_0',0) + 1*c_dag('up_0',0)*c_dag('up_0',1)*c('up_0',1)*c('up_0',0)
+Using autopartition algorithm to partition the local Hilbert space
+Found 9 subspaces.
+
+Warming up ...
+16:33:16   1% ETA 00:00:07 cycle 124 of 10000
+16:33:18  25% ETA 00:00:06 cycle 2589 of 10000
+16:33:20  56% ETA 00:00:03 cycle 5662 of 10000
+16:33:23  95% ETA 00:00:00 cycle 9533 of 10000
+
+
+
+Accumulating ...
+16:33:24   0% ETA 00:04:32 cycle 114 of 312500
+16:33:26   0% ETA 00:04:39 cycle 2360 of 312500
+16:33:28   1% ETA 00:04:42 cycle 5072 of 312500
+16:33:31   2% ETA 00:04:37 cycle 8563 of 312500
+16:33:35   4% ETA 00:04:34 cycle 12873 of 312500
+16:33:40   5% ETA 00:04:29 cycle 18241 of 312500
+16:33:47   7% ETA 00:04:24 cycle 24935 of 312500
+16:33:54  10% ETA 00:04:17 cycle 33236 of 312500
+16:34:04  13% ETA 00:04:08 cycle 43640 of 312500
+16:34:16  18% ETA 00:03:56 cycle 56712 of 312500
+16:34:31  23% ETA 00:03:41 cycle 72944 of 312500
+16:34:50  29% ETA 00:03:23 cycle 93222 of 312500
+16:35:14  37% ETA 00:02:59 cycle 118671 of 312500
+16:35:43  48% ETA 00:02:29 cycle 150564 of 312500
+16:36:20  60% ETA 00:01:52 cycle 190429 of 312500
+16:37:06  76% ETA 00:01:06 cycle 240318 of 312500
+16:38:04  96% ETA 00:00:08 cycle 302898 of 312500
+
+
+[Rank 0] Collect results: Waiting for all mpi-threads to finish accumulating...
+[Rank 0] Timings for all measures:
+Measure                                    | seconds   
+Auto-correlation time                      | 0.101628  
+Average order                              | 0.0383727 
+Average sign                               | 0.0315092 
+Density Matrix for local static observable | 2.71078   
+G_l measure                                | 25.8711   
+G_tau measure                              | 3.914     
+Perturbation order                         | 0.0734283 
+Perturbation order (down_0)                | 0.071866  
+Perturbation order (up_0)                  | 0.0596955 
+Total measure time                         | 32.8724   
+[Rank 0] Acceptance rate for all moves:
+Move set Insert two operators: 0.0197379
+  Move  Insert Delta_down_0: 0.0197369
+  Move  Insert Delta_up_0: 0.0197388
+Move set Remove two operators: 0.0197418
+  Move  Remove Delta_down_0: 0.0197412
+  Move  Remove Delta_up_0: 0.0197425
+Move set Insert four operators: 0.000838689
+  Move  Insert Delta_down_0_down_0: 0.00108305
+  Move  Insert Delta_down_0_up_0: 0.000595288
+  Move  Insert Delta_up_0_down_0: 0.000594687
+  Move  Insert Delta_up_0_up_0: 0.00108176
+Move set Remove four operators: 0.00083565
+  Move  Remove Delta_down_0_down_0: 0.00107949
+  Move  Remove Delta_down_0_up_0: 0.000594629
+  Move  Remove Delta_up_0_down_0: 0.000590326
+  Move  Remove Delta_up_0_up_0: 0.00107812
+[Rank 0] Warmup lasted: 8.18826 seconds [00:00:08]
+[Rank 0] Simulation lasted: 289.266 seconds [00:04:49]
+[Rank 0] Number of measures: 312500
+Total number of measures: 10000000
+Average sign: 0.999976
+Average order: 19.2455
+Auto-correlation time: 2.19226
+Actual time for solver: 298.84 s
+
+Total charge of impurity problem: 0.22068
+Total charge convergency of impurity problem: 0.00329
+
+Density matrix:
+down_0, real part
+[[0.05770505 0.00012158]
+ [0.00012158 0.0552861 ]]
+eigenvalues: [0.05528    0.05771115]
+up_0, real part
+[[0.05413198 0.00029741]
+ [0.00029741 0.05355696]]
+eigenvalues: [0.05343081 0.05425813]
+
+ *** Post-processing the solver output ***
+Total charge of all correlated shells : 3.922331
+
+
+*** DC determination ***
+DC for shell 0 and block up = 2.067476
+DC for shell 0 and block down = 2.067476
+DC energy for shell 0 = 1.0740035560155838
+DC for shell 3 and block up = 2.067476
+DC for shell 3 and block down = 2.067476
+DC energy for shell 3 = 1.0740035560155838
+DC for shell 1 and block up = -0.465533
+DC for shell 1 and block down = -0.465533
+DC energy for shell 1 = -0.1433169887867743
+DC for shell 2 and block up = -0.465533
+DC for shell 2 and block down = -0.465533
+DC energy for shell 2 = -0.1433169887867743
+Lattice Gf: occupation = 4.14348-0.00000j
+            G(beta/2)  = -0.00366-0.00000j
+Found blocks ['total']
+Calling MaxEnt with omega in +- 20.000 eV
+2022-02-21 16:38:19.590231
+MaxEnt run
+TRIQS application maxent
+Copyright(C) 2018 Gernot J. Kraberger
+Copyright(C) 2018 Simons Foundation
+Authors: Gernot J. Kraberger and Manuel Zingl
+This program comes with ABSOLUTELY NO WARRANTY.
+This is free software, and you are welcome to redistributeit under certain conditions; see file LICENSE.
+Please cite this code and the appropriate original papers (see documentation).
+
+Minimal chi2: 0.008329967048835575
+scaling alpha by a factor 6151 (number of data points)
+alpha[ 0] =   6.15100000e+05, chi2 =   8.92859223e+06, n_iter=       5 
+alpha[ 1] =   4.63977315e+05, chi2 =   8.62321795e+06, n_iter=       4 
+alpha[ 2] =   3.49983659e+05, chi2 =   8.09571202e+06, n_iter=       5 
+alpha[ 3] =   2.63996876e+05, chi2 =   7.27546554e+06, n_iter=       5 
+alpha[ 4] =   1.99136013e+05, chi2 =   6.18330244e+06, n_iter=       5 
+alpha[ 5] =   1.50210686e+05, chi2 =   4.93747876e+06, n_iter=       5 
+alpha[ 6] =   1.13305724e+05, chi2 =   3.71270685e+06, n_iter=       5 
+alpha[ 7] =   8.54678679e+04, chi2 =   2.65410175e+06, n_iter=       5 
+alpha[ 8] =   6.44694389e+04, chi2 =   1.82314264e+06, n_iter=       5 
+alpha[ 9] =   4.86300718e+04, chi2 =   1.21416924e+06, n_iter=       5 
+alpha[10] =   3.66822470e+04, chi2 =   7.89771107e+05, n_iter=       5 
+alpha[11] =   2.76698593e+04, chi2 =   5.05028948e+05, n_iter=       5 
+alpha[12] =   2.08717071e+04, chi2 =   3.19386888e+05, n_iter=       5 
+alpha[13] =   1.57437793e+04, chi2 =   2.00845744e+05, n_iter=       5 
+alpha[14] =   1.18757217e+04, chi2 =   1.26184829e+05, n_iter=       5 
+alpha[15] =   8.95799949e+03, chi2 =   7.95077744e+04, n_iter=       5 
+alpha[16] =   6.75712656e+03, chi2 =   5.03810581e+04, n_iter=       5 
+alpha[17] =   5.09698170e+03, chi2 =   3.21587991e+04, n_iter=       4 
+alpha[18] =   3.84471449e+03, chi2 =   2.06911329e+04, n_iter=       4 
+alpha[19] =   2.90011430e+03, chi2 =   1.34160538e+04, n_iter=       4 
+alpha[20] =   2.18759104e+03, chi2 =   8.75891622e+03, n_iter=       4 
+alpha[21] =   1.65012618e+03, chi2 =   5.75119096e+03, n_iter=       4 
+alpha[22] =   1.24470999e+03, chi2 =   3.79403975e+03, n_iter=       4 
+alpha[23] =   9.38899692e+02, chi2 =   2.51344759e+03, n_iter=       4 
+alpha[24] =   7.08223310e+02, chi2 =   1.67242002e+03, n_iter=       4 
+alpha[25] =   5.34221346e+02, chi2 =   1.11845788e+03, n_iter=       4 
+alpha[26] =   4.02969575e+02, chi2 =   7.52260409e+02, n_iter=       4 
+alpha[27] =   3.03964789e+02, chi2 =   5.08840696e+02, n_iter=       4 
+alpha[28] =   2.29284290e+02, chi2 =   3.45888027e+02, n_iter=       5 
+alpha[29] =   1.72951893e+02, chi2 =   2.36239075e+02, n_iter=       5 
+alpha[30] =   1.30459689e+02, chi2 =   1.62481224e+02, n_iter=       5 
+alpha[31] =   9.84073098e+01, chi2 =   1.13133356e+02, n_iter=       5 
+alpha[32] =   7.42298153e+01, chi2 =   8.03688310e+01, n_iter=       5 
+alpha[33] =   5.59924409e+01, chi2 =   5.87765359e+01, n_iter=       4 
+alpha[34] =   4.22357705e+01, chi2 =   4.46259675e+01, n_iter=       4 
+alpha[35] =   3.18589488e+01, chi2 =   3.53713484e+01, n_iter=       4 
+alpha[36] =   2.40315876e+01, chi2 =   2.92967862e+01, n_iter=       4 
+alpha[37] =   1.81273150e+01, chi2 =   2.52610789e+01, n_iter=       4 
+alpha[38] =   1.36736514e+01, chi2 =   2.25156800e+01, n_iter=       4 
+alpha[39] =   1.03141994e+01, chi2 =   2.05766936e+01, n_iter=       7 
+alpha[40] =   7.78012444e+00, chi2 =   1.91366006e+01, n_iter=       8 
+alpha[41] =   5.86864128e+00, chi2 =   1.80024654e+01, n_iter=      10 
+alpha[42] =   4.42678657e+00, chi2 =   1.70472074e+01, n_iter=      14 
+alpha[43] =   3.33917826e+00, chi2 =   1.61773609e+01, n_iter=      19 
+alpha[44] =   2.51878225e+00, chi2 =   1.53582790e+01, n_iter=      21 
+alpha[45] =   1.89994770e+00, chi2 =   1.46007337e+01, n_iter=      20 
+alpha[46] =   1.43315336e+00, chi2 =   1.39143364e+01, n_iter=      23 
+alpha[47] =   1.08104479e+00, chi2 =   1.32997894e+01, n_iter=      28 
+alpha[48] =   8.15445061e-01, chi2 =   1.27521913e+01, n_iter=      32 
+alpha[49] =   6.15100000e-01, chi2 =   1.22647745e+01, n_iter=      36 
+MaxEnt loop finished in 0:00:14.863558
+Starting at index 80 with A(omega=0.001)=0.000
+Peak at index 67 with A(omega=-0.593)=8.844
+Band edge at index 71 with A(omega=-0.275)=1.288
+Starting at index 80 with A(omega=0.001)=0.000
+Peak at index 99 with A(omega=1.431)=5.752
+Band edge at index 88 with A(omega=0.275)=0.617
+New chemical potential in the gap: -0.054 eV
+
+ *** calculation of observables ***
+
+extracting the impurity density matrix
+*** iteration finished ***
+============================================================
+summary of impurity observables:
+total occupany of impurity 0:  1.7405
+total occupany of impurity 1:  0.2207
+G(beta/2) occ of impurity 0:  -0.0019
+G(beta/2) occ of impurity 1:  -0.0018
+Z (simple estimate) of impurity 0 per orb:
+   up:  0.068  0.085
+ down:  0.068  0.085
+Z (simple estimate) of impurity 1 per orb:
+   up:  0.984  0.982
+ down:  0.984  0.982
+============================================================
+
+
+============================================================
+summary of energetics:
+total energy:  -140.93575067206015
+DFT energy:  -142.323171346
+correlation energy:  -0.28921251786247604
+DFT band correction:  1.6766331918023114
+============================================================
+
+============================================================
+convergence:
+δμ:      1.5195e-01
+δE_tot:  4.8164e-02
+---
+Impurity 0:
+δn imp : 3.6094e-02
+δn orb : 1.5450e-02  2.0643e-02
+δ Gimp : 1.3096e+01
+δ G0   : 1.0050e+01
+δ Σ    : 9.2290e+01
+Impurity 1:
+δn imp : 2.1813e-02
+δn orb : 1.0788e-02  1.1025e-02
+δ Gimp : 4.8219e-01
+δ G0   : 3.5381e+00
+δ Σ    : 1.1329e+01
+============================================================
+
+
+################################################################################
+Running iteration: 14 / 14
+
+ *** Correlated Shell type #  0 : Estimated total charge of impurity problem = 1.794112
+Estimated density matrix:
+down_0, real part
+[[0.44917407 0.00006421]
+ [0.00006421 0.44788183]]
+up_0, real part
+[[0.44917407 0.00006421]
+ [0.00006421 0.44788183]]
+
+Solving the impurity problem for shell 0 ...
+
+╔╦╗╦═╗╦╔═╗ ╔═╗  ┌─┐┌┬┐┬ ┬┬ ┬┌┐ 
+ ║ ╠╦╝║║═╬╗╚═╗  │   │ ├─┤└┬┘├┴┐
+ ╩ ╩╚═╩╚═╝╚╚═╝  └─┘ ┴ ┴ ┴ ┴ └─┘
+
+The local Hamiltonian of the problem:
+0.000393946*c_dag('down_0',0)*c('down_0',1) + -1.29299*c_dag('down_0',0)*c('down_0',0) + -1.2447*c_dag('down_0',1)*c('down_0',1) + 0.000393946*c_dag('down_0',1)*c('down_0',0) + 0.000393946*c_dag('up_0',0)*c('up_0',1) + -1.29299*c_dag('up_0',0)*c('up_0',0) + -1.2447*c_dag('up_0',1)*c('up_0',1) + 0.000393946*c_dag('up_0',1)*c('up_0',0) + 1*c_dag('down_0',0)*c_dag('down_0',1)*c('down_0',1)*c('down_0',0) + 0.5*c_dag('down_0',0)*c_dag('up_0',0)*c('up_0',1)*c('down_0',1) + 2.5*c_dag('down_0',0)*c_dag('up_0',0)*c('up_0',0)*c('down_0',0) + 1.5*c_dag('down_0',0)*c_dag('up_0',1)*c('up_0',1)*c('down_0',0) + 0.5*c_dag('down_0',0)*c_dag('up_0',1)*c('up_0',0)*c('down_0',1) + 0.5*c_dag('down_0',1)*c_dag('up_0',0)*c('up_0',1)*c('down_0',0) + 1.5*c_dag('down_0',1)*c_dag('up_0',0)*c('up_0',0)*c('down_0',1) + 2.5*c_dag('down_0',1)*c_dag('up_0',1)*c('up_0',1)*c('down_0',1) + 0.5*c_dag('down_0',1)*c_dag('up_0',1)*c('up_0',0)*c('down_0',0) + 1*c_dag('up_0',0)*c_dag('up_0',1)*c('up_0',1)*c('up_0',0)
+Using autopartition algorithm to partition the local Hilbert space
+Found 9 subspaces.
+
+Warming up ...
+16:38:40   1% ETA 00:00:09 cycle 106 of 10000
+16:38:42  21% ETA 00:00:07 cycle 2153 of 10000
+16:38:45  47% ETA 00:00:05 cycle 4702 of 10000
+16:38:48  79% ETA 00:00:02 cycle 7914 of 10000
+
+
+
+Accumulating ...
+16:38:50   0% ETA 00:05:40 cycle 91 of 312500
+16:38:52   0% ETA 00:05:56 cycle 1851 of 312500
+16:38:55   1% ETA 00:05:56 cycle 4034 of 312500
+16:38:58   2% ETA 00:05:46 cycle 6901 of 312500
+16:39:02   3% ETA 00:05:31 cycle 10713 of 312500
+16:39:07   4% ETA 00:05:20 cycle 15490 of 312500
+16:39:13   6% ETA 00:05:20 cycle 20865 of 312500
+16:39:21   8% ETA 00:05:14 cycle 27746 of 312500
+16:39:30  11% ETA 00:05:04 cycle 36522 of 312500
+16:39:42  15% ETA 00:04:51 cycle 47627 of 312500
+16:39:57  19% ETA 00:04:29 cycle 62475 of 312500
+16:40:16  25% ETA 00:04:08 cycle 80525 of 312500
+16:40:40  32% ETA 00:03:45 cycle 102383 of 312500
+16:41:09  41% ETA 00:03:15 cycle 130217 of 312500
+16:41:46  52% ETA 00:02:38 cycle 164437 of 312500
+16:42:32  66% ETA 00:01:52 cycle 207618 of 312500
+16:43:30  84% ETA 00:00:51 cycle 264173 of 312500
+
+
+[Rank 0] Collect results: Waiting for all mpi-threads to finish accumulating...
+[Rank 0] Timings for all measures:
+Measure                                    | seconds   
+Auto-correlation time                      | 0.124922  
+Average order                              | 0.042381  
+Average sign                               | 0.0380837 
+Density Matrix for local static observable | 2.50796   
+G_l measure                                | 53.1515   
+G_tau measure                              | 6.77112   
+Perturbation order                         | 0.0844639 
+Perturbation order (down_0)                | 0.0711658 
+Perturbation order (up_0)                  | 0.0620423 
+Total measure time                         | 62.8536   
+[Rank 0] Acceptance rate for all moves:
+Move set Insert two operators: 0.0182524
+  Move  Insert Delta_down_0: 0.0180607
+  Move  Insert Delta_up_0: 0.018444
+Move set Remove two operators: 0.0182526
+  Move  Remove Delta_down_0: 0.0180611
+  Move  Remove Delta_up_0: 0.018444
+Move set Insert four operators: 0.000715799
+  Move  Insert Delta_down_0_down_0: 0.000874412
+  Move  Insert Delta_down_0_up_0: 0.000546753
+  Move  Insert Delta_up_0_down_0: 0.000547205
+  Move  Insert Delta_up_0_up_0: 0.000894892
+Move set Remove four operators: 0.000715192
+  Move  Remove Delta_down_0_down_0: 0.000873182
+  Move  Remove Delta_down_0_up_0: 0.000546462
+  Move  Remove Delta_up_0_down_0: 0.000545974
+  Move  Remove Delta_up_0_up_0: 0.000895128
+[Rank 0] Warmup lasted: 9.80722 seconds [00:00:09]
+[Rank 0] Simulation lasted: 329.116 seconds [00:05:29]
+[Rank 0] Number of measures: 312500
+Total number of measures: 10000000
+Average sign: 0.999288
+Average order: 22.8607
+Auto-correlation time: 3.48241
+Actual time for solver: 340.32 s
+
+Total charge of impurity problem: 1.73823
+Total charge convergency of impurity problem: -0.05589
+
+Density matrix:
+down_0, real part
+[[ 0.45649798 -0.00047694]
+ [-0.00047694  0.45666101]]
+eigenvalues: [0.45609563 0.45706335]
+up_0, real part
+[[0.41616604 0.00085656]
+ [0.00085656 0.40890055]]
+eigenvalues: [0.40880093 0.41626566]
+
+ *** Correlated Shell type #  1 : Estimated total charge of impurity problem = 0.190524
+Estimated density matrix:
+down_0, real part
+[[0.04818752 0.0001323 ]
+ [0.0001323  0.04707443]]
+up_0, real part
+[[0.04818752 0.0001323 ]
+ [0.0001323  0.04707443]]
+
+Solving the impurity problem for shell 1 ...
+
+╔╦╗╦═╗╦╔═╗ ╔═╗  ┌─┐┌┬┐┬ ┬┬ ┬┌┐ 
+ ║ ╠╦╝║║═╬╗╚═╗  │   │ ├─┤└┬┘├┴┐
+ ╩ ╩╚═╩╚═╝╚╚═╝  └─┘ ┴ ┴ ┴ ┴ └─┘
+
+The local Hamiltonian of the problem:
+-0.000989246*c_dag('down_0',0)*c('down_0',1) + 1.38929*c_dag('down_0',0)*c('down_0',0) + 1.43831*c_dag('down_0',1)*c('down_0',1) + -0.000989246*c_dag('down_0',1)*c('down_0',0) + -0.000989246*c_dag('up_0',0)*c('up_0',1) + 1.38929*c_dag('up_0',0)*c('up_0',0) + 1.43831*c_dag('up_0',1)*c('up_0',1) + -0.000989246*c_dag('up_0',1)*c('up_0',0) + 1*c_dag('down_0',0)*c_dag('down_0',1)*c('down_0',1)*c('down_0',0) + 0.5*c_dag('down_0',0)*c_dag('up_0',0)*c('up_0',1)*c('down_0',1) + 2.5*c_dag('down_0',0)*c_dag('up_0',0)*c('up_0',0)*c('down_0',0) + 1.5*c_dag('down_0',0)*c_dag('up_0',1)*c('up_0',1)*c('down_0',0) + 0.5*c_dag('down_0',0)*c_dag('up_0',1)*c('up_0',0)*c('down_0',1) + 0.5*c_dag('down_0',1)*c_dag('up_0',0)*c('up_0',1)*c('down_0',0) + 1.5*c_dag('down_0',1)*c_dag('up_0',0)*c('up_0',0)*c('down_0',1) + 2.5*c_dag('down_0',1)*c_dag('up_0',1)*c('up_0',1)*c('down_0',1) + 0.5*c_dag('down_0',1)*c_dag('up_0',1)*c('up_0',0)*c('down_0',0) + 1*c_dag('up_0',0)*c_dag('up_0',1)*c('up_0',1)*c('up_0',0)
+Using autopartition algorithm to partition the local Hilbert space
+Found 9 subspaces.
+
+Warming up ...
+16:44:21   1% ETA 00:00:07 cycle 127 of 10000
+16:44:23  26% ETA 00:00:05 cycle 2627 of 10000
+16:44:25  57% ETA 00:00:03 cycle 5743 of 10000
+16:44:28  97% ETA 00:00:00 cycle 9719 of 10000
+
+
+
+Accumulating ...
+16:44:29   0% ETA 00:04:10 cycle 125 of 312500
+16:44:31   0% ETA 00:04:33 cycle 2408 of 312500
+16:44:33   1% ETA 00:04:35 cycle 5200 of 312500
+16:44:36   2% ETA 00:04:33 cycle 8687 of 312500
+16:44:40   4% ETA 00:04:29 cycle 13105 of 312500
+16:44:45   5% ETA 00:04:24 cycle 18604 of 312500
+16:44:51   8% ETA 00:04:17 cycle 25546 of 312500
+16:44:59  10% ETA 00:04:10 cycle 34110 of 312500
+16:45:09  14% ETA 00:04:00 cycle 44818 of 312500
+16:45:21  18% ETA 00:03:48 cycle 58287 of 312500
+16:45:36  24% ETA 00:03:33 cycle 75052 of 312500
+16:45:55  30% ETA 00:03:14 cycle 96127 of 312500
+16:46:18  39% ETA 00:02:50 cycle 122358 of 312500
+16:46:48  49% ETA 00:02:20 cycle 155363 of 312500
+16:47:25  62% ETA 00:01:43 cycle 196609 of 312500
+16:48:11  79% ETA 00:00:58 cycle 247595 of 312500
+
+
+[Rank 0] Collect results: Waiting for all mpi-threads to finish accumulating...
+[Rank 0] Timings for all measures:
+Measure                                    | seconds   
+Auto-correlation time                      | 0.113427  
+Average order                              | 0.0434623 
+Average sign                               | 0.0360166 
+Density Matrix for local static observable | 2.69076   
+G_l measure                                | 21.4793   
+G_tau measure                              | 3.49307   
+Perturbation order                         | 0.0724993 
+Perturbation order (down_0)                | 0.0733482 
+Perturbation order (up_0)                  | 0.0577232 
+Total measure time                         | 28.0596   
+[Rank 0] Acceptance rate for all moves:
+Move set Insert two operators: 0.0200959
+  Move  Insert Delta_down_0: 0.0200925
+  Move  Insert Delta_up_0: 0.0200993
+Move set Remove two operators: 0.0200999
+  Move  Remove Delta_down_0: 0.0200928
+  Move  Remove Delta_up_0: 0.0201069
+Move set Insert four operators: 0.000871439
+  Move  Insert Delta_down_0_down_0: 0.00111842
+  Move  Insert Delta_down_0_up_0: 0.000622746
+  Move  Insert Delta_up_0_down_0: 0.000622009
+  Move  Insert Delta_up_0_up_0: 0.00112261
+Move set Remove four operators: 0.000868482
+  Move  Remove Delta_down_0_down_0: 0.00112166
+  Move  Remove Delta_down_0_up_0: 0.000619513
+  Move  Remove Delta_up_0_down_0: 0.000614452
+  Move  Remove Delta_up_0_up_0: 0.00111826
+[Rank 0] Warmup lasted: 8.04591 seconds [00:00:08]
+[Rank 0] Simulation lasted: 279.773 seconds [00:04:39]
+[Rank 0] Number of measures: 312500
+Total number of measures: 10000000
+Average sign: 0.999994
+Average order: 17.3633
+Auto-correlation time: 2.25101
+Actual time for solver: 289.21 s
+
+Total charge of impurity problem: 0.19517
+Total charge convergency of impurity problem: 0.00464
+
+Density matrix:
+down_0, real part
+[[0.04967309 0.00013896]
+ [0.00013896 0.04701248]]
+eigenvalues: [0.04700524 0.04968033]
+up_0, real part
+[[0.04864063 0.00016351]
+ [0.00016351 0.04984257]]
+eigenvalues: [0.04861879 0.04986441]
+
+ *** Post-processing the solver output ***
+Total charge of all correlated shells : 3.866789
+
+
+*** DC determination ***
+DC for shell 0 and block up = 2.063709
+DC for shell 0 and block down = 2.063709
+DC energy for shell 0 = 1.069335491669551
+DC for shell 3 and block up = 2.063709
+DC for shell 3 and block down = 2.063709
+DC energy for shell 3 = 1.069335491669551
+DC for shell 1 and block up = -0.508052
+DC for shell 1 and block down = -0.508052
+DC energy for shell 1 = -0.13089826627569887
+DC for shell 2 and block up = -0.508052
+DC for shell 2 and block down = -0.508052
+DC energy for shell 2 = -0.13089826627569887
+Lattice Gf: occupation = 3.98794-0.00000j
+            G(beta/2)  = -0.00117-0.00000j
+Found blocks ['total']
+Calling MaxEnt with omega in +- 20.000 eV
+2022-02-21 16:49:14.959700
+MaxEnt run
+TRIQS application maxent
+Copyright(C) 2018 Gernot J. Kraberger
+Copyright(C) 2018 Simons Foundation
+Authors: Gernot J. Kraberger and Manuel Zingl
+This program comes with ABSOLUTELY NO WARRANTY.
+This is free software, and you are welcome to redistributeit under certain conditions; see file LICENSE.
+Please cite this code and the appropriate original papers (see documentation).
+
+Minimal chi2: 0.001488841277006853
+scaling alpha by a factor 6151 (number of data points)
+alpha[ 0] =   6.15100000e+05, chi2 =   8.89729032e+06, n_iter=       5 
+alpha[ 1] =   4.63977315e+05, chi2 =   8.58846859e+06, n_iter=       4 
+alpha[ 2] =   3.49983659e+05, chi2 =   8.05335530e+06, n_iter=       5 
+alpha[ 3] =   2.63996876e+05, chi2 =   7.22394897e+06, n_iter=       5 
+alpha[ 4] =   1.99136013e+05, chi2 =   6.13172851e+06, n_iter=       5 
+alpha[ 5] =   1.50210686e+05, chi2 =   4.89833068e+06, n_iter=       5 
+alpha[ 6] =   1.13305724e+05, chi2 =   3.68886395e+06, n_iter=       5 
+alpha[ 7] =   8.54678679e+04, chi2 =   2.64154112e+06, n_iter=       5 
+alpha[ 8] =   6.44694389e+04, chi2 =   1.81734927e+06, n_iter=       5 
+alpha[ 9] =   4.86300718e+04, chi2 =   1.21205217e+06, n_iter=       5 
+alpha[10] =   3.66822470e+04, chi2 =   7.89517465e+05, n_iter=       5 
+alpha[11] =   2.76698593e+04, chi2 =   5.05663270e+05, n_iter=       5 
+alpha[12] =   2.08717071e+04, chi2 =   3.20419418e+05, n_iter=       5 
+alpha[13] =   1.57437793e+04, chi2 =   2.02042228e+05, n_iter=       5 
+alpha[14] =   1.18757217e+04, chi2 =   1.27432512e+05, n_iter=       5 
+alpha[15] =   8.95799949e+03, chi2 =   8.07456810e+04, n_iter=       5 
+alpha[16] =   6.75712656e+03, chi2 =   5.15682612e+04, n_iter=       5 
+alpha[17] =   5.09698170e+03, chi2 =   3.32628901e+04, n_iter=       5 
+alpha[18] =   3.84471449e+03, chi2 =   2.16862694e+04, n_iter=       5 
+alpha[19] =   2.90011430e+03, chi2 =   1.42845159e+04, n_iter=       5 
+alpha[20] =   2.18759104e+03, chi2 =   9.49260614e+03, n_iter=       5 
+alpha[21] =   1.65012618e+03, chi2 =   6.35130158e+03, n_iter=       5 
+alpha[22] =   1.24470999e+03, chi2 =   4.26898397e+03, n_iter=       4 
+alpha[23] =   9.38899692e+02, chi2 =   2.87632864e+03, n_iter=       4 
+alpha[24] =   7.08223310e+02, chi2 =   1.93901239e+03, n_iter=       4 
+alpha[25] =   5.34221346e+02, chi2 =   1.30576109e+03, n_iter=       4 
+alpha[26] =   4.02969575e+02, chi2 =   8.77334565e+02, n_iter=       4 
+alpha[27] =   3.03964789e+02, chi2 =   5.87730322e+02, n_iter=       4 
+alpha[28] =   2.29284290e+02, chi2 =   3.92553619e+02, n_iter=       4 
+alpha[29] =   1.72951893e+02, chi2 =   2.61673605e+02, n_iter=       4 
+alpha[30] =   1.30459689e+02, chi2 =   1.74503119e+02, n_iter=       4 
+alpha[31] =   9.84073098e+01, chi2 =   1.16917145e+02, n_iter=       4 
+alpha[32] =   7.42298153e+01, chi2 =   7.92111969e+01, n_iter=       4 
+alpha[33] =   5.59924409e+01, chi2 =   5.47278498e+01, n_iter=       4 
+alpha[34] =   4.22357705e+01, chi2 =   3.89163657e+01, n_iter=       4 
+alpha[35] =   3.18589488e+01, chi2 =   2.86709770e+01, n_iter=       4 
+alpha[36] =   2.40315876e+01, chi2 =   2.18504797e+01, n_iter=       5 
+alpha[37] =   1.81273150e+01, chi2 =   1.71172789e+01, n_iter=      10 
+alpha[38] =   1.36736514e+01, chi2 =   1.38089859e+01, n_iter=       9 
+alpha[39] =   1.03141994e+01, chi2 =   1.14665517e+01, n_iter=       9 
+alpha[40] =   7.78012444e+00, chi2 =   9.76426611e+00, n_iter=      10 
+alpha[41] =   5.86864128e+00, chi2 =   8.49960662e+00, n_iter=      10 
+alpha[42] =   4.42678657e+00, chi2 =   7.55039741e+00, n_iter=      11 
+alpha[43] =   3.33917826e+00, chi2 =   6.83489251e+00, n_iter=      12 
+alpha[44] =   2.51878225e+00, chi2 =   6.29297200e+00, n_iter=      13 
+alpha[45] =   1.89994770e+00, chi2 =   5.87985347e+00, n_iter=      13 
+alpha[46] =   1.43315336e+00, chi2 =   5.56347058e+00, n_iter=      14 
+alpha[47] =   1.08104479e+00, chi2 =   5.32114008e+00, n_iter=      16 
+alpha[48] =   8.15445061e-01, chi2 =   5.13294293e+00, n_iter=      18 
+alpha[49] =   6.15100000e-01, chi2 =   4.98118846e+00, n_iter=      20 
+MaxEnt loop finished in 0:00:15.835368
+Starting at index 80 with A(omega=0.001)=0.000
+Peak at index 67 with A(omega=-0.593)=11.752
+Band edge at index 69 with A(omega=-0.419)=2.318
+Starting at index 80 with A(omega=0.001)=0.000
+Peak at index 90 with A(omega=0.419)=4.372
+Band edge at index 88 with A(omega=0.275)=0.151
+New chemical potential in the gap: -0.126 eV
+
+ *** calculation of observables ***
+
+extracting the impurity density matrix
+*** iteration finished ***
+============================================================
+summary of impurity observables:
+total occupany of impurity 0:  1.7382
+total occupany of impurity 1:  0.1952
+G(beta/2) occ of impurity 0:  -0.0004
+G(beta/2) occ of impurity 1:  -0.0004
+Z (simple estimate) of impurity 0 per orb:
+   up:  0.040  0.055
+ down:  0.040  0.055
+Z (simple estimate) of impurity 1 per orb:
+   up:  0.987  0.985
+ down:  0.987  0.985
+============================================================
+
+
+============================================================
+summary of energetics:
+total energy:  -140.98474177982354
+DFT energy:  -142.323171346
+correlation energy:  -0.31241164217289646
+DFT band correction:  1.65084120834936
+============================================================
+
+============================================================
+convergence:
+δμ:      0.0000e+00
+δE_tot:  4.8991e-02
+---
+Impurity 0:
+δn imp : 2.2599e-03
+δn orb : 1.0167e-03  3.2766e-03
+δ Gimp : 4.0616e+00
+δ G0   : 2.4165e+00
+δ Σ    : 6.5871e+01
+Impurity 1:
+δn imp : 2.5511e-02
+δn orb : 1.3523e-02  1.1988e-02
+δ Gimp : 8.7224e-01
+δ G0   : 4.0451e+00
+δ Σ    : 3.2670e+01
+============================================================
+
+
+** All requested iterations finished ***
+################################################################################
+
+================================================================================
+DMFT cycle took  2001.0209 seconds
+================================================================================
+
+  solid-dmft: Writing suppress projectors file
+  solid-dmft: Reactivating VASP
+  solid-dmft: Running VASP...
+ reading the density matrix from GAMMA
+BRMIX: very serious problems
+ the old and the new charge density differ
+ old charge density:   180.00021 new  179.82477
+    0.909E+00
+DAV:  28    -0.142311858650E+03    0.11313E-01   -0.22734E-03 64176   0.230E-01  
+  solid-dmft: Writing suppress projectors file
+  solid-dmft: Running VASP...
+ reading the density matrix from GAMMA
+    0.677E-01
+DAV:  29    -0.142322746052E+03   -0.10887E-01   -0.99045E-04 63512   0.183E-01  
+  solid-dmft: Writing suppress projectors file
+  solid-dmft: Running VASP...
+ reading the density matrix from GAMMA
+    0.517E-01
+DAV:  30    -0.142323543309E+03   -0.79726E-03   -0.61938E-05 39088   0.420E-02  
+  solid-dmft: Writing suppress projectors file
+  solid-dmft: Running VASP...
+ reading the density matrix from GAMMA
+    0.496E-01
+DAV:  31    -0.142324005296E+03   -0.46199E-03   -0.40923E-05 36616   0.250E-02  
+  solid-dmft: Writing suppress projectors file
+  solid-dmft: Running VASP...
+ reading the density matrix from GAMMA
+    0.540E-01
+DAV:  32    -0.142324849735E+03   -0.84444E-03   -0.78627E-05 40104   0.330E-02  
+  solid-dmft: Writing suppress projectors file
+  solid-dmft: Running VASP...
+ reading the density matrix from GAMMA
+    0.403E-01
+DAV:  33    -0.142325946657E+03   -0.10969E-02   -0.14991E-04 46896   0.386E-02  
+  solid-dmft: Writing suppress projectors file
+  solid-dmft: Running VASP...
+ reading the density matrix from GAMMA
+    0.447E-01
+DAV:  34    -0.142327025755E+03   -0.10791E-02   -0.99218E-05 39080   0.341E-02  
+  solid-dmft: Writing suppress projectors file
+  solid-dmft: Running VASP...
+ reading the density matrix from GAMMA
+    0.371E-01
+DAV:  35    -0.142328046144E+03   -0.10204E-02   -0.10633E-04 40832   0.320E-02  
+  solid-dmft: Writing suppress projectors file
+  solid-dmft: Running VASP...
+ reading the density matrix from GAMMA
+    0.312E-01
+DAV:  36    -0.142329748169E+03   -0.17020E-02   -0.19765E-04 52264   0.436E-02  
+  solid-dmft: Writing suppress projectors file
+  solid-dmft: Running VASP...
+ reading the density matrix from GAMMA
+    0.188E-01
+DAV:  37    -0.142330664341E+03   -0.91617E-03   -0.85142E-05 37280   0.325E-02  
+  solid-dmft: Writing suppress projectors file
+  solid-dmft: Running VASP...
+ reading the density matrix from GAMMA
+    0.762E-01
+DAV:  38    -0.142331100044E+03   -0.43570E-03   -0.40389E-05 37120   0.236E-02  
+  solid-dmft: Writing suppress projectors file
+  solid-dmft: Running VASP...
+ reading the density matrix from GAMMA
+    0.318E-01
+DAV:  39    -0.142331409740E+03   -0.30970E-03   -0.20920E-05 36048   0.163E-02  
+  solid-dmft: Writing suppress projectors file
+  solid-dmft: Running VASP...
+ reading the density matrix from GAMMA
+    0.280E-01
+DAV:  40    -0.142331494193E+03   -0.84454E-04   -0.59239E-06 35000   0.122E-02  
+  solid-dmft: Writing suppress projectors file
+  solid-dmft: Running VASP...
+ reading the density matrix from GAMMA
+    0.593E-01
+DAV:  41    -0.142331450808E+03    0.43385E-04   -0.27028E-06 34216   0.964E-03  
+  solid-dmft: Removing suppress projectors file
+  solid-dmft: Running VASP...
