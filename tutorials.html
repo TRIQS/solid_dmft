@@ -16,7 +16,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Ce\(_2\)O\(_3\): charge self-consistent total energy calculations with Quantum Espresso/Wannier90 using the Hubbard-I impurity solver" href="tutorials/Ce2O3_csc_w90/tutorial.html" />
+    <link rel="next" title="Running a charge self-consistent (CSC) calculation on PrNiO3 with VASP PLOs" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html" />
     <link rel="prev" title="util.write_kslice_to_h5" href="_autosummary/util.write_kslice_to_h5.html" /> 
 </head>
 
@@ -142,6 +142,18 @@
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html">Running a charge self-consistent (CSC) calculation on PrNiO3 with VASP PLOs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#1.-Running-the-initial-SCF-DFT-calculation-(~-1-2-core-hours)">1. Running the initial SCF DFT calculation (~ 1-2 core hours)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#2.-Running-the-CSC-DMFT-calculations-(~-x-core-hours)">2. Running the CSC DMFT calculations (~ x core hours)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Input-files-for-CSC-DMFT-calculations">Input files for CSC DMFT calculations</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Analyzing-the-observables_impn.dat">3. Analyzing the observables_imp<span class="math notranslate nohighlight">\(n\)</span>.dat</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Analyzing-the-h5-archive:-the-Legendre-Green’s-function">4. Analyzing the h5 archive: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Further-things-to-try-here">5. Further things to try here</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#To-do">To do</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/Ce2O3_csc_w90/tutorial.html">Ce<span class="math notranslate nohighlight">\(_2\)</span>O<span class="math notranslate nohighlight">\(_3\)</span>: charge self-consistent total energy calculations with Quantum Espresso/Wannier90 using the Hubbard-I impurity solver</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="tutorials/Ce2O3_csc_w90/tutorial.html#File-preparation">File preparation</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="tutorials/Ce2O3_csc_w90/tutorial.html#DFT-files">DFT files</a></li>
@@ -154,6 +166,12 @@
 <li class="toctree-l4"><a class="reference internal" href="tutorials/Ce2O3_csc_w90/tutorial.html#Total-energy-convergence">Total energy convergence</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/NiO_os_plo_mag/NiO_tutorial.html">AFM state of NiO with one-shot DMFT from Vasp</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/NiO_os_plo_mag/NiO_tutorial.html#run-DFT">run DFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/NiO_os_plo_mag/NiO_tutorial.html#creating-the-hdf5-archive">creating the hdf5 archive</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/NiO_os_plo_mag/NiO_tutorial.html#running-the-high-temperature-PM-calculation">running the high temperature PM calculation</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/correlated_bandstructure/plot_correlated_bands.html">Plotting the spectral function</a><ul>
@@ -229,10 +247,25 @@
 <span id="id1"></span><h1>tutorials<a class="headerlink" href="#tutorials" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html">Running a charge self-consistent (CSC) calculation on PrNiO3 with VASP PLOs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#1.-Running-the-initial-SCF-DFT-calculation-(~-1-2-core-hours)">1. Running the initial SCF DFT calculation (~ 1-2 core hours)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#2.-Running-the-CSC-DMFT-calculations-(~-x-core-hours)">2. Running the CSC DMFT calculations (~ x core hours)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Analyzing-the-observables_impn.dat">3. Analyzing the observables_imp<span class="math notranslate nohighlight">\(n\)</span>.dat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Analyzing-the-h5-archive:-the-Legendre-Green’s-function">4. Analyzing the h5 archive: the Legendre Green’s function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Further-things-to-try-here">5. Further things to try here</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#To-do">To do</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/Ce2O3_csc_w90/tutorial.html">Ce<span class="math notranslate nohighlight">\(_2\)</span>O<span class="math notranslate nohighlight">\(_3\)</span>: charge self-consistent total energy calculations with Quantum Espresso/Wannier90 using the Hubbard-I impurity solver</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/Ce2O3_csc_w90/tutorial.html#File-preparation">File preparation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/Ce2O3_csc_w90/tutorial.html#Run">Run</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/Ce2O3_csc_w90/tutorial.html#Analysis">Analysis</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/NiO_os_plo_mag/NiO_tutorial.html">AFM state of NiO with one-shot DMFT from Vasp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/NiO_os_plo_mag/NiO_tutorial.html#run-DFT">run DFT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/NiO_os_plo_mag/NiO_tutorial.html#creating-the-hdf5-archive">creating the hdf5 archive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/NiO_os_plo_mag/NiO_tutorial.html#running-the-high-temperature-PM-calculation">running the high temperature PM calculation</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/correlated_bandstructure/plot_correlated_bands.html">Plotting the spectral function</a><ul>
@@ -249,7 +282,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="_autosummary/util.write_kslice_to_h5.html" class="btn btn-neutral float-left" title="util.write_kslice_to_h5" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="tutorials/Ce2O3_csc_w90/tutorial.html" class="btn btn-neutral float-right" title="Ce\(_2\)O\(_3\): charge self-consistent total energy calculations with Quantum Espresso/Wannier90 using the Hubbard-I impurity solver" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html" class="btn btn-neutral float-right" title="Running a charge self-consistent (CSC) calculation on PrNiO3 with VASP PLOs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

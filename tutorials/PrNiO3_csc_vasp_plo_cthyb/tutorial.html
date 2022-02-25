@@ -17,7 +17,9 @@
         <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "tex2jax_process|mathjax_process|math|output_area"}})</script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Ce\(_2\)O\(_3\): charge self-consistent total energy calculations with Quantum Espresso/Wannier90 using the Hubbard-I impurity solver" href="../Ce2O3_csc_w90/tutorial.html" />
+    <link rel="prev" title="tutorials" href="../../tutorials.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -38,7 +40,7 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul>
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../install.html#prerequisites">Prerequisites</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../install.html#installation-steps">Installation steps</a></li>
@@ -141,7 +143,19 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">tutorials</a><ul>
+<li class="toctree-l1 current"><a class="reference internal" href="../../tutorials.html">tutorials</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Running a charge self-consistent (CSC) calculation on PrNiO3 with VASP PLOs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#1.-Running-the-initial-SCF-DFT-calculation-(~-1-2-core-hours)">1. Running the initial SCF DFT calculation (~ 1-2 core hours)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#2.-Running-the-CSC-DMFT-calculations-(~-x-core-hours)">2. Running the CSC DMFT calculations (~ x core hours)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Input-files-for-CSC-DMFT-calculations">Input files for CSC DMFT calculations</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#3.-Analyzing-the-observables_impn.dat">3. Analyzing the observables_imp<span class="math notranslate nohighlight">\(n\)</span>.dat</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#4.-Analyzing-the-h5-archive:-the-Legendre-Green’s-function">4. Analyzing the h5 archive: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#5.-Further-things-to-try-here">5. Further things to try here</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#To-do">To do</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Ce2O3_csc_w90/tutorial.html">Ce<span class="math notranslate nohighlight">\(_2\)</span>O<span class="math notranslate nohighlight">\(_3\)</span>: charge self-consistent total energy calculations with Quantum Espresso/Wannier90 using the Hubbard-I impurity solver</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../Ce2O3_csc_w90/tutorial.html#File-preparation">File preparation</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../Ce2O3_csc_w90/tutorial.html#DFT-files">DFT files</a></li>
@@ -154,6 +168,12 @@
 <li class="toctree-l4"><a class="reference internal" href="../Ce2O3_csc_w90/tutorial.html#Total-energy-convergence">Total energy convergence</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../NiO_os_plo_mag/NiO_tutorial.html">AFM state of NiO with one-shot DMFT from Vasp</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../NiO_os_plo_mag/NiO_tutorial.html#run-DFT">run DFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../NiO_os_plo_mag/NiO_tutorial.html#creating-the-hdf5-archive">creating the hdf5 archive</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../NiO_os_plo_mag/NiO_tutorial.html#running-the-high-temperature-PM-calculation">running the high temperature PM calculation</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../correlated_bandstructure/plot_correlated_bands.html">Plotting the spectral function</a><ul>
@@ -191,6 +211,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../tutorials.html">tutorials</a> &raquo;</li>
       <li>Running a charge self-consistent (CSC) calculation on PrNiO3 with VASP PLOs</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../_sources/tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.ipynb.txt" rel="nofollow"> View page source</a>
@@ -733,7 +754,10 @@ div.rendered_html tbody tr:hover {
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../../tutorials.html" class="btn btn-neutral float-left" title="tutorials" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../Ce2O3_csc_w90/tutorial.html" class="btn btn-neutral float-right" title="Ce\(_2\)O\(_3\): charge self-consistent total energy calculations with Quantum Espresso/Wannier90 using the Hubbard-I impurity solver" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

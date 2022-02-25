@@ -19,7 +19,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="reporting issues" href="../../issues.html" />
-    <link rel="prev" title="Ce\(_2\)O\(_3\): charge self-consistent total energy calculations with Quantum Espresso/Wannier90 using the Hubbard-I impurity solver" href="../Ce2O3_csc_w90/tutorial.html" /> 
+    <link rel="prev" title="AFM state of NiO with one-shot DMFT from Vasp" href="../NiO_os_plo_mag/NiO_tutorial.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -144,6 +144,18 @@
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../tutorials.html">tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html">Running a charge self-consistent (CSC) calculation on PrNiO3 with VASP PLOs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#1.-Running-the-initial-SCF-DFT-calculation-(~-1-2-core-hours)">1. Running the initial SCF DFT calculation (~ 1-2 core hours)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#2.-Running-the-CSC-DMFT-calculations-(~-x-core-hours)">2. Running the CSC DMFT calculations (~ x core hours)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Input-files-for-CSC-DMFT-calculations">Input files for CSC DMFT calculations</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Analyzing-the-observables_impn.dat">3. Analyzing the observables_imp<span class="math notranslate nohighlight">\(n\)</span>.dat</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Analyzing-the-h5-archive:-the-Legendre-Green’s-function">4. Analyzing the h5 archive: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Further-things-to-try-here">5. Further things to try here</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#To-do">To do</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Ce2O3_csc_w90/tutorial.html">Ce<span class="math notranslate nohighlight">\(_2\)</span>O<span class="math notranslate nohighlight">\(_3\)</span>: charge self-consistent total energy calculations with Quantum Espresso/Wannier90 using the Hubbard-I impurity solver</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../Ce2O3_csc_w90/tutorial.html#File-preparation">File preparation</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../Ce2O3_csc_w90/tutorial.html#DFT-files">DFT files</a></li>
@@ -156,6 +168,12 @@
 <li class="toctree-l4"><a class="reference internal" href="../Ce2O3_csc_w90/tutorial.html#Total-energy-convergence">Total energy convergence</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../NiO_os_plo_mag/NiO_tutorial.html">AFM state of NiO with one-shot DMFT from Vasp</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../NiO_os_plo_mag/NiO_tutorial.html#run-DFT">run DFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../NiO_os_plo_mag/NiO_tutorial.html#creating-the-hdf5-archive">creating the hdf5 archive</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../NiO_os_plo_mag/NiO_tutorial.html#running-the-high-temperature-PM-calculation">running the high temperature PM calculation</a></li>
 </ul>
 </li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Plotting the spectral function</a><ul>
@@ -717,7 +735,7 @@ Warning: could not identify MPI environment!
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-Starting serial run at: 2022-02-25 13:58:59.786265
+Starting serial run at: 2022-02-25 14:14:37.790052
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -730,7 +748,7 @@ H(R=0):
       0.0000+0.0000j  0.5811+0.0000j  0.0000+0.0000j
       0.0000+0.0000j  0.0000+0.0000j  0.5811+0.0000j
 Setting Sigma from ./svo_example.h5
-Run took 0.621 s
+Run took 0.760 s
 </pre></div></div>
 </div>
 <p>That’s it. Now you can look at the output:</p>
@@ -779,7 +797,7 @@ Run took 0.621 s
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../Ce2O3_csc_w90/tutorial.html" class="btn btn-neutral float-left" title="Ce\(_2\)O\(_3\): charge self-consistent total energy calculations with Quantum Espresso/Wannier90 using the Hubbard-I impurity solver" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../NiO_os_plo_mag/NiO_tutorial.html" class="btn btn-neutral float-left" title="AFM state of NiO with one-shot DMFT from Vasp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="../../issues.html" class="btn btn-neutral float-right" title="reporting issues" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
