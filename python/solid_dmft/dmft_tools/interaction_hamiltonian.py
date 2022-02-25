@@ -173,7 +173,7 @@ def _adapt_U_4index_for_SO(Umat_full):
     return Umat_full_SO
 
 
-def _construct_kanamori(sum_k, general_params, icrsh, advanced_params):
+def _construct_kanamori(sum_k, general_params, icrsh, soc_make_real):
     """
     Constructs the Kanamori interaction Hamiltonian. Only Kanamori does not
     need the full four-index matrix. Therefore, we can construct it directly
@@ -210,7 +210,7 @@ def _construct_kanamori(sum_k, general_params, icrsh, advanced_params):
         h_int = _construct_kanamori_soc(general_params['U'][icrsh], general_params['J'][icrsh],
                                         n_orb, sum_k.sumk_to_solver[icrsh],
                                         os.path.join(general_params['jobname'], 'H.txt'),
-                                        advanced_params['soc_make_real'])
+                                        soc_make_real)
     return h_int
 
 
@@ -232,8 +232,8 @@ def _construct_kanamori_soc(U_int, J_hund, n_orb, map_operator_structure,
 
     s = 'ud'
 
-    if soc_make_real != 'none':
-        mat_iscomplex = np.kron(np.iscomplex(soc_make_real), np.ones((1,2)))[0]
+    if soc_make_real != None:
+        soc_mat_iscomplex = np.kron(np.iscomplex(soc_make_real), np.ones((1,2)))[0]
 
     # density terms:
     # TODO: reformulate in terms of Umat and Upmat for consistency with triqs?
@@ -292,7 +292,7 @@ def _construct_kanamori_soc(U_int, J_hund, n_orb, map_operator_structure,
 
         H_term = 0.5 * J_hund * c_dag(*mkind(s, a1)) * c_dag(*mkind(s, a2)) * c(*mkind(s, a4)) * c(*mkind(s, a3))
         # if soc_make_real apply minus sign for specified combination of pairs
-        if soc_make_real != 'none' and np.sum([mat_iscomplex[x] for x in (a1, a2, a3, a4)]) == 2.0:
+        if soc_make_real != None and np.sum([soc_mat_iscomplex[x] for x in (a1, a2, a3, a4)]) == 2.0:
             H_term *= -1
 
         H += H_term
@@ -486,7 +486,8 @@ def construct(sum_k, general_params, advanced_params):
 
         # Kanamori
         if general_params['h_int_type'][icrsh] == 'kanamori':
-            h_int[icrsh] = _construct_kanamori(sum_k, general_params, icrsh, advanced_params)
+            soc_make_real = advanced_params['soc_make_real'] if general_params['set_rot'] == 'soc_real' else None
+            h_int[icrsh] = _construct_kanamori(sum_k, general_params, icrsh, soc_make_real)
             continue
 
         # for density density or full slater get full four-index U matrix

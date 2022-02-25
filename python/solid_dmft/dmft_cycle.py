@@ -173,7 +173,7 @@ def _calculate_rotation_matrix(general_params, sum_k, soc_make_real):
             assert len(soc_make_real) == 3, 'soc_make_real only implemented for t2g subspace'
             rot_mat_soc = np.kron(soc_make_real, np.ones((1,2))) * np.eye(6)
         else:
-            raise TypeError(f'soc_make_real should be a list, but is {type(soc_make_real)}')
+            raise TypeError('soc_make_real should be a list, but is {}'.format(type(soc_make_real)))
     else:
         raise ValueError('Parameter set_rot set to wrong value.')
 

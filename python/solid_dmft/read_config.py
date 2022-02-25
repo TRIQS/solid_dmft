@@ -832,7 +832,7 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
 
                                   'soc_make_real': {'converter': lambda s: list(map(complex, s.split(','))),
                                                     'used': lambda params: params['general']['solver_type'] not in ['ftps']
-                                                    and params['general']['set_rot'] in ['soc_real'],
+                                                        and params['general']['set_rot'] in ['soc_real'],
                                                     'default': 'none'},
                                  }
                     }
