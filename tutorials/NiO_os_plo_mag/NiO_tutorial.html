@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AFM state of NiO with one-shot DMFT from Vasp &mdash; solid_dmft  documentation</title><link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" /><link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=default"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "tex2jax_process|mathjax_process|math|output_area"}})</script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #7E588A" >
+            <a href="../../index.html" class="icon icon-home"> solid_dmft<img src="../../_static/logo_no_text.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                3.1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#installation-steps">Installation steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#version-compatibility">Version compatibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#custom-cmake-options">Custom CMake options</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../documentation.html">documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#code-structure">code structure:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#dft-code-interfaces">DFT code interfaces</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../md_notes/w90_interface.html">Wannier90 interface</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/w90_interface.html#orbital-order-in-the-w90-converter">orbital order in the W90 converter</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../md_notes/vasp_csc.html">interface to VASP</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/vasp_csc.html#general-remarks">General remarks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/vasp_csc.html#locproj-bug-for-individual-projections">LOCPROJ bug for individual projections:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/vasp_csc.html#convergence-of-projectors-with-vasp">convergence of projectors with Vasp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/vasp_csc.html#enabling-csc-calculations-with-wannier90-projectors">Enabling CSC calculations with Wannier90 projectors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/vasp_csc.html#speeding-up-by-not-writing-projectors-at-every-step">Speeding up by not writing projectors at every step</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../cRPA_VASP/README.html">How to do cRPA calculations with VASP</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#file-description">file description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#workflow">Workflow:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#important-flags">important flags:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#convergency-tests">convergency tests:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#parameterization-of-u-and-j-from-crpa-calculations">Parameterization of U and J from cRPA calculations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#general-sidemarks">general sidemarks:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#version-and-compilation">version and compilation:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#run-solid-dmft">run solid_dmft</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../md_notes/docker.html">Docker</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/docker.html#building-the-docker-image">Building the docker image</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/docker.html#pulling-a-docker-image">Pulling a docker image</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/docker.html#getting-docker-images-onto-cscs-daint">Getting docker images onto CSCS daint</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../md_notes/run_locally.html">run on your machine</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/run_locally.html#csc-calculations-locally">CSC calculations locally</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../md_notes/run_cluster.html">Running solid_dmft on a cluster</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/run_cluster.html#running-on-cscs-daint">Running on CSCS daint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/run_cluster.html#one-shot-job-on-daint">one shot job on daint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/run_cluster.html#csc-calculations-on-daint">CSC calculations on daint</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#module-reference-manual">module reference manual</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/csc_flow.html">csc_flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/dft_managers.html">dft_managers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dft_managers.qe_manager.html">dft_managers.qe_manager</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dft_managers.vasp_manager.html">dft_managers.vasp_manager</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/dmft_cycle.html">dmft_cycle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/dmft_tools.html">dmft_tools</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.afm_mapping.html">dmft_tools.afm_mapping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.convergence.html">dmft_tools.convergence</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.formatter.html">dmft_tools.formatter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.greens_functions_mixer.html">dmft_tools.greens_functions_mixer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.initial_self_energies.html">dmft_tools.initial_self_energies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.interaction_hamiltonian.html">dmft_tools.interaction_hamiltonian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.legendre_filter.html">dmft_tools.legendre_filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.manipulate_chemical_potential.html">dmft_tools.manipulate_chemical_potential</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.observables.html">dmft_tools.observables</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.results_to_archive.html">dmft_tools.results_to_archive</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.solver.html">dmft_tools.solver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/postprocessing.html">postprocessing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/postprocessing.eval_U_cRPA_Vasp.html">postprocessing.eval_U_cRPA_Vasp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/postprocessing.make_spaghetti.html">postprocessing.make_spaghetti</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/postprocessing.maxent_gf_imp.html">postprocessing.maxent_gf_imp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/postprocessing.maxent_gf_latt.html">postprocessing.maxent_gf_latt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/postprocessing.maxent_sigma.html">postprocessing.maxent_sigma</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/postprocessing.plot_correlated_bands.html">postprocessing.plot_correlated_bands</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/read_config.html">read_config</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/read_config.html#general">general</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/read_config.html#solver">solver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/read_config.html#dft">dft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/read_config.html#advanced">advanced</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/util.html">util</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/util.symmetrize_gamma_file.html">util.symmetrize_gamma_file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/util.update_dmft_config.html">util.update_dmft_config</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/util.update_results_h5.html">util.update_results_h5</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/util.write_kslice_to_h5.html">util.write_kslice_to_h5</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../Ce2O3_csc_w90/tutorial.html">Ce<span class="math notranslate nohighlight">\(_2\)</span>O<span class="math notranslate nohighlight">\(_3\)</span>: charge self-consistent total energy calculations with Quantum Espresso/Wannier90 using the Hubbard-I impurity solver</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../Ce2O3_csc_w90/tutorial.html#File-preparation">File preparation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../Ce2O3_csc_w90/tutorial.html#DFT-files">DFT files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../Ce2O3_csc_w90/tutorial.html#DMFT">DMFT</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../Ce2O3_csc_w90/tutorial.html#Run">Run</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../Ce2O3_csc_w90/tutorial.html#Analysis">Analysis</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../Ce2O3_csc_w90/tutorial.html#Tight-binding-Hamiltonian">Tight-binding Hamiltonian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../Ce2O3_csc_w90/tutorial.html#Total-energy-convergence">Total energy convergence</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../correlated_bandstructure/plot_correlated_bands.html">Plotting the spectral function</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../correlated_bandstructure/plot_correlated_bands.html#Configuration">Configuration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../correlated_bandstructure/plot_correlated_bands.html#Basic-options">Basic options</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../correlated_bandstructure/plot_correlated_bands.html#Wannier90">Wannier90</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../correlated_bandstructure/plot_correlated_bands.html#BZ-configuration">BZ configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../correlated_bandstructure/plot_correlated_bands.html#Self-energy">Self-energy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../correlated_bandstructure/plot_correlated_bands.html#Plotting-options">Plotting options</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../correlated_bandstructure/plot_correlated_bands.html#Run-and-Plotting">Run and Plotting</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../issues.html">reporting issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ChangeLog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-0-0">Version 3.0.0</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #7E588A" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">solid_dmft</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>AFM state of NiO with one-shot DMFT from Vasp</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/tutorials/NiO_os_plo_mag/NiO_tutorial.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span><span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">triqs.plot.mpl_interface</span> <span class="kn">import</span> <span class="n">plt</span><span class="p">,</span><span class="n">oplot</span>
+
+<span class="kn">from</span> <span class="nn">h5</span> <span class="kn">import</span> <span class="n">HDFArchive</span>
+<span class="kn">from</span> <span class="nn">triqs.gf</span> <span class="kn">import</span> <span class="n">BlockGf</span>
+
+<span class="kn">from</span> <span class="nn">triqs_dft_tools.converters.vasp</span> <span class="kn">import</span> <span class="n">VaspConverter</span>
+<span class="kn">import</span> <span class="nn">triqs_dft_tools.converters.plovasp.converter</span> <span class="k">as</span> <span class="nn">plo_converter</span>
+
+<span class="kn">import</span> <span class="nn">pymatgen.io.vasp.outputs</span> <span class="k">as</span> <span class="nn">vio</span>
+<span class="kn">from</span> <span class="nn">pymatgen.electronic_structure.dos</span> <span class="kn">import</span> <span class="n">CompleteDos</span>
+<span class="kn">from</span> <span class="nn">pymatgen.electronic_structure.core</span> <span class="kn">import</span> <span class="n">Spin</span><span class="p">,</span> <span class="n">Orbital</span><span class="p">,</span> <span class="n">OrbitalType</span>
+
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span> <span class="c1">#ignore some matplotlib warnings</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Warning: could not identify MPI environment!
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Starting serial run at: 2022-02-25 08:11:24.095391
+</pre></div></div>
+</div>
+<div class="section" id="AFM-state-of-NiO-with-one-shot-DMFT-from-Vasp">
+<h1>AFM state of NiO with one-shot DMFT from Vasp<a class="headerlink" href="#AFM-state-of-NiO-with-one-shot-DMFT-from-Vasp" title="Permalink to this headline">¶</a></h1>
+<p>In this tutorial we will take a look at a magnetic DMFT calculation for NiO in the antiferromagnetic phase. This tutorial will guide you through the following steps:</p>
+<ul class="simple">
+<li>run a non-magnetic Vasp calculation for NiO with a two atom unit cel</li>
+<li>create projectors in a large energy window for all Ni-<span class="math notranslate nohighlight">\(d\)</span> orbitals and all O-<span class="math notranslate nohighlight">\(p\)</span> orbitals</li>
+<li>create the hdf5 input via the Vasp converter for solid_dmft</li>
+<li>run a high temperature paramagnetic calculation and a low temperature AFM calculation</li>
+<li>take a look at the output</li>
+</ul>
+<p>all caluclations are performed on a 24 core machine and for real convergence the accuracy of all steps has to be significantly increased!</p>
+<div class="section" id="run-DFT">
+<h2>run DFT<a class="headerlink" href="#run-DFT" title="Permalink to this headline">¶</a></h2>
+<p>we start by running Vasp to create the raw projectors. The <a class="reference external" href="INCAR" rel="noopener noreferrer" target="_blank">INCAR</a>, <a class="reference external" href="POSCAR" rel="noopener noreferrer" target="_blank">POSCAR</a>, and <a class="reference external" href="KPOINTS" rel="noopener noreferrer" target="_blank">KPOINTS</a> file are kept relatively simple. We only need to make sure that the Kohn-Sham eigenstates converge well (rms), hence we do quite a few extra SCF steps here.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[106]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">!</span>mpirun -n <span class="m">4</span> vasp_std
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+hwloc/linux: Ignoring PCI device with non-16bit domain.
+Pass --enable-32bits-pci-domain to configure to support such devices
+(warning: it would break the library ABI, don&#39;t enable unless really needed).
+ ----------------------------------------------------
+    OOO  PPPP  EEEEE N   N M   M PPPP
+   O   O P   P E     NN  N MM MM P   P
+   O   O PPPP  EEEEE N N N M M M PPPP   -- VERSION
+   O   O P     E     N  NN M   M P
+    OOO  P     EEEEE N   N M   M P
+ ----------------------------------------------------
+ running    4 mpi-ranks, with    4 threads/rank
+ distrk:  each k-point on    4 cores,    1 groups
+ distr:  one band on    1 cores,    4 groups
+ vasp.6.3.0 20Jan22 (build Feb  9 2022 16:28:10) complex
+ POSCAR found type information on POSCAR NiO
+ POSCAR found :  2 types and       4 ions
+ Reading from existing POTCAR
+ scaLAPACK will be used
+ Reading from existing POTCAR
+ LDA part: xc-table for Pade appr. of Perdew
+ POSCAR, INCAR and KPOINTS ok, starting setup
+ FFT: planning ... GRIDC
+ FFT: planning ... GRID_SOFT
+ FFT: planning ... GRID
+ WAVECAR not read
+ WARNING: random wavefunctions but no delay for mixing, default for NELMDL
+ entering main loop
+       N       E                     dE             d eps       ncg     rms          rms(c)
+DAV:   1     0.230390548566E+03    0.23039E+03   -0.12566E+04 49544   0.118E+03
+DAV:   2    -0.635265216538E+01   -0.23674E+03   -0.21077E+03 48528   0.290E+02
+DAV:   3    -0.268453430934E+02   -0.20493E+02   -0.19049E+02 53664   0.898E+01
+DAV:   4    -0.271947681959E+02   -0.34943E+00   -0.34803E+00 55096   0.121E+01
+DAV:   5    -0.272033103076E+02   -0.85421E-02   -0.85408E-02 58032   0.183E+00    0.180E+01
+DAV:   6    -0.260843064627E+02    0.11190E+01   -0.11903E+01 63296   0.646E+01    0.218E+01
+DAV:   7    -0.227923558372E+02    0.32920E+01   -0.52358E+00 54784   0.577E+01    0.659E+00
+DAV:   8    -0.227279128022E+02    0.64443E-01   -0.59912E-01 66896   0.117E+01    0.373E+00
+DAV:   9    -0.232128072097E+02   -0.48489E+00   -0.20284E-01 68224   0.170E+01    0.129E+01
+DAV:  10    -0.226745767630E+02    0.53823E+00   -0.11152E-01 63744   0.125E+01    0.907E-01
+DAV:  11    -0.226801136433E+02   -0.55369E-02   -0.18430E-02 67856   0.217E+00    0.259E-01
+DAV:  12    -0.226812020818E+02   -0.10884E-02   -0.28746E-03 64784   0.824E-01    0.325E-01
+DAV:  13    -0.226809604891E+02    0.24159E-03   -0.20375E-04 70752   0.391E-01    0.571E-02
+DAV:  14    -0.226809797532E+02   -0.19264E-04   -0.31376E-05 72584   0.121E-01    0.575E-02
+DAV:  15    -0.226809706529E+02    0.91003E-05   -0.58257E-06 65768   0.653E-02    0.589E-03
+DAV:  16    -0.226809711164E+02   -0.46354E-06   -0.14209E-06 67560   0.113E-02    0.477E-03
+DAV:  17    -0.226809711575E+02   -0.41086E-07   -0.20742E-07 63560   0.101E-02    0.209E-03
+DAV:  18    -0.226809711310E+02    0.26485E-07   -0.26372E-08 69360   0.207E-03    0.407E-04
+DAV:  19    -0.226809711328E+02   -0.17649E-08   -0.26002E-09 75720   0.559E-04    0.192E-04
+DAV:  20    -0.226809711311E+02    0.16666E-08   -0.34341E-10 54912   0.143E-04    0.199E-04
+DAV:  21    -0.226809711319E+02   -0.78899E-09   -0.28929E-11 37840   0.222E-04    0.176E-05
+DAV:  22    -0.226809711332E+02   -0.13465E-08   -0.22876E-11 34128   0.416E-05    0.183E-05
+DAV:  23    -0.226809711334E+02   -0.16735E-09   -0.43721E-12 32456   0.299E-05    0.488E-06
+DAV:  24    -0.226809711328E+02    0.56161E-09   -0.82602E-13 31608   0.101E-05    0.726E-06
+DAV:  25    -0.226809711334E+02   -0.57116E-09   -0.10404E-13 30560   0.587E-06    0.421E-06
+DAV:  26    -0.226809711329E+02    0.53205E-09    0.76307E-14 30296   0.340E-06    0.719E-07
+DAV:  27    -0.226809711335E+02   -0.59072E-09    0.28615E-14 30184   0.164E-06    0.406E-07
+DAV:  28    -0.226809711321E+02    0.13533E-08    0.28995E-13 29424   0.686E-07    0.247E-07
+DAV:  29    -0.226809711325E+02   -0.38744E-09    0.19827E-13 28792   0.423E-07    0.156E-07
+DAV:  30    -0.226809711330E+02   -0.54160E-09    0.19055E-13 28432   0.286E-07    0.548E-08
+DAV:  31    -0.226809711325E+02    0.57298E-09    0.94554E-14 28056   0.191E-07    0.388E-08
+DAV:  32    -0.226809711322E+02    0.22510E-09    0.14233E-13 27432   0.105E-07    0.236E-08
+DAV:  33    -0.226809711323E+02   -0.19099E-10    0.18046E-13 27608   0.698E-08
+ LOCPROJ mode
+ Computing AMN (projections onto localized orbitals)
+   1 F= -.22680971E+02 E0= -.22669554E+02  d E =-.228342E-01
+</pre></div></div>
+</div>
+<p>let us take a look at the density of states:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">vasprun</span> <span class="o">=</span> <span class="n">vio</span><span class="o">.</span><span class="n">Vasprun</span><span class="p">(</span><span class="s1">&#39;vasprun.xml&#39;</span><span class="p">)</span>
+<span class="n">dos</span> <span class="o">=</span> <span class="n">vasprun</span><span class="o">.</span><span class="n">complete_dos</span>
+<span class="n">Ni_spd_dos</span> <span class="o">=</span> <span class="n">dos</span><span class="o">.</span><span class="n">get_element_spd_dos</span><span class="p">(</span><span class="s2">&quot;Ni&quot;</span><span class="p">)</span>
+<span class="n">O_spd_dos</span> <span class="o">=</span> <span class="n">dos</span><span class="o">.</span><span class="n">get_element_spd_dos</span><span class="p">(</span><span class="s2">&quot;O&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vasprun</span><span class="o">.</span><span class="n">tdos</span><span class="o">.</span><span class="n">energies</span> <span class="o">-</span> <span class="n">vasprun</span><span class="o">.</span><span class="n">efermi</span> <span class="p">,</span> <span class="n">vasprun</span><span class="o">.</span><span class="n">tdos</span><span class="o">.</span><span class="n">densities</span><span class="p">[</span><span class="n">Spin</span><span class="o">.</span><span class="n">up</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;total DOS&#39;</span><span class="p">,</span> <span class="n">lw</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vasprun</span><span class="o">.</span><span class="n">tdos</span><span class="o">.</span><span class="n">energies</span> <span class="o">-</span> <span class="n">vasprun</span><span class="o">.</span><span class="n">efermi</span> <span class="p">,</span> <span class="n">Ni_spd_dos</span><span class="p">[</span><span class="n">OrbitalType</span><span class="o">.</span><span class="n">d</span><span class="p">]</span><span class="o">.</span><span class="n">densities</span><span class="p">[</span><span class="n">Spin</span><span class="o">.</span><span class="n">up</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;Ni-d&#39;</span><span class="p">,</span> <span class="n">lw</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vasprun</span><span class="o">.</span><span class="n">tdos</span><span class="o">.</span><span class="n">energies</span> <span class="o">-</span> <span class="n">vasprun</span><span class="o">.</span><span class="n">efermi</span> <span class="p">,</span> <span class="n">O_spd_dos</span><span class="p">[</span><span class="n">OrbitalType</span><span class="o">.</span><span class="n">p</span><span class="p">]</span><span class="o">.</span><span class="n">densities</span><span class="p">[</span><span class="n">Spin</span><span class="o">.</span><span class="n">up</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;O-p&#39;</span><span class="p">,</span> <span class="n">lw</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Energy relative to Fermi energy (eV)&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;DOS (1/eV)&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">9</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_NiO_os_plo_mag_NiO_tutorial_7_0.png" src="../../_images/tutorials_NiO_os_plo_mag_NiO_tutorial_7_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="creating-the-hdf5-archive">
+<h2>creating the hdf5 archive<a class="headerlink" href="#creating-the-hdf5-archive" title="Permalink to this headline">¶</a></h2>
+<p>now we run the Vasp converter to create an input h5 archive for the solver. The <a class="reference external" href="plo.cfg" rel="noopener noreferrer" target="_blank">plo.cfg</a> looks like this:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">!</span>cat plo.cfg
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[General]
+BASENAME = nio
+
+[Group 1]
+SHELLS = 1
+EWINDOW = -9 2
+NORMALIZE = True
+
+[Shell 1] # Ni d shell
+LSHELL = 2
+IONS = 1 2
+CORR = True
+
+</pre></div></div>
+</div>
+<p>we create <span class="math notranslate nohighlight">\(d\)</span> like projectors within a large energy window from -9 to 2 eV for very localized states for both Ni sites. Important: the sites are markes as non equivalent, so that we can later have different spin orientations on them. Next we run the converter:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Generate and store PLOs</span>
+<span class="n">plo_converter</span><span class="o">.</span><span class="n">generate_and_output_as_text</span><span class="p">(</span><span class="s1">&#39;plo.cfg&#39;</span><span class="p">,</span> <span class="n">vasp_dir</span><span class="o">=</span><span class="s1">&#39;./&#39;</span><span class="p">)</span>
+
+<span class="c1"># run the archive creat routine</span>
+<span class="n">conv</span> <span class="o">=</span> <span class="n">VaspConverter</span><span class="p">(</span><span class="s1">&#39;nio&#39;</span><span class="p">)</span>
+<span class="n">conv</span><span class="o">.</span><span class="n">convert_dft_input</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+!!! WARNING !!!: Error reading E-Fermi from LOCPROJ, trying DOSCAR
+Read parameters:
+0  -&gt;  {&#39;label&#39;: &#39;dxy&#39;, &#39;isite&#39;: 1, &#39;l&#39;: 2, &#39;m&#39;: 0}
+1  -&gt;  {&#39;label&#39;: &#39;dyz&#39;, &#39;isite&#39;: 1, &#39;l&#39;: 2, &#39;m&#39;: 1}
+2  -&gt;  {&#39;label&#39;: &#39;dz2&#39;, &#39;isite&#39;: 1, &#39;l&#39;: 2, &#39;m&#39;: 2}
+3  -&gt;  {&#39;label&#39;: &#39;dxz&#39;, &#39;isite&#39;: 1, &#39;l&#39;: 2, &#39;m&#39;: 3}
+4  -&gt;  {&#39;label&#39;: &#39;dx2-y2&#39;, &#39;isite&#39;: 1, &#39;l&#39;: 2, &#39;m&#39;: 4}
+5  -&gt;  {&#39;label&#39;: &#39;dxy&#39;, &#39;isite&#39;: 2, &#39;l&#39;: 2, &#39;m&#39;: 0}
+6  -&gt;  {&#39;label&#39;: &#39;dyz&#39;, &#39;isite&#39;: 2, &#39;l&#39;: 2, &#39;m&#39;: 1}
+7  -&gt;  {&#39;label&#39;: &#39;dz2&#39;, &#39;isite&#39;: 2, &#39;l&#39;: 2, &#39;m&#39;: 2}
+8  -&gt;  {&#39;label&#39;: &#39;dxz&#39;, &#39;isite&#39;: 2, &#39;l&#39;: 2, &#39;m&#39;: 3}
+9  -&gt;  {&#39;label&#39;: &#39;dx2-y2&#39;, &#39;isite&#39;: 2, &#39;l&#39;: 2, &#39;m&#39;: 4}
+  Found POSCAR, title line: Ni2 O2
+  Total number of ions: 4
+  Number of types: 2
+  Number of ions for each type: [2, 2]
+
+    Total number of k-points: 729
+  No tetrahedron data found in IBZKPT. Skipping...
+eigvals from LOCPROJ
+
+  Unorthonormalized density matrices and overlaps:
+  Spin: 1
+  Site: 1
+  Density matrix                                                  Overlap
+   1.6802167  -0.0000204   0.0000021   0.2829390   0.0000126       0.9796332   0.0000000   0.0000006   0.0010589  -0.0000025
+  -0.0000204   1.4809892   0.0000004  -0.0000020   0.2829297       0.0000000   0.9789492  -0.0000000  -0.0000005   0.0010597
+   0.0000021   0.0000004   1.8815925   0.0000009  -0.0000019       0.0000006  -0.0000000   0.9804248   0.0000000   0.0000000
+   0.2829390  -0.0000020   0.0000009   1.4809869   0.0000075       0.0010589  -0.0000005   0.0000000   0.9789486  -0.0000004
+   0.0000126   0.2829297  -0.0000019   0.0000075   1.6802316      -0.0000025   0.0010597   0.0000000  -0.0000004   0.9796407
+  Site: 2
+  Density matrix                                                  Overlap
+   1.6802296  -0.0000173   0.0000006   0.2829223   0.0000127       0.9796336  -0.0000000   0.0000009   0.0010587  -0.0000027
+  -0.0000173   1.4809876  -0.0000006  -0.0000108   0.2829166      -0.0000000   0.9789482  -0.0000003  -0.0000007   0.0010606
+   0.0000006  -0.0000006   1.8815888   0.0000026  -0.0000010       0.0000009  -0.0000003   0.9804252  -0.0000003   0.0000001
+   0.2829223  -0.0000108   0.0000026   1.4809955   0.0000106       0.0010587  -0.0000007  -0.0000003   0.9789491  -0.0000002
+   0.0000127   0.2829166  -0.0000010   0.0000106   1.6802446      -0.0000027   0.0010606   0.0000001  -0.0000002   0.9796405
+
+  Generating 1 shell...
+
+    Shell         : 1
+    Orbital l     : 2
+    Number of ions: 2
+    Dimension     : 5
+    Correlated    : True
+    Ion sort      : [1, 2]
+Density matrix:
+  Shell 1
+    Site 1
+     1.7575263    -0.0000232     0.0000021     0.3116073     0.0000129
+    -0.0000232     1.5403462     0.0000015    -0.0000032     0.3115962
+     0.0000021     0.0000015     1.9798771    -0.0000007    -0.0000019
+     0.3116073    -0.0000032    -0.0000007     1.5403450     0.0000075
+     0.0000129     0.3115962    -0.0000019     0.0000075     1.7575414
+      trace:  8.57563606077663
+    Site 2
+     1.7575440    -0.0000199     0.0000007     0.3115915     0.0000133
+    -0.0000199     1.5403449     0.0000003    -0.0000127     0.3115842
+     0.0000007     0.0000003     1.9798766     0.0000014    -0.0000011
+     0.3115915    -0.0000127     0.0000014     1.5403546     0.0000108
+     0.0000133     0.3115842    -0.0000011     0.0000108     1.7575596
+      trace:  8.575679705658635
+
+  Impurity density: 17.151315766435264
+
+Overlap:
+  Site 1
+[[ 1. -0. -0.  0. -0.]
+ [-0.  1. -0. -0. -0.]
+ [-0. -0.  1. -0. -0.]
+ [ 0. -0. -0.  1.  0.]
+ [-0. -0. -0.  0.  1.]]
+
+Local Hamiltonian:
+  Shell 1
+    Site 1 (real | complex part)
+    -1.1898763    -0.0000007    -0.0000085    -0.0971728    -0.0000168 |     0.0000000     0.0000000     0.0000000    -0.0000000     0.0000000
+    -0.0000007    -1.1190868     0.0000018     0.0000027    -0.0971821 |    -0.0000000    -0.0000000    -0.0000000     0.0000000    -0.0000000
+    -0.0000085     0.0000018    -1.2550852    -0.0000019     0.0000065 |    -0.0000000     0.0000000     0.0000000    -0.0000000    -0.0000000
+    -0.0971728     0.0000027    -0.0000019    -1.1190908    -0.0000103 |     0.0000000    -0.0000000     0.0000000     0.0000000    -0.0000000
+    -0.0000168    -0.0971821     0.0000065    -0.0000103    -1.1898957 |    -0.0000000     0.0000000     0.0000000     0.0000000    -0.0000000
+    Site 2 (real | complex part)
+    -1.1897329     0.0000048    -0.0000023    -0.0971720    -0.0000179 |    -0.0000000     0.0000000    -0.0000000    -0.0000000     0.0000000
+     0.0000048    -1.1189552     0.0000005    -0.0000010    -0.0971749 |    -0.0000000     0.0000000     0.0000000    -0.0000000    -0.0000000
+    -0.0000023     0.0000005    -1.2549596     0.0000003     0.0000029 |     0.0000000    -0.0000000     0.0000000    -0.0000000     0.0000000
+    -0.0971720    -0.0000010     0.0000003    -1.1189551    -0.0000048 |     0.0000000     0.0000000     0.0000000     0.0000000    -0.0000000
+    -0.0000179    -0.0971749     0.0000029    -0.0000048    -1.1897536 |    -0.0000000     0.0000000    -0.0000000     0.0000000     0.0000000
+  Storing ctrl-file...
+  Storing PLO-group file &#39;nio.pg1&#39;...
+  Density within window: 28.000000000082892
+Reading input from nio.ctrl...
+{
+    &#34;ngroups&#34;: 1,
+    &#34;nk&#34;: 729,
+    &#34;ns&#34;: 1,
+    &#34;kvec1&#34;: [
+        0.335224328260196,
+        0.0,
+        0.0
+    ],
+    &#34;kvec2&#34;: [
+        0.19352673911761079,
+        0.38707550436461646,
+        0.0
+    ],
+    &#34;kvec3&#34;: [
+        -0.06853450805762902,
+        0.06853303315885005,
+        0.20559198962611736
+    ],
+    &#34;nc_flag&#34;: 0
+}
+
+  No. of inequivalent shells: 2
+</pre></div></div>
+</div>
+<p>We note a few special things here. First, the density matrix off the d-shell seems to be quite off-diagonal. This is because in Vasp local projections are always done with respect to cartesian axis, and hence the unit cell is non cubic shaped the oxygen octahedra are rotated in the cell, leading to projection which is not strictly what we expect. We will correct for that in the next step when we run DMFT. Second, the in the end of each run we see how many inequivalent impurities are created,
+which is different for the two runs as expected.</p>
+</div>
+<div class="section" id="running-the-high-temperature-PM-calculation">
+<h2>running the high temperature PM calculation<a class="headerlink" href="#running-the-high-temperature-PM-calculation" title="Permalink to this headline">¶</a></h2>
+<p>he input file for solid_dmft looks as follows:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">!</span>cat config_highT.ini
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[general]
+# use here h5 archive with 1 impurity problem
+seedname = nio
+jobname = NiO_highT
+
+enforce_off_diag = False
+block_threshold = 0.001
+# rotate to diagonal orbital basis that corresponds to
+# normal d orbitals. Note, that Vasp does projections
+# along cartesian axis, hence orbitals got mixed
+set_rot = hloc
+
+solver_type = cthyb
+n_iw = 501
+
+prec_mu = 0.001
+
+h_int_type = density_density
+U = 8.0
+J = 1.0
+
+# temperature ~2200 K
+beta = 5
+# allow for magnetic order
+magnetic = True
+# make both sites equivalent but spin in the same direction
+magmom = 0.0001, 0.0001
+afm_order = True
+
+n_iter_dmft = 10
+
+g0_mix_type = linear
+g0_mix = 0.9
+
+dc_type = 0
+dc = True
+dc_dmft = False
+
+[solver]
+length_cycle = 150
+n_warmup_cycles = 10000
+n_cycles_tot = 1e+7
+# use new delta interface to reduce noise
+delta_interface = True
+imag_threshold = 1e-5
+# cut off diag elements for simplicity
+off_diag_threshold = 1e-3
+
+perform_tail_fit = True
+fit_max_moment = 4
+fit_min_w = 6
+fit_max_w = 10
+
+</pre></div></div>
+</div>
+<p>we allow also for the high temperature calculation for a magnetic moment by setting <code class="docutils literal notranslate"><span class="pre">magnetic</span> <span class="pre">=</span> <span class="pre">True</span></code>. By setting the flag magmom to a small value with the same sign on both sites we tell solid_dmft that both sites are equivalent. We see in the low temperature example how we can use this to enfore a antiferromagnetic order. Now we run solid_dmft simply by <code class="docutils literal notranslate"><span class="pre">mpirun</span> <span class="pre">solid_dmft</span> <span class="pre">config_highT.ini</span></code> . Caution: this is a very heavy job and will take roughly 10 min on 256 mpi ranks.</p>
+<p>In the beginning of the calculation try to locate the following lines:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">AFM</span> <span class="n">calculation</span> <span class="n">selected</span><span class="p">,</span> <span class="n">mapping</span> <span class="bp">self</span> <span class="n">energies</span> <span class="k">as</span> <span class="n">follows</span><span class="p">:</span>
+<span class="n">imp</span>  <span class="p">[</span><span class="n">copy</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">source</span> <span class="n">imp</span><span class="p">,</span> <span class="n">switch</span> <span class="n">up</span><span class="o">/</span><span class="n">down</span><span class="p">]</span>
+<span class="o">---------------------------------------------</span>
+<span class="mi">0</span><span class="p">:</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">]</span>
+<span class="mi">1</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>this tells us that solid_dmft detected correctly how we want to orientate the spin moments. This also reflects itself during the iterations when the second impurity problem should be solver. Instead of solving solid_dmft copies all properties of the first impurity and if neccessary flips the spin channel:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+<span class="n">copying</span> <span class="n">the</span> <span class="bp">self</span><span class="o">-</span><span class="n">energy</span> <span class="k">for</span> <span class="n">shell</span> <span class="mi">1</span> <span class="kn">from</span> <span class="nn">shell</span> <span class="mi">0</span>
+<span class="n">inverting</span> <span class="n">spin</span> <span class="n">channels</span><span class="p">:</span> <span class="kc">False</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+<p>After the calculation is finished we can take a look at the results:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">with</span> <span class="n">HDFArchive</span><span class="p">(</span><span class="s1">&#39;NiO_highT/nio.h5&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">h5</span><span class="p">:</span>
+    <span class="n">Sigma_iw</span> <span class="o">=</span> <span class="n">h5</span><span class="p">[</span><span class="s1">&#39;DMFT_results/last_iter/Sigma_freq_0&#39;</span><span class="p">]</span>
+    <span class="n">obs</span> <span class="o">=</span> <span class="n">h5</span><span class="p">[</span><span class="s1">&#39;DMFT_results/observables&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;iteration&#39;</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;up&#39;</span><span class="p">])</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;down&#39;</span><span class="p">]),</span> <span class="s1">&#39;-o&#39;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;iteration&#39;</span><span class="p">],</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;up&#39;</span><span class="p">])</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;down&#39;</span><span class="p">])),</span> <span class="s1">&#39;-o&#39;</span><span class="p">)</span>
+
+
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Imp. occupation</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mf">8.2</span><span class="p">,</span> <span class="mf">8.7</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Iterations&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_NiO_os_plo_mag_NiO_tutorial_18_0.png" src="../../_images/tutorials_NiO_os_plo_mag_NiO_tutorial_18_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">oplot</span><span class="p">(</span><span class="n">Sigma_iw</span><span class="p">[</span><span class="s1">&#39;up_0&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imag</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;up $t_</span><span class="si">{2g}</span><span class="s1">$&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">oplot</span><span class="p">(</span><span class="n">Sigma_iw</span><span class="p">[</span><span class="s1">&#39;up_0&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imag</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;up $e_</span><span class="si">{g}</span><span class="s1">$&#39;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$Im \Sigma (i \omega)$&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">40</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">2.5</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_NiO_os_plo_mag_NiO_tutorial_19_0.png" src="../../_images/tutorials_NiO_os_plo_mag_NiO_tutorial_19_0.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">with</span> <span class="n">HDFArchive</span><span class="p">(</span><span class="s1">&#39;NiO_lowT/nio.h5&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">h5</span><span class="p">:</span>
+    <span class="n">Sigma_iw</span> <span class="o">=</span> <span class="n">h5</span><span class="p">[</span><span class="s1">&#39;DMFT_results/it_5/Sigma_freq_0&#39;</span><span class="p">]</span>
+    <span class="n">obs</span> <span class="o">=</span> <span class="n">h5</span><span class="p">[</span><span class="s1">&#39;DMFT_results/observables&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;iteration&#39;</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;up&#39;</span><span class="p">])</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;down&#39;</span><span class="p">]),</span> <span class="s1">&#39;-o&#39;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;iteration&#39;</span><span class="p">],</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;up&#39;</span><span class="p">])</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;down&#39;</span><span class="p">])),</span> <span class="s1">&#39;-o&#39;</span><span class="p">)</span>
+
+
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Imp. occupation</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mf">8.2</span><span class="p">,</span> <span class="mf">8.7</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Iterations&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_NiO_os_plo_mag_NiO_tutorial_21_0.png" src="../../_images/tutorials_NiO_os_plo_mag_NiO_tutorial_21_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">oplot</span><span class="p">(</span><span class="n">Sigma_iw</span><span class="p">[</span><span class="s1">&#39;up_0&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imag</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;up $t_</span><span class="si">{2g}</span><span class="s1">$&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">oplot</span><span class="p">(</span><span class="n">Sigma_iw</span><span class="p">[</span><span class="s1">&#39;up_0&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imag</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;up $e_</span><span class="si">{g}</span><span class="s1">$&#39;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$Im \Sigma (i \omega)$&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">40</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">2.5</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_NiO_os_plo_mag_NiO_tutorial_22_0.png" src="../../_images/tutorials_NiO_os_plo_mag_NiO_tutorial_22_0.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (C) 2018-2020, ETH Zurich Copyright (C) 2021, The Simons Foundation authors: A. Hampel, M. Merkel, and S. Beck.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
