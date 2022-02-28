@@ -13,29 +13,35 @@ code structure:
 
 more details in the reference manual below.
 
-DFT code interfaces
+To get started with the code after a successful :ref:`installation`, take a look at the :ref`tutorials` section. Here we provide further special information and a reference manual for all available functions.
+
+DFT interface notes
 ===================
 
 .. toctree::
-   md_notes/w90_interface.md
-   md_notes/vasp_csc.md
-   cRPA_VASP/README.md
+    :maxdepth: 1
 
-run solid_dmft
-===================
+    md_notes/w90_interface.md
+    md_notes/vasp_csc.md
+    cRPA_VASP/README.md
+
+further details for running
+===========================
    
-   .. toctree::
-      md_notes/docker.md
-      md_notes/run_locally.md
-      md_notes/run_cluster.md
+.. toctree::
+    :maxdepth: 1
+    
+    md_notes/docker.md
+    md_notes/run_locally.md
+    md_notes/run_cluster.md
 
 module reference manual
 =======================
 
 .. autosummary::
-   :toctree: _autosummary
-   :template: autosummary_module_template.rst
-   :recursive:
+    :toctree: _autosummary
+    :template: autosummary_module_template.rst
+    :recursive:
 
     csc_flow
     dft_managers

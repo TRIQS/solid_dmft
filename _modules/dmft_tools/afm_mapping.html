@@ -46,7 +46,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../documentation.html">documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation.html#code-structure">code structure:</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#dft-code-interfaces">DFT code interfaces</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#dft-interface-notes">DFT interface notes</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../md_notes/w90_interface.html">Wannier90 interface</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../md_notes/w90_interface.html#orbital-order-in-the-w90-converter">orbital order in the W90 converter</a></li>
 </ul>
@@ -71,7 +71,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#run-solid-dmft">run solid_dmft</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#further-details-for-running">further details for running</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../md_notes/docker.html">Docker</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../md_notes/docker.html#building-the-docker-image">Building the docker image</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../md_notes/docker.html#pulling-a-docker-image">Pulling a docker image</a></li>
@@ -338,6 +338,7 @@
 
     <span class="k">if</span> <span class="n">solver_params</span><span class="p">[</span><span class="s1">&#39;measure_density_matrix&#39;</span><span class="p">]:</span>
         <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">density_matrix</span> <span class="o">=</span> <span class="n">solvers</span><span class="p">[</span><span class="n">imp_source</span><span class="p">]</span><span class="o">.</span><span class="n">density_matrix</span>
+        <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">h_loc_diagonalization</span> <span class="o">=</span> <span class="n">solvers</span><span class="p">[</span><span class="n">imp_source</span><span class="p">]</span><span class="o">.</span><span class="n">h_loc_diagonalization</span>
 
     <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;measure_chi_SzSz&#39;</span><span class="p">]:</span>
         <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">O_time</span> <span class="o">=</span> <span class="n">solvers</span><span class="p">[</span><span class="n">imp_source</span><span class="p">]</span><span class="o">.</span><span class="n">O_time</span>

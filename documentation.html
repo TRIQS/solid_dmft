@@ -48,7 +48,7 @@
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#code-structure">code structure:</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#dft-code-interfaces">DFT code interfaces</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#dft-interface-notes">DFT interface notes</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="md_notes/w90_interface.html">Wannier90 interface</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="md_notes/w90_interface.html#orbital-order-in-the-w90-converter">orbital order in the W90 converter</a></li>
 </ul>
@@ -73,7 +73,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#run-solid-dmft">run solid_dmft</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#further-details-for-running">further details for running</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="md_notes/docker.html">Docker</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="md_notes/docker.html#building-the-docker-image">Building the docker image</a></li>
 <li class="toctree-l4"><a class="reference internal" href="md_notes/docker.html#pulling-a-docker-image">Pulling a docker image</a></li>
@@ -249,63 +249,27 @@
 <h2>code structure:<a class="headerlink" href="#code-structure" title="Permalink to this headline">¶</a></h2>
 <a class="reference internal image-reference" href="_images/code_structure.png"><img alt="_images/code_structure.png" class="align-center" src="_images/code_structure.png" style="width: 100%;" /></a>
 <p>more details in the reference manual below.</p>
+<p>To get started with the code after a successful <a class="reference internal" href="install.html#installation"><span class="std std-ref">Installation</span></a>, take a look at the :ref`tutorials` section. Here we provide further special information and a reference manual for all available functions.</p>
 </div>
-<div class="section" id="dft-code-interfaces">
-<h2>DFT code interfaces<a class="headerlink" href="#dft-code-interfaces" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="dft-interface-notes">
+<h2>DFT interface notes<a class="headerlink" href="#dft-interface-notes" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="md_notes/w90_interface.html">Wannier90 interface</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="md_notes/w90_interface.html#orbital-order-in-the-w90-converter">orbital order in the W90 converter</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="md_notes/vasp_csc.html">interface to VASP</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="md_notes/vasp_csc.html#general-remarks">General remarks</a></li>
-<li class="toctree-l2"><a class="reference internal" href="md_notes/vasp_csc.html#locproj-bug-for-individual-projections">LOCPROJ bug for individual projections:</a></li>
-<li class="toctree-l2"><a class="reference internal" href="md_notes/vasp_csc.html#convergence-of-projectors-with-vasp">convergence of projectors with Vasp</a></li>
-<li class="toctree-l2"><a class="reference internal" href="md_notes/vasp_csc.html#enabling-csc-calculations-with-wannier90-projectors">Enabling CSC calculations with Wannier90 projectors</a></li>
-<li class="toctree-l2"><a class="reference internal" href="md_notes/vasp_csc.html#speeding-up-by-not-writing-projectors-at-every-step">Speeding up by not writing projectors at every step</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="cRPA_VASP/README.html">How to do cRPA calculations with VASP</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="cRPA_VASP/README.html#file-description">file description</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cRPA_VASP/README.html#workflow">Workflow:</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cRPA_VASP/README.html#important-flags">important flags:</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cRPA_VASP/README.html#convergency-tests">convergency tests:</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cRPA_VASP/README.html#parameterization-of-u-and-j-from-crpa-calculations">Parameterization of U and J from cRPA calculations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cRPA_VASP/README.html#general-sidemarks">general sidemarks:</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cRPA_VASP/README.html#version-and-compilation">version and compilation:</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="md_notes/w90_interface.html">Wannier90 interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="md_notes/vasp_csc.html">interface to VASP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cRPA_VASP/README.html">How to do cRPA calculations with VASP</a></li>
 </ul>
 </div>
 </div>
-<div class="section" id="run-solid-dmft">
-<h2>run solid_dmft<a class="headerlink" href="#run-solid-dmft" title="Permalink to this headline">¶</a></h2>
-<blockquote>
-<div><div class="toctree-wrapper compound">
+<div class="section" id="further-details-for-running">
+<h2>further details for running<a class="headerlink" href="#further-details-for-running" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="md_notes/docker.html">Docker</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="md_notes/docker.html#building-the-docker-image">Building the docker image</a></li>
-<li class="toctree-l2"><a class="reference internal" href="md_notes/docker.html#pulling-a-docker-image">Pulling a docker image</a></li>
-<li class="toctree-l2"><a class="reference internal" href="md_notes/docker.html#getting-docker-images-onto-cscs-daint">Getting docker images onto CSCS daint</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="md_notes/docker.html#running-a-docker-container">Running a docker container</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="md_notes/run_locally.html">run on your machine</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="md_notes/run_locally.html#csc-calculations-locally">CSC calculations locally</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="md_notes/run_cluster.html">Running solid_dmft on a cluster</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="md_notes/run_cluster.html#running-on-cscs-daint">Running on CSCS daint</a></li>
-<li class="toctree-l2"><a class="reference internal" href="md_notes/run_cluster.html#one-shot-job-on-daint">one shot job on daint</a></li>
-<li class="toctree-l2"><a class="reference internal" href="md_notes/run_cluster.html#csc-calculations-on-daint">CSC calculations on daint</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="md_notes/docker.html">Docker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="md_notes/run_locally.html">run on your machine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="md_notes/run_cluster.html">Running solid_dmft on a cluster</a></li>
 </ul>
 </div>
-</div></blockquote>
 </div>
 <div class="section" id="module-reference-manual">
 <h2>module reference manual<a class="headerlink" href="#module-reference-manual" title="Permalink to this headline">¶</a></h2>

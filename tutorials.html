@@ -48,7 +48,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="documentation.html">documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="documentation.html#code-structure">code structure:</a></li>
-<li class="toctree-l2"><a class="reference internal" href="documentation.html#dft-code-interfaces">DFT code interfaces</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html#dft-interface-notes">DFT interface notes</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="md_notes/w90_interface.html">Wannier90 interface</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="md_notes/w90_interface.html#orbital-order-in-the-w90-converter">orbital order in the W90 converter</a></li>
 </ul>
@@ -73,7 +73,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="documentation.html#run-solid-dmft">run solid_dmft</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html#further-details-for-running">further details for running</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="md_notes/docker.html">Docker</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="md_notes/docker.html#building-the-docker-image">Building the docker image</a></li>
 <li class="toctree-l4"><a class="reference internal" href="md_notes/docker.html#pulling-a-docker-image">Pulling a docker image</a></li>
@@ -245,6 +245,15 @@
 </style>
 <div class="section" id="tutorials">
 <span id="id1"></span><h1>tutorials<a class="headerlink" href="#tutorials" title="Permalink to this headline">¶</a></h1>
+<p>These tutorials provide an overview about typical workflows to perform DFT+DMFT calculations with solid_dmft. The tutorials are sorted by complexity and introduce one after another more available features. The available tutorials are:</p>
+<ol class="arabic simple">
+<li>os_w90_cthyb: typical one-shot DMFT calculation based on prepared hdf5 archive for SrVO3</li>
+<li><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html"><span class="std std-ref">csc_vasp_plo_cthyb</span></a>:  full charge self-consistent (CSC) DFT+DMFT calculation using the PLO formalism with Vasp for PrNiO3</li>
+<li><a class="reference internal" href="tutorials/Ce2O3_csc_w90/tutorial.html"><span class="std std-ref">csc_qe_w90_hubbardI</span></a>: full CSC DFT+DMFT calculation using w90 in combination with Quantum Espresso utilizing the lighter HubbardI solver</li>
+<li><a class="reference internal" href="tutorials/NiO_os_plo_mag/NiO_tutorial.html"><span class="std std-ref">os_vasp_plo_cthyb</span></a>: one-shot magnetic DMFT calculation for NiO in a large energy window for 5 d orbitals at two different temperatures</li>
+<li><a class="reference internal" href="tutorials/correlated_bandstructure/plot_correlated_bands.html"><span class="std std-ref">plot_correlated_bands</span></a>: plot the spectral function after a DFT+DMFT calculation</li>
+</ol>
+<hr class="docutils" />
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html">Running a charge self-consistent (CSC) calculation on PrNiO3 with VASP PLOs</a><ul>
