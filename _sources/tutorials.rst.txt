@@ -1,6 +1,6 @@
 .. _tutorials:
 
-tutorials
+Tutorials
 ==========
 
 These tutorials provide an overview about typical workflows to perform DFT+DMFT calculations with solid_dmft. The tutorials are sorted by complexity and introduce one after another more available features. The available tutorials are:

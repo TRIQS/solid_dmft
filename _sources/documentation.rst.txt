@@ -1,10 +1,10 @@
 .. _documentation:
 
 ***************
-documentation
+Documentation
 ***************
 
-code structure:
+Code structure:
 ===============
 
 .. image:: _static/code_structure.png
@@ -25,7 +25,7 @@ DFT interface notes
     md_notes/vasp_csc.md
     cRPA_VASP/README.md
 
-further details for running
+Further details for running
 ===========================
    
 .. toctree::
@@ -35,7 +35,7 @@ further details for running
     md_notes/run_locally.md
     md_notes/run_cluster.md
 
-module reference manual
+Module reference manual
 =======================
 
 .. autosummary::
