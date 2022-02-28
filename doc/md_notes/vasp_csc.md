@@ -1,4 +1,4 @@
-# interface to VASP
+# Interface to VASP
 
 
 ## General remarks

@@ -1,4 +1,4 @@
-# run on your machine
+# Run on your machine
 
 ## CSC calculations locally
 
