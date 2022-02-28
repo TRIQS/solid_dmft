@@ -118,6 +118,7 @@ def apply(general_params, solver_params, icrsh, gf_struct_solver, solvers):
 
     if solver_params['measure_density_matrix']:
         solvers[icrsh].density_matrix = solvers[imp_source].density_matrix
+        solvers[icrsh].h_loc_diagonalization = solvers[imp_source].h_loc_diagonalization
 
     if general_params['measure_chi_SzSz']:
         solvers[icrsh].O_time = solvers[imp_source].O_time

@@ -13,7 +13,7 @@ code structure:
 
 more details in the reference manual below.
 
-To get started with the code after a successful :ref:`installation`, take a look at the :ref`tutorials` section. Here we provide further special information and a reference manual for all available functions.
+To get started with the code after a successful :ref:`installation`, take a look at the :ref:`tutorials` section. Here we provide further special information and a reference manual for all available functions.
 
 DFT interface notes
 ===================
