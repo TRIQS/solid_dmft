@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM ubuntu:impish
 
 ##################################################
 # Essential packages and libraries               #
@@ -13,10 +13,15 @@ RUN apt-get update && \
     libmpich-dev \
     mpich \
     build-essential \
+    cmake \
+# OpenMP problem
+    libmkl-gnu-thread \
+    libomp-dev \
+    libgomp1 \
 # Vasp, doesn't work with newer gfortran versions
-    gfortran-7 \
-    gcc-10 \
-    g++-10 \
+    gfortran \
+    gcc \
+    g++ \
     git \
     rsync \
 # TODO: add scaLAPACK
@@ -46,16 +51,6 @@ RUN apt-get update && \
     apt-get autoremove --purge -y && \
     apt-get autoclean -y && \
     rm -rf /var/cache/apt/* /var/lib/apt/lists/*
-
-# Necessary to install cmake through pip. There is a bug in the apt version (status 2020/09/11)
-RUN pip3 install --no-cache-dir cmake==3.14.3
-ENV PATH=/usr/local/bin:${PATH}
-
-RUN ln -sf $(which gfortran-7) /usr/bin/gfortran
-RUN ln -sf /usr/lib/gcc/x86_64-linux-gnu/7/f951 /usr/local/bin/.
-RUN ln -sf /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /usr/lib/x86_64-linux-gnu/libstdc++.so
-RUN ln -sf /usr/bin/gcc-10 /usr/bin/gcc
-RUN ln -sf /usr/bin/g++-10 /usr/bin/g++
 
 # For old sarus version, needs to remove ligfortran5. ligfortran5 needed for previous
 # MKL installation but two different libgfortran versions (libgfortran4 comes from gfortran7
@@ -118,14 +113,16 @@ RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/triqs
     && mkdir -p triqs.build && cd triqs.build \
     && cmake ../triqs.src -DCMAKE_INSTALL_PREFIX=/triqs \
        -DBLAS_LIBRARIES=/lib/x86_64-linux-gnu/libmkl_rt.so \
-       -DLIBCLANG_LOCATION=/usr/lib/llvm-10/lib/libclang.so \
-    && make -j$(nproc) && make -j$(nproc) test && make install
+#       -DCMAKE_CXX_COMPILER_ID=Clang \
+       -DLIBCLANG_LOCATION=/usr/lib/llvm-13/lib/libclang.so \
+    && make -j2
+RUN cd /source/triqs.build && make -j2 test && make install
 
 ENV CPATH=/triqs/include:${CPATH}
 ENV PATH=/triqs/bin:${PATH}
 ENV LIBRARY_PATH=/triqs/lib:${LIBRARY_PATH}
 ENV LD_LIBRARY_PATH=/triqs/lib:${LD_LIBRARY_PATH}
-ENV PYTHONPATH=/triqs/lib/python3.8/site-packages:${PYTHONPATH}
+ENV PYTHONPATH=/triqs/lib/python3.9/site-packages:${PYTHONPATH}
 ENV CMAKE_PREFIX_PATH=/triqs/share/cmake:${CMAKE_PREFIX_PATH}
 ENV TRIQS_ROOT=/triqs
 
@@ -133,37 +130,37 @@ ENV TRIQS_ROOT=/triqs
 RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/dft_tools.git dft_tools.src \
     && mkdir -p dft_tools.build && cd dft_tools.build \
     && cmake ../dft_tools.src -DCMAKE_INSTALL_PREFIX=/triqs \
-    && make && make -j$(nproc) test && make install
+    && make -j2 && make -j2 test && make install
 
 # cthyb
 RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/cthyb.git cthyb.src \
     && mkdir -p cthyb.build && cd cthyb.build \
     && cmake ../cthyb.src -DCMAKE_INSTALL_PREFIX=/triqs \
-    && make -j$(nproc) && make -j$(nproc) test && make install
+    && make -j2 && make -j2 test && make install
 
 # maxent
 RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/maxent.git maxent.src \
     && mkdir -p maxent.build && cd maxent.build \
     && cmake ../maxent.src -DCMAKE_INSTALL_PREFIX=/triqs \
-    && make -j$(nproc) && make -j$(nproc) test && make install
+    && make -j2 && make -j2 test && make install
 
 # ctint
 # ADD ctint-3.0.x.tar.gz /source/ctint.src
 # RUN cd /source && mkdir -p ctint.build && cd ctint.build \
 #     && cmake ../ctint.src -DCMAKE_INSTALL_PREFIX=/triqs \
-#     && make -j$(nproc) && make -j$(nproc) test && make install
+#     && make -j2 && make -j2 test && make install
 
 # hubbardI
 RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hubbardI hubbardI.src \
     && mkdir -p hubbardI.build && cd hubbardI.build \
     && cmake ../hubbardI.src -DCMAKE_INSTALL_PREFIX=/triqs \
-    && make -j$(nproc) && make -j$(nproc) test && make install
+    && make -j2 && make -j2 test && make install
 
 # solid_dmft
 RUN cd /source && git clone -b unstable --depth 1 https://github.com/flatironinstitute/solid_dmft.git solid_dmft.src \
     && mkdir -p solid_dmft.build && cd solid_dmft.build \
     && cmake ../solid_dmft.src -DCMAKE_INSTALL_PREFIX=/triqs \
-    && make -j$(nproc) && make -j$(nproc) test && make install
+    && make -j2 && make -j2 test && make install
 
 
 ##################################################
@@ -179,9 +176,10 @@ RUN cd /wannier90 && make default lib
 
 # TODO: include scalapack
 # VASP for CSC calculations
-ADD csc_vasp.tar.gz /vasp/
+ADD vasp.6.3.0_csc.tar.gz /vasp/
 COPY mpich_vasp.makefile /vasp/makefile.include
 # Install vasp
+# TODO: add ncl
 RUN cd /vasp/ \
     && make std \
     && rm -rf src/ build/ arch/
