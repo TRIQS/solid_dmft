@@ -55,7 +55,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../md_notes/w90_interface.html#orbital-order-in-the-w90-converter">orbital order in the W90 converter</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../md_notes/vasp_csc.html">interface to VASP</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../md_notes/vasp_csc.html">Interface to VASP</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../md_notes/vasp_csc.html#general-remarks">General remarks</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../md_notes/vasp_csc.html#locproj-bug-for-individual-projections">LOCPROJ bug for individual projections:</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../md_notes/vasp_csc.html#convergence-of-projectors-with-vasp">convergence of projectors with Vasp</a></li>
@@ -82,7 +82,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../md_notes/docker.html#getting-docker-images-onto-cscs-daint">Getting docker images onto CSCS daint</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../md_notes/run_locally.html">run on your machine</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../md_notes/run_locally.html">Run on your machine</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../md_notes/run_locally.html#csc-calculations-locally">CSC calculations locally</a></li>
 </ul>
 </li>
@@ -171,9 +171,11 @@
 </ul>
 </li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">AFM state of NiO with one-shot DMFT from Vasp</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#run-DFT">run DFT</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#creating-the-hdf5-archive">creating the hdf5 archive</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#running-the-high-temperature-PM-calculation">running the high temperature PM calculation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#1.-Run-DFT">1. Run DFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#2.-Creating-the-hdf5-archive-/-DMFT-input">2. Creating the hdf5 archive / DMFT input</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#3.-Running-the-high-temperature-PM-calculation">3. Running the high temperature PM calculation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#4.-Running-the-low-temperature-PM-calculation">4. Running the low temperature PM calculation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#5.-Multiplet-analysis">5. Multiplet analysis</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../correlated_bandstructure/plot_correlated_bands.html">Plotting the spectral function</a><ul>
@@ -534,24 +536,32 @@ Starting serial run at: 2022-02-25 08:11:24.095391
 </div>
 <div class="section" id="AFM-state-of-NiO-with-one-shot-DMFT-from-Vasp">
 <h1>AFM state of NiO with one-shot DMFT from Vasp<a class="headerlink" href="#AFM-state-of-NiO-with-one-shot-DMFT-from-Vasp" title="Permalink to this headline">¶</a></h1>
-<p>In this tutorial we will take a look at a magnetic DMFT calculation for NiO in the antiferromagnetic phase. This tutorial will guide you through the following steps:</p>
+<p>In this tutorial we will take a look at a magnetic DMFT calculation for NiO in the antiferromagnetic phase. NiO is known to undergo a magnetic transition at around 525 K resulting in an AFM type II order, with all 180 degree Ni-0-Ni bonds to order anti-ferromagnetically.</p>
+<p>This tutorial will guide you through the following steps:</p>
 <ul class="simple">
-<li>run a non-magnetic Vasp calculation for NiO with a two atom unit cel</li>
+<li>run a non-magnetic Vasp calculation for NiO with a two atom unit cell</li>
 <li>create projectors in a large energy window for all Ni-<span class="math notranslate nohighlight">\(d\)</span> orbitals and all O-<span class="math notranslate nohighlight">\(p\)</span> orbitals</li>
 <li>create the hdf5 input via the Vasp converter for solid_dmft</li>
 <li>run a high temperature paramagnetic calculation and a low temperature AFM calculation</li>
 <li>take a look at the output</li>
 </ul>
-<p>all caluclations are performed on a 24 core machine and for real convergence the accuracy of all steps has to be significantly increased!</p>
-<div class="section" id="run-DFT">
-<h2>run DFT<a class="headerlink" href="#run-DFT" title="Permalink to this headline">¶</a></h2>
-<p>we start by running Vasp to create the raw projectors. The <a class="reference external" href="INCAR" rel="noopener noreferrer" target="_blank">INCAR</a>, <a class="reference external" href="POSCAR" rel="noopener noreferrer" target="_blank">POSCAR</a>, and <a class="reference external" href="KPOINTS" rel="noopener noreferrer" target="_blank">KPOINTS</a> file are kept relatively simple. We only need to make sure that the Kohn-Sham eigenstates converge well (rms), hence we do quite a few extra SCF steps here.</p>
+<p>Warning: the DMFT calculations here are very heavy requiring ~700 core hours per DMFT job.</p>
+<div class="section" id="1.-Run-DFT">
+<h2>1. Run DFT<a class="headerlink" href="#1.-Run-DFT" title="Permalink to this headline">¶</a></h2>
+<p>The tutorial is based on the NiO example from <a class="reference external" href="https://triqs.github.io/dft_tools/unstable/tutorials/nio_csc.html" rel="noopener noreferrer" target="_blank">DFTTools</a>, but is more advanced by allowing to acccess the magnetic state of the system.</p>
+<p>We start by running Vasp to create the raw projectors. The <a class="reference external" href="INCAR" rel="noopener noreferrer" target="_blank">INCAR</a>, <a class="reference external" href="POSCAR" rel="noopener noreferrer" target="_blank">POSCAR</a>, and <a class="reference external" href="KPOINTS" rel="noopener noreferrer" target="_blank">KPOINTS</a> file are kept relatively simple. For the POTCAR the standard <code class="docutils literal notranslate"><span class="pre">PBE</span> <span class="pre">Ni</span></code> and <code class="docutils literal notranslate"><span class="pre">PBE</span> <span class="pre">O</span></code> pseudo potentials are used. Here we make sure that the Kohn-Sham eigenstates are converged well (rms), hence we do quite a few extra SCF steps here by setting <code class="docutils literal notranslate"><span class="pre">NELMIN=30</span></code>. We tell Vasp to create projectors for the Ni d shell by setting the INCAR flag
+<code class="docutils literal notranslate"><span class="pre">LOCPROJ</span> <span class="pre">=</span> <span class="pre">LOCPROJ</span> <span class="pre">=</span> <span class="pre">1</span> <span class="pre">2</span> <span class="pre">:</span> <span class="pre">d</span> <span class="pre">:</span> <span class="pre">Pr</span></code>. More information can be found on the <a class="reference external" href="https://triqs.github.io/dft_tools/unstable/guide/conv_vasp.html" rel="noopener noreferrer" target="_blank">DFTTools webpage of the Vasp converter</a>.</p>
+<p>Let’s run Vasp with</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mpirun</span> <span class="n">vasp_std</span> <span class="mi">1</span><span class="o">&gt;</span><span class="n">out</span> <span class="mi">2</span><span class="o">&gt;</span><span class="n">err</span> <span class="o">&amp;</span>
+</pre></div>
+</div>
+<p>and monitor the output. After Vasp is finished the result should look like this:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[106]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[82]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="o">!</span>mpirun -n <span class="m">4</span> vasp_std
+<span></span><span class="o">!</span>tail -n <span class="m">10</span> vasp.out
 </pre></div>
 </div>
 </div>
@@ -560,75 +570,21 @@ Starting serial run at: 2022-02-25 08:11:24.095391
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-hwloc/linux: Ignoring PCI device with non-16bit domain.
-Pass --enable-32bits-pci-domain to configure to support such devices
-(warning: it would break the library ABI, don&#39;t enable unless really needed).
- ----------------------------------------------------
-    OOO  PPPP  EEEEE N   N M   M PPPP
-   O   O P   P E     NN  N MM MM P   P
-   O   O PPPP  EEEEE N N N M M M PPPP   -- VERSION
-   O   O P     E     N  NN M   M P
-    OOO  P     EEEEE N   N M   M P
- ----------------------------------------------------
- running    4 mpi-ranks, with    4 threads/rank
- distrk:  each k-point on    4 cores,    1 groups
- distr:  one band on    1 cores,    4 groups
- vasp.6.3.0 20Jan22 (build Feb  9 2022 16:28:10) complex
- POSCAR found type information on POSCAR NiO
- POSCAR found :  2 types and       4 ions
- Reading from existing POTCAR
- scaLAPACK will be used
- Reading from existing POTCAR
- LDA part: xc-table for Pade appr. of Perdew
- POSCAR, INCAR and KPOINTS ok, starting setup
- FFT: planning ... GRIDC
- FFT: planning ... GRID_SOFT
- FFT: planning ... GRID
- WAVECAR not read
- WARNING: random wavefunctions but no delay for mixing, default for NELMDL
- entering main loop
-       N       E                     dE             d eps       ncg     rms          rms(c)
-DAV:   1     0.230390548566E+03    0.23039E+03   -0.12566E+04 49544   0.118E+03
-DAV:   2    -0.635265216538E+01   -0.23674E+03   -0.21077E+03 48528   0.290E+02
-DAV:   3    -0.268453430934E+02   -0.20493E+02   -0.19049E+02 53664   0.898E+01
-DAV:   4    -0.271947681959E+02   -0.34943E+00   -0.34803E+00 55096   0.121E+01
-DAV:   5    -0.272033103076E+02   -0.85421E-02   -0.85408E-02 58032   0.183E+00    0.180E+01
-DAV:   6    -0.260843064627E+02    0.11190E+01   -0.11903E+01 63296   0.646E+01    0.218E+01
-DAV:   7    -0.227923558372E+02    0.32920E+01   -0.52358E+00 54784   0.577E+01    0.659E+00
-DAV:   8    -0.227279128022E+02    0.64443E-01   -0.59912E-01 66896   0.117E+01    0.373E+00
-DAV:   9    -0.232128072097E+02   -0.48489E+00   -0.20284E-01 68224   0.170E+01    0.129E+01
-DAV:  10    -0.226745767630E+02    0.53823E+00   -0.11152E-01 63744   0.125E+01    0.907E-01
-DAV:  11    -0.226801136433E+02   -0.55369E-02   -0.18430E-02 67856   0.217E+00    0.259E-01
-DAV:  12    -0.226812020818E+02   -0.10884E-02   -0.28746E-03 64784   0.824E-01    0.325E-01
-DAV:  13    -0.226809604891E+02    0.24159E-03   -0.20375E-04 70752   0.391E-01    0.571E-02
-DAV:  14    -0.226809797532E+02   -0.19264E-04   -0.31376E-05 72584   0.121E-01    0.575E-02
-DAV:  15    -0.226809706529E+02    0.91003E-05   -0.58257E-06 65768   0.653E-02    0.589E-03
-DAV:  16    -0.226809711164E+02   -0.46354E-06   -0.14209E-06 67560   0.113E-02    0.477E-03
-DAV:  17    -0.226809711575E+02   -0.41086E-07   -0.20742E-07 63560   0.101E-02    0.209E-03
-DAV:  18    -0.226809711310E+02    0.26485E-07   -0.26372E-08 69360   0.207E-03    0.407E-04
-DAV:  19    -0.226809711328E+02   -0.17649E-08   -0.26002E-09 75720   0.559E-04    0.192E-04
-DAV:  20    -0.226809711311E+02    0.16666E-08   -0.34341E-10 54912   0.143E-04    0.199E-04
-DAV:  21    -0.226809711319E+02   -0.78899E-09   -0.28929E-11 37840   0.222E-04    0.176E-05
-DAV:  22    -0.226809711332E+02   -0.13465E-08   -0.22876E-11 34128   0.416E-05    0.183E-05
-DAV:  23    -0.226809711334E+02   -0.16735E-09   -0.43721E-12 32456   0.299E-05    0.488E-06
-DAV:  24    -0.226809711328E+02    0.56161E-09   -0.82602E-13 31608   0.101E-05    0.726E-06
-DAV:  25    -0.226809711334E+02   -0.57116E-09   -0.10404E-13 30560   0.587E-06    0.421E-06
-DAV:  26    -0.226809711329E+02    0.53205E-09    0.76307E-14 30296   0.340E-06    0.719E-07
-DAV:  27    -0.226809711335E+02   -0.59072E-09    0.28615E-14 30184   0.164E-06    0.406E-07
-DAV:  28    -0.226809711321E+02    0.13533E-08    0.28995E-13 29424   0.686E-07    0.247E-07
-DAV:  29    -0.226809711325E+02   -0.38744E-09    0.19827E-13 28792   0.423E-07    0.156E-07
-DAV:  30    -0.226809711330E+02   -0.54160E-09    0.19055E-13 28432   0.286E-07    0.548E-08
-DAV:  31    -0.226809711325E+02    0.57298E-09    0.94554E-14 28056   0.191E-07    0.388E-08
-DAV:  32    -0.226809711322E+02    0.22510E-09    0.14233E-13 27432   0.105E-07    0.236E-08
-DAV:  33    -0.226809711323E+02   -0.19099E-10    0.18046E-13 27608   0.698E-08
+DAV:  30    -0.226809711331E+02    0.20827E-09    0.80041E-14 28416   0.286E-07    0.535E-08
+DAV:  31    -0.226809711332E+02   -0.10186E-09    0.13035E-13 28032   0.190E-07    0.384E-08
+DAV:  32    -0.226809711325E+02    0.69713E-09    0.13333E-13 27480   0.106E-07    0.229E-08
+DAV:  33    -0.226809711323E+02    0.23601E-09    0.91588E-14 27616   0.699E-08    0.789E-09
+DAV:  34    -0.226809711333E+02   -0.10236E-08    0.21298E-13 27368   0.465E-08    0.780E-09
+DAV:  35    -0.226809711324E+02    0.91086E-09    0.83940E-14 27208   0.305E-08    0.626E-09
+DAV:  36    -0.226809711323E+02    0.93678E-10    0.39223E-14 27056   0.192E-08
  LOCPROJ mode
  Computing AMN (projections onto localized orbitals)
    1 F= -.22680971E+02 E0= -.22669554E+02  d E =-.228342E-01
 </pre></div></div>
 </div>
-<p>let us take a look at the density of states:</p>
+<p>let us take a look at the density of states from Vasp:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[83]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -640,7 +596,7 @@ DAV:  33    -0.226809711323E+02   -0.19099E-10    0.18046E-13 27608   0.698E-08
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[84]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -668,9 +624,9 @@ DAV:  33    -0.226809711323E+02   -0.19099E-10    0.18046E-13 27608   0.698E-08
 </div>
 </div>
 </div>
-<div class="section" id="creating-the-hdf5-archive">
-<h2>creating the hdf5 archive<a class="headerlink" href="#creating-the-hdf5-archive" title="Permalink to this headline">¶</a></h2>
-<p>now we run the Vasp converter to create an input h5 archive for the solver. The <a class="reference external" href="plo.cfg" rel="noopener noreferrer" target="_blank">plo.cfg</a> looks like this:</p>
+<div class="section" id="2.-Creating-the-hdf5-archive-/-DMFT-input">
+<h2>2. Creating the hdf5 archive / DMFT input<a class="headerlink" href="#2.-Creating-the-hdf5-archive-/-DMFT-input" title="Permalink to this headline">¶</a></h2>
+<p>Next we run the <a class="reference external" href="https://triqs.github.io/dft_tools/unstable/guide/conv_vasp.html" rel="noopener noreferrer" target="_blank">Vasp converter</a> to create an input h5 archive for solid_dmft. The <a class="reference external" href="plo.cfg" rel="noopener noreferrer" target="_blank">plo.cfg</a> looks like this:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
@@ -700,7 +656,8 @@ CORR = True
 
 </pre></div></div>
 </div>
-<p>we create <span class="math notranslate nohighlight">\(d\)</span> like projectors within a large energy window from -9 to 2 eV for very localized states for both Ni sites. Important: the sites are markes as non equivalent, so that we can later have different spin orientations on them. Next we run the converter:</p>
+<p>we create <span class="math notranslate nohighlight">\(d\)</span> like projectors within a large energy window from -9 to 2 eV for very localized states for both Ni sites. Important: the sites are markes as non equivalent, so that we can later have different spin orientations on them.</p>
+<p>Let’s run the converter:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
@@ -836,83 +793,82 @@ Reading input from nio.ctrl...
   No. of inequivalent shells: 2
 </pre></div></div>
 </div>
-<p>We note a few special things here. First, the density matrix off the d-shell seems to be quite off-diagonal. This is because in Vasp local projections are always done with respect to cartesian axis, and hence the unit cell is non cubic shaped the oxygen octahedra are rotated in the cell, leading to projection which is not strictly what we expect. We will correct for that in the next step when we run DMFT. Second, the in the end of each run we see how many inequivalent impurities are created,
-which is different for the two runs as expected.</p>
+<p>We note that the resulting density matrix and local Hamiltian off the d-shell seems to be quite off-diagonal. This is because in Vasp local projections are always done with respect to cartesian axis, and hence the unit cell here is non cubic the oxygen octahedra are rotated in the cell, leading to projectors resulting in off-diagonal occupations. We will correct for that in the next step when we run DMFT.</p>
 </div>
-<div class="section" id="running-the-high-temperature-PM-calculation">
-<h2>running the high temperature PM calculation<a class="headerlink" href="#running-the-high-temperature-PM-calculation" title="Permalink to this headline">¶</a></h2>
-<p>he input file for solid_dmft looks as follows:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="section" id="3.-Running-the-high-temperature-PM-calculation">
+<h2>3. Running the high temperature PM calculation<a class="headerlink" href="#3.-Running-the-high-temperature-PM-calculation" title="Permalink to this headline">¶</a></h2>
+<p>The prepared confilg file <a class="reference external" href="config_highT.ini" rel="noopener noreferrer" target="_blank">config_highT.ini</a> looks like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">general</span><span class="p">]</span>
+<span class="n">seedname</span> <span class="o">=</span> <span class="n">nio</span>
+<span class="n">jobname</span> <span class="o">=</span> <span class="n">NiO_highT</span>
+
+<span class="n">block_threshold</span> <span class="o">=</span> <span class="mf">0.001</span>
+<span class="n">set_rot</span> <span class="o">=</span> <span class="n">hloc</span>
+
+<span class="n">solver_type</span> <span class="o">=</span> <span class="n">cthyb</span>
+<span class="n">n_iw</span> <span class="o">=</span> <span class="mi">501</span>
+
+<span class="n">prec_mu</span> <span class="o">=</span> <span class="mf">0.001</span>
+
+<span class="n">h_int_type</span> <span class="o">=</span> <span class="n">density_density</span>
+<span class="n">U</span> <span class="o">=</span> <span class="mf">8.0</span>
+<span class="n">J</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+<span class="n">beta</span> <span class="o">=</span> <span class="mi">5</span>
+
+<span class="n">magnetic</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">magmom</span> <span class="o">=</span> <span class="mf">0.0001</span><span class="p">,</span> <span class="mf">0.0001</span>
+<span class="n">afm_order</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="n">n_iter_dmft</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="n">g0_mix_type</span> <span class="o">=</span> <span class="n">linear</span>
+<span class="n">g0_mix</span> <span class="o">=</span> <span class="mf">0.8</span>
+
+<span class="n">dc_type</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">dc</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">dc_dmft</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="p">[</span><span class="n">solver</span><span class="p">]</span>
+<span class="n">length_cycle</span> <span class="o">=</span> <span class="mi">300</span>
+<span class="n">n_warmup_cycles</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="n">n_cycles_tot</span> <span class="o">=</span> <span class="mf">3e+7</span>
+<span class="n">delta_interface</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">imag_threshold</span> <span class="o">=</span> <span class="mf">1e-5</span>
+<span class="n">off_diag_threshold</span> <span class="o">=</span> <span class="mf">1e-3</span>
+
+<span class="n">perform_tail_fit</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">fit_max_moment</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">fit_min_w</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">fit_max_w</span> <span class="o">=</span> <span class="mi">14</span>
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="o">!</span>cat config_highT.ini
+<p>Let’s go through some special options we set in the config file:</p>
+<ul class="simple">
+<li>we changed <code class="docutils literal notranslate"><span class="pre">n_iw=501</span></code> because at higher temperatures we need less Matsubara frequencies</li>
+<li>with <code class="docutils literal notranslate"><span class="pre">set_rot=hloc</span></code> solid_dmft will rotate the projectors into a basis that diagonalizes the non-interacting local Hamiltonian before doing the calculation. Ensuring that we have the desired diagonal orbital structure.</li>
+<li><code class="docutils literal notranslate"><span class="pre">h_int_type</span></code> is set to <code class="docutils literal notranslate"><span class="pre">density_density</span></code> to reduce complexity of the problem</li>
+<li><code class="docutils literal notranslate"><span class="pre">beta=5</span></code> here we set the temperature to ~2300K</li>
+<li><code class="docutils literal notranslate"><span class="pre">magnetic=True</span></code> lift spin degeneracy</li>
+<li><code class="docutils literal notranslate"><span class="pre">magmom</span></code> here we specify the magnetic order. Here, we say that both Ni sites have the same spin, which should average to 0 at this high temperature. The magnetic moment is specified in units of the DC potential. Hence, small values should be chosen.</li>
+<li><code class="docutils literal notranslate"><span class="pre">afm_order=True</span></code> tells solid_dmft to not solve impurities with the same <code class="docutils literal notranslate"><span class="pre">magmom</span></code> but rather copy the self-energy and if necessary flip the spin</li>
+<li>with <code class="docutils literal notranslate"><span class="pre">dc_type=0</span></code> we select the FLL double counting. The result will heavily depend in NiO on the DC scheme <a class="reference external" href="https://doi.org/10.1016/j.elspec.2010.05.021" rel="noopener noreferrer" target="_blank">1</a></li>
+<li><code class="docutils literal notranslate"><span class="pre">length_cycle=300</span></code> is the length between two Green’s function measurements in cthyb. This number has to be choosen carefully to give an autocorrelation time &lt;1</li>
+<li>here we use tail fitting to get good high frequency self-energy behavior: <code class="docutils literal notranslate"><span class="pre">perform_tail_fit=True</span></code></li>
+</ul>
+<p>By setting the flag magmom to a small value with the same sign on both sites we tell solid_dmft that both sites are equivalent. We see in the low temperature example how we can use this to enfore a antiferromagnetic order. Now we run solid_dmft simply by executing <code class="docutils literal notranslate"><span class="pre">mpirun</span> <span class="pre">solid_dmft</span> <span class="pre">config_highT.ini</span></code> .</p>
+<p>Caution: this is a very heavy job and will take roughly ~ 650 core hours, which should be submitted on a cluster.</p>
+<p>In the beginning of the calculation you should find information that solid_dmft diagonalizes <code class="docutils literal notranslate"><span class="pre">Hloc_0</span></code> to rotate all properties. TThe new rotation matrices <code class="docutils literal notranslate"><span class="pre">rot_mat</span></code> are being printed. The following density matrix should be mostly diagonal:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DFT</span> <span class="n">density</span> <span class="n">matrix</span>
+<span class="n">rho</span><span class="p">[</span> <span class="mi">0</span><span class="p">]</span>                           <span class="n">up</span>                                           <span class="n">down</span>
+             <span class="mf">0.97707</span> <span class="o">-</span><span class="mf">0.00000</span>  <span class="mf">0.00000</span> <span class="o">-</span><span class="mf">0.00050</span> <span class="o">-</span><span class="mf">0.00211</span>    <span class="mf">0.97707</span> <span class="o">-</span><span class="mf">0.00000</span>  <span class="mf">0.00000</span> <span class="o">-</span><span class="mf">0.00050</span> <span class="o">-</span><span class="mf">0.00211</span>
+            <span class="o">-</span><span class="mf">0.00000</span>  <span class="mf">0.97707</span> <span class="o">-</span><span class="mf">0.00000</span>  <span class="mf">0.00210</span> <span class="o">-</span><span class="mf">0.00050</span>   <span class="o">-</span><span class="mf">0.00000</span>  <span class="mf">0.97707</span> <span class="o">-</span><span class="mf">0.00000</span>  <span class="mf">0.00210</span> <span class="o">-</span><span class="mf">0.00050</span>
+             <span class="mf">0.00000</span> <span class="o">-</span><span class="mf">0.00000</span>  <span class="mf">0.97699</span>  <span class="mf">0.00000</span> <span class="o">-</span><span class="mf">0.00000</span>    <span class="mf">0.00000</span> <span class="o">-</span><span class="mf">0.00000</span>  <span class="mf">0.97699</span>  <span class="mf">0.00000</span> <span class="o">-</span><span class="mf">0.00000</span>
+            <span class="o">-</span><span class="mf">0.00050</span>  <span class="mf">0.00210</span>  <span class="mf">0.00000</span>  <span class="mf">0.67124</span>  <span class="mf">0.00000</span>   <span class="o">-</span><span class="mf">0.00050</span>  <span class="mf">0.00210</span>  <span class="mf">0.00000</span>  <span class="mf">0.67124</span>  <span class="mf">0.00000</span>
+            <span class="o">-</span><span class="mf">0.00211</span> <span class="o">-</span><span class="mf">0.00050</span> <span class="o">-</span><span class="mf">0.00000</span>  <span class="mf">0.00000</span>  <span class="mf">0.67125</span>   <span class="o">-</span><span class="mf">0.00211</span> <span class="o">-</span><span class="mf">0.00050</span> <span class="o">-</span><span class="mf">0.00000</span>  <span class="mf">0.00000</span>  <span class="mf">0.67125</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-[general]
-# use here h5 archive with 1 impurity problem
-seedname = nio
-jobname = NiO_highT
-
-enforce_off_diag = False
-block_threshold = 0.001
-# rotate to diagonal orbital basis that corresponds to
-# normal d orbitals. Note, that Vasp does projections
-# along cartesian axis, hence orbitals got mixed
-set_rot = hloc
-
-solver_type = cthyb
-n_iw = 501
-
-prec_mu = 0.001
-
-h_int_type = density_density
-U = 8.0
-J = 1.0
-
-# temperature ~2200 K
-beta = 5
-# allow for magnetic order
-magnetic = True
-# make both sites equivalent but spin in the same direction
-magmom = 0.0001, 0.0001
-afm_order = True
-
-n_iter_dmft = 10
-
-g0_mix_type = linear
-g0_mix = 0.9
-
-dc_type = 0
-dc = True
-dc_dmft = False
-
-[solver]
-length_cycle = 150
-n_warmup_cycles = 10000
-n_cycles_tot = 1e+7
-# use new delta interface to reduce noise
-delta_interface = True
-imag_threshold = 1e-5
-# cut off diag elements for simplicity
-off_diag_threshold = 1e-3
-
-perform_tail_fit = True
-fit_max_moment = 4
-fit_min_w = 6
-fit_max_w = 10
-
-</pre></div></div>
-</div>
-<p>we allow also for the high temperature calculation for a magnetic moment by setting <code class="docutils literal notranslate"><span class="pre">magnetic</span> <span class="pre">=</span> <span class="pre">True</span></code>. By setting the flag magmom to a small value with the same sign on both sites we tell solid_dmft that both sites are equivalent. We see in the low temperature example how we can use this to enfore a antiferromagnetic order. Now we run solid_dmft simply by <code class="docutils literal notranslate"><span class="pre">mpirun</span> <span class="pre">solid_dmft</span> <span class="pre">config_highT.ini</span></code> . Caution: this is a very heavy job and will take roughly 10 min on 256 mpi ranks.</p>
-<p>In the beginning of the calculation try to locate the following lines:</p>
+<p>and the same for up/down, because the DFT calculation is performed without magnetism as all magnetism is thought to arise within the Ni-<span class="math notranslate nohighlight">\(d\)</span> shell. Further below we find the following lines:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">AFM</span> <span class="n">calculation</span> <span class="n">selected</span><span class="p">,</span> <span class="n">mapping</span> <span class="bp">self</span> <span class="n">energies</span> <span class="k">as</span> <span class="n">follows</span><span class="p">:</span>
 <span class="n">imp</span>  <span class="p">[</span><span class="n">copy</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">source</span> <span class="n">imp</span><span class="p">,</span> <span class="n">switch</span> <span class="n">up</span><span class="o">/</span><span class="n">down</span><span class="p">]</span>
 <span class="o">---------------------------------------------</span>
@@ -920,7 +876,7 @@ fit_max_w = 10
 <span class="mi">1</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">]</span>
 </pre></div>
 </div>
-<p>this tells us that solid_dmft detected correctly how we want to orientate the spin moments. This also reflects itself during the iterations when the second impurity problem should be solver. Instead of solving solid_dmft copies all properties of the first impurity and if neccessary flips the spin channel:</p>
+<p>this tells us that solid_dmft detected correctly how we want to orientate the spin moments. This also reflects itself during the iterations when the second impurity problem should be solved. But instead of solving solid_dmft copies all properties of the first impurity and if neccessary flips the spin channel:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
 <span class="n">copying</span> <span class="n">the</span> <span class="bp">self</span><span class="o">-</span><span class="n">energy</span> <span class="k">for</span> <span class="n">shell</span> <span class="mi">1</span> <span class="kn">from</span> <span class="nn">shell</span> <span class="mi">0</span>
 <span class="n">inverting</span> <span class="n">spin</span> <span class="n">channels</span><span class="p">:</span> <span class="kc">False</span>
@@ -929,33 +885,34 @@ fit_max_w = 10
 </div>
 <p>After the calculation is finished we can take a look at the results:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[114]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="k">with</span> <span class="n">HDFArchive</span><span class="p">(</span><span class="s1">&#39;NiO_highT/nio.h5&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">h5</span><span class="p">:</span>
-    <span class="n">Sigma_iw</span> <span class="o">=</span> <span class="n">h5</span><span class="p">[</span><span class="s1">&#39;DMFT_results/last_iter/Sigma_freq_0&#39;</span><span class="p">]</span>
-    <span class="n">obs</span> <span class="o">=</span> <span class="n">h5</span><span class="p">[</span><span class="s1">&#39;DMFT_results/observables&#39;</span><span class="p">]</span>
+    <span class="n">Sigma_iw_highT</span> <span class="o">=</span> <span class="n">h5</span><span class="p">[</span><span class="s1">&#39;DMFT_results/last_iter/Sigma_freq_0&#39;</span><span class="p">]</span>
+    <span class="n">obs_highT</span> <span class="o">=</span> <span class="n">h5</span><span class="p">[</span><span class="s1">&#39;DMFT_results/observables&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[98]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
 
-<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;iteration&#39;</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;up&#39;</span><span class="p">])</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;down&#39;</span><span class="p">]),</span> <span class="s1">&#39;-o&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">obs_highT</span><span class="p">[</span><span class="s1">&#39;iteration&#39;</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">obs_highT</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;up&#39;</span><span class="p">])</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">obs_highT</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;down&#39;</span><span class="p">]),</span> <span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;Ni$_0$&#39;</span><span class="p">)</span>
 
-<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;iteration&#39;</span><span class="p">],</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;up&#39;</span><span class="p">])</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;down&#39;</span><span class="p">])),</span> <span class="s1">&#39;-o&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">obs_highT</span><span class="p">[</span><span class="s1">&#39;iteration&#39;</span><span class="p">],</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">obs_highT</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;up&#39;</span><span class="p">])</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">obs_highT</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;down&#39;</span><span class="p">])),</span> <span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;Ni$_0$&#39;</span><span class="p">)</span>
 
 
-
-<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Imp. occupation</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mf">8.2</span><span class="p">,</span> <span class="mf">8.7</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Imp. occupation&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;magnetization $\mu_B$&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mf">8.2</span><span class="p">,</span> <span class="mf">8.6</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
 <span class="n">ax</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Iterations&#39;</span><span class="p">)</span>
-
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -964,23 +921,25 @@ fit_max_w = 10
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_NiO_os_plo_mag_NiO_tutorial_18_0.png" src="../../_images/tutorials_NiO_os_plo_mag_NiO_tutorial_18_0.png" />
+<img alt="../../_images/tutorials_NiO_os_plo_mag_NiO_tutorial_17_0.png" src="../../_images/tutorials_NiO_os_plo_mag_NiO_tutorial_17_0.png" />
 </div>
 </div>
+<p>We see that the impurity occupation converges after 4 iterations to around 8.3 electrons per Ni site. Since we have a large energy window with other states in the energy window besides the Ni-<span class="math notranslate nohighlight">\(d\)</span> states, charge is exchanged with the bath. Only the occupation of the band basis lattice Green’s function is fixed to n=28. The second plot shows the magnetization of the Ni site, which fluctuates around 0. We can also take a look at the resulting self-energies:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[95]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
 
-<span class="n">ax</span><span class="o">.</span><span class="n">oplot</span><span class="p">(</span><span class="n">Sigma_iw</span><span class="p">[</span><span class="s1">&#39;up_0&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imag</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;up $t_</span><span class="si">{2g}</span><span class="s1">$&#39;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">oplot</span><span class="p">(</span><span class="n">Sigma_iw</span><span class="p">[</span><span class="s1">&#39;up_0&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imag</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;up $e_</span><span class="si">{g}</span><span class="s1">$&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">oplot</span><span class="p">(</span><span class="n">Sigma_iw_highT</span><span class="p">[</span><span class="s1">&#39;up_0&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imag</span><span class="p">,</span> <span class="s1">&#39;-x&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;up $t_</span><span class="si">{2g}</span><span class="s1">$&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">oplot</span><span class="p">(</span><span class="n">Sigma_iw_highT</span><span class="p">[</span><span class="s1">&#39;up_0&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imag</span><span class="p">,</span> <span class="s1">&#39;-x&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;up $e_</span><span class="si">{g}</span><span class="s1">$&#39;</span><span class="p">)</span>
 
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$Im \Sigma (i \omega)$&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$Im \Sigma (i \omega_n)$ (eV)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\omega_n$ (eV)&quot;</span><span class="p">)</span>
 
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">40</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">2.5</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">2.9</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -993,33 +952,68 @@ fit_max_w = 10
 <img alt="../../_images/tutorials_NiO_os_plo_mag_NiO_tutorial_19_0.png" src="../../_images/tutorials_NiO_os_plo_mag_NiO_tutorial_19_0.png" />
 </div>
 </div>
+<p>We can clearly see that a <span class="math notranslate nohighlight">\(\omega_n=8\)</span> the self-energy is replaced by the tail-fit as specified in the input config file. This cut is rather early, but ensures convergence. For higher sampling rates this has to be changed. We also observe that for <span class="math notranslate nohighlight">\(i \omega_n\)</span>-&gt;0 the e<span class="math notranslate nohighlight">\(_g\)</span> orbital self-energy shows an continuously increasing value indicating an insulating solution. In contrast the t<span class="math notranslate nohighlight">\(_{2g}\)</span> orbital self-energy approaches smoothly 0 for <span class="math notranslate nohighlight">\(i \omega_n\)</span>-&gt;0 indicating
+a metallic solution with some renormalization.</p>
+</div>
+<div class="section" id="4.-Running-the-low-temperature-PM-calculation">
+<h2>4. Running the low temperature PM calculation<a class="headerlink" href="#4.-Running-the-low-temperature-PM-calculation" title="Permalink to this headline">¶</a></h2>
+<p>now we run the low temperature calculation at around 390 K, well below the ordering temperature of NiO. We change only a few things in the config file <a class="reference external" href="config_lowT.ini" rel="noopener noreferrer" target="_blank">config_lowT.ini</a>. We change:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">beta=30</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">magmom=-0.01,</span> <span class="pre">0.01</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">measure_density_matrix</span> <span class="pre">=</span> <span class="pre">True</span></code> measures the impurity many-body density matrix in the Fock basis for a multiplet analysis</li>
+</ul>
+<p>and a few other numerical parameters for the solver. We run this example as well via <code class="docutils literal notranslate"><span class="pre">mpirun</span> <span class="pre">solid_dmft</span> <span class="pre">config_lowT.ini</span></code>. Now the magnetic setup looks like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">AFM</span> <span class="n">calculation</span> <span class="n">selected</span><span class="p">,</span> <span class="n">mapping</span> <span class="bp">self</span> <span class="n">energies</span> <span class="k">as</span> <span class="n">follows</span><span class="p">:</span>
+<span class="n">imp</span>  <span class="p">[</span><span class="n">copy</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">source</span> <span class="n">imp</span><span class="p">,</span> <span class="n">switch</span> <span class="n">up</span><span class="o">/</span><span class="n">down</span><span class="p">]</span>
+<span class="o">---------------------------------------------</span>
+<span class="mi">0</span><span class="p">:</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">]</span>
+<span class="mi">1</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">True</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Meaning that now the spin will be flipped from the first to the second impurity. Furthermore, we can observe right in the first iteration that the occupation matrix favors the up spin channel (compare down_0 vs up_0 block)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">down_0</span><span class="p">,</span> <span class="n">real</span> <span class="n">part</span>
+<span class="p">[[</span><span class="mf">0.98415624</span> <span class="mf">0.00468119</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.00468119</span> <span class="mf">0.3657067</span> <span class="p">]]</span>
+<span class="o">...</span>
+<span class="n">up_0</span><span class="p">,</span> <span class="n">real</span> <span class="n">part</span>
+<span class="p">[[</span> <span class="mf">0.99667026</span> <span class="o">-</span><span class="mf">0.00151364</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">0.00151364</span>  <span class="mf">0.9085364</span> <span class="p">]]</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+<p>this should initialize the calculation enough to give a magnetic solution.</p>
+<p>Let’s take a look at the results:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[137]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="k">with</span> <span class="n">HDFArchive</span><span class="p">(</span><span class="s1">&#39;NiO_lowT/nio.h5&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">h5</span><span class="p">:</span>
-    <span class="n">Sigma_iw</span> <span class="o">=</span> <span class="n">h5</span><span class="p">[</span><span class="s1">&#39;DMFT_results/it_5/Sigma_freq_0&#39;</span><span class="p">]</span>
-    <span class="n">obs</span> <span class="o">=</span> <span class="n">h5</span><span class="p">[</span><span class="s1">&#39;DMFT_results/observables&#39;</span><span class="p">]</span>
+    <span class="n">Sigma_iw_lowT</span> <span class="o">=</span> <span class="n">h5</span><span class="p">[</span><span class="s1">&#39;DMFT_results/last_iter/Sigma_freq_0&#39;</span><span class="p">]</span>
+    <span class="n">obs_lowT</span> <span class="o">=</span> <span class="n">h5</span><span class="p">[</span><span class="s1">&#39;DMFT_results/observables&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[138]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
 
-<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;iteration&#39;</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;up&#39;</span><span class="p">])</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;down&#39;</span><span class="p">]),</span> <span class="s1">&#39;-o&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">obs_lowT</span><span class="p">[</span><span class="s1">&#39;iteration&#39;</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">obs_lowT</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;up&#39;</span><span class="p">])</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">obs_lowT</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;down&#39;</span><span class="p">]),</span> <span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;Ni$_0$&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">obs_lowT</span><span class="p">[</span><span class="s1">&#39;iteration&#39;</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">obs_lowT</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;up&#39;</span><span class="p">])</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">obs_lowT</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;down&#39;</span><span class="p">]),</span> <span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;Ni$_1$&#39;</span><span class="p">)</span>
 
-<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;iteration&#39;</span><span class="p">],</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;up&#39;</span><span class="p">])</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;down&#39;</span><span class="p">])),</span> <span class="s1">&#39;-o&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">obs_lowT</span><span class="p">[</span><span class="s1">&#39;iteration&#39;</span><span class="p">],</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">obs_lowT</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;up&#39;</span><span class="p">])</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">obs_lowT</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;down&#39;</span><span class="p">])),</span> <span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;Ni$_0$&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">obs_lowT</span><span class="p">[</span><span class="s1">&#39;iteration&#39;</span><span class="p">],</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">obs_lowT</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;up&#39;</span><span class="p">])</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">obs_lowT</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;down&#39;</span><span class="p">])),</span> <span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;Ni$_1$&#39;</span><span class="p">)</span>
 
-
-
-<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Imp. occupation</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mf">8.2</span><span class="p">,</span> <span class="mf">8.7</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Imp. occupation&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;magnetization $\mu_B$&#39;</span><span class="p">)</span>
+<span class="c1"># ax[0].set_ylim(8.2, 8.7)</span>
+<span class="c1"># ax[1].set_ylim(-0.5, 0.5)</span>
 <span class="n">ax</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Iterations&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -1029,18 +1023,18 @@ fit_max_w = 10
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_NiO_os_plo_mag_NiO_tutorial_21_0.png" src="../../_images/tutorials_NiO_os_plo_mag_NiO_tutorial_21_0.png" />
+<img alt="../../_images/tutorials_NiO_os_plo_mag_NiO_tutorial_23_0.png" src="../../_images/tutorials_NiO_os_plo_mag_NiO_tutorial_23_0.png" />
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[139]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
 
-<span class="n">ax</span><span class="o">.</span><span class="n">oplot</span><span class="p">(</span><span class="n">Sigma_iw</span><span class="p">[</span><span class="s1">&#39;up_0&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imag</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;up $t_</span><span class="si">{2g}</span><span class="s1">$&#39;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">oplot</span><span class="p">(</span><span class="n">Sigma_iw</span><span class="p">[</span><span class="s1">&#39;up_0&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imag</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;up $e_</span><span class="si">{g}</span><span class="s1">$&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">oplot</span><span class="p">(</span><span class="n">Sigma_iw_lowT</span><span class="p">[</span><span class="s1">&#39;up_0&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imag</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;up $t_</span><span class="si">{2g}</span><span class="s1">$&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">oplot</span><span class="p">(</span><span class="n">Sigma_iw_lowT</span><span class="p">[</span><span class="s1">&#39;up_4&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imag</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;up $e_</span><span class="si">{g}</span><span class="s1">$&#39;</span><span class="p">)</span>
 
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$Im \Sigma (i \omega)$&quot;</span><span class="p">)</span>
 
@@ -1055,9 +1049,12 @@ fit_max_w = 10
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_NiO_os_plo_mag_NiO_tutorial_22_0.png" src="../../_images/tutorials_NiO_os_plo_mag_NiO_tutorial_22_0.png" />
+<img alt="../../_images/tutorials_NiO_os_plo_mag_NiO_tutorial_24_0.png" src="../../_images/tutorials_NiO_os_plo_mag_NiO_tutorial_24_0.png" />
 </div>
 </div>
+</div>
+<div class="section" id="5.-Multiplet-analysis">
+<h2>5. Multiplet analysis<a class="headerlink" href="#5.-Multiplet-analysis" title="Permalink to this headline">¶</a></h2>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
