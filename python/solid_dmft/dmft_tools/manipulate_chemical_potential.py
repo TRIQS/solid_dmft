@@ -235,7 +235,7 @@ def _set_mu_to_gap_middle_with_maxent(general_params, sum_k, gf_lattice_iw, arch
         return None
 
     # Runs MaxEnt using the Chi2Curvature analyzer
-    maxent_results = maxent_gf_latt._run_maxent(gf_lattice_iw, sum_k, False)
+    maxent_results = maxent_gf_latt._run_maxent(gf_lattice_iw, sum_k, .02, None, None, 200, 30)
     mesh = np.array(maxent_results['total'].omega)
     spectral_function = maxent_results['total'].get_A_out('Chi2CurvatureAnalyzer')
 
