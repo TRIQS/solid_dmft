@@ -175,14 +175,20 @@ COPY wannier90.make.inc /wannier90/make.inc
 RUN cd /wannier90 && make default lib
 
 # TODO: include scalapack
-# VASP for CSC calculations
-ADD vasp.6.3.0_csc.tar.gz /vasp/
+# Adds modified VASP for CSC calculations
+ADD vasp.6.3.0.tgz /
+RUN mv /vasp.6.3.0 /vasp
 COPY mpich_vasp.makefile /vasp/makefile.include
+COPY vasp_diffs /vasp/vasp_diffs
+RUN cd /vasp/src \
+    && for name in electron.F fileio.F locproj.F mlwf.F .objects; \
+       do patch $name -p1 -i ../vasp_diffs/$name.diff; done
+
 # Install vasp
 # TODO: add ncl
 RUN cd /vasp/ \
     && make std \
-    && rm -rf src/ build/ arch/
+    && rm -rf src/ build/ arch/ vasp_diffs/
 
 ENV PATH=/vasp/bin:/wannier90:${PATH}
 

@@ -1,0 +1,26 @@
+175,182d174
+< 	electron.o \
+< 	rot.o \
+< 	electron_all.o \
+< 	shm.o \
+< 	pardens.o \
+< 	optics.o \
+< 	constr_cell_relax.o \
+< 	stm.o \
+192a185,195
+> 	twoelectron4o.o \
+> 	umco.o \
+> 	mlwf.o \
+> 	electron.o \
+> 	rot.o \
+> 	electron_all.o \
+> 	shm.o \
+> 	pardens.o \
+> 	optics.o \
+> 	constr_cell_relax.o \
+> 	stm.o \
+197d199
+< 	twoelectron4o.o \
+207,208d208
+< 	umco.o \
+< 	mlwf.o \
