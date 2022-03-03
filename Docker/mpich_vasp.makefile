@@ -14,7 +14,7 @@ CPP        = gcc -E -P -C -w $*$(FUFFIX) >$*$(SUFFIX) $(CPP_OPTIONS)
 FC         = mpif90 -m64
 FCL        = mpif90 -m64
 
-FREE       = -ffree-form -ffree-line-length-none -fallow-argument-mismatch
+FREE       = -ffree-form -ffree-line-length-none -fallow-argument-mismatch -fno-strict-aliasing
 
 FFLAGS     = -w
 
