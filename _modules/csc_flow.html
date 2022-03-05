@@ -330,7 +330,7 @@
         <span class="c1"># if calculation is restarted, need to check in first iteration if DFT step needs to be skipped</span>
         <span class="n">iter_one_shot</span> <span class="o">=</span> <span class="p">(</span><span class="n">iter_dmft</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;n_iter_dmft_first&#39;</span><span class="p">])</span><span class="o">%</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;n_iter_dmft_per&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">iteration_offset</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">iter_dmft</span> <span class="o">==</span> <span class="n">iteration_offset</span> <span class="o">+</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">iter_one_shot</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;  solid-dmft: ...skipping DFT step&#39;</span><span class="p">)</span>
+            <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;  solid_dmft: ...skipping DFT step&#39;</span><span class="p">)</span>
             <span class="k">return</span>
 
         <span class="n">qe_scf</span> <span class="o">=</span> <span class="n">start_qe</span><span class="p">(</span><span class="n">dft_params</span><span class="p">[</span><span class="s1">&#39;n_cores&#39;</span><span class="p">],</span> <span class="s1">&#39;mod_scf&#39;</span><span class="p">)</span>
@@ -395,10 +395,10 @@
 <span class="k">def</span> <span class="nf">_set_projections_suppressed</span><span class="p">(</span><span class="n">suppressed</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">suppressed</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;  solid-dmft: Writing suppress projectors file&#39;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;  solid_dmft: Writing suppress projectors file&#39;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;./vasp.suppress_projs&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s1">&#39;./vasp.suppress_projs&#39;</span><span class="p">):</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;  solid-dmft: Removing suppress projectors file&#39;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;  solid_dmft: Removing suppress projectors file&#39;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;./vasp.suppress_projs&#39;</span><span class="p">)</span>
     <span class="n">mpi</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
 
@@ -509,7 +509,7 @@
                                      <span class="n">dft_params</span><span class="p">[</span><span class="s1">&#39;mpi_env&#39;</span><span class="p">])</span>
         <span class="c1"># Removes projection suppression file if present</span>
         <span class="n">_set_projections_suppressed</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
-        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;  solid-dmft: Waiting for VASP to start (lock appears)...&#39;</span><span class="p">)</span>
+        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;  solid_dmft: Waiting for VASP to start (lock appears)...&#39;</span><span class="p">)</span>
         <span class="k">while</span> <span class="ow">not</span> <span class="n">vasp</span><span class="o">.</span><span class="n">is_lock_file_present</span><span class="p">():</span>
             <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
@@ -524,7 +524,7 @@
     <span class="n">iter_dmft</span> <span class="o">=</span> <span class="n">iteration_offset</span><span class="o">+</span><span class="mi">1</span>
     <span class="n">start_time_dft</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
     <span class="k">while</span> <span class="n">iter_dmft</span> <span class="o">&lt;=</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;n_iter_dmft&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">iteration_offset</span><span class="p">:</span>
-        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;  solid-dmft: Running </span><span class="si">{}</span><span class="s1">...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dft_params</span><span class="p">[</span><span class="s1">&#39;dft_code&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()))</span>
+        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;  solid_dmft: Running </span><span class="si">{}</span><span class="s1">...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dft_params</span><span class="p">[</span><span class="s1">&#39;dft_code&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()))</span>
         <span class="n">mpi</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
 
         <span class="c1"># vasp dft run</span>
@@ -544,7 +544,7 @@
             <span class="k">continue</span>
 
         <span class="n">end_time_dft</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
-        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;  solid-dmft: DFT cycle took </span><span class="si">{:10.4f}</span><span class="s1"> seconds&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">end_time_dft</span><span class="o">-</span><span class="n">start_time_dft</span><span class="p">))</span>
+        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;  solid_dmft: DFT cycle took </span><span class="si">{:10.4f}</span><span class="s1"> seconds&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">end_time_dft</span><span class="o">-</span><span class="n">start_time_dft</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">dft_params</span><span class="p">[</span><span class="s1">&#39;dft_code&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;vasp&#39;</span><span class="p">:</span>
             <span class="c1"># Runs the converter</span>
@@ -619,12 +619,12 @@
             <span class="n">start_time_dft</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">dft_params</span><span class="p">[</span><span class="s1">&#39;dft_code&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;vasp&#39;</span><span class="p">:</span>
                 <span class="n">_set_projections_suppressed</span><span class="p">(</span><span class="n">dft_params</span><span class="p">[</span><span class="s1">&#39;n_iter&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
-                <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;  solid-dmft: Reactivating VASP&#39;</span><span class="p">)</span>
+                <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;  solid_dmft: Reactivating VASP&#39;</span><span class="p">)</span>
                 <span class="n">vasp</span><span class="o">.</span><span class="n">reactivate</span><span class="p">()</span>
 
     <span class="c1"># Stops after maximum number of dmft iterations or convergence</span>
     <span class="k">if</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;  solid-dmft: Stopping </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dft_params</span><span class="p">[</span><span class="s1">&#39;dft_code&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()),</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;  solid_dmft: Stopping </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dft_params</span><span class="p">[</span><span class="s1">&#39;dft_code&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()),</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">dft_params</span><span class="p">[</span><span class="s1">&#39;dft_code&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;vasp&#39;</span><span class="p">:</span>
             <span class="n">vasp</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="n">vasp_process_id</span><span class="p">)</span></div>
 </pre></div>
