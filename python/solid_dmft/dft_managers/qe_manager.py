@@ -175,7 +175,7 @@ def _fork_and_start_qe(mpi_exe, arguments, env_vars, seedname):
         out = open(f'{seedname}.{qe_file_ext}.out','w')
         err = open(f'{seedname}.{qe_file_ext}.err','w')
 
-        print('  soliDMFT: Starting {} calculation...'.format(qe_file_ext))
+        print('  solid_dmft: Starting {} calculation...'.format(qe_file_ext))
 
         # start subprocess
         qe_process_id = subprocess.run(mpi_arguments, stdin=inp, env=env_vars, capture_output=True,
@@ -193,7 +193,7 @@ def _fork_and_start_qe(mpi_exe, arguments, env_vars, seedname):
 
     elif 'win' in qe_file_ext:
 
-        print('  soliDMFT: Starting Wannier90 {}...'.format(qe_file_ext))
+        print('  solid_dmft: Starting Wannier90 {}...'.format(qe_file_ext))
 
         # don't need any piping for Wannier90
         qe_process_id = subprocess.check_call(mpi_arguments + [seedname], env=env_vars, shell=False)

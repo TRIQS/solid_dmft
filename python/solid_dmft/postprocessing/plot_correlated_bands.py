@@ -377,8 +377,8 @@ def setup_plot_kslice(ax):
     #ax.set_ylim(0,1)
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))
     ax.yaxis.set_major_locator(MaxNLocator(integer=True))
-    ax.set_xlabel(r'$k_xa/\pi$')
-    ax.set_ylabel(r'$k_yb/\pi$')
+    ax.set_xlabel(r'$k_xa/2\pi$')
+    ax.set_ylabel(r'$k_yb/2\pi$')
 
 def check_and_convert_plotting(quarter=None, **specs):
 

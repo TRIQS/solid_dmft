@@ -77,7 +77,7 @@ def _gf_fit_tail_fraction(Gf, fraction=0.4, replace=None, known_moments=None):
 class SolverStructure:
 
     r'''
-    Handles all soliDMFT solver objects and contains TRIQS solver instance.
+    Handles all solid_dmft solver objects and contains TRIQS solver instance.
 
     Attributes
     ----------
