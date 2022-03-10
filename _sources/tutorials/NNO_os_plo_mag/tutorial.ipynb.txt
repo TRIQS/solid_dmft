@@ -17,7 +17,7 @@
      "name": "stderr",
      "output_type": "stream",
      "text": [
-      "Starting serial run at: 2022-03-10 16:36:24.095216\n"
+      "Starting serial run at: 2022-03-10 17:08:16.981449\n"
      ]
     }
    ],
@@ -208,12 +208,28 @@
      "name": "stdout",
      "output_type": "stream",
      "text": [
-      "cat: ref/plo.cfg: No such file or directory\n"
+      "[General]\n",
+      "BASENAME = nno\n",
+      "\n",
+      "[Group 1]\n",
+      "SHELLS = 1\n",
+      "NORMALIZE = True\n",
+      "NORMION = False\n",
+      "EWINDOW = -10 10\n",
+      "\n",
+      "[Shell 1]\n",
+      "LSHELL = 2\n",
+      "IONS = 3 4\n",
+      "TRANSFORM = 0.0  0.0  0.0  0.0  1.0\n",
+      "            0.0  1.0  0.0  0.0  0.0\n",
+      "            0.0  0.0  1.0  0.0  0.0\n",
+      "            0.0  0.0  0.0  1.0  0.0\n",
+      "            1.0  0.0  0.0  0.0  0.0\n"
      ]
     }
    ],
    "source": [
-    "!cat ref/plo.cfg"
+    "!cat plo.cfg"
    ]
   },
   {
