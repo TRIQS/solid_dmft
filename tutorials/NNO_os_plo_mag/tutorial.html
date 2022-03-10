@@ -503,7 +503,6 @@ div.rendered_html tbody tr:hover {
 <span class="kn">from</span> <span class="nn">triqs.plot.mpl_interface</span> <span class="kn">import</span> <span class="n">plt</span><span class="p">,</span><span class="n">oplot</span>
 
 <span class="kn">from</span> <span class="nn">h5</span> <span class="kn">import</span> <span class="n">HDFArchive</span>
-<span class="kn">from</span> <span class="nn">triqs.gf</span> <span class="kn">import</span> <span class="n">BlockGf</span>
 
 <span class="kn">from</span> <span class="nn">triqs_dft_tools.converters.vasp</span> <span class="kn">import</span> <span class="n">VaspConverter</span>
 <span class="kn">import</span> <span class="nn">triqs_dft_tools.converters.plovasp.converter</span> <span class="k">as</span> <span class="nn">plo_converter</span>
@@ -530,7 +529,7 @@ Warning: could not identify MPI environment!
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-Starting serial run at: 2022-03-08 18:08:41.300264
+Starting serial run at: 2022-03-10 16:36:24.095216
 </pre></div></div>
 </div>
 <div class="section" id="AFM-state-of-NdNiO2-with-one-shot-DMFT-from-Vasp">
@@ -546,21 +545,31 @@ Starting serial run at: 2022-03-08 18:08:41.300264
 <li>take a look at the output and analyse the multiplets of the Ni-d states</li>
 </ul>
 <p>Warning: the DMFT calculations here are very heavy requiring ~2500 core hours for the DMFT job.</p>
+<p>We set a <code class="docutils literal notranslate"><span class="pre">path</span></code> variable here to the reference files, which should be changed when doing the actual calculations do the work directory:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">path</span> <span class="o">=</span> <span class="s1">&#39;./ref/&#39;</span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="1.-Run-DFT">
 <h2>1. Run DFT<a class="headerlink" href="#1.-Run-DFT" title="Permalink to this headline">¶</a></h2>
-<p>We start by running Vasp to create the raw projectors. The <a class="reference external" href="INCAR" rel="noopener noreferrer" target="_blank">INCAR</a>, <a class="reference external" href="POSCAR" rel="noopener noreferrer" target="_blank">POSCAR</a>, and <a class="reference external" href="KPOINTS" rel="noopener noreferrer" target="_blank">KPOINTS</a> file are kept relatively simple. For the POTCAR the <code class="docutils literal notranslate"><span class="pre">PBE</span> <span class="pre">Nd_3</span></code>, <code class="docutils literal notranslate"><span class="pre">PBE</span> <span class="pre">Ni_pv</span></code> and <code class="docutils literal notranslate"><span class="pre">PBE</span> <span class="pre">O</span></code> pseudo potentials are used. Here we make sure that the Kohn-Sham eigenstates are converged well (rms), meaning performing quite a few extra SCF steps here by setting <code class="docutils literal notranslate"><span class="pre">NELMIN=30</span></code>. We tell Vasp to create projectors for the Ni-<span class="math notranslate nohighlight">\(d\)</span> shell by setting the INCAR flag
-<code class="docutils literal notranslate"><span class="pre">LOCPROJ</span> <span class="pre">=</span> <span class="pre">LOCPROJ</span> <span class="pre">=</span> <span class="pre">3</span> <span class="pre">4</span> <span class="pre">:</span> <span class="pre">d</span> <span class="pre">:</span> <span class="pre">Pr</span></code>. More information can be found on the <a class="reference external" href="https://triqs.github.io/dft_tools/unstable/guide/conv_vasp.html" rel="noopener noreferrer" target="_blank">DFTTools webpage of the Vasp converter</a>.</p>
-<p>Let’s run Vasp with</p>
+<p>We start by running Vasp to create the raw projectors. The <a class="reference external" href="INCAR" rel="noopener noreferrer" target="_blank">INCAR</a>, <a class="reference external" href="POSCAR" rel="noopener noreferrer" target="_blank">POSCAR</a>, and <a class="reference external" href="KPOINTS" rel="noopener noreferrer" target="_blank">KPOINTS</a> file are kept relatively simple. For the POTCAR the <code class="docutils literal notranslate"><span class="pre">PBE</span> <span class="pre">Nd_3</span></code>, <code class="docutils literal notranslate"><span class="pre">PBE</span> <span class="pre">Ni_pv</span></code> and <code class="docutils literal notranslate"><span class="pre">PBE</span> <span class="pre">O</span></code> pseudo potentials are used. Here we make sure that the Kohn-Sham eigenstates are well converged (rms), by performing a few extra SCF steps by setting <code class="docutils literal notranslate"><span class="pre">NELMIN=30</span></code>. Then, the INCAR flag <code class="docutils literal notranslate"><span class="pre">LOCPROJ</span> <span class="pre">=</span> <span class="pre">LOCPROJ</span> <span class="pre">=</span> <span class="pre">3</span> <span class="pre">4</span> <span class="pre">:</span> <span class="pre">d</span> <span class="pre">:</span> <span class="pre">Pr</span></code> instructs Vasp to create projectors for the Ni-<span class="math notranslate nohighlight">\(d\)</span>
+shell of the two Ni sties. More information can be found on the <a class="reference external" href="https://triqs.github.io/dft_tools/unstable/guide/conv_vasp.html" rel="noopener noreferrer" target="_blank">DFTTools webpage of the Vasp converter</a>.</p>
+<p>Next, run Vasp with</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mpirun</span> <span class="n">vasp_std</span> <span class="mi">1</span><span class="o">&gt;</span><span class="n">out</span><span class="o">.</span><span class="n">vasp</span> <span class="mi">2</span><span class="o">&gt;</span><span class="n">err</span><span class="o">.</span><span class="n">vasp</span> <span class="o">&amp;</span>
 </pre></div>
 </div>
 <p>and monitor the output. After Vasp is finished the result should look like this:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="o">!</span>tail -n <span class="m">10</span> out.vasp
+<span></span><span class="o">!</span>tail -n <span class="m">10</span> ref/out.vasp
 </pre></div>
 </div>
 </div>
@@ -583,11 +592,11 @@ DAV:  31    -0.569483098573E+02   -0.92768E-10    0.34212E-12 29024   0.218E-08
 </div>
 <p>let us take a look at the density of states from Vasp:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">vasprun</span> <span class="o">=</span> <span class="n">vio</span><span class="o">.</span><span class="n">Vasprun</span><span class="p">(</span><span class="s1">&#39;vasprun.xml&#39;</span><span class="p">)</span>
+<span></span><span class="n">vasprun</span> <span class="o">=</span> <span class="n">vio</span><span class="o">.</span><span class="n">Vasprun</span><span class="p">(</span><span class="n">path</span><span class="o">+</span><span class="s1">&#39;/vasprun.xml&#39;</span><span class="p">)</span>
 <span class="n">dos</span> <span class="o">=</span> <span class="n">vasprun</span><span class="o">.</span><span class="n">complete_dos</span>
 <span class="n">Ni_spd_dos</span> <span class="o">=</span> <span class="n">dos</span><span class="o">.</span><span class="n">get_element_spd_dos</span><span class="p">(</span><span class="s2">&quot;Ni&quot;</span><span class="p">)</span>
 <span class="n">O_spd_dos</span> <span class="o">=</span> <span class="n">dos</span><span class="o">.</span><span class="n">get_element_spd_dos</span><span class="p">(</span><span class="s2">&quot;O&quot;</span><span class="p">)</span>
@@ -596,7 +605,7 @@ DAV:  31    -0.569483098573E+02   -0.92768E-10    0.34212E-12 29024   0.218E-08
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -621,7 +630,7 @@ DAV:  31    -0.569483098573E+02   -0.92768E-10    0.34212E-12 29024   0.218E-08
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_NNO_os_plo_mag_tutorial_7_0.png" src="../../_images/tutorials_NNO_os_plo_mag_tutorial_7_0.png" />
+<img alt="../../_images/tutorials_NNO_os_plo_mag_tutorial_8_0.png" src="../../_images/tutorials_NNO_os_plo_mag_tutorial_8_0.png" />
 </div>
 </div>
 <p>We see that the Ni-<span class="math notranslate nohighlight">\(d\)</span> states are entangled / hybridizing with O-<span class="math notranslate nohighlight">\(p\)</span> states and Nd-<span class="math notranslate nohighlight">\(d\)</span> states in the energy range between -9 and 9 eV. Hence, we orthonormalize our projectors considering all states in this energy window to create well localized real-space states. These projectors will be indeed quite similar to the internal DFT+<span class="math notranslate nohighlight">\(U\)</span> projectors used in VASP due to the large energy window.</p>
@@ -630,11 +639,11 @@ DAV:  31    -0.569483098573E+02   -0.92768E-10    0.34212E-12 29024   0.218E-08
 <h2>2. Creating the hdf5 archive / DMFT input<a class="headerlink" href="#2.-Creating-the-hdf5-archive-/-DMFT-input" title="Permalink to this headline">¶</a></h2>
 <p>Next we run the <a class="reference external" href="https://triqs.github.io/dft_tools/unstable/guide/conv_vasp.html" rel="noopener noreferrer" target="_blank">Vasp converter</a> to create an input h5 archive for solid_dmft. The <a class="reference external" href="plo.cfg" rel="noopener noreferrer" target="_blank">plo.cfg</a> looks like this:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="o">!</span>cat plo.cfg
+<span></span><span class="o">!</span>cat ref/plo.cfg
 </pre></div>
 </div>
 </div>
@@ -643,35 +652,19 @@ DAV:  31    -0.569483098573E+02   -0.92768E-10    0.34212E-12 29024   0.218E-08
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[General]
-BASENAME = nno
-
-[Group 1]
-SHELLS = 1
-NORMALIZE = True
-NORMION = False
-EWINDOW = -10 10
-
-[Shell 1]
-LSHELL = 2
-IONS = 3 4
-TRANSFORM = 0.0  0.0  0.0  0.0  1.0
-            0.0  1.0  0.0  0.0  0.0
-            0.0  0.0  1.0  0.0  0.0
-            0.0  0.0  0.0  1.0  0.0
-            1.0  0.0  0.0  0.0  0.0
+cat: ref/plo.cfg: No such file or directory
 </pre></div></div>
 </div>
 <p>we create <span class="math notranslate nohighlight">\(d\)</span> like projectors within a large energy window from -10 to 10 eV for very localized states for both Ni sites. Important: the sites are markes as non equivalent, so that we can later have different spin orientations on them. The flag <code class="docutils literal notranslate"><span class="pre">TRANSFORM</span></code> swaps the <span class="math notranslate nohighlight">\(d_{xy}\)</span> and <span class="math notranslate nohighlight">\(d_{x^2 - y^2}\)</span> orbitals, since the orientation in the unit cell of the oxygen bonds is rotated by 45 degreee. Vasp always performs projections in a global cartesian coordinate frame, so one has to
 rotate the orbitals manually with the octahedra orientation.</p>
 <p>Let’s run the converter:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="c1"># Generate and store PLOs</span>
-<span class="n">plo_converter</span><span class="o">.</span><span class="n">generate_and_output_as_text</span><span class="p">(</span><span class="s1">&#39;plo.cfg&#39;</span><span class="p">,</span> <span class="n">vasp_dir</span><span class="o">=</span><span class="s1">&#39;./&#39;</span><span class="p">)</span>
+<span class="n">plo_converter</span><span class="o">.</span><span class="n">generate_and_output_as_text</span><span class="p">(</span><span class="s1">&#39;plo.cfg&#39;</span><span class="p">,</span> <span class="n">vasp_dir</span><span class="o">=</span><span class="n">path</span><span class="p">)</span>
 
 <span class="c1"># run the archive creat routine</span>
 <span class="n">conv</span> <span class="o">=</span> <span class="n">VaspConverter</span><span class="p">(</span><span class="s1">&#39;nno&#39;</span><span class="p">)</span>
@@ -702,6 +695,8 @@ Read parameters:
 
     Total number of k-points: 405
   No tetrahedron data found in IBZKPT. Skipping...
+!!! WARNING !!!: Error reading from EIGENVAL, trying LOCPROJ
+!!! WARNING !!!: Error reading from Efermi from DOSCAR, trying LOCPROJ
 eigvals from LOCPROJ
 
   Unorthonormalized density matrices and overlaps:
@@ -807,13 +802,13 @@ research article <a class="reference external" href="https://doi.org/10.1103/Phy
 <p>now we run the calculation at around 290 K, which should be below the ordering temperature of NdNiO2 in DMFT. The config file <a class="reference external" href="config.ini" rel="noopener noreferrer" target="_blank">config.ini</a> for solid_dmft looks like this:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">general</span><span class="p">]</span>
 <span class="n">seedname</span> <span class="o">=</span> <span class="n">nno</span>
-<span class="n">jobname</span> <span class="o">=</span> <span class="n">NNO_lowT</span>
+<span class="n">jobname</span> <span class="o">=</span> <span class="n">NNO_AFM</span>
 
 <span class="n">block_threshold</span> <span class="o">=</span> <span class="mf">0.001</span>
 
 <span class="n">solver_type</span> <span class="o">=</span> <span class="n">cthyb</span>
 <span class="n">n_iw</span> <span class="o">=</span> <span class="mi">8001</span>
-<span class="n">n_tau</span> <span class="o">=</span> <span class="mi">40001</span>
+<span class="n">n_tau</span> <span class="o">=</span> <span class="mi">50001</span>
 
 <span class="n">prec_mu</span> <span class="o">=</span> <span class="mf">0.001</span>
 
@@ -856,7 +851,7 @@ research article <a class="reference external" href="https://doi.org/10.1103/Phy
 <li><code class="docutils literal notranslate"><span class="pre">magnetic=True</span></code> lift spin degeneracy</li>
 <li><code class="docutils literal notranslate"><span class="pre">magmom</span></code> here we specify the magnetic order. Here, we say that both Ni sites have the same spin, which should average to 0 at this high temperature. The magnetic moment is specified in units of the DC potential. Hence, small values should be chosen.</li>
 <li><code class="docutils literal notranslate"><span class="pre">afm_order=True</span></code> tells solid_dmft to not solve impurities with the same <code class="docutils literal notranslate"><span class="pre">magmom</span></code> but rather copy the self-energy and if necessary flip the spin accordingly</li>
-<li><code class="docutils literal notranslate"><span class="pre">length_cycle=150</span></code> is the length between two Green’s function measurements in cthyb. This number has to be choosen carefully to give an autocorrelation time &lt;1</li>
+<li><code class="docutils literal notranslate"><span class="pre">length_cycle=150</span></code> is the length between two Green’s function measurements in cthyb. This number has to be choosen carefully to give an autocorrelation time &lt;1 for all orbitals</li>
 <li><code class="docutils literal notranslate"><span class="pre">perform_tail_fit=True</span></code> : here we use tail fitting to get good high frequency self-energy behavior</li>
 <li><code class="docutils literal notranslate"><span class="pre">measure_density_matrix</span> <span class="pre">=</span> <span class="pre">True</span></code> measures the impurity many-body density matrix in the Fock basis for a multiplet analysis</li>
 </ul>
@@ -879,19 +874,18 @@ research article <a class="reference external" href="https://doi.org/10.1103/Phy
 </div>
 <p>After the calculation is running or is finished we can take a look at the results:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">path</span> <span class="o">=</span> <span class="s1">&#39;./&#39;</span>
-<span class="k">with</span> <span class="n">HDFArchive</span><span class="p">(</span><span class="n">path</span><span class="o">+</span><span class="s1">&#39;NNO_lowT/nno.h5&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ar</span><span class="p">:</span>
+<span></span><span class="k">with</span> <span class="n">HDFArchive</span><span class="p">(</span><span class="n">path</span><span class="o">+</span><span class="s1">&#39;/nno.h5&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ar</span><span class="p">:</span>
     <span class="n">Sigma_iw</span> <span class="o">=</span> <span class="n">ar</span><span class="p">[</span><span class="s1">&#39;DMFT_results/last_iter/Sigma_freq_0&#39;</span><span class="p">]</span>
     <span class="n">obs</span> <span class="o">=</span> <span class="n">ar</span><span class="p">[</span><span class="s1">&#39;DMFT_results/observables&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -927,12 +921,12 @@ research article <a class="reference external" href="https://doi.org/10.1103/Phy
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_NNO_os_plo_mag_tutorial_17_0.png" src="../../_images/tutorials_NNO_os_plo_mag_tutorial_17_0.png" />
+<img alt="../../_images/tutorials_NNO_os_plo_mag_tutorial_18_0.png" src="../../_images/tutorials_NNO_os_plo_mag_tutorial_18_0.png" />
 </div>
 </div>
 <p>Let’s take a look at the self-energy of the two Ni <span class="math notranslate nohighlight">\(e_g\)</span> orbitals:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -957,16 +951,17 @@ research article <a class="reference external" href="https://doi.org/10.1103/Phy
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_NNO_os_plo_mag_tutorial_19_0.png" src="../../_images/tutorials_NNO_os_plo_mag_tutorial_19_0.png" />
+<img alt="../../_images/tutorials_NNO_os_plo_mag_tutorial_20_0.png" src="../../_images/tutorials_NNO_os_plo_mag_tutorial_20_0.png" />
 </div>
 </div>
-<p>We can clearly see that a <span class="math notranslate nohighlight">\(\omega_n=8\)</span> the self-energy is replaced by the tail-fit as specified in the input config file. This cut is rather early, but ensures convergence. For higher sampling rates this has to be changed. We can also nicely observe a splitting of the spin channels indicating a magnetic solution, but we still have a metallic solution with both self-energies approaching 0 for small omega walues.</p>
+<p>We can clearly see that a <span class="math notranslate nohighlight">\(\omega_n=8\)</span> the self-energy is replaced by the tail-fit as specified in the input config file. This cut is rather early, but ensures convergence. For higher sampling rates this has to be changed. We can also nicely observe a splitting of the spin channels indicating a magnetic solution, but we still have a metallic solution with both self-energies approaching 0 for small omega walues. However, the QMC noise is still rather high, especially in the
+<span class="math notranslate nohighlight">\(d_{x^2-y^2}\)</span> orbital.</p>
 </div>
 <div class="section" id="5.-Multiplet-analysis">
 <h2>5. Multiplet analysis<a class="headerlink" href="#5.-Multiplet-analysis" title="Permalink to this headline">¶</a></h2>
 <p>We follow now the triqs/cthyb tutorial on the <a class="reference external" href="https://triqs.github.io/cthyb/unstable/guide/multiplet_analysis_notebook.html" rel="noopener noreferrer" target="_blank">multiplet analysis</a> to analyze the multiplets of the Ni-d orbitals:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -982,11 +977,11 @@ research article <a class="reference external" href="https://doi.org/10.1103/Phy
 </div>
 <p>first we have to load the measured density matrix and the local Hamiltonian of the impurity problem from the h5 archive, which we stored by setting <code class="docutils literal notranslate"><span class="pre">measure_density_matrix=True</span></code> in the config file:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="k">with</span> <span class="n">HDFArchive</span><span class="p">(</span><span class="n">path</span><span class="o">+</span><span class="s1">&#39;bak.NNO_lowT/nno.h5&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ar</span><span class="p">:</span>
+<span></span><span class="k">with</span> <span class="n">HDFArchive</span><span class="p">(</span><span class="n">path</span><span class="o">+</span><span class="s1">&#39;nno.h5&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ar</span><span class="p">:</span>
     <span class="n">rho</span> <span class="o">=</span> <span class="n">ar</span><span class="p">[</span><span class="s1">&#39;DMFT_results/last_iter/full_dens_mat_0&#39;</span><span class="p">]</span>
     <span class="n">h_loc</span> <span class="o">=</span> <span class="n">ar</span><span class="p">[</span><span class="s1">&#39;DMFT_results/last_iter/h_loc_diag_0&#39;</span><span class="p">]</span>
 </pre></div>
@@ -994,7 +989,7 @@ research article <a class="reference external" href="https://doi.org/10.1103/Phy
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">rho</span></code> is just a list of arrays containing the weights of each of the impurity eigenstates (many body states), and <code class="docutils literal notranslate"><span class="pre">h_loc</span></code> is a:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1012,7 +1007,7 @@ research article <a class="reference external" href="https://doi.org/10.1103/Phy
 </div>
 <p>containing the local Hamiltonian of the impurity including eigenstates, eigenvalues etc.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1074,7 +1069,7 @@ research article <a class="reference external" href="https://doi.org/10.1103/Phy
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1088,22 +1083,22 @@ research article <a class="reference external" href="https://doi.org/10.1103/Phy
 <div class="output_area docutils container">
 <div class="highlight"><pre>
     Sub#  EV#   N    energy      prob  m_s  |m_s|                 state
-5      5    0   9  0.331356  0.359575  0.5    0.5   +1.0000|1111101111&gt;
-0      0    0   8  0.000000  0.156004  1.0    1.0   +1.0000|1111101011&gt;
-2      2    0   9  0.241295  0.053509  0.5    0.5   +1.0000|1111111011&gt;
-25    25    0   8  1.147767  0.048450  0.0    0.0   +1.0000|1101101111&gt;
-40    40    0   8  1.629801  0.041584  1.0    1.0   +1.0000|1111101110&gt;
-55    55    0  10  7.059943  0.038929  0.0    0.0   +1.0000|1111111111&gt;
-15    15    0   8  0.637905  0.023181  1.0    1.0   +1.0000|1111101101&gt;
-4      4    0   9  0.331356  0.023174 -0.5    0.5   +1.0000|0111111111&gt;
-50    50    0   8  2.745626  0.023033  0.0    0.0   +1.0000|0111101111&gt;
-14    14    0   8  0.637905  0.022844  1.0    1.0   +1.0000|1111100111&gt;
+5      5    0   9  0.562426  0.341965  0.5    0.5   +1.0000|1111101111&gt;
+0      0    0   8  0.000000  0.160698  1.0    1.0   +1.0000|1111101011&gt;
+3      3    0   9  0.472365  0.057380  0.5    0.5   +1.0000|1111111011&gt;
+25    25    0   8  1.147767  0.048976  0.0    0.0   +1.0000|1101101111&gt;
+40    40    0   8  1.629801  0.041522  1.0    1.0   +1.0000|1111101110&gt;
+55    55    0  10  7.522083  0.038053  0.0    0.0   +1.0000|1111111111&gt;
+4      4    0   9  0.562426  0.028791 -0.5    0.5   +1.0000|0111111111&gt;
+50    50    0   8  2.745626  0.024248  0.0    0.0   +1.0000|0111101111&gt;
+8      8    0   8  0.637905  0.021395  1.0    1.0   +1.0000|1111100111&gt;
+11    11    0   9  0.734944  0.021376 -0.5    0.5   +1.0000|1101111111&gt;
 </pre></div></div>
 </div>
 <p>This table shows the eigenstates of the impurity with the highest weight / occurence probability. Each row shows the state of the system, where the 1/0 indicates if an orbital is occupied. The orbitals are ordered as given in the projectors (dxy, dyz, dz2, dxz, dx2-y2) from right to left, first one spin-channel, then the other. Additionally each row shows the particle sector of the state, the energy, and the <code class="docutils literal notranslate"><span class="pre">m_s</span></code> quantum number.</p>
 <p>It can be seen, that the state with the highest weight is a state with one hole (N=9 electrons) in the <span class="math notranslate nohighlight">\(d_{x^2-y^2, up}\)</span> orbital carrying a spin of <code class="docutils literal notranslate"><span class="pre">0.5</span></code>. The second state in the list is a state with two holes (N=8). One in the <span class="math notranslate nohighlight">\(d_{x^2-y^2, up}\)</span> and one in the <span class="math notranslate nohighlight">\(d_{z^2, up}\)</span> giving a magnetic moment of 1. This is because the impurity occupation is somewhere between 8 and 9. We can also create a nice state histogram from this:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1123,7 +1118,7 @@ research article <a class="reference external" href="https://doi.org/10.1103/Phy
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_NNO_os_plo_mag_tutorial_32_0.png" src="../../_images/tutorials_NNO_os_plo_mag_tutorial_32_0.png" />
+<img alt="../../_images/tutorials_NNO_os_plo_mag_tutorial_33_0.png" src="../../_images/tutorials_NNO_os_plo_mag_tutorial_33_0.png" />
 </div>
 </div>
 <p>This concludes the tutorial. This you can try next:</p>

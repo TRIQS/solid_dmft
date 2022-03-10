@@ -1,11 +1,13 @@
-System  = NiO
+System  = NdNiO2
 
 EDIFF = 1e-10
 ENCUT = 450
+
 NELMIN = 30
 
 ISMEAR = 0
 SIGMA = 0.1
+PREC = Accurate
 
 # the energy window to optimize projector channels
 EMIN = -5
