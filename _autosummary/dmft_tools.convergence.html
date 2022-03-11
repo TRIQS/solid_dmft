@@ -331,23 +331,25 @@ is set</p>
 
 <dl class="py function">
 <dt id="dmft_tools.convergence.max_G_diff">
-<code class="descclassname"><span class="pre">dmft_tools.convergence.</span></code><code class="descname"><span class="pre">max_G_diff</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">G1</span></span></em>, <em><span class="n"><span class="pre">G2</span></span></em>, <em><span class="n"><span class="pre">wg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dmft_tools/convergence.html#max_G_diff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dmft_tools.convergence.max_G_diff" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname"><span class="pre">dmft_tools.convergence.</span></code><code class="descname"><span class="pre">max_G_diff</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">G1</span></span></em>, <em><span class="n"><span class="pre">G2</span></span></em>, <em><span class="n"><span class="pre">norm_temp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dmft_tools/convergence.html#max_G_diff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dmft_tools.convergence.max_G_diff" title="Permalink to this definition">¶</a></dt>
 <dd><p>calculates difference between two block Gfs
-uses numpy linalg norm on the last indices to calculate
-norm at then makes a weighted sum 1/w_i^wg to give more
-weight to smaller frequencies</p>
-<p>sum_k 1/(w_k^wg) sqrt( sum_ij [abs(G1 - G2)_ij(w_k)]^2 )</p>
+uses numpy linalg norm on the last two indices first
+and then the norm along the mesh axis. The result is divided
+by sqrt(beta) for MeshImFreq and by sqrt(beta/#taupoints) for
+MeshImTime.</p>
+<p>1/ (2* sqrt(beta)) sqrt( sum_n sum_ij [abs(G1 - G2)_ij(w_n)]^2 )</p>
 <p>this is only done for MeshImFreq Gf objects, for all other
 meshes the weights are set to 1</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>G1</strong> : block Gf 1 to compare</p>
-<p><strong>G2</strong> : block Gf 2 to compare</p>
-<p><strong>wg: float, default = 0.5</strong> :</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>G1</strong> : Gf or BlockGf to compare</p>
+<p><strong>G2</strong> : Gf or BlockGf to compare</p>
+<p><strong>norm_temp: bool, default = True</strong> :</p>
 <blockquote>
-<div><p>weight for scaling with frequency</p>
+<div><p>divide by an additional sqrt(beta) to account for temperature scaling
+only correct for uniformly distributed error.</p>
 </div></blockquote>
 <p><strong>__Returns:__</strong> :</p>
 <p><strong>diff</strong> : float</p>

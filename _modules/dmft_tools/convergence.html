@@ -250,7 +250,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="c1"># triqs</span>
-<span class="kn">from</span> <span class="nn">triqs.gf</span> <span class="kn">import</span> <span class="n">MeshImFreq</span>
+<span class="kn">from</span> <span class="nn">triqs.gf</span> <span class="kn">import</span> <span class="n">MeshImFreq</span><span class="p">,</span> <span class="n">MeshImTime</span><span class="p">,</span> <span class="n">MeshReFreq</span><span class="p">,</span> <span class="n">BlockGf</span><span class="p">,</span> <span class="n">make_zero_tail</span>
 
 <span class="k">def</span> <span class="nf">_generate_header</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -328,45 +328,68 @@
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">obs_file</span><span class="p">:</span>
             <span class="n">obs_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="max_G_diff"><a class="viewcode-back" href="../../_autosummary/dmft_tools.convergence.html#dmft_tools.convergence.max_G_diff">[docs]</a><span class="k">def</span> <span class="nf">max_G_diff</span><span class="p">(</span><span class="n">G1</span><span class="p">,</span> <span class="n">G2</span><span class="p">,</span> <span class="n">wg</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">):</span>
+<div class="viewcode-block" id="max_G_diff"><a class="viewcode-back" href="../../_autosummary/dmft_tools.convergence.html#dmft_tools.convergence.max_G_diff">[docs]</a><span class="k">def</span> <span class="nf">max_G_diff</span><span class="p">(</span><span class="n">G1</span><span class="p">,</span> <span class="n">G2</span><span class="p">,</span> <span class="n">norm_temp</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    calculates difference between two block Gfs</span>
-<span class="sd">    uses numpy linalg norm on the last indices to calculate</span>
-<span class="sd">    norm at then makes a weighted sum 1/w_i^wg to give more</span>
-<span class="sd">    weight to smaller frequencies</span>
+<span class="sd">    uses numpy linalg norm on the last two indices first</span>
+<span class="sd">    and then the norm along the mesh axis. The result is divided</span>
+<span class="sd">    by sqrt(beta) for MeshImFreq and by sqrt(beta/#taupoints) for</span>
+<span class="sd">    MeshImTime.</span>
 
-<span class="sd">    sum_k 1/(w_k^wg) sqrt( sum_ij [abs(G1 - G2)_ij(w_k)]^2 )</span>
+<span class="sd">    1/ (2* sqrt(beta)) sqrt( sum_n sum_ij [abs(G1 - G2)_ij(w_n)]^2 )</span>
 
 <span class="sd">    this is only done for MeshImFreq Gf objects, for all other</span>
 <span class="sd">    meshes the weights are set to 1</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    G1 : block Gf 1 to compare</span>
+<span class="sd">    G1 : Gf or BlockGf to compare</span>
 
-<span class="sd">    G2 : block Gf 2 to compare</span>
+<span class="sd">    G2 : Gf or BlockGf to compare</span>
 
-<span class="sd">    wg: float, default = 0.5</span>
-<span class="sd">        weight for scaling with frequency</span>
+<span class="sd">    norm_temp: bool, default = True</span>
+<span class="sd">       divide by an additional sqrt(beta) to account for temperature scaling</span>
+<span class="sd">       only correct for uniformly distributed error.</span>
 
 <span class="sd">    __Returns:__</span>
 
 <span class="sd">    diff : float</span>
 <span class="sd">           difference between the two Gfs</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">diff</span> <span class="o">=</span> <span class="mf">0.0</span>
-    <span class="k">for</span> <span class="n">block</span><span class="p">,</span> <span class="n">gf</span> <span class="ow">in</span> <span class="n">G1</span><span class="p">:</span>
-        <span class="c1">#  calculate norm over all axis but the first one which are frequencies</span>
-        <span class="n">norm</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">G1</span><span class="p">[</span><span class="n">block</span><span class="p">]</span><span class="o">.</span><span class="n">data</span> <span class="o">-</span> <span class="n">G2</span><span class="p">[</span><span class="n">block</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">G1</span><span class="p">[</span><span class="n">block</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ndim</span><span class="p">))))</span>
-        <span class="c1"># scale by frequencies (change factor wg to something to scale different)</span>
-        <span class="c1"># for Matsubara Gfs this gives more weight to smaller frequencies</span>
-        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">G1</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span> <span class="ow">is</span> <span class="n">MeshImFreq</span><span class="p">:</span>
-            <span class="n">w_scal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">abs</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">value</span><span class="p">)</span><span class="o">**</span><span class="n">wg</span><span class="p">))</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">G1</span><span class="o">.</span><span class="n">mesh</span><span class="p">])</span>
-            <span class="n">diff</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">norm</span><span class="p">,</span> <span class="n">w_scal</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">diff</span> <span class="o">+=</span> <span class="n">norm</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 
-    <span class="k">return</span> <span class="n">diff</span></div>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">G1</span><span class="p">,</span> <span class="n">BlockGf</span><span class="p">):</span>
+        <span class="n">diff</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">for</span> <span class="n">block</span><span class="p">,</span> <span class="n">gf</span> <span class="ow">in</span> <span class="n">G1</span><span class="p">:</span>
+            <span class="n">diff</span> <span class="o">+=</span> <span class="n">max_G_diff</span><span class="p">(</span><span class="n">G1</span><span class="p">[</span><span class="n">block</span><span class="p">],</span> <span class="n">G2</span><span class="p">[</span><span class="n">block</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">diff</span>
+
+    <span class="k">assert</span> <span class="n">G1</span><span class="o">.</span><span class="n">mesh</span> <span class="o">==</span> <span class="n">G2</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="s1">&#39;mesh of two input Gfs does not match&#39;</span>
+    <span class="k">assert</span> <span class="n">G1</span><span class="o">.</span><span class="n">target_shape</span> <span class="o">==</span> <span class="n">G2</span><span class="o">.</span><span class="n">target_shape</span><span class="p">,</span> <span class="s1">&#39;can only compare Gfs with same shape&#39;</span>
+
+    <span class="c1"># subtract largest real value to make sure that G1-G2 falls off to 0</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">G1</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span> <span class="ow">is</span> <span class="n">MeshImFreq</span><span class="p">:</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">G1</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">real</span> <span class="o">-</span> <span class="n">G2</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">real</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="c1">#  calculate norm over all axis but the first one which are frequencies</span>
+    <span class="n">norm_grid</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">G1</span><span class="o">.</span><span class="n">data</span> <span class="o">-</span> <span class="n">G2</span><span class="o">.</span><span class="n">data</span> <span class="o">-</span> <span class="n">offset</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">G1</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ndim</span><span class="p">))))</span>
+    <span class="c1"># now calculate Frobenius norm over grid points</span>
+    <span class="n">norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">norm_grid</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">G1</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span> <span class="ow">is</span> <span class="n">MeshImFreq</span><span class="p">:</span>
+        <span class="n">norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">norm_grid</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">G1</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">beta</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">G1</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span> <span class="ow">is</span> <span class="n">MeshImTime</span><span class="p">:</span>
+        <span class="n">norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">norm_grid</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">G1</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">beta</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">G1</span><span class="o">.</span><span class="n">mesh</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">G1</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span> <span class="ow">is</span> <span class="n">MeshReFreq</span><span class="p">:</span>
+        <span class="n">norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">norm_grid</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">G1</span><span class="o">.</span><span class="n">mesh</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;MeshReTime is not implemented&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">G1</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span> <span class="ow">is</span> <span class="n">MeshImFreq</span> <span class="ow">or</span> <span class="n">MeshImTime</span> <span class="ow">and</span> <span class="n">norm_temp</span><span class="p">:</span>
+        <span class="n">norm</span> <span class="o">=</span> <span class="n">norm</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">G1</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">beta</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">norm</span></div>
 
 <div class="viewcode-block" id="prep_conv_obs"><a class="viewcode-back" href="../../_autosummary/dmft_tools.convergence.html#dmft_tools.convergence.prep_conv_obs">[docs]</a><span class="k">def</span> <span class="nf">prep_conv_obs</span><span class="p">(</span><span class="n">h5_archive</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -489,8 +512,6 @@
             <span class="n">conv_obs</span><span class="p">[</span><span class="s1">&#39;d_orb_occ&#39;</span><span class="p">][</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">observables</span><span class="p">[</span><span class="s1">&#39;orb_occ&#39;</span><span class="p">][</span><span class="n">icrsh</span><span class="p">][</span><span class="s1">&#39;ud&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span>
                                                     <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="n">icrsh</span><span class="p">][</span><span class="s1">&#39;ud&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">2</span><span class="p">]))</span>
 
-        <span class="c1"># difference for Gimp - Gloc calculate as sum of elements of the norm per freq</span>
-        <span class="c1"># sum( ||Gimp(w)-Gloc(w)||  ) (norm calculated for each w on the orbital indices)</span>
         <span class="n">conv_obs</span><span class="p">[</span><span class="s1">&#39;d_Gimp&#39;</span><span class="p">][</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">max_G_diff</span><span class="p">(</span><span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">G_freq</span><span class="p">,</span> <span class="n">G_loc_all</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]))</span>
         <span class="n">conv_obs</span><span class="p">[</span><span class="s1">&#39;d_G0&#39;</span><span class="p">][</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">max_G_diff</span><span class="p">(</span><span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">G0_freq</span><span class="p">,</span> <span class="n">G0_old</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]))</span>
         <span class="n">conv_obs</span><span class="p">[</span><span class="s1">&#39;d_Sigma&#39;</span><span class="p">][</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">max_G_diff</span><span class="p">(</span><span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">Sigma_freq</span><span class="p">,</span> <span class="n">Sigma_freq_previous</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]))</span>
