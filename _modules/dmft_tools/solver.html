@@ -250,7 +250,6 @@
 <span class="kn">from</span> <span class="nn">triqs.gf.descriptors</span> <span class="kn">import</span> <span class="n">Fourier</span>
 <span class="kn">from</span> <span class="nn">triqs.operators</span> <span class="kn">import</span> <span class="n">c_dag</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">Operator</span>
 <span class="kn">import</span> <span class="nn">triqs.utility.mpi</span> <span class="k">as</span> <span class="nn">mpi</span>
-<span class="kn">from</span> <span class="nn">triqs_dft_tools.block_structure</span> <span class="kn">import</span> <span class="n">gf_struct_flatten</span>
 <span class="kn">from</span> <span class="nn">h5</span> <span class="kn">import</span> <span class="n">HDFArchive</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">legendre_filter</span>
@@ -750,7 +749,7 @@
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="kn">from</span> <span class="nn">triqs_cthyb.solver</span> <span class="kn">import</span> <span class="n">Solver</span> <span class="k">as</span> <span class="n">cthyb_solver</span>
 
-        <span class="n">gf_struct</span> <span class="o">=</span> <span class="n">gf_struct_flatten</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sum_k</span><span class="o">.</span><span class="n">gf_struct_solver_list</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">icrsh</span><span class="p">])</span>
+        <span class="n">gf_struct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sum_k</span><span class="o">.</span><span class="n">gf_struct_solver_list</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">icrsh</span><span class="p">]</span>
         <span class="c1"># Construct the triqs_solver instances</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_params</span><span class="p">[</span><span class="s1">&#39;measure_G_l&#39;</span><span class="p">]:</span>
             <span class="n">triqs_solver</span> <span class="o">=</span> <span class="n">cthyb_solver</span><span class="p">(</span><span class="n">beta</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">],</span> <span class="n">gf_struct</span><span class="o">=</span><span class="n">gf_struct</span><span class="p">,</span>
@@ -769,7 +768,7 @@
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="kn">from</span> <span class="nn">triqs_ctint</span> <span class="kn">import</span> <span class="n">Solver</span> <span class="k">as</span> <span class="n">ctint_solver</span>
 
-        <span class="n">gf_struct</span> <span class="o">=</span> <span class="n">gf_struct_flatten</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sum_k</span><span class="o">.</span><span class="n">gf_struct_solver_list</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">icrsh</span><span class="p">])</span>
+        <span class="n">gf_struct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sum_k</span><span class="o">.</span><span class="n">gf_struct_solver_list</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">icrsh</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;h_int_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;dynamic&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">U_iw</span> <span class="o">=</span> <span class="kc">None</span>
@@ -795,7 +794,7 @@
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="kn">from</span> <span class="nn">triqs_hubbardI</span> <span class="kn">import</span> <span class="n">Solver</span> <span class="k">as</span> <span class="n">hubbardI_solver</span>
 
-        <span class="n">gf_struct</span> <span class="o">=</span>  <span class="n">gf_struct_flatten</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sum_k</span><span class="o">.</span><span class="n">gf_struct_solver_list</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">icrsh</span><span class="p">])</span>
+        <span class="n">gf_struct</span> <span class="o">=</span>  <span class="bp">self</span><span class="o">.</span><span class="n">sum_k</span><span class="o">.</span><span class="n">gf_struct_solver_list</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">icrsh</span><span class="p">]</span>
         <span class="c1"># Construct the triqs_solver instances</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_params</span><span class="p">[</span><span class="s1">&#39;measure_G_l&#39;</span><span class="p">]:</span>
             <span class="n">triqs_solver</span> <span class="o">=</span> <span class="n">hubbardI_solver</span><span class="p">(</span><span class="n">beta</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">],</span> <span class="n">gf_struct</span><span class="o">=</span><span class="n">gf_struct</span><span class="p">,</span>
@@ -834,7 +833,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">n_w_b_nn</span> <span class="o">=</span> <span class="mi">1001</span>
 
-        <span class="n">gf_struct</span> <span class="o">=</span> <span class="n">gf_struct_flatten</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sum_k</span><span class="o">.</span><span class="n">gf_struct_solver_list</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">icrsh</span><span class="p">])</span>
+        <span class="n">gf_struct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sum_k</span><span class="o">.</span><span class="n">gf_struct_solver_list</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">icrsh</span><span class="p">]</span>
         <span class="c1"># Construct the triqs_solver instances</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_params</span><span class="p">[</span><span class="s1">&#39;measure_gl&#39;</span><span class="p">]:</span>
             <span class="n">triqs_solver</span> <span class="o">=</span> <span class="n">ctseg_solver</span><span class="p">(</span><span class="n">beta</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">],</span> <span class="n">gf_struct</span><span class="o">=</span><span class="n">gf_struct</span><span class="p">,</span>
@@ -869,7 +868,7 @@
             <span class="n">calc_me</span> <span class="o">=</span> <span class="p">[[</span><span class="sa">f</span><span class="s1">&#39;ud_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span> <span class="ow">in</span> <span class="n">product</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">))]</span>
 
         <span class="c1"># create solver</span>
-        <span class="n">triqs_solver</span> <span class="o">=</span> <span class="n">ftps</span><span class="o">.</span><span class="n">Solver</span><span class="p">(</span><span class="n">gf_struct</span><span class="o">=</span><span class="n">gf_struct_flatten</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gf_struct</span><span class="p">),</span> <span class="n">nw</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;n_w&#39;</span><span class="p">],</span>
+        <span class="n">triqs_solver</span> <span class="o">=</span> <span class="n">ftps</span><span class="o">.</span><span class="n">Solver</span><span class="p">(</span><span class="n">gf_struct</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gf_struct</span><span class="p">,</span> <span class="n">nw</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;n_w&#39;</span><span class="p">],</span>
                                    <span class="n">wmin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;w_range&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">wmax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;w_range&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
 
 
