@@ -29,7 +29,7 @@ import os.path
 import numpy as np
 
 # triqs
-from triqs.gf import MeshImFreq
+from triqs.gf import MeshImFreq, MeshImTime, MeshReFreq, BlockGf, make_zero_tail
 
 def _generate_header(general_params, sum_k):
     """
@@ -107,45 +107,68 @@ def write_conv(conv_obs, sum_k, general_params):
         with open(file_name, 'a') as obs_file:
             obs_file.write(line + '\n')
 
-def max_G_diff(G1, G2, wg = 0.5):
+def max_G_diff(G1, G2, norm_temp = True):
     """
     calculates difference between two block Gfs
-    uses numpy linalg norm on the last indices to calculate
-    norm at then makes a weighted sum 1/w_i^wg to give more
-    weight to smaller frequencies
+    uses numpy linalg norm on the last two indices first
+    and then the norm along the mesh axis. The result is divided
+    by sqrt(beta) for MeshImFreq and by sqrt(beta/#taupoints) for
+    MeshImTime.
 
-    sum_k 1/(w_k^wg) sqrt( sum_ij [abs(G1 - G2)_ij(w_k)]^2 )
+    1/ (2* sqrt(beta)) sqrt( sum_n sum_ij [abs(G1 - G2)_ij(w_n)]^2 )
 
     this is only done for MeshImFreq Gf objects, for all other
     meshes the weights are set to 1
 
     Parameters
     ----------
-    G1 : block Gf 1 to compare
+    G1 : Gf or BlockGf to compare
 
-    G2 : block Gf 2 to compare
+    G2 : Gf or BlockGf to compare
 
-    wg: float, default = 0.5
-        weight for scaling with frequency
+    norm_temp: bool, default = True
+       divide by an additional sqrt(beta) to account for temperature scaling
+       only correct for uniformly distributed error.
 
     __Returns:__
 
     diff : float
            difference between the two Gfs
     """
-    diff = 0.0
-    for block, gf in G1:
-        #  calculate norm over all axis but the first one which are frequencies
-        norm = abs(np.linalg.norm(G1[block].data - G2[block].data,axis=tuple(range(1, G1[block].data.ndim))))
-        # scale by frequencies (change factor wg to something to scale different)
-        # for Matsubara Gfs this gives more weight to smaller frequencies
-        if type(G1.mesh) is MeshImFreq:
-            w_scal = np.array([abs(1/(abs(w.value)**wg)) for w in G1.mesh])
-            diff += np.dot(norm, w_scal)
-        else:
-            diff += norm.sum()
 
-    return diff
+    if isinstance(G1, BlockGf):
+        diff = 0.0
+        for block, gf in G1:
+            diff += max_G_diff(G1[block], G2[block])
+        return diff
+
+    assert G1.mesh == G2.mesh, 'mesh of two input Gfs does not match'
+    assert G1.target_shape == G2.target_shape, 'can only compare Gfs with same shape'
+
+    # subtract largest real value to make sure that G1-G2 falls off to 0
+    if type(G1.mesh) is MeshImFreq:
+        offset = np.diag(np.diag(G1.data[-1,:,:].real - G2.data[-1,:,:].real))
+    else:
+        offset = 0.0
+
+    #  calculate norm over all axis but the first one which are frequencies
+    norm_grid = abs(np.linalg.norm(G1.data - G2.data - offset, axis=tuple(range(1, G1.data.ndim))))
+    # now calculate Frobenius norm over grid points
+    norm = np.linalg.norm(norm_grid, axis=0)
+
+    if type(G1.mesh) is MeshImFreq:
+        norm = np.linalg.norm(norm_grid, axis=0) / np.sqrt(G1.mesh.beta)
+    elif type(G1.mesh) is MeshImTime:
+        norm = np.linalg.norm(norm_grid, axis=0) * np.sqrt(G1.mesh.beta/len(G1.mesh))
+    elif type(G1.mesh) is MeshReFreq:
+        norm = np.linalg.norm(norm_grid, axis=0) / np.sqrt(len(G1.mesh))
+    else:
+        raise ValueError('MeshReTime is not implemented')
+
+    if type(G1.mesh) is MeshImFreq or MeshImTime and norm_temp:
+        norm = norm / np.sqrt(G1.mesh.beta)
+
+    return norm
 
 def prep_conv_obs(h5_archive, sum_k):
     """
@@ -268,8 +291,6 @@ def calc_convergence_quantities(sum_k, general_params, conv_obs, observables,
             conv_obs['d_orb_occ'][icrsh].append(abs(observables['orb_occ'][icrsh]['ud'][-1]+
                                                     observables['imp_occ'][icrsh]['ud'][-2]))
 
-        # difference for Gimp - Gloc calculate as sum of elements of the norm per freq
-        # sum( ||Gimp(w)-Gloc(w)||  ) (norm calculated for each w on the orbital indices)
         conv_obs['d_Gimp'][icrsh].append(max_G_diff(solvers[icrsh].G_freq, G_loc_all[icrsh]))
         conv_obs['d_G0'][icrsh].append(max_G_diff(solvers[icrsh].G0_freq, G0_old[icrsh]))
         conv_obs['d_Sigma'][icrsh].append(max_G_diff(solvers[icrsh].Sigma_freq, Sigma_freq_previous[icrsh]))
