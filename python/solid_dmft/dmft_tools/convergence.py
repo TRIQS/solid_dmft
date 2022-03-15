@@ -165,7 +165,7 @@ def max_G_diff(G1, G2, norm_temp = True):
     else:
         raise ValueError('MeshReTime is not implemented')
 
-    if type(G1.mesh) is MeshImFreq or MeshImTime and norm_temp:
+    if type(G1.mesh) in (MeshImFreq, MeshImTime) and norm_temp:
         norm = norm / np.sqrt(G1.mesh.beta)
 
     return norm
