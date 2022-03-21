@@ -91,7 +91,7 @@
     "\n",
     "The script will produce a heatmap image of the value of G(beta/2) for each pair of U and J. The white area corresponds to the Mott insulating state.\n",
     "\n",
-    "![alt text](./results/MIT_transition.jpg \"Coarser grid\")\n",
+    "![coarsegrid](./results/MIT_transition.jpg \"Coarser grid\")\n",
     "\n",
     "Do you notice anything strange? (hint: look at the bottom right corner and check the output file `observables_imp0.dat` for U = 2 J=1.0. )\n",
     "\n",
@@ -110,7 +110,7 @@
     "\n",
     "The result is also visible here:\n",
     "\n",
-    "![alt text](./results/MIT_transition_fine.jpg \"Finer grid\")\n",
+    "![finegrid](./results/MIT_transition_fine.jpg \"finegrid\")\n",
     "\n"
    ]
   },
@@ -130,7 +130,7 @@
     "`python3 read_spectral_function.py`\n",
     "\n",
     "\n",
-    "![alt text](./results/A_func_J=0.0_U=4.25.jpg \"Finer grid\")\n",
+    "![afunc](./results/A_func_J=0.0_U=4.25.jpg \"afunc\")\n",
     "\n",
     "\n",
     "Take care to edit the values of J and U in the python file. What is happing to the spectral function (density of states) as one cranks U up?\n",
@@ -151,7 +151,7 @@
     "python3 read_spectral_function_transition.py\n",
     "```\n",
     "\n",
-    "![alt text](./results/A_func_transition.jpg \"Finer grid\")\n",
+    "![transition](./results/A_func_transition.jpg \"transition\")\n",
     "\n",
     "\n"
    ]
