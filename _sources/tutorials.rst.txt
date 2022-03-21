@@ -16,6 +16,7 @@ These tutorials provide an overview about typical workflows to perform DFT+DMFT 
 
 .. toctree::
     :maxdepth: 2
+
     tutorials/SVO_os_qe/tutorial
     tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial
     tutorials/Ce2O3_csc_w90/tutorial
