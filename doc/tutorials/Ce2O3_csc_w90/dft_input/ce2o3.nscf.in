@@ -1,12 +1,12 @@
 &control
-   calculation        = 'scf',
-   restart_mode       = 'restart',
-   wf_collect         = .false.,
+   calculation        = 'nscf',
+   wf_collect         = .true.,
    prefix             = 'ce2o3_soliddmft', 
    tstress            = .true., 
    tprnfor            = .true., 
-   pseudo_dir         = '../pseudo/',
-   outdir             = '../QE_tmp/',
+   verbosity          = 'high',
+   pseudo_dir         = 'pseudo/',
+   outdir             = 'QE_tmp/',
 / 
 &system 
    ibrav              = 0,
@@ -18,18 +18,15 @@
    occupations        = 'smearing',
    degauss            = 0.01,
    smearing           = 'm-p',
-   nbnd               = 50
-   dmft               = .true.
-   dmft_prefix        = 'ce2o3',
+   nbnd               = 50,
+   dmft               = .true.,
    nosym              = .true.
 / 
 &electrons 
-   electron_maxstep   = 1,
-   conv_thr           = 1.0d-8,
-   mixing_beta        = 0.3,
+   conv_thr           = 1.0d-6,
+   mixing_beta        = 0.7,
    mixing_mode        = 'local-TF'
    startingpot        = 'file',
-   startingwfc        = 'file',
 /
 
 ATOMIC_SPECIES 

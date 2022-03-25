@@ -5,8 +5,8 @@
    prefix             = 'ce2o3_soliddmft', 
    tstress            = .true., 
    tprnfor            = .true., 
-   pseudo_dir         = '../pseudo/',
-   outdir             = '../QE_tmp/',
+   pseudo_dir         = 'pseudo/',
+   outdir             = 'QE_tmp/',
 / 
 &system 
    ibrav              = 0,

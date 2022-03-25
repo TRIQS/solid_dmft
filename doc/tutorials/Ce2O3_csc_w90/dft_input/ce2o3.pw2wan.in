@@ -1,6 +1,6 @@
 &inputpp 
    prefix       = 'ce2o3_soliddmft'
-   outdir       = '../QE_tmp/',
+   outdir       = 'QE_tmp/',
    seedname     = 'ce2o3'
    write_mmn    = .true.
    write_amn    = .true.
