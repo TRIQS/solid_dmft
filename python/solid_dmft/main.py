@@ -56,11 +56,14 @@ def main(args):
     solver_params = None
     dft_params = None
     advanced_params = None
+    if len(args) > 1:
+        config_file_name = str(args[1])
+    else:
+        config_file_name = 'dmft_config.ini'
+    if not os.path.isfile(config_file_name):
+        raise FileNotFoundError(f'Could not find config file {config_file_name}.')
+
     if mpi.is_master_node():
-        if len(args) > 1:
-            config_file_name = str(args[1])
-        else:
-            config_file_name = 'dmft_config.ini'
         print('Reading the config file ' + config_file_name)
         general_params, solver_params, dft_params, advanced_params = read_config(config_file_name)
         general_params['config_file'] = config_file_name
