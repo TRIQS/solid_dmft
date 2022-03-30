@@ -182,7 +182,7 @@ COPY mpich_vasp.makefile /vasp/makefile.include
 COPY vasp_diffs /vasp/vasp_diffs
 RUN cd /vasp/src \
     && for name in electron.F fileio.F locproj.F mlwf.F .objects; \
-       do patch $name -p1 -i ../vasp_diffs/$name.diff; done
+       do patch $name -p1 -i ../vasp_diffs/$name; done
 
 # Install vasp
 # TODO: add ncl
