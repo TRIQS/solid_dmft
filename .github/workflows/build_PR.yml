@@ -1,0 +1,33 @@
+name: build
+
+on:
+  pull_request:
+    branches: [ unstable ]
+
+jobs:
+  build:
+
+    strategy:
+      fail-fast: false
+
+    runs-on: ubuntu-latest
+    container: 
+      image: materialstheory/solid_dmft_ci
+
+    steps:
+      - uses: actions/checkout@v2
+        with: 
+          path: 'solid_dmft.src'
+
+      - name: Build solid_dmft
+        run: |
+          mkdir solid_dmft.build && cd solid_dmft.build && cmake ../solid_dmft.src -DMPIEXEC_PREFLAGS='--allow-run-as-root' 
+          make
+
+      - name: Test solid_dmft
+        run: |
+          cd solid_dmft.build
+          ctest --output-on-failure
+
+
+
