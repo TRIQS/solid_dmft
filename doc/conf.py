@@ -3,8 +3,8 @@
 # TRIQS documentation build configuration file
 
 import sys
-sys.path.insert(0, "/home/acarta/Gitlab_projects/solid_dmft/doc/sphinxext")
-sys.path.insert(0, "/home/acarta/Gitlab_projects/solid_dmft/doc/sphinxext/numpydoc")
+sys.path.insert(0, "@CMAKE_CURRENT_SOURCE_DIR@/sphinxext")
+sys.path.insert(0, "@CMAKE_CURRENT_SOURCE_DIR@/sphinxext/numpydoc")
 
 # exclude these folders from scanning by sphinx
 exclude_patterns = ['_templates', 'examples']
@@ -45,19 +45,19 @@ source_suffix = '.rst'
 # Turn on sphinx.ext.autosummary
 autosummary_generate = True
 
-project = 'solid_dmft'
-version = '3.1.0'
+project = '@PROJECT_NAME@'
+version = '@PROJECT_VERSION@'
 
 copyright = 'Copyright (C) 2018-2020, ETH Zurich Copyright (C) 2021, The Simons Foundation authors: A. Hampel, M. Merkel, and S. Beck'
 
 mathjax_path = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=default"
-templates_path = ['/home/acarta/Gitlab_projects/solid_dmft/doc/_templates']
+templates_path = ['@CMAKE_CURRENT_SOURCE_DIR@/_templates']
 
 html_theme = 'sphinx_rtd_theme'
 html_style = 'css/custom.css'
 
-html_favicon = '/home/acarta/Gitlab_projects/solid_dmft/doc/logos/favicon.ico'
-html_logo = '/home/acarta/Gitlab_projects/solid_dmft/doc/logos/logo_no_text.png'
+html_favicon = '@CMAKE_CURRENT_SOURCE_DIR@/logos/favicon.ico'
+html_logo = '@CMAKE_CURRENT_SOURCE_DIR@/logos/logo_no_text.png'
 
 html_theme_options = {
     'logo_only': False,
@@ -75,11 +75,11 @@ html_theme_options = {
 }
 
 html_show_sphinx = True
-html_context = {'header_title': 'solid_dmft'}
-html_static_path = ['/home/acarta/Gitlab_projects/solid_dmft/doc/_static']
+html_context = {'header_title': '@PROJECT_NAME@'}
+html_static_path = ['@CMAKE_CURRENT_SOURCE_DIR@/_static']
 html_sidebars = {'index': ['sideb.html', 'searchbox.html']}
 
-htmlhelp_basename = 'solid_dmftdoc'
+htmlhelp_basename = '@PROJECT_NAME@doc'
 
 intersphinx_mapping = {'python': ('https://docs.python.org/3.8', None), 'triqslibs': ('https://triqs.github.io/triqs/latest', None)}
 
