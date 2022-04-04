@@ -26,22 +26,23 @@
 Analytic continuation of the lattice Green's function to the lattice spectral
 function using maxent.
 
-Reads G_latt(i omega) from the h5 archive and writes A_latt(omega) back.
+Reads G_latt(i omega) from the h5 archive and writes A_latt(omega) back.  See
+the docstring of main() for more information.
+
+mpi parallelized for the generation of the imaginary-frequency lattice GF over
+k points.
+
+Author: Maximilian Merkel, Materials Theory Group, ETH Zurich, 2020 - 2022
 
 Known problems:
     * when using parameter `energy_shift_orbitals` in soliDMFT, this is not
       accounted for in this routine. It requires a similar modification of the
       hopping matrix of SumkDFT as in dmft_cycle.py.
-
-
-Author: Max Merkel, 2020
 """
 
 import sys
 import time
-import glob
-from multiprocessing import Pool
-from functools import partial
+import distutils.util
 import numpy as np
 
 from triqs_maxent.tau_maxent import TauMaxEnt
@@ -49,7 +50,8 @@ from triqs_maxent.omega_meshes import HyperbolicOmegaMesh
 from triqs_maxent.alpha_meshes import LogAlphaMesh
 from triqs_dft_tools.sumk_dft import SumkDFT
 from h5 import HDFArchive
-from triqs.gf import GfImFreq
+from triqs.utility import mpi
+from triqs.gf import GfImFreq, BlockGf
 
 
 def _read_h5(external_path, iteration=None):
@@ -71,7 +73,6 @@ def _read_h5(external_path, iteration=None):
         if block_structure.corr_to_inequiv is None:
             block_structure.corr_to_inequiv = archive['dft_input/corr_to_inequiv']
 
-        dc_energy = archive[h5_internal_path]['DC_energ']
         dc_potential = archive[h5_internal_path]['DC_pot']
 
         if 'chemical_potential_post' in archive[h5_internal_path]:
@@ -80,87 +81,65 @@ def _read_h5(external_path, iteration=None):
             # Old name for chemical_potential_post
             chemical_potential = archive[h5_internal_path]['chemical_potential']
 
-    return sigma_iw, chemical_potential, dc_energy, dc_potential, block_structure
+    return sigma_iw, chemical_potential, dc_potential, block_structure
 
 
-def _write_lattice_gf_to_h5(gf_latt_iw, external_path, iteration=None):
-    """ Writes the G_latt(i omega) to the h5 archive. Mostly for faster testing. """
-    h5_internal_path = 'DMFT_results/' + ('last_iter' if iteration is None
-                                          else 'it_{}'.format(iteration))
+def _generate_lattice_gf(sum_k, sum_spins):
+    # Initializes lattice GF to zero for each process
+    spin_blocks = ['total'] if sum_spins else sum_k.spin_block_names[sum_k.SO]
+    mesh = sum_k.Sigma_imp_iw[0].mesh
+    trace_gf_latt = {key: GfImFreq(mesh=mesh, data=np.zeros((len(mesh), 1, 1), dtype=complex))
+                     for key in spin_blocks}
 
-    with HDFArchive(external_path, 'a') as archive:
-        archive[h5_internal_path]['Glatt_iw'] = gf_latt_iw
+    # Takes trace over orbitals (and spins). Individual entries do not make sense
+    # because the KS Hamiltonian ususally has the bands sorted by energy
+    for ik in mpi.slice_array(np.arange(sum_k.n_k)):
+        gf_latt = sum_k.lattice_gf(ik) * sum_k.bz_weights[ik]
+        if sum_spins:
+            trace_gf_latt['total'].data[:] += np.trace(sum(g.data for _, g in gf_latt), axis1=1, axis2=2).reshape(-1, 1, 1)
+        else:
+            for s in spin_blocks:
+                trace_gf_latt[s].data[:] += np.trace(gf_latt[s].data, axis1=1, axis2=2).reshape(-1, 1, 1)
 
+    for s in spin_blocks:
+        trace_gf_latt[s] << mpi.all_reduce(mpi.world, trace_gf_latt[s], lambda x, y: x + y)
 
-def _read_lattice_gf_from_h5(external_path, iteration=None):
-    """ Reads the G_latt(i omega) from the h5 archive. Mostly for faster testing. """
-    h5_internal_path = 'DMFT_results/' + ('last_iter' if iteration is None
-                                          else 'it_{}'.format(iteration))
-
-    with HDFArchive(external_path, 'r') as archive:
-        return archive[h5_internal_path]['Glatt_iw']
-
-
-def _get_nondegenerate_greens_functions(spins_degenerate, block, block_gf):
-    """
-    If spins_degenerate and there is a corresponding up, down pair (same names),
-    it returns the averaged from up and down for the up index and None for the down
-    index. This way, the gf will only be continued analytically once for each spin pair.
-    """
-
-    if spins_degenerate:
-        if 'up' in block:
-            degenerate_block = block.replace('up', 'down')
-            if degenerate_block in block_gf.indices:
-                print(' '*10 + 'Block {}: '.format(block)
-                      + 'using average with degenerate block {}.'.format(degenerate_block))
-                return (block_gf[block] + block_gf[degenerate_block]) / 2
-        elif 'down' in block and block.replace('down', 'up') in block_gf.indices:
-            print(' '*10 + 'Block {}: skipping, same as degenerate up state.'.format(block))
-            return None
-
-    return block_gf[block]
+    # Lattice GF as BlockGf, required for compatibility with MaxEnt functions
+    gf_lattice_iw = BlockGf(name_list=trace_gf_latt.keys(), block_list=trace_gf_latt.values())
+    return gf_lattice_iw
 
 
-def _run_maxent(gf_latt_iw, sum_k, spins_degenerate, maxent_error=.03):
+def _run_maxent(gf_lattice_iw, sum_k, error, omega_min, omega_max,
+                n_points_maxent, n_points_alpha):
     """
     Runs maxent to get the spectral function from the list of block GF.
-    If spins_degenerate, pairs with the same name except up<->down switched
-    will only be calculated once.
     """
 
-    results = {}
+    # Automatic determination of energy range from hopping matrix
+    if omega_max is None:
+        num_ks_orbitals = sum_k.hopping.shape[2]
+        hopping_diagonal = sum_k.hopping[:, :, np.arange(num_ks_orbitals), np.arange(num_ks_orbitals)]
+        hopping_min = np.min(hopping_diagonal)
+        hopping_max = np.max(hopping_diagonal)
+        omega_min = min(-20, hopping_min - sum_k.chemical_potential)
+        omega_max = max(20, hopping_max - sum_k.chemical_potential)
+        mpi.report('Set omega range to {:.3f}...{:.3f} eV'.format(omega_min, omega_max))
+
 
     # Prints information on the blocks found
-    print('Found blocks {}'.format(list(gf_latt_iw.indices)))
-    for block in gf_latt_iw.indices:
-        # Checks if gf is part of a degenerate pair
-        gf = _get_nondegenerate_greens_functions(spins_degenerate, block, gf_latt_iw)
-        if gf is None:
-            results[block] = None
-            continue
+    mpi.report('Found blocks {}'.format(list(gf_lattice_iw.indices)))
 
-        # Take trace of lattice GF. Individual entries do not make sense
-        # because the KS Hamiltonian ususally has the bands sorted by energy
-        gf = GfImFreq(mesh=gf.mesh, data=np.trace(gf.data, axis1=1, axis2=2))
-        # Initializes and runs the maxent solver
-        num_ks_orbitals = sum_k.hopping.shape[2]
-        # Gets maximal entry on the diagonal of the hopping matrix
-        hopping_max = np.max(np.abs(sum_k.hopping[:, :, np.arange(num_ks_orbitals), np.arange(num_ks_orbitals)]
-                                    - sum_k.chemical_potential))
-        omega_limit = max(20, hopping_max+2)
-        print('Calling MaxEnt with omega in +- {:.3f} eV'.format(omega_limit))
+    # Initializes and runs the maxent solver
+    # TODO: parallelization over blocks
+    results = {}
+    for block, gf in gf_lattice_iw:
+        mpi.report('-'*80, f'Running MaxEnt on block "{block}" now', '-'*80)
         solver = TauMaxEnt()
         solver.set_G_iw(gf)
-        solver.set_error(maxent_error)
-        solver.omega = HyperbolicOmegaMesh(omega_min=-omega_limit, omega_max=omega_limit, n_points=int(8*omega_limit))
-        solver.alpha_mesh = LogAlphaMesh(alpha_min=1e-4, alpha_max=1e2, n_points=50)
+        solver.set_error(error)
+        solver.omega = HyperbolicOmegaMesh(omega_min=omega_min, omega_max=omega_max, n_points=n_points_maxent)
+        solver.alpha_mesh = LogAlphaMesh(alpha_min=1e-6, alpha_max=1e2, n_points=n_points_alpha)
         results[block] = solver.run()
-
-    # Assign up's solution to down result for degenerate calculations
-    for key in results:
-        if results[key] is None:
-            results[key] = results[key.replace('down', 'up')]
 
     return results
 
@@ -186,68 +165,99 @@ def _write_spectral_function_to_h5(unpacked_results, external_path, iteration=No
                                           else 'it_{}'.format(iteration))
 
     with HDFArchive(external_path, 'a') as archive:
-        archive[h5_internal_path]['Alatt_w'] = unpacked_results
+        archive[h5_internal_path]['Alatt_maxent'] = unpacked_results
 
 
-def main(external_path, iteration=None, read_g_latt_iw=False):
+def main(external_path, iteration=None, sum_spins=False, maxent_error=.02,
+         n_points_maxent=200, n_points_alpha=50, omega_min=None, omega_max=None):
     """
-    Main function that reads the lattice Greens function from h5, analytically
-    continues it and writes the result back to the h5 archive.
-    Only the trace is used because the Kohn-Sham energies ("hopping") are not
-    sorted by "orbital" but by energy, leading to crossovers which can confuse
-    MaxEnt.
+    Main function that reads the lattice Green's function (GF) from h5,
+    analytically continues it, writes the result back to the h5 archive and
+    also returns the results.
+    Only the trace can be used because the Kohn-Sham energies ("hopping") are not
+    sorted by "orbital" but by energy, leading to crossovers.
 
     Parameters
     ----------
-    external_path: string, path of the h5 archive
-    iteration: int/string, optional, iteration to read from and write to
-    read_g_latt_iw: bool, optional, reads G_latt from the h5 instead of
-        generating it from Sigma(i omega). Only works if this code has run before
+    external_path: string
+        Path to the h5 archive to read from and write to.
+    iteration: int/string
+        Iteration to read from and write to. Defaults to last_iter.
+    sum_spins: bool
+        Whether to sum over the spins or continue the lattice GF
+        for the up and down spin separately, for example for magnetized results.
+    maxent_error : float
+        The error that is used for the analyzers.
+    n_points_maxent : int
+        Number of omega points on the hyperbolic mesh used in the continuation.
+    n_points_alpha : int
+        Number of points that the MaxEnt alpha parameter is varied on logarithmically.
+    omega_min : float
+        Lower end of range where the GF is being continued. Range has to comprise
+        all features of the lattice GF for correct normalization.
+        If omega_min and omega_max are None, they are chosen automatically based
+        on the diagonal entries in the hopping matrix but at least to -20...20 eV.
+    omega_max : float
+        Upper end of range where the GF is being continued. See omega_min.
     Returns
     -------
-    list of dict, per impurity: dict containing the omega mesh
-        and A_imp from two different analyzers
+    unpacked_results : dict
+        The omega mesh and lattice spectral function from two different analyzers
     """
+
+    if (omega_max is None and omega_min is not None
+            or omega_max is not None and omega_min is None):
+        raise ValueError('Both or neither of omega_max and omega_min have to be None')
+
     start_time = time.time()
 
-    if read_g_latt_iw:
-        gf_lattice_iw = _read_lattice_gf_from_h5(external_path, iteration)
-    else:
-        sum_k = SumkDFT(external_path, use_dft_blocks=False)
-        sigma_iw, chemical_potential, dc_energy, dc_potential, block_structure = _read_h5(external_path, iteration)
-        sum_k.block_structure = block_structure
-        sum_k.put_Sigma(sigma_iw)
-        sum_k.set_mu(chemical_potential)
-        sum_k.set_dc(dc_potential, dc_energy)
+    # Sets up the SumkDFT object
+    sum_k = SumkDFT(external_path, use_dft_blocks=False)
+    h5_content = None
+    if mpi.is_master_node():
+        h5_content = _read_h5(external_path, iteration)
+    sigma_iw, chemical_potential, dc_potential, block_structure = mpi.bcast(h5_content)
+    sum_k.block_structure = block_structure
+    sum_k.put_Sigma(sigma_iw)
+    sum_k.set_mu(chemical_potential)
+    sum_k.set_dc(dc_potential, None)
 
-        gf_lattice_iw = sum(sum_k.lattice_gf(i)*sum_k.bz_weights[i] for i in range(sum_k.n_k))
-        _write_lattice_gf_to_h5(gf_lattice_iw, external_path, iteration)
-        print('Generated the lattice GF. Starting maxent now.')
+    # Generates the lattice GF
+    gf_lattice_iw = _generate_lattice_gf(sum_k, sum_spins)
+    mpi.report('Generated the lattice GF.')
 
-    maxent_results = _run_maxent(gf_lattice_iw, sum_k, True)
-    unpacked_results = _unpack_maxent_results(maxent_results)
-    _write_spectral_function_to_h5(unpacked_results, external_path, iteration)
+    # Runs MaxEnt
+    unpacked_results = None
+    if mpi.is_master_node():
+        maxent_results = _run_maxent(gf_lattice_iw, sum_k, maxent_error, omega_min,
+                                     omega_max, n_points_maxent, n_points_alpha)
+        unpacked_results = _unpack_maxent_results(maxent_results)
+        _write_spectral_function_to_h5(unpacked_results, external_path, iteration)
+    unpacked_results = mpi.bcast(unpacked_results)
 
     total_time = time.time() - start_time
-    print('-'*50 + '\nDONE')
-    print('The program took {:.0f} s.'.format(total_time))
+    mpi.report('-'*80, 'DONE')
+    mpi.report('Total run time: {:.0f} s.'.format(total_time))
 
     return unpacked_results
 
 
 if __name__ == '__main__':
-    if len(sys.argv) not in (2, 3):
-        print('Please give the h5 name (and optionally the iteration). Exiting.')
-        sys.exit(2)
+    # Casts input parameters
+    if len(sys.argv) > 2:
+        if sys.argv[2].lower() == 'none':
+            sys.argv[2] = None
+    if len(sys.argv) > 3:
+        sys.argv[3] = distutils.util.strtobool(sys.argv[3])
+    if len(sys.argv) > 4:
+        sys.argv[4] = float(sys.argv[4])
+    if len(sys.argv) > 5:
+        sys.argv[5] = int(sys.argv[5])
+    if len(sys.argv) > 6:
+        sys.argv[6] = int(sys.argv[6])
+    if len(sys.argv) > 7:
+        sys.argv[7] = float(sys.argv[7])
+    if len(sys.argv) > 8:
+        sys.argv[8] = float(sys.argv[8])
 
-    files = glob.glob(sys.argv[1])
-    pool = Pool(processes=min(8, len(files)))
-
-    if len(sys.argv) == 2:
-        function = main
-    elif len(sys.argv) == 3:
-        function = partial(main, iteration=sys.argv[2])
-
-    pool.map(function, files)
-
-    pool.close()
+    main(*sys.argv[1:])

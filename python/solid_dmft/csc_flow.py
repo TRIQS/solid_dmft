@@ -108,7 +108,7 @@ def _run_qe(general_params, dft_params, iter_dmft, iteration_offset):
         # if calculation is restarted, need to check in first iteration if DFT step needs to be skipped
         iter_one_shot = (iter_dmft - 1 - general_params['n_iter_dmft_first'])%general_params['n_iter_dmft_per']
         if iteration_offset > 0 and iter_dmft == iteration_offset + 1 and iter_one_shot > 0:
-            mpi.report('  solid-dmft: ...skipping DFT step')
+            mpi.report('  solid_dmft: ...skipping DFT step')
             return
 
         qe_scf = start_qe(dft_params['n_cores'], 'mod_scf')
@@ -173,10 +173,10 @@ def read_dft_energy_qe(seedname):
 def _set_projections_suppressed(suppressed):
     if mpi.is_master_node():
         if suppressed:
-            print('  solid-dmft: Writing suppress projectors file', flush=True)
+            print('  solid_dmft: Writing suppress projectors file', flush=True)
             open('./vasp.suppress_projs', 'w').close()
         elif os.path.isfile('./vasp.suppress_projs'):
-            print('  solid-dmft: Removing suppress projectors file', flush=True)
+            print('  solid_dmft: Removing suppress projectors file', flush=True)
             os.remove('./vasp.suppress_projs')
     mpi.barrier()
 
@@ -287,7 +287,7 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
                                      dft_params['mpi_env'])
         # Removes projection suppression file if present
         _set_projections_suppressed(False)
-        mpi.report('  solid-dmft: Waiting for VASP to start (lock appears)...')
+        mpi.report('  solid_dmft: Waiting for VASP to start (lock appears)...')
         while not vasp.is_lock_file_present():
             time.sleep(1)
 
@@ -302,7 +302,7 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
     iter_dmft = iteration_offset+1
     start_time_dft = timer()
     while iter_dmft <= general_params['n_iter_dmft'] + iteration_offset:
-        mpi.report('  solid-dmft: Running {}...'.format(dft_params['dft_code'].upper()))
+        mpi.report('  solid_dmft: Running {}...'.format(dft_params['dft_code'].upper()))
         mpi.barrier()
 
         # vasp dft run
@@ -322,7 +322,7 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
             continue
 
         end_time_dft = timer()
-        mpi.report('  solid-dmft: DFT cycle took {:10.4f} seconds'.format(end_time_dft-start_time_dft))
+        mpi.report('  solid_dmft: DFT cycle took {:10.4f} seconds'.format(end_time_dft-start_time_dft))
 
         if dft_params['dft_code'] == 'vasp':
             # Runs the converter
@@ -397,11 +397,11 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
             start_time_dft = timer()
             if dft_params['dft_code'] == 'vasp':
                 _set_projections_suppressed(dft_params['n_iter'] > 1)
-                mpi.report('  solid-dmft: Reactivating VASP')
+                mpi.report('  solid_dmft: Reactivating VASP')
                 vasp.reactivate()
 
     # Stops after maximum number of dmft iterations or convergence
     if mpi.is_master_node():
-        print('  solid-dmft: Stopping {}\n'.format(dft_params['dft_code'].upper()), flush=True)
+        print('  solid_dmft: Stopping {}\n'.format(dft_params['dft_code'].upper()), flush=True)
         if dft_params['dft_code'] == 'vasp':
             vasp.kill(vasp_process_id)

@@ -70,7 +70,7 @@
              | 675 Mass Ave, Cambridge, MA 02139, USA.           |
              |                                                   |
              +---------------------------------------------------+
-             |    Execution started on 15Feb2022 at 12:01:54     |
+             |    Execution started on 23Mar2022 at 19:57:27     |
              +---------------------------------------------------+
  
  ******************************************************************************
@@ -442,7 +442,7 @@
  *----------------------------------------------------------------------------*
  |  Plotting Hamiltonian in WF basis          :                 T             |
  *----------------------------------------------------------------------------*
- Time to read parameters        0.023 (sec)
+ Time to read parameters        0.024 (sec)
 
  *---------------------------------- K-MESH ----------------------------------*
  +----------------------------------------------------------------------------+
@@ -523,7 +523,7 @@
  |             4         0.000000    0.000000    0.259279                     |
  +----------------------------------------------------------------------------+
   
- Time to get kmesh              0.110 (sec)
+ Time to get kmesh              0.111 (sec)
  *============================================================================*
  |                              MEMORY ESTIMATE                               |
  |         Maximum RAM allocated during each phase of the calculation         |
@@ -539,11 +539,11 @@
  Starting a new Wannier90 calculation ...
 
 
- Reading overlaps from ce2o3.mmn    :  Created on 15Feb2022 at 12: 1:36
+ Reading overlaps from ce2o3.mmn    :  Created on 23Mar2022 at 19:57: 9
 
- Reading projections from ce2o3.amn :  Created on 15Feb2022 at 12: 1:17
+ Reading projections from ce2o3.amn :  Created on 23Mar2022 at 19:56:50
 
- Time to read overlaps          0.622 (sec)
+ Time to read overlaps          0.646 (sec)
 
  Writing checkpoint file ce2o3.chk... done
 
@@ -596,7 +596,7 @@
                                Omega OD     =     0.416398083
     Final Spread (Ang^2)       Omega Total  =    13.024132385
  ------------------------------------------------------------------------------
- Time for wannierise            0.016 (sec)
+ Time for wannierise            0.013 (sec)
 
  Writing checkpoint file ce2o3.chk... done
 
@@ -607,21 +607,21 @@
 
  Calculating interpolated band-structure
 
- Time to calculate interpolated band structure       2.607 (sec)
+ Time to calculate interpolated band structure       2.614 (sec)
 
- Time for plotting              2.936 (sec)
- Total Execution Time           3.713 (sec)
+ Time for plotting              2.945 (sec)
+ Total Execution Time           3.746 (sec)
 
  *===========================================================================*
  |                             TIMING INFORMATION                            |
  *===========================================================================*
  |    Tag                                                Ncalls      Time (s)|
  |---------------------------------------------------------------------------|
- |kmesh: get                                        :         1         0.110|
- |overlap: allocate                                 :         1         0.002|
- |overlap: read                                     :         1         0.614|
- |wann: main                                        :         1         0.015|
- |plot: main                                        :         1         2.936|
+ |kmesh: get                                        :         1         0.111|
+ |overlap: allocate                                 :         1         0.004|
+ |overlap: read                                     :         1         0.637|
+ |wann: main                                        :         1         0.013|
+ |plot: main                                        :         1         2.945|
  *---------------------------------------------------------------------------*
 
  All done: wannier90 exiting

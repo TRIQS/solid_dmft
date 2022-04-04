@@ -29,7 +29,6 @@ from triqs.gf.tools import inverse, make_zero_tail
 from triqs.gf.descriptors import Fourier
 from triqs.operators import c_dag, c, Operator
 import triqs.utility.mpi as mpi
-from triqs_dft_tools.block_structure import gf_struct_flatten
 from h5 import HDFArchive
 
 from . import legendre_filter
@@ -77,7 +76,7 @@ def _gf_fit_tail_fraction(Gf, fraction=0.4, replace=None, known_moments=None):
 class SolverStructure:
 
     r'''
-    Handles all soliDMFT solver objects and contains TRIQS solver instance.
+    Handles all solid_dmft solver objects and contains TRIQS solver instance.
 
     Attributes
     ----------
@@ -529,7 +528,7 @@ class SolverStructure:
         '''
         from triqs_cthyb.solver import Solver as cthyb_solver
 
-        gf_struct = gf_struct_flatten(self.sum_k.gf_struct_solver_list[self.icrsh])
+        gf_struct = self.sum_k.gf_struct_solver_list[self.icrsh]
         # Construct the triqs_solver instances
         if self.solver_params['measure_G_l']:
             triqs_solver = cthyb_solver(beta=self.general_params['beta'], gf_struct=gf_struct,
@@ -548,7 +547,7 @@ class SolverStructure:
         '''
         from triqs_ctint import Solver as ctint_solver
 
-        gf_struct = gf_struct_flatten(self.sum_k.gf_struct_solver_list[self.icrsh])
+        gf_struct = self.sum_k.gf_struct_solver_list[self.icrsh]
 
         if self.general_params['h_int_type'] == 'dynamic':
             self.U_iw = None
@@ -574,7 +573,7 @@ class SolverStructure:
         '''
         from triqs_hubbardI import Solver as hubbardI_solver
 
-        gf_struct =  gf_struct_flatten(self.sum_k.gf_struct_solver_list[self.icrsh])
+        gf_struct =  self.sum_k.gf_struct_solver_list[self.icrsh]
         # Construct the triqs_solver instances
         if self.solver_params['measure_G_l']:
             triqs_solver = hubbardI_solver(beta=self.general_params['beta'], gf_struct=gf_struct,
@@ -613,7 +612,7 @@ class SolverStructure:
         else:
             n_w_b_nn = 1001
 
-        gf_struct = gf_struct_flatten(self.sum_k.gf_struct_solver_list[self.icrsh])
+        gf_struct = self.sum_k.gf_struct_solver_list[self.icrsh]
         # Construct the triqs_solver instances
         if self.solver_params['measure_gl']:
             triqs_solver = ctseg_solver(beta=self.general_params['beta'], gf_struct=gf_struct,
@@ -648,7 +647,7 @@ class SolverStructure:
             calc_me = [[f'ud_{i}',j] for i,j in product(range(2), range(3))]
 
         # create solver
-        triqs_solver = ftps.Solver(gf_struct=gf_struct_flatten(self.gf_struct), nw=self.general_params['n_w'],
+        triqs_solver = ftps.Solver(gf_struct=self.gf_struct, nw=self.general_params['n_w'],
                                    wmin=self.general_params['w_range'][0], wmax=self.general_params['w_range'][1])
 
 

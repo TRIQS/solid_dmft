@@ -48,6 +48,13 @@ autosummary_generate = True
 project = '@PROJECT_NAME@'
 version = '@PROJECT_VERSION@'
 
+# this makes the current project version available as var in every rst file
+rst_epilog = """
+.. |PROJECT_VERSION| replace:: {version}
+""".format(
+version = version,
+)
+
 copyright = 'Copyright (C) 2018-2020, ETH Zurich Copyright (C) 2021, The Simons Foundation authors: A. Hampel, M. Merkel, and S. Beck'
 
 mathjax_path = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=default"

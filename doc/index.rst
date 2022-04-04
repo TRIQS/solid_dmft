@@ -5,9 +5,9 @@
 solid_dmft
 **********
 
-.. sidebar:: solid_dmft 3.0.0
+.. sidebar:: solid_dmft |PROJECT_VERSION|
 
-   This is the homepage of solid_dmft v3.0.0.
+   This is the homepage of solid_dmft |PROJECT_VERSION|.
    For changes see the :ref:`changelog page <changelog>`.
    visit us on:
       
