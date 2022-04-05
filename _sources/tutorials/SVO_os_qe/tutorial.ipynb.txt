@@ -8,7 +8,7 @@
     "\n",
     "Heavy calculations: Current tutorial is best performed on an HPC facility.\n",
     "\n",
-    "# Running a one-shot DMFT calculation on SrVO$_3$ (SVO)"
+    "# 1. Running a one-shot DMFT calculation on SrVO3"
    ]
   },
   {
