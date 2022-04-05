@@ -256,7 +256,7 @@
 }
 </style>
 <p><em>Disclaimer:</em></p>
-<p>Heavy calculations: Current tutorial is best performed on an HPC facility. Before starting the tutorial copy all files from the <code class="docutils literal notranslate"><span class="pre">/data/</span></code> and <code class="docutils literal notranslate"><span class="pre">/scripts/</span></code> folder to a working directory</p>
+<p>Heavy calculations: Current tutorial is best performed on an HPC facility.</p>
 <div class="section" id="Running-a-one-shot-DMFT-calculation-on-SrVO_3-(SVO)">
 <h1>Running a one-shot DMFT calculation on SrVO<span class="math notranslate nohighlight">\(_3\)</span> (SVO)<a class="headerlink" href="#Running-a-one-shot-DMFT-calculation-on-SrVO_3-(SVO)" title="Permalink to this headline">¶</a></h1>
 <p>Hello, welcome to the first part of the tutorial for solid_dmft. Here we will guide to set up and run your first DMFT calculations.</p>
@@ -303,7 +303,7 @@
 <p>Run the script, sit back and have a long coffee break, this is going to take a while (about 10 hours on 30 cores).</p>
 <p>Once the run is finished run</p>
 <p><code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">./collect_results_coarse.py</span></code></p>
-<p>The script will produce a heatmap image of the value of G(beta/2) for each pair of U and J. The white area corresponds to the Mott insulating state.</p>
+<p>The script will produce a heatmap image of the value of G(beta/2) for each pair of U and J. The white area corresponds to an insulating state.</p>
 <p><img alt="coarsegrid" src="../../_images/MIT_transition.jpg" /></p>
 <p>Do you notice anything strange? (hint: look at the bottom right corner and check the output file <code class="docutils literal notranslate"><span class="pre">observables_imp0.dat</span></code> for U = 2 J=1.0. )</p>
 <p>We have seen that for 1 electron per system U and J are competing against each other: larger J favor the metallic state. The coulomb integral U wants to repel neighbouring electrons while J would like to bring electrons together on one site,. When the latter component dominates the resulting phase is known as a charge disproportionated state which is also insulating. What is happening in the bottom right corner is that the J favors here charge disproportionation but the unit cell has a single
@@ -322,7 +322,7 @@ site, therefore the system has trouble converging and oscillate between a high o
 <p><code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">/path_to_solid_dmft/maxent_scripts/maxent_gf_imp.py</span> <span class="pre">./J0.0/U5/out/SCO.h5</span></code></p>
 <p>and plot the result by running in the docker container:</p>
 <p><code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">read_spectral_function.py</span></code></p>
-<p><img alt="afunc" src="../../_images/A_func_J=0.0_U=4.25.jpg" /></p>
+<p><img alt="Afunc" src="../../_images/A_func_J=0.0_U=4.25.jpg" /></p>
 <p>Take care to edit the values of J and U in the python file. What is happing to the spectral function (density of states) as one cranks U up?</p>
 </div>
 <div class="section" id="5-Visualizing-the-MIT">
@@ -332,7 +332,7 @@ site, therefore the system has trouble converging and oscillate between a high o
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="n">read_spectral_function_transition</span><span class="o">.</span><span class="n">py</span>
 </pre></div>
 </div>
-<p><img alt="transition" src="../../_images/A_func_transition.jpg" /></p>
+<p><img alt="MIT" src="../../_images/A_func_transition.jpg" /></p>
 </div>
 </div>
 
