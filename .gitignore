@@ -2,6 +2,8 @@ compile_commands.json
 .ipynb_checkpoints
 ipynb_checkpoints
 /doc/html
+/doc/_autosummary
+/.vscode
 doc/cpp2rst_generated
 .spyproject
 __pycache__
