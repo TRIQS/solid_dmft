@@ -12,7 +12,7 @@ NELMDL = -12 ! converge the KS wave function first
 ISMEAR = -5
 SIGMA = 0.01
 
-NCORE = 4
+NCORE = 1
 
 LMAXMIX = 6
 LORBIT = 14
