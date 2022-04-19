@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Running a charge self-consistent (CSC) calculation on PrNiO3 with VASP PLOs &mdash; solid_dmft  documentation</title><link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+  <title>2. CSC with VASP PLOs &mdash; solid_dmft  documentation</title><link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" /><link rel="shortcut icon" href="../../_static/favicon.ico"/>
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
@@ -152,18 +152,19 @@
 <li class="toctree-l3"><a class="reference internal" href="../SVO_os_qe/tutorial.html#5-Visualizing-the-MIT">5 Visualizing the MIT</a></li>
 </ul>
 </li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Running a charge self-consistent (CSC) calculation on PrNiO3 with VASP PLOs</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#1.-Running-the-initial-SCF-DFT-calculation-(~-1-2-core-hours)">1. Running the initial SCF DFT calculation (~ 1-2 core hours)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#2.-Running-the-CSC-DMFT-calculations-(~-x-core-hours)">2. Running the CSC DMFT calculations (~ x core hours)</a><ul>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">2. CSC with VASP PLOs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#2.1.-Running-the-initial-scf-DFT-calculation-(~-2-core-hours)">2.1. Running the initial scf DFT calculation (~ 2 core hours)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#2.2.-Running-the-CSC-DMFT-calculations-(~-150-core-hours)">2.2. Running the CSC DMFT calculations (~ 150 core hours)</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#Input-files-for-CSC-DMFT-calculations">Input files for CSC DMFT calculations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Starting-the-calculations">Starting the calculations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Analyzing-the-projectors">Analyzing the projectors</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#3.-Analyzing-the-observables_impn.dat">3. Analyzing the observables_imp<span class="math notranslate nohighlight">\(n\)</span>.dat</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#4.-Analyzing-the-h5-archive:-the-Legendre-Green’s-function">4. Analyzing the h5 archive: the Legendre Green’s function</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#5.-Further-things-to-try-here">5. Further things to try here</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#2.3.-Plotting-the-results:-observables">2.3. Plotting the results: observables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#2.4.-Plotting-the-results:-the-Legendre-Green’s-function">2.4. Plotting the results: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#2.5.-Next-steps-to-try">2.5. Next steps to try</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#To-do">To do</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Ce2O3_csc_w90/tutorial.html">3. CSC with QE/W90 and HubbardI: total energy in Ce2O3</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../Ce2O3_csc_w90/tutorial.html#1.-Input-file-preparation">1. Input file preparation</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../Ce2O3_csc_w90/tutorial.html#DFT-files">DFT files</a></li>
@@ -221,7 +222,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="../../tutorials.html">Tutorials</a> &raquo;</li>
-      <li>Running a charge self-consistent (CSC) calculation on PrNiO3 with VASP PLOs</li>
+      <li>2. CSC with VASP PLOs</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../_sources/tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.ipynb.txt" rel="nofollow"> View page source</a>
       </li>
@@ -502,7 +503,7 @@ div.rendered_html tbody tr:hover {
 }
 </style>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[50]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -514,12 +515,8 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<p>Disclaimer:</p>
-<p>Heavy calculations. Current parameters won’t give converged solution but are simplified to give results on x cores in x hrs (estimates, depend on system of course).</p>
-<div class="section" id="Running-a-charge-self-consistent-(CSC)-calculation-on-PrNiO3-with-VASP-PLOs">
-<h1>Running a charge self-consistent (CSC) calculation on PrNiO3 with VASP PLOs<a class="headerlink" href="#Running-a-charge-self-consistent-(CSC)-calculation-on-PrNiO3-with-VASP-PLOs" title="Permalink to this headline">¶</a></h1>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -528,23 +525,41 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<div class="section" id="1.-Running-the-initial-SCF-DFT-calculation-(~-1-2-core-hours)">
-<h2>1. Running the initial SCF DFT calculation (~ 1-2 core hours)<a class="headerlink" href="#1.-Running-the-initial-SCF-DFT-calculation-(~-1-2-core-hours)" title="Permalink to this headline">¶</a></h2>
-<p>Get started: - Go into folder <code class="docutils literal notranslate"><span class="pre">1_dft_scf</span></code> - Insert POTCAR as concatenation of <code class="docutils literal notranslate"><span class="pre">PAW_PBE</span> <span class="pre">Pr_3</span></code>, <code class="docutils literal notranslate"><span class="pre">PAW_PBE</span> <span class="pre">Ni_pv</span></code> and <code class="docutils literal notranslate"><span class="pre">PAW_PBE</span> <span class="pre">O</span></code> - Goal: get well-converged charge density (CHGCAR) and understand where correlated bands are (DOSCAR and potentially PROCAR and band structure)</p>
-<p>Input files: - INCAR: large number of steps for good convergence (relatively cheap calculation which will be starting point for future calculations) - POSCAR: PrNiO3 close to experimental low-temperature structure (P21/n symmetry) -&gt; insulating in experiment (true?) - KPOINTS: approximately unidistant grid of 7 x 7 x 5</p>
-<p>Run Vasp with <code class="docutils literal notranslate"><span class="pre">mpirun</span> <span class="pre">-n</span> <span class="pre">8</span> <span class="pre">vasp_std</span></code>.</p>
-<p>Main output: - CHGCAR: converged charge density to start the DMFT calculation from - DOSCAR: to identify the energy range of the correlated subspace</p>
+<p>Disclaimer: charge self-consistent (CSC) calculations are heavy. The current parameters won’t give well converged solution but are tuned down to give results in roughly 150 core hours.</p>
+<div class="section" id="2.-CSC-with-VASP-PLOs">
+<h1>2. CSC with VASP PLOs<a class="headerlink" href="#2.-CSC-with-VASP-PLOs" title="Permalink to this headline">¶</a></h1>
+<p>Set the variable <code class="docutils literal notranslate"><span class="pre">read_from_ref</span></code> below to False if you want to plot your own calculated results. Otherwise, the provided reference files are used.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">dft_energy</span><span class="p">,</span> <span class="n">dft_dos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="s1">&#39;1_dft_scf/refs/DOSCAR&#39;</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">unpack</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span></span><span class="c1"># Reads files from reference? Otherwise, uses your simulation results</span>
+<span class="n">read_from_ref</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">path_mod</span> <span class="o">=</span> <span class="s1">&#39;/ref&#39;</span> <span class="k">if</span> <span class="n">read_from_ref</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+</pre></div>
+</div>
+</div>
+<p>PrNiO3 is a perovskite that exhibits a metal-insulator transition coupled to a breathing distortion and charge disproportionation, see <a class="reference external" href="https://doi.org/10.1038/s41535-019-0145-4" rel="noopener noreferrer" target="_blank">here</a>. In this tutorial, we will run DMFT calculation on the low-temperature insulating state. We will do this in a CSC way, where the correlated orbitals are defined by <a class="reference external" href="https://doi.org/10.1088/1361-648x/aae80a" rel="noopener noreferrer" target="_blank">projected localized orbitals (PLOs)</a> calculated with VASP.</p>
+<div class="section" id="2.1.-Running-the-initial-scf-DFT-calculation-(~-2-core-hours)">
+<h2>2.1. Running the initial scf DFT calculation (~ 2 core hours)<a class="headerlink" href="#2.1.-Running-the-initial-scf-DFT-calculation-(~-2-core-hours)" title="Permalink to this headline">¶</a></h2>
+<p>To get started, we run a self-consistent field (scf) DFT calculation: * Go into folder <code class="docutils literal notranslate"><span class="pre">1_dft_scf</span></code> * Insert the POTCAR as concatenation of the files <code class="docutils literal notranslate"><span class="pre">PAW_PBE</span> <span class="pre">Pr_3</span></code>, <code class="docutils literal notranslate"><span class="pre">PAW_PBE</span> <span class="pre">Ni_pv</span></code> and <code class="docutils literal notranslate"><span class="pre">PAW_PBE</span> <span class="pre">O</span></code> distributed with VASP * Goal: get a well-converged charge density (CHGCAR) and understand where the correlated bands are (DOSCAR and potentially PROCAR and band structure)</p>
+<p>Other input files are: * <a class="reference external" href="1_dft_csc/INCAR" rel="noopener noreferrer" target="_blank">INCAR</a>: using a large number of steps for good convergence. Compared to the DMFT calculation, it is relatively cheap and it is good to have a well converged starting point for DMFT. * <a class="reference external" href="1_dft_csc/POSCAR" rel="noopener noreferrer" target="_blank">POSCAR</a>: PrNiO3 close to the experimental low-temperature structure (P21/n symmetry) * <a class="reference external" href="1_dft_csc/KPOINTS" rel="noopener noreferrer" target="_blank">KPOINTS</a>: approximately unidistant grid of 7 x 7 x 5</p>
+<p>Then run Vasp with the command <code class="docutils literal notranslate"><span class="pre">mpirun</span> <span class="pre">-n</span> <span class="pre">8</span> <span class="pre">vasp_std</span></code>.</p>
+<p>The main output here is: * CHGCAR: the converged charge density to start the DMFT calculation from * DOSCAR: to identify the energy range of the correlated subspace. (A partial DOS and band structure can be very helpful to identify the correlated subspace as well. The partial DOS can be obtained by uncommenting the LORBIT parameter in the INCAR but then the below functions to plot the DOS need to be adapted.)</p>
+<p>We now plot the DFT DOS and discuss the correlated subspace.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">dft_energy</span><span class="p">,</span> <span class="n">dft_dos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;1_dft_scf</span><span class="si">{</span><span class="n">path_mod</span><span class="si">}</span><span class="s1">/DOSCAR&#39;</span><span class="p">,</span>
+                                 <span class="n">skiprows</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">unpack</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[73]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -564,38 +579,52 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_PrNiO3_csc_vasp_plo_cthyb_tutorial_5_0.png" src="../../_images/tutorials_PrNiO3_csc_vasp_plo_cthyb_tutorial_5_0.png" />
+<img alt="../../_images/tutorials_PrNiO3_csc_vasp_plo_cthyb_tutorial_6_0.png" src="../../_images/tutorials_PrNiO3_csc_vasp_plo_cthyb_tutorial_6_0.png" />
 </div>
 </div>
-<p>The DOS contains (can be checked with partial DOS, uncomment LORBIT parameter in INCAR): - split Fe-eg bands in the range -0.4 to 2.5 eV - mainly Fe-t2g bands between -1.5 and 0.5 eV - mainly O-p bands between -7 and -1.5 eV - hybridization between Fe-t2g and O-p</p>
-<p>Ways DFT gets the system wrong: - system is metallic instead of insulating despite gap in the eg orbitals</p>
-<p>We will use the Fe-eg range to construct our correlated subspace</p>
-<p>Mention that it’s faster to start from converged WAVECAR? And scaling of DFT and DMFT part</p>
+<p>The DOS contains (you can check this with the partial DOS): * Fe-eg bands in the range -0.4 to 2.5 eV with a small gap at around 0.6 eV * mainly Fe-t2g bands between -1.5 and -0.5 eV * mainly O-p bands between -7 and -1.5 eV The Fe-d and O-p orbitals are hybridized, with an overlap in the DOS betwen Fe-t2g and O-p.</p>
+<p>DFT does not describe the system correctly in predicting a metallic state. In a simplified picture, the paramagnetism in DMFT will be able to split the correlated bands and push the Fermi energy into the gap of the eg orbitals, as we will see below.</p>
+<p>We will use the Fe-eg range to construct our correlated subspace.</p>
 </div>
-<div class="section" id="2.-Running-the-CSC-DMFT-calculations-(~-x-core-hours)">
-<h2>2. Running the CSC DMFT calculations (~ x core hours)<a class="headerlink" href="#2.-Running-the-CSC-DMFT-calculations-(~-x-core-hours)" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>Link relevant files like CHGCAR, KPOINTS, POSCAR, POTCAR from previous directory by running <code class="docutils literal notranslate"><span class="pre">./2_link_files.sh</span></code></li>
-<li>Explain CSC principle (shortly), how Vasp works in CSC mode (vasp.lock) and what GAMMA file does</li>
-<li>Run with <code class="docutils literal notranslate"><span class="pre">mpirun</span> <span class="pre">-n</span> <span class="pre">32</span> <span class="pre">python3</span> <span class="pre">uni_dmft.py</span></code></li>
-<li>Discuss output and results: occupations, energies</li>
-</ul>
+<div class="section" id="2.2.-Running-the-CSC-DMFT-calculations-(~-150-core-hours)">
+<h2>2.2. Running the CSC DMFT calculations (~ 150 core hours)<a class="headerlink" href="#2.2.-Running-the-CSC-DMFT-calculations-(~-150-core-hours)" title="Permalink to this headline">¶</a></h2>
+<p>We now run the DMFT calculation. In CSC calculations, the corrected charge density from DMFT is fed back into the DFT calculation to re-calculate the Kohn-Sham energies and projectors onto correlated orbitals.</p>
+<p>With VASP, the procedure works as described <a class="reference external" href="https://triqs.github.io/dft_tools/latest/guide/dftdmft_selfcons.html#vasp-plovasp" rel="noopener noreferrer" target="_blank">here</a>, where the GAMMA file written by DMFT contains the charge density <em>correction</em>. In the VASP-CSC implementation, we first converge a non-scf DFT calculation based on the CHGCAR from before, then run DMFT on the results. The VASP process stays alive but idle during the DMFT calculation. Then, when we want to update the DFT-derived quantities energies, we need to
+run multiple DFT steps in between the DMFT steps because the density correction is fed into VASP iteratively through mixing to ensure stability.</p>
 <div class="section" id="Input-files-for-CSC-DMFT-calculations">
 <h3>Input files for CSC DMFT calculations<a class="headerlink" href="#Input-files-for-CSC-DMFT-calculations" title="Permalink to this headline">¶</a></h3>
+<p>We first take a look into the input file <a class="reference external" href="2_dmft_csc/dmft_config.ini" rel="noopener noreferrer" target="_blank">dmft_config.ini</a> and discuss some parameters. Please make sure you understand the role of the other parameters as well, as documented in the <a class="reference external" href="https://flatironinstitute.github.io/solid_dmft/_autosummary/read_config.html" rel="noopener noreferrer" target="_blank">reference manual of the read_config.py</a> on the solid_dmft website. This is a selection of parameters from the dmft_config.ini:</p>
+<p>Group [general]: * <code class="docutils literal notranslate"><span class="pre">set_rot</span> <span class="pre">=</span> <span class="pre">hloc</span></code>: rotates the local impurity problem into a basis where the local Hamiltonian is diagonal * <code class="docutils literal notranslate"><span class="pre">plo_cfg</span> <span class="pre">=</span> <span class="pre">plo.cfg</span></code>: the name of the config file for constructing the PLOs (see below) * <code class="docutils literal notranslate"><span class="pre">n_l</span> <span class="pre">=</span> <span class="pre">30</span></code>: the number of Legendre coefficients to measure the imaginary-time Green’s function in. Too few resulting in a “bumpy” Matsubara self-energy, too many include simulation noise. See also <a class="reference external" href="https://doi.org/10.1103/PhysRevB.84.075145" rel="noopener noreferrer" target="_blank">https://doi.org/10.1103/PhysRevB.84.075145</a>. * <code class="docutils literal notranslate"><span class="pre">dc_dmft</span> <span class="pre">=</span> <span class="pre">True</span></code>: using the
+DMFT occupations for the double counting is mandatory in CSC calculations. The DFT occupations are not well defined after the first density correction anymore * <code class="docutils literal notranslate"><span class="pre">mu_gap_gb2_threshold</span> <span class="pre">=</span> <span class="pre">0.05</span></code>: the system is treated as gapped if the lattice Green’s function at tau=beta/2 goes below the threshold. Then solid_dmft uses MaxEnt to set the chemical potential in the middle of the gap * <code class="docutils literal notranslate"><span class="pre">mu_gap_occ_deviation</span> <span class="pre">=</span> <span class="pre">0.4</span></code>: additional condition for the above described procedure. Only uses MaxEnt if the
+occupation after a solver run deviates from the target occupation by this value</p>
+<p>Group [solver]: * <code class="docutils literal notranslate"><span class="pre">measure_G_l</span> <span class="pre">=</span> <span class="pre">True</span></code>: turns on measuring the Green’s function in Legendre coefficients</p>
+<div class="line-block">
+<div class="line">Group [dft]: * <code class="docutils literal notranslate"><span class="pre">n_iter</span> <span class="pre">=</span> <span class="pre">15</span></code>: number of DFT iterations between the DMFT occupations. Should be large enough for the density correction to be fully mixed into the DFT calculation * <code class="docutils literal notranslate"><span class="pre">n_cores</span> <span class="pre">=</span> <span class="pre">32</span></code>: number of cores that DFT is run on. Check how many cores achieve the optimal DFT performance * <code class="docutils literal notranslate"><span class="pre">dft_code</span> <span class="pre">=</span> <span class="pre">vasp</span></code>: we are running VASP * <code class="docutils literal notranslate"><span class="pre">dft_exec</span> <span class="pre">=</span> <span class="pre">vasp_std</span></code>: the executable is vasp_std and its path is in the ROOT variable in our docker setup</div>
+<div class="line">* <code class="docutils literal notranslate"><span class="pre">mpi_env</span> <span class="pre">=</span> <span class="pre">local</span></code>: sets the mpi environment * <code class="docutils literal notranslate"><span class="pre">projector_type</span> <span class="pre">=</span> <span class="pre">plo</span></code>: chooses PLO projectors</div>
+</div>
+<p>The <a class="reference external" href="2_dmft_csc/plo.cfg" rel="noopener noreferrer" target="_blank">plo.cfg</a> file is described <a class="reference external" href="https://triqs.github.io/dft_tools/latest/guide/conv_vasp.html" rel="noopener noreferrer" target="_blank">here</a>. The <a class="reference external" href="2_dmft_csc/rotations.dat" rel="noopener noreferrer" target="_blank">rotations.dat</a> file is generated by diagonalizing the local d-shell density matrix and identifying the least occupied eigenstates as eg states.</p>
+</div>
+<div class="section" id="Starting-the-calculations">
+<h3>Starting the calculations<a class="headerlink" href="#Starting-the-calculations" title="Permalink to this headline">¶</a></h3>
+<p>Now we can start the calculations:</p>
 <ul class="simple">
-<li>Explain plo.cfg, dmft_config.ini (n_l), and rotations.dat</li>
-<li>Say how to adjust parameters for well-converged calculations</li>
-<li>Explain other input files?</li>
+<li>Go into the folder <code class="docutils literal notranslate"><span class="pre">2_dmft_csc</span></code></li>
+<li>Link relevant files like CHGCAR, KPOINTS, POSCAR, POTCAR from previous directory by running <code class="docutils literal notranslate"><span class="pre">./2_link_files.sh</span></code></li>
+<li>Run with <code class="docutils literal notranslate"><span class="pre">mpirun</span> <span class="pre">-n</span> <span class="pre">32</span> <span class="pre">python3</span> <span class="pre">uni_dmft.py</span></code></li>
 </ul>
+</div>
+<div class="section" id="Analyzing-the-projectors">
+<h3>Analyzing the projectors<a class="headerlink" href="#Analyzing-the-projectors" title="Permalink to this headline">¶</a></h3>
+<p>Now we plot the DOS of the PLOs we are using to make sure that our correlated subspace works out as expected. You can speed up the calculation of the PLOs by removing the calculation of the DOS from the plo.cfg file.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[87]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">energies</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">doss</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">imp</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;2_dmft_csc/refs/pdos_0_</span><span class="si">{</span><span class="n">imp</span><span class="si">}</span><span class="s1">.dat&#39;</span><span class="p">,</span> <span class="n">unpack</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;2_dmft_csc</span><span class="si">{</span><span class="n">path_mod</span><span class="si">}</span><span class="s1">/pdos_0_</span><span class="si">{</span><span class="n">imp</span><span class="si">}</span><span class="s1">.dat&#39;</span><span class="p">,</span> <span class="n">unpack</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">energies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="n">doss</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
 
@@ -605,7 +634,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[88]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -632,41 +661,60 @@ div.rendered_html tbody tr:hover {
 <img alt="../../_images/tutorials_PrNiO3_csc_vasp_plo_cthyb_tutorial_10_0.png" src="../../_images/tutorials_PrNiO3_csc_vasp_plo_cthyb_tutorial_10_0.png" />
 </div>
 </div>
-<p>Shows: We are capturing the right bands, small changes from charge self-consistency</p>
+<p>This plot shows the original DFT charge density and the PLO-DOS after applying the DMFT charge corrections. It proves that we are capturing indeed capturing the eg bands with the projectors, where the partial DOS differs a bit because of the changes from the charge self-consistency. Note that this quantity in the CSC DMFT formalism does not have any real meaning, it mainly serves as a check of the method. The correct quantity to analyze are the lattice or impurity Green’s functions.</p>
 </div>
 </div>
-<div class="section" id="3.-Analyzing-the-observables_impn.dat">
-<h2>3. Analyzing the observables_imp<span class="math notranslate nohighlight">\(n\)</span>.dat<a class="headerlink" href="#3.-Analyzing-the-observables_impn.dat" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="2.3.-Plotting-the-results:-observables">
+<h2>2.3. Plotting the results: observables<a class="headerlink" href="#2.3.-Plotting-the-results:-observables" title="Permalink to this headline">¶</a></h2>
+<p>We first read in the pre-computed observables from the h5 archive and print their names:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[66]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">observables_data</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;2_dmft_csc/refs/observables_imp</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">.dat&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
-        <span class="n">observables_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">((</span><span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">file</span><span class="p">),</span> <span class="n">skiprows</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
-<span class="n">observables_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">observables_data</span><span class="p">)</span>
+<span></span><span class="k">with</span> <span class="n">HDFArchive</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;2_dmft_csc</span><span class="si">{</span><span class="n">path_mod</span><span class="si">}</span><span class="s1">/vasp.h5&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">archive</span><span class="p">:</span>
+    <span class="n">observables</span> <span class="o">=</span> <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_results/observables&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[85]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">observables</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+dict_keys([&#39;E_DC&#39;, &#39;E_bandcorr&#39;, &#39;E_corr_en&#39;, &#39;E_dft&#39;, &#39;E_int&#39;, &#39;E_tot&#39;, &#39;imp_gb2&#39;, &#39;imp_occ&#39;, &#39;iteration&#39;, &#39;mu&#39;, &#39;orb_Z&#39;, &#39;orb_gb2&#39;, &#39;orb_occ&#39;])
+</pre></div></div>
+</div>
+<p>We will now use this to plot the occupation per impurity <code class="docutils literal notranslate"><span class="pre">imp_occ</span></code> (to see if there is charge disproportionation), the impurity Green’s function at <span class="math notranslate nohighlight">\(\tau=\beta/2\)</span> <code class="docutils literal notranslate"><span class="pre">imp_gb2</span></code> (to see if the system becomes insulating), the total energy <code class="docutils literal notranslate"><span class="pre">E_tot</span></code> and the DFT energy <code class="docutils literal notranslate"><span class="pre">E_dft</span></code> over the iterations:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
-    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">observables_data</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">6</span><span class="p">],</span> <span class="s1">&#39;.-&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;C</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">observables_data</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">2</span><span class="p">]</span><span class="o">+</span><span class="n">observables_data</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">3</span><span class="p">],</span> <span class="s1">&#39;.-&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;C</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">observables</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;up&#39;</span><span class="p">])</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">observables</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;down&#39;</span><span class="p">]),</span> <span class="s1">&#39;.-&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;C</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Impurity </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">observables</span><span class="p">[</span><span class="s1">&#39;imp_gb2&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;up&#39;</span><span class="p">])</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">observables</span><span class="p">[</span><span class="s1">&#39;imp_gb2&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;down&#39;</span><span class="p">]),</span> <span class="s1">&#39;.-&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;C</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
 <span class="c1"># Not impurity-dependent</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">observables_data</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">7</span><span class="p">],</span> <span class="s1">&#39;.-&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Total energy&#39;</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">observables_data</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">8</span><span class="p">],</span> <span class="s1">&#39;x--&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;DFT energy&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_tot&#39;</span><span class="p">],</span> <span class="s1">&#39;.-&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Total energy&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_dft&#39;</span><span class="p">],</span> <span class="s1">&#39;x--&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;DFT energy&#39;</span><span class="p">)</span>
 
 <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Imp. occupation</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$G(\beta/2)$&#39;</span><span class="p">)</span>
 <span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Energy&#39;</span><span class="p">)</span>
 <span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
@@ -681,27 +729,30 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_PrNiO3_csc_vasp_plo_cthyb_tutorial_14_0.png" src="../../_images/tutorials_PrNiO3_csc_vasp_plo_cthyb_tutorial_14_0.png" />
+<img alt="../../_images/tutorials_PrNiO3_csc_vasp_plo_cthyb_tutorial_15_0.png" src="../../_images/tutorials_PrNiO3_csc_vasp_plo_cthyb_tutorial_15_0.png" />
 </div>
 </div>
-<p>Shows: - Occupation converges towards disproportionated 1.8+0.2 electrons state - Both sites become insulating, relation is <span class="math notranslate nohighlight">\(A(\omega = 0) \approx -(\beta/\pi) G(\beta/2)\)</span> - The DFT energy barely changes (this is qualitatively different for other systems!), the total energy converges to value</p>
+<p>These plots show: * The occupation converges towards a disproportionated 1.8+0.2 electrons state * Both sites become insulating, which we can deduce from <span class="math notranslate nohighlight">\(G(\beta/2)\)</span> from its relation to the spectral function at the Fermi energy <span class="math notranslate nohighlight">\(A(\omega = 0) \approx -(\beta/\pi) G(\beta/2)\)</span> * The DFT energy barely changes here (this is qualitatively different for other systems!), and the total energy converges to a different value than the DFT energy once the system has stabilized in the
+insulating state</p>
+<p>Therefore, we can conclude that we managed to capture the desired paramagnetic, insulating state that PrNiO3 shows in the experiments.</p>
 </div>
-<div class="section" id="4.-Analyzing-the-h5-archive:-the-Legendre-Green’s-function">
-<h2>4. Analyzing the h5 archive: the Legendre Green’s function<a class="headerlink" href="#4.-Analyzing-the-h5-archive:-the-Legendre-Green’s-function" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="2.4.-Plotting-the-results:-the-Legendre-Green’s-function">
+<h2>2.4. Plotting the results: the Legendre Green’s function<a class="headerlink" href="#2.4.-Plotting-the-results:-the-Legendre-Green’s-function" title="Permalink to this headline">¶</a></h2>
+<p>We now take a look at the imaginary-time Green’s function expressed in Legendre coefficients <span class="math notranslate nohighlight">\(G_l\)</span>. This is the main solver output (if we are measuring it) and also saved in the h5 archive.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[89]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">legendre_gf</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">with</span> <span class="n">HDFArchive</span><span class="p">(</span><span class="s1">&#39;2_dmft_csc/refs/vasp.h5&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">archive</span><span class="p">:</span>
+<span class="k">with</span> <span class="n">HDFArchive</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;2_dmft_csc</span><span class="si">{</span><span class="n">path_mod</span><span class="si">}</span><span class="s1">/vasp.h5&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">archive</span><span class="p">:</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
         <span class="n">legendre_gf</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">archive</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;DMFT_results/last_iter/Gimp_l_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[90]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -716,9 +767,9 @@ div.rendered_html tbody tr:hover {
     <span class="n">l_max</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
 
     <span class="n">ax</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">l_max</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">::</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">real</span><span class="p">,</span> <span class="n">axis1</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">axis2</span><span class="o">=</span><span class="mi">1</span><span class="p">)),</span> <span class="s1">&#39;x-&#39;</span><span class="p">,</span>
-                <span class="n">c</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;C</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Imp. </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">, even indices&#39;</span><span class="p">)</span>
+                <span class="n">c</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;C</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Imp. </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">, even indices&#39;</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">l_max</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">real</span><span class="p">,</span> <span class="n">axis1</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">axis2</span><span class="o">=</span><span class="mi">1</span><span class="p">)),</span> <span class="s1">&#39;.:&#39;</span><span class="p">,</span>
-                <span class="n">c</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;C</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Imp. </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">, odd indices&#39;</span><span class="p">)</span>
+                <span class="n">c</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;C</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Imp. </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">, odd indices&#39;</span><span class="p">)</span>
 
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 
@@ -735,20 +786,14 @@ div.rendered_html tbody tr:hover {
 <img alt="../../_images/tutorials_PrNiO3_csc_vasp_plo_cthyb_tutorial_18_0.png" src="../../_images/tutorials_PrNiO3_csc_vasp_plo_cthyb_tutorial_18_0.png" />
 </div>
 </div>
-<p>Discuss: - Choice of n_l: If too small, we are missing information. If too large, not filtering noise efficiently noise - Often effective noise filter. See also doi.org/10.1103/PhysRevB.84.075145 - Noise should reduce with sqrt(n_cycles_tot) for QMC calculations but prefactor depends on material and its Hamiltonian, the electron filling, …</p>
+<p>The choice of the correct <code class="docutils literal notranslate"><span class="pre">n_l</span></code>, i.e., the Legendre cutoff is important. If it is too small, we are ignoring potential information about the Green’s function. If it is too large, the noise filtering is not efficient. This can be seen by first running a few iterations with large <code class="docutils literal notranslate"><span class="pre">n_l</span></code>, e.g., 50. Then, the coefficients will first decay exponentially as in the plot above and then at higher <span class="math notranslate nohighlight">\(l\)</span> starting showing noisy behavior. For more information about the Legendre coefficients, take a
+look <a class="reference external" href="https://doi.org/10.1103/PhysRevB.84.075145" rel="noopener noreferrer" target="_blank">here</a>.</p>
+<p>The noise itself should reduce with sqrt(<code class="docutils literal notranslate"><span class="pre">n_cycles_tot</span></code>) for QMC calculations but the prefactor always depends on material and its Hamiltonian, the electron filling, etc. But if you increase <code class="docutils literal notranslate"><span class="pre">n_cycles_tot</span></code>, make sure to test if you can include more Legendre coefficients.</p>
 </div>
-<div class="section" id="5.-Further-things-to-try-here">
-<h2>5. Further things to try here<a class="headerlink" href="#5.-Further-things-to-try-here" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>change U and J and try to see if you can reach a metallic state. What does the occupation look like?</li>
-</ul>
-</div>
-</div>
-<div class="section" id="To-do">
-<h1>To do<a class="headerlink" href="#To-do" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li>add flag to plot files in refs folder or not</li>
-</ul>
+<div class="section" id="2.5.-Next-steps-to-try">
+<h2>2.5. Next steps to try<a class="headerlink" href="#2.5.-Next-steps-to-try" title="Permalink to this headline">¶</a></h2>
+<p>Here are some suggestions on how continue on this type of DMFT calculations: * change U and J and try to see if you can reach a metallic state. What does the occupation look like? * try for better convergence: change <code class="docutils literal notranslate"><span class="pre">n_cycles_tot</span></code> and <code class="docutils literal notranslate"><span class="pre">n_l</span></code> * play around with the other parameters in the dmft_config.ini * analyze other quantities or have a look at the spectral functions from analytical continuation * try other ways to construct the correlated orbitals in CSC, e.g., with Wannier90 *
+apply this to the material of your choice!</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
@@ -756,6 +801,7 @@ div.rendered_html tbody tr:hover {
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span>
 </pre></div>
+</div>
 </div>
 </div>
 </div>

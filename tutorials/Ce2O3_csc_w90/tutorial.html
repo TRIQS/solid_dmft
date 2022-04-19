@@ -19,7 +19,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="4. OS with VASP/PLOs and cthyb: AFM state of NdNiO2" href="../NNO_os_plo_mag/tutorial.html" />
-    <link rel="prev" title="Running a charge self-consistent (CSC) calculation on PrNiO3 with VASP PLOs" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html" /> 
+    <link rel="prev" title="2. CSC with VASP PLOs" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -152,18 +152,19 @@
 <li class="toctree-l3"><a class="reference internal" href="../SVO_os_qe/tutorial.html#5-Visualizing-the-MIT">5 Visualizing the MIT</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html">Running a charge self-consistent (CSC) calculation on PrNiO3 with VASP PLOs</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#1.-Running-the-initial-SCF-DFT-calculation-(~-1-2-core-hours)">1. Running the initial SCF DFT calculation (~ 1-2 core hours)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#2.-Running-the-CSC-DMFT-calculations-(~-x-core-hours)">2. Running the CSC DMFT calculations (~ x core hours)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html">2. CSC with VASP PLOs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#2.1.-Running-the-initial-scf-DFT-calculation-(~-2-core-hours)">2.1. Running the initial scf DFT calculation (~ 2 core hours)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#2.2.-Running-the-CSC-DMFT-calculations-(~-150-core-hours)">2.2. Running the CSC DMFT calculations (~ 150 core hours)</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Input-files-for-CSC-DMFT-calculations">Input files for CSC DMFT calculations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Starting-the-calculations">Starting the calculations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Analyzing-the-projectors">Analyzing the projectors</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Analyzing-the-observables_impn.dat">3. Analyzing the observables_imp<span class="math notranslate nohighlight">\(n\)</span>.dat</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Analyzing-the-h5-archive:-the-Legendre-Green’s-function">4. Analyzing the h5 archive: the Legendre Green’s function</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Further-things-to-try-here">5. Further things to try here</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#2.3.-Plotting-the-results:-observables">2.3. Plotting the results: observables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#2.4.-Plotting-the-results:-the-Legendre-Green’s-function">2.4. Plotting the results: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#2.5.-Next-steps-to-try">2.5. Next steps to try</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#To-do">To do</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">3. CSC with QE/W90 and HubbardI: total energy in Ce2O3</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#1.-Input-file-preparation">1. Input file preparation</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#DFT-files">DFT files</a></li>
@@ -912,7 +913,7 @@ Starting serial run at: 2022-03-25 12:42:36.663824
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html" class="btn btn-neutral float-left" title="Running a charge self-consistent (CSC) calculation on PrNiO3 with VASP PLOs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html" class="btn btn-neutral float-left" title="2. CSC with VASP PLOs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="../NNO_os_plo_mag/tutorial.html" class="btn btn-neutral float-right" title="4. OS with VASP/PLOs and cthyb: AFM state of NdNiO2" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
