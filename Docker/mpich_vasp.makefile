@@ -7,12 +7,13 @@ CPP_OPTIONS= -DHOST=\"LinuxIFC\"\
              -Dvasp6 \
              -Duse_bse_te \
              -Dtbdyn \
-             -DVASP2WANNIER90
+             -DVASP2WANNIER90 \
+             -D_OPENMP
 
 CPP        = gcc -E -P -C -w $*$(FUFFIX) >$*$(SUFFIX) $(CPP_OPTIONS)
 
-FC         = mpif90 -m64
-FCL        = mpif90 -m64
+FC         = mpif90 -m64 -fopenmp
+FCL        = mpif90 -m64 -fopenmp
 
 FREE       = -ffree-form -ffree-line-length-none -fallow-argument-mismatch -fno-strict-aliasing
 

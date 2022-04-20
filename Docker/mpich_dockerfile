@@ -85,6 +85,7 @@ RUN pip3 install --no-cache-dir \
     zmq \
     notebook \
     tk \
+    scikit-image \
     # Jupyter lab packages
     jupyterlab \
     descartes \
@@ -113,7 +114,6 @@ RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/triqs
     && mkdir -p triqs.build && cd triqs.build \
     && cmake ../triqs.src -DCMAKE_INSTALL_PREFIX=/triqs \
        -DBLAS_LIBRARIES=/lib/x86_64-linux-gnu/libmkl_rt.so \
-#       -DCMAKE_CXX_COMPILER_ID=Clang \
        -DLIBCLANG_LOCATION=/usr/lib/llvm-13/lib/libclang.so \
     && make -j2
 RUN cd /source/triqs.build && make -j2 test && make install
@@ -172,7 +172,7 @@ RUN cd /source && git clone -b unstable --depth 1 https://github.com/flatironins
 RUN cd / && git clone -b v3.1.0 --depth 1 https://github.com/wannier-developers/wannier90.git
 # Make gfort use the intel libraries
 COPY wannier90.make.inc /wannier90/make.inc
-RUN cd /wannier90 && make default lib
+RUN cd /wannier90 && make default lib && rm -r test-suite
 
 # TODO: include scalapack
 # Adds modified VASP for CSC calculations
@@ -188,7 +188,7 @@ RUN cd /vasp/src \
 # TODO: add ncl
 RUN cd /vasp/ \
     && make std \
-    && rm -rf src/ build/ arch/ vasp_diffs/
+    && rm -rf src/ build/ arch/ vasp_diffs/ testsuite/
 
 ENV PATH=/vasp/bin:/wannier90:${PATH}
 

@@ -24,10 +24,7 @@ LREAL = .FALSE. ! my master's voice told me to
 ALGO = Normal
 !! subspace rotation - TRUE (=default) means slower and more stable for metals, small gaps
 ! LDIAG = .TRUE.
-!! parallelization parameters
-LPLANE = .TRUE. ! TRUE for not massively parallel (1000) computations
-NSIM = 2 ! 4 should increase performance
-NCORE = 6
+NCORE = 1
 
 LMAXMIX=6
 LORBIT=14
@@ -37,4 +34,4 @@ LOCPROJ = 2 : d : Pr
 
 !! write WAVECAR, CHGCAR
 LWAVE = .FALSE.
-LCHARG = .TRUE.
+LCHARG = .FALSE.
