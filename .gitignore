@@ -1,9 +1,13 @@
 compile_commands.json
-.ipynb_checkpoints
-ipynb_checkpoints
 /doc/html
 /doc/_autosummary
-/.vscode
 doc/cpp2rst_generated
+
+.vscode
 .spyproject
 __pycache__
+ipynb_checkpoints
+.ipynb_checkpoints
+
+POTCAR
+vasp.6.3.0.tgz
