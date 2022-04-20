@@ -457,7 +457,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">density_matrix</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">h_loc_diagonalization</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;solver_type&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;cthyb&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;measure_chi_SzSz&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;solver_type&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;cthyb&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;measure_chi&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;none&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">O_time</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">_init_ReFreq_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -964,7 +964,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">perturbation_order</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">triqs_solver</span><span class="o">.</span><span class="n">perturbation_order</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">perturbation_order_total</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">triqs_solver</span><span class="o">.</span><span class="n">perturbation_order_total</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;measure_chi_SzSz&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;measure_chi&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;none&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">O_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">triqs_solver</span><span class="o">.</span><span class="n">O_tau</span>
 
         <span class="k">return</span>

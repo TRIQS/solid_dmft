@@ -350,7 +350,7 @@
         <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">density_matrix</span> <span class="o">=</span> <span class="n">solvers</span><span class="p">[</span><span class="n">imp_source</span><span class="p">]</span><span class="o">.</span><span class="n">density_matrix</span>
         <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">h_loc_diagonalization</span> <span class="o">=</span> <span class="n">solvers</span><span class="p">[</span><span class="n">imp_source</span><span class="p">]</span><span class="o">.</span><span class="n">h_loc_diagonalization</span>
 
-    <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;measure_chi_SzSz&#39;</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;measure_chi&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;none&#39;</span><span class="p">:</span>
         <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">O_time</span> <span class="o">=</span> <span class="n">solvers</span><span class="p">[</span><span class="n">imp_source</span><span class="p">]</span><span class="o">.</span><span class="n">O_time</span>
 
     <span class="k">return</span> <span class="n">solvers</span>

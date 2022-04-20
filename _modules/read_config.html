@@ -413,8 +413,9 @@
 <span class="sd">            use hloc_dft to diagonalize occupations = &#39;hloc&#39;</span>
 <span class="sd">oneshot_postproc_gamma_file : bool, optional, default=False</span>
 <span class="sd">            write the GAMMA file for vasp after completed one-shot calculations</span>
-<span class="sd">measure_chi_SzSz: bool, optional, default=False</span>
-<span class="sd">            measure the dynamic spin suszeptibility chi(sz,sz(tau))</span>
+<span class="sd">measure_chi: string, optional, default=None</span>
+<span class="sd">            measure dynamic suszeptibility &lt;Op(tau) Op(0)&gt; , can be either</span>
+<span class="sd">            &#39;SzSz&#39;: &lt; Sz(tau) Sz(0) &gt; , or &#39;NN&#39;: &lt; N(tau) N(0) &gt;</span>
 <span class="sd">            triqs.github.io/cthyb/unstable/guide/dynamic_susceptibility_notebook.html</span>
 <span class="sd">measure_chi_insertions: int, optional, default=100</span>
 <span class="sd">            number of insertation for measurement of chi</span>
@@ -769,7 +770,7 @@
                                  <span class="s1">&#39;oneshot_postproc_gamma_file&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;converter&#39;</span><span class="p">:</span> <span class="n">BOOL_PARSER</span><span class="p">,</span>
                                                                  <span class="s1">&#39;used&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">params</span><span class="p">:</span> <span class="ow">not</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">][</span><span class="s1">&#39;csc&#39;</span><span class="p">],</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
 
-                                 <span class="s1">&#39;measure_chi_SzSz&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;converter&#39;</span><span class="p">:</span> <span class="n">BOOL_PARSER</span><span class="p">,</span> <span class="s1">&#39;used&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+                                 <span class="s1">&#39;measure_chi&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;valid for&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;SzSz&#39;</span><span class="p">,</span> <span class="s1">&#39;NN&#39;</span><span class="p">,</span> <span class="s1">&#39;none&#39;</span><span class="p">),</span> <span class="s1">&#39;used&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;none&#39;</span><span class="p">},</span>
 
                                  <span class="s1">&#39;measure_chi_insertions&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;converter&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;used&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">},</span>
 

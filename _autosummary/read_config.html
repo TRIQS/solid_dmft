@@ -355,7 +355,8 @@ mu_mix_const = 1.0 and mu_mix_per_occupation_offset = 0.0 means no mixing.</dd>
 <dt>set_rot<span class="classifier">string, optional, default=’none’</span></dt><dd>use density_mat_dft to diagonalize occupations = ‘den’
 use hloc_dft to diagonalize occupations = ‘hloc’</dd>
 <dt>oneshot_postproc_gamma_file<span class="classifier">bool, optional, default=False</span></dt><dd>write the GAMMA file for vasp after completed one-shot calculations</dd>
-<dt>measure_chi_SzSz: bool, optional, default=False</dt><dd>measure the dynamic spin suszeptibility chi(sz,sz(tau))
+<dt>measure_chi: string, optional, default=None</dt><dd>measure dynamic suszeptibility &lt;Op(tau) Op(0)&gt; , can be either
+‘SzSz’: &lt; Sz(tau) Sz(0) &gt; , or ‘NN’: &lt; N(tau) N(0) &gt;
 triqs.github.io/cthyb/unstable/guide/dynamic_susceptibility_notebook.html</dd>
 <dt>measure_chi_insertions: int, optional, default=100</dt><dd>number of insertation for measurement of chi</dd>
 <dt>mu_gap_gb2_threshold<span class="classifier">float, optional, default=none</span></dt><dd>Threshold of the absolute of the lattice GF at tau=beta/2 for use
