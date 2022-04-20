@@ -84,7 +84,7 @@ def test_config_file_1():
     assert are_iterables_equal(parameters, {'dft': {},
                                             'general': {'magnetic': False, 'fixed_mu_value': 'none',
                                                         'mu_update_freq': 1,
-                                                        'measure_chi_SzSz': False, 'block_threshold': 0.001,
+                                                        'measure_chi': 'none', 'block_threshold': 0.001,
                                                         'set_rot': u'none', 'prec_mu': -0.001,
                                                         'dft_mu': u'none', 'solver_type': 'cthyb',
                                                         'mu_mix_const': 1., 'mu_mix_per_occupation_offset': 0.,
@@ -205,7 +205,7 @@ def test_config_file_2():
     print(parameters)
     assert are_iterables_equal(parameters, {'dft': {},
                                             'general': {'afm_order': True, 'magnetic': True,
-                                                        'measure_chi_SzSz': False,
+                                                        'measure_chi': 'none',
                                                         'block_threshold': 0.001, 'set_rot': u'none',
                                                         'prec_mu': 0.001, 'dft_mu': u'none',
                                                         'mu_mix_const': 1., 'mu_mix_per_occupation_offset': 0.,
