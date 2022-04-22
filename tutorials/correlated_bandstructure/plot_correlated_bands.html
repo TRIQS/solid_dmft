@@ -745,7 +745,7 @@ Warning: could not identify MPI environment!
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-Starting serial run at: 2022-04-22 19:10:22.348692
+Starting serial run at: 2022-04-22 19:23:35.594035
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -754,11 +754,11 @@ Starting serial run at: 2022-04-22 19:10:22.348692
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 H(R=0):
-      0.5811+0.0000j  0.0000+0.0000j  0.0000+0.0000j
-      0.0000+0.0000j  0.5811+0.0000j  0.0000+0.0000j
-      0.0000+0.0000j  0.0000+0.0000j  0.5811+0.0000j
+      0.5811  0.0000  0.0000
+      0.0000  0.5811  0.0000
+      0.0000  0.0000  0.5811
 Setting Sigma from ./svo_example.h5
-Run took 0.632 s
+Run took 0.626 s
 </pre></div></div>
 </div>
 <p>That’s it. Now you can look at the output:</p>
@@ -788,7 +788,7 @@ Run took 0.632 s
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-/__w/solid_dmft/solid_dmft/solid_dmft.build/python/solid_dmft/postprocessing/plot_correlated_bands.py:415: MatplotlibDeprecationWarning: shading=&#39;flat&#39; when X and Y have the same dimensions as C is deprecated since 3.3.  Either specify the corners of the quadrilaterals with X and Y, or pass shading=&#39;auto&#39;, &#39;nearest&#39; or &#39;gouraud&#39;, or set rcParams[&#39;pcolor.shading&#39;].  This will become an error two minor releases later.
+/__w/solid_dmft/solid_dmft/solid_dmft.build/python/solid_dmft/postprocessing/plot_correlated_bands.py:421: MatplotlibDeprecationWarning: shading=&#39;flat&#39; when X and Y have the same dimensions as C is deprecated since 3.3.  Either specify the corners of the quadrilaterals with X and Y, or pass shading=&#39;auto&#39;, &#39;nearest&#39; or &#39;gouraud&#39;, or set rcParams[&#39;pcolor.shading&#39;].  This will become an error two minor releases later.
   graph = ax.pcolormesh(kw_x, kw_y, alatt_k_w.T, cmap=plot_dict[&#39;colorscheme_bands&#39;], norm=Normalize(vmin=plot_dict[&#39;vmin&#39;], vmax=np.max(alatt_k_w)))
 </pre></div></div>
 </div>
