@@ -110,7 +110,7 @@ ENV FFLAGS="-m64 -O3"
 # triqs
 RUN cd / && mkdir -p triqs && mkdir -p source
 
-RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/triqs triqs.src \
+RUN cd /source && git clone -b 3.1.x --depth 1 https://github.com/TRIQS/triqs triqs.src \
     && mkdir -p triqs.build && cd triqs.build \
     && cmake ../triqs.src -DCMAKE_INSTALL_PREFIX=/triqs \
        -DBLAS_LIBRARIES=/lib/x86_64-linux-gnu/libmkl_rt.so \
@@ -127,19 +127,19 @@ ENV CMAKE_PREFIX_PATH=/triqs/share/cmake:${CMAKE_PREFIX_PATH}
 ENV TRIQS_ROOT=/triqs
 
 # dft_tools
-RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/dft_tools.git dft_tools.src \
+RUN cd /source && git clone -b 3.1.x --depth 1 https://github.com/TRIQS/dft_tools.git dft_tools.src \
     && mkdir -p dft_tools.build && cd dft_tools.build \
     && cmake ../dft_tools.src -DCMAKE_INSTALL_PREFIX=/triqs \
     && make -j2 && make -j2 test && make install
 
 # cthyb
-RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/cthyb.git cthyb.src \
+RUN cd /source && git clone -b 3.1.x --depth 1 https://github.com/TRIQS/cthyb.git cthyb.src \
     && mkdir -p cthyb.build && cd cthyb.build \
     && cmake ../cthyb.src -DCMAKE_INSTALL_PREFIX=/triqs \
     && make -j2 && make -j2 test && make install
 
 # maxent
-RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/maxent.git maxent.src \
+RUN cd /source && git clone -b 3.1.x --depth 1 https://github.com/TRIQS/maxent.git maxent.src \
     && mkdir -p maxent.build && cd maxent.build \
     && cmake ../maxent.src -DCMAKE_INSTALL_PREFIX=/triqs \
     && make -j2 && make -j2 test && make install
@@ -151,13 +151,13 @@ RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/maxen
 #     && make -j2 && make -j2 test && make install
 
 # hubbardI
-RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hubbardI hubbardI.src \
+RUN cd /source && git clone -b 3.1.x --depth 1 https://github.com/TRIQS/hubbardI hubbardI.src \
     && mkdir -p hubbardI.build && cd hubbardI.build \
     && cmake ../hubbardI.src -DCMAKE_INSTALL_PREFIX=/triqs \
     && make -j2 && make -j2 test && make install
 
 # solid_dmft
-RUN cd /source && git clone -b unstable --depth 1 https://github.com/flatironinstitute/solid_dmft.git solid_dmft.src \
+RUN cd /source && git clone -b 3.1.x --depth 1 https://github.com/flatironinstitute/solid_dmft.git solid_dmft.src \
     && mkdir -p solid_dmft.build && cd solid_dmft.build \
     && cmake ../solid_dmft.src -DCMAKE_INSTALL_PREFIX=/triqs \
     && make -j2 && make -j2 test && make install
