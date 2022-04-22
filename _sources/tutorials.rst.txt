@@ -3,7 +3,10 @@
 Tutorials
 ==========
 
-These tutorials provide an overview about typical workflows to perform DFT+DMFT calculations with solid_dmft. The tutorials are sorted by complexity and introduce one after another more available features. The tutorials are run with the 3.1.x branch of triqs. 
+These tutorials provide an overview about typical workflows to perform DFT+DMFT calculations with solid_dmft. The tutorials are sorted by complexity and introduce one after another more available features. 
+
+.. note::
+   The tutorials are run with the 3.1.x branch of triqs. Please use the 3.1.x branch for triqs and all applications to reproduce the results shown here. 
 
 Short description of the tutorials linked below: 
 

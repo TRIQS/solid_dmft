@@ -16,7 +16,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="1. Running a one-shot DMFT calculation on SrVO3" href="tutorials/SVO_os_qe/tutorial.html" />
+    <link rel="next" title="1. OS with QE/W90 and cthyb: SrVO3 MIT" href="tutorials/SVO_os_qe/tutorial.html" />
     <link rel="prev" title="util.write_kslice_to_h5" href="_autosummary/util.write_kslice_to_h5.html" /> 
 </head>
 
@@ -142,7 +142,7 @@
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorials</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/SVO_os_qe/tutorial.html">1. Running a one-shot DMFT calculation on SrVO3</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/SVO_os_qe/tutorial.html">1. OS with QE/W90 and cthyb: SrVO3 MIT</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="tutorials/SVO_os_qe/tutorial.html#1.-Starting-out-with-DMFT">1. Starting out with DMFT</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tutorials/SVO_os_qe/tutorial.html#2.-Looking-at-the-Metal-Insulator-Transition">2. Looking at the Metal-Insulator Transition</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tutorials/SVO_os_qe/tutorial.html#3.-Refinining-the-diagram">3. Refinining the diagram</a></li>
@@ -150,9 +150,9 @@
 <li class="toctree-l3"><a class="reference internal" href="tutorials/SVO_os_qe/tutorial.html#5-Visualizing-the-MIT">5 Visualizing the MIT</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html">2. CSC with VASP PLOs</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#2.1.-Running-the-initial-scf-DFT-calculation-(~-2-core-hours)">2.1. Running the initial scf DFT calculation (~ 2 core hours)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#2.2.-Running-the-CSC-DMFT-calculations-(~-150-core-hours)">2.2. Running the CSC DMFT calculations (~ 150 core hours)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html">2. CSC with VASP PLOs: charge order in PrNiO3</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#2.1.-Running-the-initial-scf-DFT-calculation">2.1. Running the initial scf DFT calculation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#2.2.-Running-the-CSC-DMFT-calculations">2.2. Running the CSC DMFT calculations</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Input-files-for-CSC-DMFT-calculations">Input files for CSC DMFT calculations</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Starting-the-calculations">Starting the calculations</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Analyzing-the-projectors">Analyzing the projectors</a></li>
@@ -255,7 +255,11 @@
 </style>
 <div class="section" id="tutorials">
 <span id="id1"></span><h1>Tutorials<a class="headerlink" href="#tutorials" title="Permalink to this headline">¶</a></h1>
-<p>These tutorials provide an overview about typical workflows to perform DFT+DMFT calculations with solid_dmft. The tutorials are sorted by complexity and introduce one after another more available features. The tutorials are run with the 3.1.x branch of triqs.</p>
+<p>These tutorials provide an overview about typical workflows to perform DFT+DMFT calculations with solid_dmft. The tutorials are sorted by complexity and introduce one after another more available features.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The tutorials are run with the 3.1.x branch of triqs. Please use the 3.1.x branch for triqs and all applications to reproduce the results shown here.</p>
+</div>
 <p>Short description of the tutorials linked below:</p>
 <ol class="arabic simple">
 <li>Typical one-shot (OS) DMFT calculation based on prepared hdf5 archive for SrVO3</li>
@@ -267,7 +271,7 @@
 <hr class="docutils" />
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/SVO_os_qe/tutorial.html">1. Running a one-shot DMFT calculation on SrVO3</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/SVO_os_qe/tutorial.html">1. OS with QE/W90 and cthyb: SrVO3 MIT</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/SVO_os_qe/tutorial.html#1.-Starting-out-with-DMFT">1. Starting out with DMFT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/SVO_os_qe/tutorial.html#2.-Looking-at-the-Metal-Insulator-Transition">2. Looking at the Metal-Insulator Transition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/SVO_os_qe/tutorial.html#3.-Refinining-the-diagram">3. Refinining the diagram</a></li>
@@ -275,9 +279,9 @@
 <li class="toctree-l2"><a class="reference internal" href="tutorials/SVO_os_qe/tutorial.html#5-Visualizing-the-MIT">5 Visualizing the MIT</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html">2. CSC with VASP PLOs</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#2.1.-Running-the-initial-scf-DFT-calculation-(~-2-core-hours)">2.1. Running the initial scf DFT calculation (~ 2 core hours)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#2.2.-Running-the-CSC-DMFT-calculations-(~-150-core-hours)">2.2. Running the CSC DMFT calculations (~ 150 core hours)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html">2. CSC with VASP PLOs: charge order in PrNiO3</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#2.1.-Running-the-initial-scf-DFT-calculation">2.1. Running the initial scf DFT calculation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#2.2.-Running-the-CSC-DMFT-calculations">2.2. Running the CSC DMFT calculations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#2.3.-Plotting-the-results:-observables">2.3. Plotting the results: observables</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#2.4.-Plotting-the-results:-the-Legendre-Green’s-function">2.4. Plotting the results: the Legendre Green’s function</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#2.5.-Next-steps-to-try">2.5. Next steps to try</a></li>
@@ -310,7 +314,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="_autosummary/util.write_kslice_to_h5.html" class="btn btn-neutral float-left" title="util.write_kslice_to_h5" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="tutorials/SVO_os_qe/tutorial.html" class="btn btn-neutral float-right" title="1. Running a one-shot DMFT calculation on SrVO3" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="tutorials/SVO_os_qe/tutorial.html" class="btn btn-neutral float-right" title="1. OS with QE/W90 and cthyb: SrVO3 MIT" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

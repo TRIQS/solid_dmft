@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>2. CSC with VASP PLOs &mdash; solid_dmft  documentation</title><link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+  <title>2. CSC with VASP PLOs: charge order in PrNiO3 &mdash; solid_dmft  documentation</title><link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" /><link rel="shortcut icon" href="../../_static/favicon.ico"/>
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
@@ -19,7 +19,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="3. CSC with QE/W90 and HubbardI: total energy in Ce2O3" href="../Ce2O3_csc_w90/tutorial.html" />
-    <link rel="prev" title="1. Running a one-shot DMFT calculation on SrVO3" href="../SVO_os_qe/tutorial.html" /> 
+    <link rel="prev" title="1. OS with QE/W90 and cthyb: SrVO3 MIT" href="../SVO_os_qe/tutorial.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -144,7 +144,7 @@
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../tutorials.html">Tutorials</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../SVO_os_qe/tutorial.html">1. Running a one-shot DMFT calculation on SrVO3</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../SVO_os_qe/tutorial.html">1. OS with QE/W90 and cthyb: SrVO3 MIT</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../SVO_os_qe/tutorial.html#1.-Starting-out-with-DMFT">1. Starting out with DMFT</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../SVO_os_qe/tutorial.html#2.-Looking-at-the-Metal-Insulator-Transition">2. Looking at the Metal-Insulator Transition</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../SVO_os_qe/tutorial.html#3.-Refinining-the-diagram">3. Refinining the diagram</a></li>
@@ -152,9 +152,9 @@
 <li class="toctree-l3"><a class="reference internal" href="../SVO_os_qe/tutorial.html#5-Visualizing-the-MIT">5 Visualizing the MIT</a></li>
 </ul>
 </li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">2. CSC with VASP PLOs</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#2.1.-Running-the-initial-scf-DFT-calculation-(~-2-core-hours)">2.1. Running the initial scf DFT calculation (~ 2 core hours)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#2.2.-Running-the-CSC-DMFT-calculations-(~-150-core-hours)">2.2. Running the CSC DMFT calculations (~ 150 core hours)</a><ul>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">2. CSC with VASP PLOs: charge order in PrNiO3</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#2.1.-Running-the-initial-scf-DFT-calculation">2.1. Running the initial scf DFT calculation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#2.2.-Running-the-CSC-DMFT-calculations">2.2. Running the CSC DMFT calculations</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#Input-files-for-CSC-DMFT-calculations">Input files for CSC DMFT calculations</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#Starting-the-calculations">Starting the calculations</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#Analyzing-the-projectors">Analyzing the projectors</a></li>
@@ -222,7 +222,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="../../tutorials.html">Tutorials</a> &raquo;</li>
-      <li>2. CSC with VASP PLOs</li>
+      <li>2. CSC with VASP PLOs: charge order in PrNiO3</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../_sources/tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.ipynb.txt" rel="nofollow"> View page source</a>
       </li>
@@ -526,8 +526,8 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <p>Disclaimer: charge self-consistent (CSC) calculations are heavy. The current parameters won’t give well converged solution but are tuned down to give results in roughly 150 core hours.</p>
-<div class="section" id="2.-CSC-with-VASP-PLOs">
-<h1>2. CSC with VASP PLOs<a class="headerlink" href="#2.-CSC-with-VASP-PLOs" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="2.-CSC-with-VASP-PLOs:-charge-order-in-PrNiO3">
+<h1>2. CSC with VASP PLOs: charge order in PrNiO3<a class="headerlink" href="#2.-CSC-with-VASP-PLOs:-charge-order-in-PrNiO3" title="Permalink to this headline">¶</a></h1>
 <p>Set the variable <code class="docutils literal notranslate"><span class="pre">read_from_ref</span></code> below to False if you want to plot your own calculated results. Otherwise, the provided reference files are used.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
@@ -541,8 +541,9 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <p>PrNiO3 is a perovskite that exhibits a metal-insulator transition coupled to a breathing distortion and charge disproportionation, see <a class="reference external" href="https://doi.org/10.1038/s41535-019-0145-4" rel="noopener noreferrer" target="_blank">here</a>. In this tutorial, we will run DMFT calculation on the low-temperature insulating state. We will do this in a CSC way, where the correlated orbitals are defined by <a class="reference external" href="https://doi.org/10.1088/1361-648x/aae80a" rel="noopener noreferrer" target="_blank">projected localized orbitals (PLOs)</a> calculated with VASP.</p>
-<div class="section" id="2.1.-Running-the-initial-scf-DFT-calculation-(~-2-core-hours)">
-<h2>2.1. Running the initial scf DFT calculation (~ 2 core hours)<a class="headerlink" href="#2.1.-Running-the-initial-scf-DFT-calculation-(~-2-core-hours)" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="2.1.-Running-the-initial-scf-DFT-calculation">
+<h2>2.1. Running the initial scf DFT calculation<a class="headerlink" href="#2.1.-Running-the-initial-scf-DFT-calculation" title="Permalink to this headline">¶</a></h2>
+<p>(~ 2 core hours)</p>
 <p>To get started, we run a self-consistent field (scf) DFT calculation: * Go into folder <code class="docutils literal notranslate"><span class="pre">1_dft_scf</span></code> * Insert the POTCAR as concatenation of the files <code class="docutils literal notranslate"><span class="pre">PAW_PBE</span> <span class="pre">Pr_3</span></code>, <code class="docutils literal notranslate"><span class="pre">PAW_PBE</span> <span class="pre">Ni_pv</span></code> and <code class="docutils literal notranslate"><span class="pre">PAW_PBE</span> <span class="pre">O</span></code> distributed with VASP * Goal: get a well-converged charge density (CHGCAR) and understand where the correlated bands are (DOSCAR and potentially PROCAR and band structure)</p>
 <p>Other input files are: * <a class="reference external" href="1_dft_csc/INCAR" rel="noopener noreferrer" target="_blank">INCAR</a>: using a large number of steps for good convergence. Compared to the DMFT calculation, it is relatively cheap and it is good to have a well converged starting point for DMFT. * <a class="reference external" href="1_dft_csc/POSCAR" rel="noopener noreferrer" target="_blank">POSCAR</a>: PrNiO3 close to the experimental low-temperature structure (P21/n symmetry) * <a class="reference external" href="1_dft_csc/KPOINTS" rel="noopener noreferrer" target="_blank">KPOINTS</a>: approximately unidistant grid of 7 x 7 x 5</p>
 <p>Then run Vasp with the command <code class="docutils literal notranslate"><span class="pre">mpirun</span> <span class="pre">-n</span> <span class="pre">8</span> <span class="pre">vasp_std</span></code>.</p>
@@ -586,8 +587,9 @@ div.rendered_html tbody tr:hover {
 <p>DFT does not describe the system correctly in predicting a metallic state. In a simplified picture, the paramagnetism in DMFT will be able to split the correlated bands and push the Fermi energy into the gap of the eg orbitals, as we will see below.</p>
 <p>We will use the Fe-eg range to construct our correlated subspace.</p>
 </div>
-<div class="section" id="2.2.-Running-the-CSC-DMFT-calculations-(~-150-core-hours)">
-<h2>2.2. Running the CSC DMFT calculations (~ 150 core hours)<a class="headerlink" href="#2.2.-Running-the-CSC-DMFT-calculations-(~-150-core-hours)" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="2.2.-Running-the-CSC-DMFT-calculations">
+<h2>2.2. Running the CSC DMFT calculations<a class="headerlink" href="#2.2.-Running-the-CSC-DMFT-calculations" title="Permalink to this headline">¶</a></h2>
+<p>(~ 150 core hours)</p>
 <p>We now run the DMFT calculation. In CSC calculations, the corrected charge density from DMFT is fed back into the DFT calculation to re-calculate the Kohn-Sham energies and projectors onto correlated orbitals.</p>
 <p>With VASP, the procedure works as described <a class="reference external" href="https://triqs.github.io/dft_tools/latest/guide/dftdmft_selfcons.html#vasp-plovasp" rel="noopener noreferrer" target="_blank">here</a>, where the GAMMA file written by DMFT contains the charge density <em>correction</em>. In the VASP-CSC implementation, we first converge a non-scf DFT calculation based on the CHGCAR from before, then run DMFT on the results. The VASP process stays alive but idle during the DMFT calculation. Then, when we want to update the DFT-derived quantities energies, we need to
 run multiple DFT steps in between the DMFT steps because the density correction is fed into VASP iteratively through mixing to ensure stability.</p>
@@ -794,15 +796,6 @@ look <a class="reference external" href="https://doi.org/10.1103/PhysRevB.84.075
 <h2>2.5. Next steps to try<a class="headerlink" href="#2.5.-Next-steps-to-try" title="Permalink to this headline">¶</a></h2>
 <p>Here are some suggestions on how continue on this type of DMFT calculations: * change U and J and try to see if you can reach a metallic state. What does the occupation look like? * try for better convergence: change <code class="docutils literal notranslate"><span class="pre">n_cycles_tot</span></code> and <code class="docutils literal notranslate"><span class="pre">n_l</span></code> * play around with the other parameters in the dmft_config.ini * analyze other quantities or have a look at the spectral functions from analytical continuation * try other ways to construct the correlated orbitals in CSC, e.g., with Wannier90 *
 apply this to the material of your choice!</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>
-</pre></div>
-</div>
-</div>
 </div>
 </div>
 
@@ -810,7 +803,7 @@ apply this to the material of your choice!</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../SVO_os_qe/tutorial.html" class="btn btn-neutral float-left" title="1. Running a one-shot DMFT calculation on SrVO3" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../SVO_os_qe/tutorial.html" class="btn btn-neutral float-left" title="1. OS with QE/W90 and cthyb: SrVO3 MIT" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="../Ce2O3_csc_w90/tutorial.html" class="btn btn-neutral float-right" title="3. CSC with QE/W90 and HubbardI: total energy in Ce2O3" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

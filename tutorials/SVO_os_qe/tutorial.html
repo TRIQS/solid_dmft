@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>1. Running a one-shot DMFT calculation on SrVO3 &mdash; solid_dmft  documentation</title><link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+  <title>1. OS with QE/W90 and cthyb: SrVO3 MIT &mdash; solid_dmft  documentation</title><link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" /><link rel="shortcut icon" href="../../_static/favicon.ico"/>
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
@@ -18,7 +18,7 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="2. CSC with VASP PLOs" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html" />
+    <link rel="next" title="2. CSC with VASP PLOs: charge order in PrNiO3" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html" />
     <link rel="prev" title="Tutorials" href="../../tutorials.html" /> 
 </head>
 
@@ -144,7 +144,7 @@
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../tutorials.html">Tutorials</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">1. Running a one-shot DMFT calculation on SrVO3</a><ul>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">1. OS with QE/W90 and cthyb: SrVO3 MIT</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#1.-Starting-out-with-DMFT">1. Starting out with DMFT</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#2.-Looking-at-the-Metal-Insulator-Transition">2. Looking at the Metal-Insulator Transition</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#3.-Refinining-the-diagram">3. Refinining the diagram</a></li>
@@ -152,9 +152,9 @@
 <li class="toctree-l3"><a class="reference internal" href="#5-Visualizing-the-MIT">5 Visualizing the MIT</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html">2. CSC with VASP PLOs</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#2.1.-Running-the-initial-scf-DFT-calculation-(~-2-core-hours)">2.1. Running the initial scf DFT calculation (~ 2 core hours)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#2.2.-Running-the-CSC-DMFT-calculations-(~-150-core-hours)">2.2. Running the CSC DMFT calculations (~ 150 core hours)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html">2. CSC with VASP PLOs: charge order in PrNiO3</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#2.1.-Running-the-initial-scf-DFT-calculation">2.1. Running the initial scf DFT calculation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#2.2.-Running-the-CSC-DMFT-calculations">2.2. Running the CSC DMFT calculations</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Input-files-for-CSC-DMFT-calculations">Input files for CSC DMFT calculations</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Starting-the-calculations">Starting the calculations</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Analyzing-the-projectors">Analyzing the projectors</a></li>
@@ -222,7 +222,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="../../tutorials.html">Tutorials</a> &raquo;</li>
-      <li>1. Running a one-shot DMFT calculation on SrVO3</li>
+      <li>1. OS with QE/W90 and cthyb: SrVO3 MIT</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../_sources/tutorials/SVO_os_qe/tutorial.ipynb.txt" rel="nofollow"> View page source</a>
       </li>
@@ -258,8 +258,8 @@
 </style>
 <p><em>Disclaimer:</em></p>
 <p>Heavy calculations: Current tutorial is best performed on an HPC facility.</p>
-<div class="section" id="1.-Running-a-one-shot-DMFT-calculation-on-SrVO3">
-<h1>1. Running a one-shot DMFT calculation on SrVO3<a class="headerlink" href="#1.-Running-a-one-shot-DMFT-calculation-on-SrVO3" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="1.-OS-with-QE/W90-and-cthyb:-SrVO3-MIT">
+<h1>1. OS with QE/W90 and cthyb: SrVO3 MIT<a class="headerlink" href="#1.-OS-with-QE/W90-and-cthyb:-SrVO3-MIT" title="Permalink to this headline">¶</a></h1>
 <p>Hello, welcome to the first part of the tutorial for solid_dmft. Here we will guide to set up and run your first DMFT calculations.</p>
 <p>To begin your DMFT journey we will immediately start a DMFT run on Strontium Vanadate (SVO). SVO is a member of a family of material known as complex perovskite oxides.</p>
 <p>In these materials, the electrons sitting on the transition metal ions (V in this case) are fairly localized, and the fully delocalized picture of DFT is insufficient to describe their physics. DMFT accounts for the electron-electron interaction by providing a fully interacting many body correction to the DFT non-interacting problem.</p>
@@ -342,7 +342,7 @@ site, therefore the system has trouble converging and oscillate between a high o
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../../tutorials.html" class="btn btn-neutral float-left" title="Tutorials" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html" class="btn btn-neutral float-right" title="2. CSC with VASP PLOs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html" class="btn btn-neutral float-right" title="2. CSC with VASP PLOs: charge order in PrNiO3" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
