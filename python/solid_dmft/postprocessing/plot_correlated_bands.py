@@ -91,7 +91,13 @@ def change_basis(n_orb, orbital_order_to, orbital_order_from):
 def print_matrix(matrix, n_orb, text):
 
     print('{}:'.format(text))
-    fmt = '{:16.4f}' * n_orb
+
+    if np.any(matrix.imag > 1e-4):
+        fmt = '{:16.4f}' * n_orb
+    else:
+        fmt = '{:8.4f}' * n_orb
+        matrix = matrix.real
+
     for row in matrix:
         print((' '*4 + fmt).format(*row))
 
@@ -496,7 +502,7 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, add_spin, mu, add_lambda, with_sig
     # print local H(R)
     h_of_r = tb.hoppings[(0,0,0)][2:5,2:5] if add_spin else tb.hoppings[(0,0,0)]
     h_of_r = np.einsum('ij, jk -> ik', np.linalg.inv(change_of_basis), np.einsum('ij, jk -> ik', h_of_r, change_of_basis))
-    print_matrix(h_of_r, n_orb, 'H(R=0)')
+    if n_orb <=12: print_matrix(h_of_r, n_orb, 'H(R=0)')
 
     # bands info
     w90_paths = list(map(lambda section: (np.array(specs[section[0]]), np.array(specs[section[1]])), specs['bands_path']))
