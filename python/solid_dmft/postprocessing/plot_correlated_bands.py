@@ -117,7 +117,7 @@ def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, block, orbital_orde
                     raise KeyError('Provide either "Sigma_freq_0" in real frequency or "Sigma_maxent_0".')
             dc = ar['DMFT_results'][specs['it']]['DC_pot'][0][spin][0,0]
             mu = ar['DMFT_results'][specs['it']]['chemical_potential_post']
-            dft_mu = ar['DMFT_results']['it_1']['chemical_potential_pre']
+            dft_mu = ar['DMFT_results/observables']['mu'][0]
 
     else:
         print('Setting Sigma from memory')
@@ -209,7 +209,7 @@ def _calc_alatt(n_orb, mu, eta, e_mat, sigma, qp_bands=False, e_vecs=np.array([N
             Glatt =  np.linalg.inv(w + eta[None,...] + mu[None,...] - e_mat[None,...] - sigma.transpose(2,0,1) )
             if trace:
                 return -1.0/np.pi * np.trace( Glatt ,axis1=1, axis2=2).imag
-            else: 
+            else:
                 return -1.0/np.pi * np.diagonal( Glatt ,axis1=1, axis2=2).imag
 
         for ik in range(n_k):
@@ -418,7 +418,8 @@ def plot_bands(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb, dft_mu, tb=True, a
                 ax.scatter(tb_data['k_mesh'], alatt_k_w[:,orb].T, c=np.array([eval('cm.'+plot_dict['colorscheme_qpbands'])(1.0)]), zorder=2., s=1.)
         else:
             kw_x, kw_y = np.meshgrid(tb_data['k_mesh'], freq_dict['w_mesh'])
-            graph = ax.pcolormesh(kw_x, kw_y, alatt_k_w.T, cmap=plot_dict['colorscheme_bands'], norm=Normalize(vmin=plot_dict['vmin'], vmax=np.max(alatt_k_w)))
+            graph = ax.pcolormesh(kw_x, kw_y, alatt_k_w.T, cmap=plot_dict['colorscheme_bands'],
+                                  norm=Normalize(vmin=plot_dict['vmin'], vmax=np.max(alatt_k_w)), shading='gouraud')
             colorbar = plt.colorbar(graph)
             colorbar.set_label(r'$A(k, \omega)$')
 
@@ -455,8 +456,8 @@ def plot_kslice(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb, tb_dict, tb=True,
                 for orb in range(n_orb):
                     ax.contour(qx * kx/(n_kx-1), qy * ky/(n_ky-1), alatt_k_w[:,:,orb].T, colors=np.array([eval('cm.'+plot_dict['colorscheme_qpbands'])(0.7)]), levels=1, zorder=2)
             else:
-                graph = ax.pcolormesh(qrt[0] * kx/(n_kx-1), qrt[1] * ky/(n_ky-1), alatt_k_w.T, cmap=plot_dict['colorscheme_kslice'],
-                                      norm=LogNorm(vmin=plot_dict['vmin'], vmax=np.max(alatt_k_w)))
+                graph = ax.pcolormesh(qx * kx/(n_kx-1), qy * ky/(n_ky-1), alatt_k_w.T, cmap=plot_dict['colorscheme_kslice'],
+                                      norm=Normalize(vmin=plot_dict['vmin'], vmax=np.max(alatt_k_w)))
                 #colorbar = plt.colorbar(graph)
                 #colorbar.set_label(r'$A(k, 0$)')
 
@@ -547,8 +548,7 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, add_spin, mu, add_lambda, with_sig
         if with_sigma == 'model': delta_sigma, mu, dft_mu, freq_dict = _sigma_from_model(n_orb, orbital_order_to, **specs)
         # else is from dmft or memory:
         else: delta_sigma, mu, dft_mu, freq_dict = _sigma_from_dmft(n_orb, orbital_order_to, with_sigma, **specs)
-        #TODO: smarter way to compute this, might be incorrect
-        corrected_mu = mu + np.abs(np.abs(mu) - np.abs(dft_mu))
+        corrected_mu = mu - dft_mu
 
         # calculate alatt
         if not fermi_slice:
