@@ -34,7 +34,7 @@ saved in an h5 archive (in the framework that we are using).
 
 List of all parameters, sorted by sections:
 
-general
+[  general  ]
 -------
 
 seedname : str or list of str
@@ -46,13 +46,15 @@ csc : bool, optional, default=False
 plo_cfg : str, optional, default='plo.cfg'
             config file for PLOs for the converter
 h_int_type : string
-            interaction type
-            density_density: used for full d-shell or eg- or t2g-subset
-            kanamori: only physical for the t2g or the eg subset
-            full_slater: used for full d-shell or eg- or t2g-subset
-            crpa: use the cRPA matrix as interaction Hamiltonian
-            crpa_density_density: use the density-density terms of the cRPA matrix
-            dynamic: use dynamic U from h5 archive
+            interaction type:
+
+            * density_density: used for full d-shell or eg- or t2g-subset
+            * kanamori: only physical for the t2g or the eg subset
+            * full_slater: used for full d-shell or eg- or t2g-subset
+            * crpa: use the cRPA matrix as interaction Hamiltonian
+            * crpa_density_density: use the density-density terms of the cRPA matrix
+            * dynamic: use dynamic U from h5 archive
+            
             Needs to be stored as Matsubara Gf under dynamic_U/U_iw in the input h5
 U :  float or comma separated list of floats
             U values for impurities if only one value is given, the same U is assumed for all impurities
@@ -64,28 +66,38 @@ ratio_F4_F2 : float or comma separated list of floats, optional, default='none'
             only for d-shell impurities, where the default is 0.63.
 beta : float, only used if solver ImFreq
             inverse temperature for Greens function etc
-n_iter_dmft_first : int, optional, default = 10
+n_iter_dmft_first : int, optional, default= 10
             number of iterations in first dmft cycle to converge dmft solution
-n_iter_dmft_per : int, optional, default = 2
+n_iter_dmft_per : int, optional, default= 2
             number of iterations per dmft step in CSC calculations
 n_iter_dmft : int
-        number of iterations per dmft cycle after first cycle
+            number of iterations per dmft cycle after first cycle
 dc_type : int
-            0: FLL
-            1: held formula, needs to be used with slater-kanamori h_int_type=2
-            2: AMF
-            3: FLL for eg orbitals only with U,J for Kanamori
+            Type of double counting correction considered:
+            * 0: FLL
+            * 1: held formula, needs to be used with slater-kanamori h_int_type=2
+            * 2: AMF
+            * 3: FLL for eg orbitals only with U,J for Kanamori
 prec_mu : float
             general precision for determining the chemical potential at any time calc_mu is called
 dc_dmft : bool
-            DC with DMFT occupation in each iteration -> True
-            DC with DFT occupations after each DFT cycle -> False
+           Whether to use DMFT or DFT occupations:
+
+           * DC with DMFT occupation in each iteration -> True
+           * DC with DFT occupations after each DFT cycle -> False
 cpa_zeta : float or comma separated list of floats
             shift of local levels per impurity in CPA
 cpa_x : float or comma separated list of floats
             probability distribution for summing G(tau) in CPA
-solver_type: str
-            'cthyb', 'ctint', 'ftps', 'hubbardI', 'ctseg'
+solver_type : str
+            type of solver chosen for the calculation, currently supports:
+
+            * 'cthyb'
+            * 'ctint'
+            * 'ftps'
+            * 'hubbardI'
+            * 'ctseg'
+
 n_iw : int, optional, default=1025
             number of Matsubara frequencies
 n_tau : int, optional, default=10001
@@ -95,11 +107,11 @@ n_l : int, needed if measure_G_l=True or legendre_fit=True
 n_w : int, optional, default=5001
             number of real frequency points
 w_range : tuple, optional, default=(-10, 10)
-          w_min and w_max, example: w_range = -10, 10
+            w_min and w_max, example: w_range = -10, 10
 eta : float, only used if solver ReFreq
             broadening of Green's function
 diag_delta : bool, optional, default=False
-             option to remove off-diagonal terms in the hybridization function
+            option to remove off-diagonal terms in the hybridization function
 
 
 h5_save_freq : int, optional, default=5
@@ -108,7 +120,7 @@ magnetic : bool, optional, default=False
             are we doing a magnetic calculations? If yes put magnetic to True.
             Not implemented for CSC calculations
 magmom : list of float seperated by comma, optional default=[]
-            init magnetic moments if magnetic is on. length must be #imps.
+            initialize magnetic moments if magnetic is on. length must be #imps.
             This will be used as factor for each imp in the initial self
             energy, with up (or ud for spin-orbit coupling) (1+fac)*sigma, and
             with down (1-fac)*sigma
@@ -116,7 +128,7 @@ enforce_off_diag : bool, optional, default=False
             enforce off diagonal elements in block structure finder
 h_field : float, optional, default=0.0
             magnetic field
-energy_shift_orbitals : list of floats, optional, default = 'none'
+energy_shift_orbitals : list of floats, optional, default= 'none'
             orbitals will be shifted by this energy
             The entries can be python code, to be combined with configparser's interpolation
 sigma_mix : float, optional, default=1.0
@@ -126,8 +138,8 @@ g0_mix : float, optional, default=1.0
             mixing the weiss field G0 with previous iteration G0 for better convergency. 1.0 means no mixing
 g0_mix_type : string, optional, default='linear'
             which type of mixing is used. Possible values are:
-            linear : linear mixing
-            broyden : broyden mixing
+            linear: linear mixing
+            broyden: broyden mixing
 broy_max_it : int, optional, default=1
             maximum number of iteration to be considered for broyden mixing
             1 corresponds to simple linear mixing
@@ -156,24 +168,26 @@ g0_conv_crit : float, optional, default= -1
             stop the calculation if sum_w 1/(w^0.6) ||G0-G0_prev|| is smaller than threshold
 sigma_conv_crit : float, optional, default= -1
             stop the calculation if sum_w 1/(w^0.6) ||Sigma-Sigma_prev|| is smaller than threshold
-sampling_iterations : int, optional, default = 0
+sampling_iterations : int, optional, default= 0
             for how many iterations should the solution sampled after the CSC loop is converged
-sampling_h5_save_freq : int, optional, default = 5
+sampling_h5_save_freq : int, optional, default= 5
             overwrites h5_save_freq when sampling has started
-fixed_mu_value : float, optional, default = 'none'
+fixed_mu_value : float, optional, default= 'none'
             If given, the chemical potential remains fixed in calculations
-mu_update_freq : int, optional, default = 1
+mu_update_freq : int, optional, default= 1
             The chemical potential will be updated every # iteration
-dft_mu : float, optional, default = 'none'
+dft_mu : float, optional, default= 'none'
             The chemical potential of the DFT calculation.
             If not given, mu will be calculated from the DFT bands
-mu_mix_const : float, optional, default = 1.0
+mu_mix_const : float, optional, default= 1.0
             Constant term of the mixing of the chemical potential. See mu_mix_per_occupation_offset.
-mu_mix_per_occupation_offset : float, optional, default = 0.0
+mu_mix_per_occupation_offset : float, optional, default= 0.0
             Mu mixing proportional to the occupation offset.
-            Mixing between the dichotomy result and the previous mu,
+            Mixing between the dichotomy result and the previous mui,
+
             mu_next = factor * mu_dichotomy + (1-factor) * mu_previous, with
             factor = mu_mix_per_occupation_offset * abs(n - n\_target) + mu_mix_const.
+
             The program ensures that 0 <= factor <= 1.
             mu_mix_const = 1.0 and mu_mix_per_occupation_offset = 0.0 means no mixing.
 afm_order : bool, optional, default=False
@@ -183,11 +197,10 @@ set_rot : string, optional, default='none'
             use hloc_dft to diagonalize occupations = 'hloc'
 oneshot_postproc_gamma_file : bool, optional, default=False
             write the GAMMA file for vasp after completed one-shot calculations
-measure_chi: string, optional, default=None
-            measure dynamic suszeptibility <Op(tau) Op(0)> , can be either
-            'SzSz': < Sz(tau) Sz(0) > , or 'NN': < N(tau) N(0) >
+measure_chi_SzSz : bool, optional, default=False
+            measure the dynamic spin suszeptibility chi(sz,sz(tau))
             triqs.github.io/cthyb/unstable/guide/dynamic_susceptibility_notebook.html
-measure_chi_insertions: int, optional, default=100
+measure_chi_insertions : int, optional, default=100
             number of insertation for measurement of chi
 mu_gap_gb2_threshold : float, optional, default=none
             Threshold of the absolute of the lattice GF at tau=beta/2 for use
@@ -199,9 +212,9 @@ mu_gap_occ_deviation : float, optional, default=none
             for finding the middle of the gap through occupation deviation to
             avoid getting stuck in an insulating state with wrong occupation.
 
-solver
+[  solver  ]
 ------
-store_solver: bool, optional default = False
+store_solver : bool, optional default= False
             store the whole solver object under DMFT_input in h5 archive
 
 cthyb parameters
@@ -221,11 +234,13 @@ measure_G_iw : bool,optional, default=False
 measure_density_matrix : bool, optional, default=False
             measures the impurity density matrix and sets also
             use_norm_as_weight to true
-measure_pert_order: bool, optional, default=False
+measure_pert_order : bool, optional, default=False
             measure perturbation order histograms: triqs.github.io/cthyb/latest/guide/perturbation_order_notebook.html
-            stored in the h5 archive under DMFT_results per iteration stored in pert_order_imp_X and, pert_order_total_imp_X
+
+            The result is stored in the h5 archive under 'DMFT_results' at every iteration
+            in the subgroups 'pert_order_imp_X' and 'pert_order_total_imp_X'
 max_time : int, optional, default=-1
-            maximum amount the solver is allowed to spend in eacht iteration
+            maximum amount the solver is allowed to spend in each iteration
 imag_threshold : float, optional, default= 10e-15
             threshold for imag part of G0_tau. be warned if symmetries are off in projection scheme imag parts can occur in G0_tau
 off_diag_threshold : float, optional
@@ -246,52 +261,52 @@ fit_min_w : float, optional
             start matsubara frequency to start with
 fit_max_w : float, optional
             highest matsubara frequency to fit
-random_seed: int, optional default by triqs
+random_seed : int, optional default by triqs
             if specified the int will be used for random seeds! Careful, this will give the same random
             numbers on all mpi ranks
-legendre_fit: bool, optional default = False
+legendre_fit : bool, optional default= False
             filter noise of G(tau) with G_l, cutoff is taken from n_l
 
 ftps parameters
 ===============
-n_bath:     int
+n_bath :     int
             number of bath sites
-bath_fit:   bool, default=False
+bath_fit :   bool, default=False
             DiscretizeBath vs BathFitter
-refine_factor: int, optional, default=1
+refine_factor : int, optional, default=1
             rerun ftps cycle with increased accuracy
-ph_symm:    bool, optional, default=False
+ph_symm :    bool, optional, default=False
             particle-hole symmetric problem
-calc_me:    bool, optional, default=True
+calc_me :    bool, optional, default=True
             calculate only symmetry-inequivalent spins/orbitals, symmetrized afterwards
-enforce_gap: list of floats, optional, default='none'
+enforce_gap : list of floats, optional, default='none'
             enforce gap in DiscretizeBath between interval
-ignore_weight: float, optional, default=0.0
+ignore_weight : float, optional, default=0.0
             ignore weight of peaks for bath fitter
-dt:         float
+dt :         float
             time step
-state_storage: string, default = './'
+state_storage : string, default= './'
             location of large MPS states
-path_to_gs: string, default = 'none'
+path_to_gs : string, default= 'none'
             location of GS if already present. Use 'postprocess' to skip solver and go directly to post-processing
             of previously terminated time-evolved state
-sweeps:     int, optional, default = 10
+sweeps :     int, optional, default= 10
             Number of DMRG sweeps
-maxmI:      int, optional, default = 100
+maxmI :      int, optional, default= 100
             maximal imp-imp bond dimensions
-maxmIB:     int, optional, default = 100
+maxmIB :     int, optional, default= 100
             maximal imp-bath bond dimensions
-maxmB:      int, optional, default = 100
+maxmB :      int, optional, default= 100
             maximal bath-bath bond dimensions
-tw:         float, default 1E-9
+tw :         float, default 1E-9
             truncated weight for every link
-dmrg_maxmI: int, optional, default = 100
+dmrg_maxmI : int, optional, default= 100
             maximal imp-imp bond dimensions
-dmrg_maxmIB:int, optional, default = 100
+dmrg_maxmIB : int, optional, default= 100
             maximal imp-bath bond dimensions
-dmrg_maxmB: int, optional, default = 100
+dmrg_maxmB : int, optional, default= 100
             maximal bath-bath bond dimensions
-dmrg_tw:    float, default 1E-9
+dmrg_tw :    float, default 1E-9
             truncated weight for every link
 
 ctseg parameters
@@ -303,13 +318,18 @@ improved_estimator  : bool, optional, default=False
               Sigma_iw will automatically be calculated via
               http://dx.doi.org/10.1103/PhysRevB.85.205106
 
-dft
+[  dft  ]
 ---
 dft_code : string
-           'vasp' or 'qe'
+            Choose the DFT code interface, for now Quantum Espresso and Vasp are available.
+
+            Possible values:
+
+            * 'vasp'
+            * 'qe'
 n_cores : int
             number of cores for the DFT code (VASP)
-n_iter : int, optional, default = 6
+n_iter : int, optional, default= 6
             number of dft iterations per cycle
 dft_exec :  string, default= 'vasp_std'
             command for the DFT / VASP executable
@@ -326,18 +346,18 @@ w90_exec :  string, default='wannier90.x'
 w90_tolerance :  float, default=1e-6
             threshold for mapping of shells and checks of the Hamiltonian
 
-advanced
+[  advanced  ]
 --------
-dc_factor : float, optional, default = 'none' (corresponds to 1)
+dc_factor : float, optional, default= 'none' (corresponds to 1)
             If given, scales the dc energy by multiplying with this factor, usually < 1
-dc_fixed_value : float, optional, default = 'none'
+dc_fixed_value : float, optional, default= 'none'
             If given, it sets the DC (energy/imp) to this fixed value. Overwrites EVERY other DC configuration parameter if DC is turned on
-dc_fixed_occ : list of float, optional, defaul = 'none'
+dc_fixed_occ : list of float, optional, default= 'none'
             If given, the occupation for the DC for each impurity is set to the provided value.
             Still uses the same kind of DC!
-dc_U :  float or comma seperated list of floats, optional, default = general_params['U']
+dc_U :  float or comma seperated list of floats, optional, default= general_params['U']
             U values for DC determination if only one value is given, the same U is assumed for all impurities
-dc_J :  float or comma seperated list of floats, optional, default = general_params['J']
+dc_J :  float or comma seperated list of floats, optional, default= general_params['J']
             J values for DC determination if only one value is given, the same J is assumed for all impurities
 map_solver_struct : dict, optional, default=no additional mapping
             Additional manual mapping of the solver block structure, applied
