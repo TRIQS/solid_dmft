@@ -296,6 +296,8 @@
 <span class="sd">        Double counting for each impurity</span>
 <span class="sd">    chemical_potential : float</span>
 <span class="sd">        The chemical potential of the problem. Should be approximately real</span>
+<span class="sd">    chemical_potential_zero : float</span>
+<span class="sd">        The chemical potential at 0 iteration. Should be approximately real</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">h5_internal_path</span> <span class="o">=</span> <span class="s1">&#39;DMFT_results/&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;last_iter&#39;</span> <span class="k">if</span> <span class="n">iteration</span> <span class="ow">is</span> <span class="kc">None</span>
@@ -317,11 +319,12 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Old name for chemical_potential_post</span>
             <span class="n">chemical_potential</span> <span class="o">=</span> <span class="n">archive</span><span class="p">[</span><span class="n">h5_internal_path</span><span class="p">][</span><span class="s1">&#39;chemical_potential&#39;</span><span class="p">]</span>
+        <span class="n">chemical_potential_zero</span> <span class="o">=</span> <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_results/observables&#39;</span><span class="p">][</span><span class="s1">&#39;mu&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
 
-    <span class="k">return</span> <span class="n">sigma_iw</span><span class="p">,</span> <span class="n">dc_potential</span><span class="p">,</span> <span class="n">chemical_potential</span>
+    <span class="k">return</span> <span class="n">sigma_iw</span><span class="p">,</span> <span class="n">dc_potential</span><span class="p">,</span> <span class="n">chemical_potential</span><span class="p">,</span> <span class="n">chemical_potential_zero</span>
 
 
-<span class="k">def</span> <span class="nf">_create_sigma_continuator</span><span class="p">(</span><span class="n">sigma_iw</span><span class="p">,</span> <span class="n">dc_potential</span><span class="p">,</span> <span class="n">chemical_potential</span><span class="p">,</span> <span class="n">continuator_type</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_create_sigma_continuator</span><span class="p">(</span><span class="n">sigma_iw</span><span class="p">,</span> <span class="n">dc_potential</span><span class="p">,</span> <span class="n">chemical_potential</span><span class="p">,</span> <span class="n">chemical_potential_zero</span><span class="p">,</span> <span class="n">continuator_type</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Initializes the inversion and direct sigma continuator. Returns a list of</span>
 <span class="sd">    continuators. Types of supported auxiliary Green&#39;s functions:</span>
@@ -345,7 +348,7 @@
         <span class="n">continuators</span> <span class="o">=</span> <span class="p">[</span><span class="n">InversionSigmaContinuator</span><span class="p">(</span><span class="n">sigma_imp</span><span class="p">,</span> <span class="n">shift</span><span class="p">)</span>
                         <span class="k">for</span> <span class="n">sigma_imp</span><span class="p">,</span> <span class="n">shift</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">sigma_iw</span><span class="p">,</span> <span class="n">shifts</span><span class="p">)]</span>
     <span class="k">elif</span> <span class="n">continuator_type</span> <span class="o">==</span> <span class="s1">&#39;inversion_sigmainf&#39;</span><span class="p">:</span>
-        <span class="n">shifts</span> <span class="o">=</span> <span class="p">[{</span><span class="n">key</span><span class="p">:</span> <span class="n">sigma_block</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">real</span> <span class="o">+</span> <span class="n">chemical_potential</span>
+        <span class="n">shifts</span> <span class="o">=</span> <span class="p">[{</span><span class="n">key</span><span class="p">:</span> <span class="n">sigma_block</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">real</span> <span class="o">+</span> <span class="p">(</span><span class="n">chemical_potential</span> <span class="o">-</span> <span class="n">chemical_potential_zero</span><span class="p">)</span>
                    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">sigma_block</span> <span class="ow">in</span> <span class="n">sigma_imp</span><span class="p">}</span> <span class="k">for</span> <span class="n">sigma_imp</span> <span class="ow">in</span> <span class="n">sigma_iw</span><span class="p">]</span>
         <span class="n">continuators</span> <span class="o">=</span> <span class="p">[</span><span class="n">InversionSigmaContinuator</span><span class="p">(</span><span class="n">sigma_imp</span><span class="p">,</span> <span class="n">shift</span><span class="p">)</span>
                         <span class="k">for</span> <span class="n">sigma_imp</span><span class="p">,</span> <span class="n">shift</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">sigma_iw</span><span class="p">,</span> <span class="n">shifts</span><span class="p">)]</span>
@@ -525,10 +528,10 @@
     <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">continuators</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
-        <span class="n">sigma_iw</span><span class="p">,</span> <span class="n">dc_potential</span><span class="p">,</span> <span class="n">chemical_potential</span> <span class="o">=</span> <span class="n">_read_h5</span><span class="p">(</span><span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="p">)</span>
+        <span class="n">sigma_iw</span><span class="p">,</span> <span class="n">dc_potential</span><span class="p">,</span> <span class="n">chemical_potential</span><span class="p">,</span> <span class="n">chemical_potential_zero</span> <span class="o">=</span> <span class="n">_read_h5</span><span class="p">(</span><span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="p">)</span>
         <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;Finished reading h5 archive. Found </span><span class="si">{}</span><span class="s1"> impurities.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sigma_iw</span><span class="p">)))</span>
         <span class="n">continuators</span> <span class="o">=</span> <span class="n">_create_sigma_continuator</span><span class="p">(</span><span class="n">sigma_iw</span><span class="p">,</span> <span class="n">dc_potential</span><span class="p">,</span>
-                                                 <span class="n">chemical_potential</span><span class="p">,</span> <span class="n">continuator_type</span><span class="p">)</span>
+                                                 <span class="n">chemical_potential</span><span class="p">,</span> <span class="n">chemical_potential_zero</span><span class="p">,</span> <span class="n">continuator_type</span><span class="p">)</span>
     <span class="n">continuators</span> <span class="o">=</span> <span class="n">mpi</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">continuators</span><span class="p">)</span>
     <span class="n">init_end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 
