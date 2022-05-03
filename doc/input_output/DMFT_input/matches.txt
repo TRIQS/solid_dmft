@@ -1,0 +1,876 @@
+"""
+List of all parameters, sorted by sections:
+
+general
+-------
+
+
+.. admonition:: seedname: 
+ 
+            *type= str or list of str*
+
+            seedname for h5 archive or for multiple if calculations should be connected
+
+.. admonition:: jobname: 
+ 
+            gg*type= str or list of str, optional 
+            default=seedname*
+
+            one or multiple jobnames specifying the output directories
+
+.. admonition:: csc: 
+ 
+            gg*type= bool, optional 
+            default=False*
+
+            are we doing a CSC calculation?
+
+.. admonition:: plo_cfg: 
+ 
+            gg*type= str, optional 
+            default='plo.cfg'*
+
+            config file for PLOs for the converter
+
+.. admonition:: h_int_type: 
+ 
+            *type= string*
+
+            interaction type
+            density_density: used for full d-shell or eg- or t2g-subset
+            kanamori: only physical for the t2g or the eg subset
+            full_slater: used for full d-shell or eg- or t2g-subset
+            crpa: use the cRPA matrix as interaction Hamiltonian
+            crpa_density_density: use the density-density terms of the cRPA matrix
+            dynamic: use dynamic U from h5 archive
+            Needs to be stored as Matsubara Gf under dynamic_U/U_iw in the input h5
+
+.. admonition:: U: 
+ 
+            *type= float or comma separated list of floats*
+
+            U values for impurities if only one value is given, the same U is assumed for all impurities
+
+.. admonition:: J: 
+ 
+            *type= float or comma separated list of floats*
+
+            J values for impurities if only one value is given, the same J is assumed for all impurities
+
+.. admonition:: ratio_F4_F2: 
+ 
+            gg*type= float or comma separated list of floats, optional 
+            default='none'*
+
+            Ratio between the Slater integrals  F_4 and F_2. Only used for the
+            interaction Hamiltonians 'density_density' and 'full_slater' and
+            only for d-shell impurities, where the default is 0.63.
+
+.. admonition:: beta: 
+ 
+            gg*type= float 
+            only used if solver ImFreq*
+
+            inverse temperature for Greens function etc
+
+.. admonition:: n_iter_dmft_first: 
+ 
+            gg*type= int, optional 
+            default = 10*
+
+            number of iterations in first dmft cycle to converge dmft solution
+
+.. admonition:: n_iter_dmft_per: 
+ 
+            gg*type= int, optional 
+            default = 2*
+
+            number of iterations per dmft step in CSC calculations
+
+.. admonition:: n_iter_dmft: 
+ 
+            *type= int*
+
+        number of iterations per dmft cycle after first cycle
+
+.. admonition:: dc_type: 
+ 
+            *type= int*
+
+            0: FLL
+            1: held formula, needs to be used with slater-kanamori h_int_type=2
+            2: AMF
+            3: FLL for eg orbitals only with U,J for Kanamori
+
+.. admonition:: prec_mu: 
+ 
+            *type= float*
+
+            general precision for determining the chemical potential at any time calc_mu is called
+
+.. admonition:: dc_dmft: 
+ 
+            *type= bool*
+
+            DC with DMFT occupation in each iteration -> True
+            DC with DFT occupations after each DFT cycle -> False
+
+.. admonition:: cpa_zeta: 
+ 
+            *type= float or comma separated list of floats*
+
+            shift of local levels per impurity in CPA
+
+.. admonition:: cpa_x: 
+ 
+            *type= float or comma separated list of floats*
+
+            probability distribution for summing G(tau) in CPA
+solver_type: str
+            'cthyb', 'ctint', 'ftps', 'hubbardI', 'ctseg'
+
+.. admonition:: n_iw: 
+ 
+            gg*type= int, optional 
+            default=1025*
+
+            number of Matsubara frequencies
+
+.. admonition:: n_tau: 
+ 
+            gg*type= int, optional 
+            default=10001*
+
+            number of imaginary time points
+
+.. admonition:: n_l: 
+ 
+            gg*type= int 
+            needed if measure_G_l=True or legendre_fit=True*
+
+            number of Legendre coefficients
+
+.. admonition:: n_w: 
+ 
+            gg*type= int, optional 
+            default=5001*
+
+            number of real frequency points
+
+.. admonition:: w_range: 
+ 
+            gg*type= tuple, optional, default=(-10 
+            10)*
+
+          w_min and w_max, example: w_range = -10, 10
+
+.. admonition:: eta: 
+ 
+            gg*type= float 
+            only used if solver ReFreq*
+
+            broadening of Green's function
+
+.. admonition:: diag_delta: 
+ 
+            gg*type= bool, optional 
+            default=False*
+
+             option to remove off-diagonal terms in the hybridization function
+
+
+
+.. admonition:: h5_save_freq: 
+ 
+            gg*type= int, optional 
+            default=5*
+
+            how often is the output saved to the h5 archive
+
+.. admonition:: magnetic: 
+ 
+            gg*type= bool, optional 
+            default=False*
+
+            are we doing a magnetic calculations? If yes put magnetic to True.
+            Not implemented for CSC calculations
+
+.. admonition:: magmom: 
+ 
+            gg*type= list of float seperated by comma 
+            optional default=[]*
+
+            init magnetic moments if magnetic is on. length must be #imps.
+            This will be used as factor for each imp in the initial self
+            energy, with up (or ud for spin-orbit coupling) (1+fac)*sigma, and
+            with down (1-fac)*sigma
+
+.. admonition:: enforce_off_diag: 
+ 
+            gg*type= bool, optional 
+            default=False*
+
+            enforce off diagonal elements in block structure finder
+
+.. admonition:: h_field: 
+ 
+            gg*type= float, optional 
+            default=0.0*
+
+            magnetic field
+
+.. admonition:: energy_shift_orbitals: 
+ 
+            gg*type= list of floats, optional 
+            default = 'none'*
+
+            orbitals will be shifted by this energy
+            The entries can be python code, to be combined with configparser's interpolation
+
+.. admonition:: sigma_mix: 
+ 
+            gg*type= float, optional 
+            default=1.0*
+
+            careful: Sigma mixing can break orbital symmetries, use G0 mixing
+            mixing sigma with previous iteration sigma for better convergency. 1.0 means no mixing
+
+.. admonition:: g0_mix: 
+ 
+            gg*type= float, optional 
+            default=1.0*
+
+            mixing the weiss field G0 with previous iteration G0 for better convergency. 1.0 means no mixing
+
+.. admonition:: g0_mix_type: 
+ 
+            gg*type= string, optional 
+            default='linear'*
+
+            which type of mixing is used. Possible values are:
+            linear: linear mixing
+            broyden: broyden mixing
+
+.. admonition:: broy_max_it: 
+ 
+            gg*type= int, optional 
+            default=1*
+
+            maximum number of iteration to be considered for broyden mixing
+            1 corresponds to simple linear mixing
+
+.. admonition:: dc: 
+ 
+            gg*type= bool, optional 
+            default=True*
+
+            dc correction on yes or no?
+
+.. admonition:: calc_energies: 
+ 
+            gg*type= bool, optional, default=False 
+            not compatible with 'ftps' solver*
+
+            calc energies explicitly within the dmft loop
+
+.. admonition:: block_threshold: 
+ 
+            gg*type= float, optional 
+            default=1e-05*
+
+            threshold for finding block structures in the input data (off-diag yes or no)
+
+.. admonition:: block_suppress_orbital_symm: 
+ 
+            gg*type= bool, optional 
+            default=False*
+
+            should blocks be checked if symmetry-equiv. between orbitals?
+            Does not affect spin symmetries.
+
+.. admonition:: load_sigma: 
+ 
+            gg*type= bool, optional 
+            default=False*
+
+            load a old sigma from h5 file
+
+.. admonition:: path_to_sigma: 
+ 
+            gg*type= str 
+            needed if load_sigma is true*
+
+            path to h5 file from which the sigma should be loaded
+
+.. admonition:: load_sigma_iter: 
+ 
+            gg*type= int, optional 
+            default= last iteration*
+
+            load the sigma from a specific iteration if wanted
+
+.. admonition:: noise_level_initial_sigma: 
+ 
+            gg*type= float, optional 
+            default=0.0*
+
+            spread of Gaussian noise applied to the initial Sigma
+
+.. admonition:: occ_conv_crit: 
+ 
+            gg*type= float, optional 
+            default= -1*
+
+            stop the calculation if a certain threshold for the imp occ change is reached
+
+.. admonition:: gimp_conv_crit: 
+ 
+            gg*type= float, optional 
+            default= -1*
+
+            stop the calculation if  sum_w 1/(w^0.6) ||Gimp-Gloc|| is smaller than threshold
+
+.. admonition:: g0_conv_crit: 
+ 
+            gg*type= float, optional 
+            default= -1*
+
+            stop the calculation if sum_w 1/(w^0.6) ||G0-G0_prev|| is smaller than threshold
+
+.. admonition:: sigma_conv_crit: 
+ 
+            gg*type= float, optional 
+            default= -1*
+
+            stop the calculation if sum_w 1/(w^0.6) ||Sigma-Sigma_prev|| is smaller than threshold
+
+.. admonition:: sampling_iterations: 
+ 
+            gg*type= int, optional 
+            default = 0*
+
+            for how many iterations should the solution sampled after the CSC loop is converged
+
+.. admonition:: sampling_h5_save_freq: 
+ 
+            gg*type= int, optional 
+            default = 5*
+
+            overwrites h5_save_freq when sampling has started
+
+.. admonition:: fixed_mu_value: 
+ 
+            gg*type= float, optional 
+            default = 'none'*
+
+            If given, the chemical potential remains fixed in calculations
+
+.. admonition:: mu_update_freq: 
+ 
+            gg*type= int, optional 
+            default = 1*
+
+            The chemical potential will be updated every # iteration
+
+.. admonition:: dft_mu: 
+ 
+            gg*type= float, optional 
+            default = 'none'*
+
+            The chemical potential of the DFT calculation.
+            If not given, mu will be calculated from the DFT bands
+
+.. admonition:: mu_mix_const: 
+ 
+            gg*type= float, optional 
+            default = 1.0*
+
+            Constant term of the mixing of the chemical potential. See mu_mix_per_occupation_offset.
+
+.. admonition:: mu_mix_per_occupation_offset: 
+ 
+            gg*type= float, optional 
+            default = 0.0*
+
+            Mu mixing proportional to the occupation offset.
+            Mixing between the dichotomy result and the previous mu,
+            mu_next = factor * mu_dichotomy + (1-factor) * mu_previous, with
+            factor = mu_mix_per_occupation_offset * abs(n - n\_target) + mu_mix_const.
+            The program ensures that 0 <= factor <= 1.
+            mu_mix_const = 1.0 and mu_mix_per_occupation_offset = 0.0 means no mixing.
+
+.. admonition:: afm_order: 
+ 
+            gg*type= bool, optional 
+            default=False*
+
+            copy self energies instead of solving explicitly for afm order
+
+.. admonition:: set_rot: 
+ 
+            gg*type= string, optional 
+            default='none'*
+
+            use density_mat_dft to diagonalize occupations = 'den'
+            use hloc_dft to diagonalize occupations = 'hloc'
+
+.. admonition:: oneshot_postproc_gamma_file: 
+ 
+            gg*type= bool, optional 
+            default=False*
+
+            write the GAMMA file for vasp after completed one-shot calculations
+measure_chi_SzSz: bool, optional, default=False
+            measure the dynamic spin suszeptibility chi(sz,sz(tau))
+            triqs.github.io/cthyb/unstable/guide/dynamic_susceptibility_notebook.html
+measure_chi_insertions: int, optional, default=100
+            number of insertation for measurement of chi
+
+.. admonition:: mu_gap_gb2_threshold: 
+ 
+            gg*type= float, optional 
+            default=none*
+
+            Threshold of the absolute of the lattice GF at tau=beta/2 for use
+            of MaxEnt's lattice spectral function to put the chemical potential
+            into the middle of the gap. Does not work if system completely full
+            or empty, mu mixing is not applied to it. Recommended value 0.01.
+
+.. admonition:: mu_gap_occ_deviation: 
+ 
+            gg*type= float, optional 
+            default=none*
+
+            Only used if mu_gap_gb2_threshold != none. Sets additional criterion
+            for finding the middle of the gap through occupation deviation to
+            avoid getting stuck in an insulating state with wrong occupation.
+
+solver
+------
+
+.. admonition:: store_solver: 
+ 
+            gg*type= bool 
+            optional default = False*
+
+            store the whole solver object under DMFT_input in h5 archive
+
+cthyb parameters
+================
+
+.. admonition:: length_cycle: 
+ 
+            *type= int*
+
+            length of each cycle; number of sweeps before measurement is taken
+
+.. admonition:: n_warmup_cycles: 
+ 
+            *type= int*
+
+            number of warmup cycles before real measurement sets in
+
+.. admonition:: n_cycles_tot: 
+ 
+            *type= int*
+
+            total number of sweeps
+
+.. admonition:: measure_G_l: 
+ 
+            *type= bool*
+
+            measure Legendre Greens function
+
+.. admonition:: measure_G_tau: 
+ 
+            gg*type= bool,optional 
+            default=True*
+
+            should the solver measure G(tau)?
+
+.. admonition:: measure_G_iw: 
+ 
+            gg*type= bool,optional 
+            default=False*
+
+            should the solver measure G(iw)?
+
+.. admonition:: measure_density_matrix: 
+ 
+            gg*type= bool, optional 
+            default=False*
+
+            measures the impurity density matrix and sets also
+            use_norm_as_weight to true
+measure_pert_order: bool, optional, default=False
+            measure perturbation order histograms: triqs.github.io/cthyb/latest/guide/perturbation_order_notebook.html
+            stored in the h5 archive under DMFT_results per iteration stored in pert_order_imp_X and, pert_order_total_imp_X
+
+.. admonition:: max_time: 
+ 
+            gg*type= int, optional 
+            default=-1*
+
+            maximum amount the solver is allowed to spend in eacht iteration
+
+.. admonition:: imag_threshold: 
+ 
+            gg*type= float, optional 
+            default= 10e-15*
+
+            threshold for imag part of G0_tau. be warned if symmetries are off in projection scheme imag parts can occur in G0_tau
+
+.. admonition:: off_diag_threshold: 
+ 
+            gg*type= float 
+            optional*
+
+            threshold for off-diag elements in Hloc0
+
+.. admonition:: delta_interface: 
+ 
+            gg*type= bool, optional 
+            default=False*
+
+            use new delta interface in cthyb instead of input G0
+
+.. admonition:: move_double: 
+ 
+            gg*type= bool, optional 
+            default=True*
+
+            double moves in solver
+
+.. admonition:: perform_tail_fit: 
+ 
+            gg*type= bool, optional 
+            default=False*
+
+            tail fitting if legendre is off?
+
+.. admonition:: fit_max_moment: 
+ 
+            gg*type= int 
+            optional*
+
+            max moment to be fitted
+
+.. admonition:: fit_min_n: 
+ 
+            gg*type= int 
+            optional*
+
+            number of start matsubara frequency to start with
+
+.. admonition:: fit_max_n: 
+ 
+            gg*type= int 
+            optional*
+
+            number of highest matsubara frequency to fit
+
+.. admonition:: fit_min_w: 
+ 
+            gg*type= float 
+            optional*
+
+            start matsubara frequency to start with
+
+.. admonition:: fit_max_w: 
+ 
+            gg*type= float 
+            optional*
+
+            highest matsubara frequency to fit
+
+.. admonition:: random_seed: 
+ 
+            gg*type= int 
+            optional default by triqs*
+
+            if specified the int will be used for random seeds! Careful, this will give the same random
+            numbers on all mpi ranks
+
+.. admonition:: legendre_fit: 
+ 
+            gg*type= bool 
+            optional default = False*
+
+            filter noise of G(tau) with G_l, cutoff is taken from n_l
+
+ftps parameters
+===============
+
+.. admonition:: n_bath: 
+ 
+            *type= int*
+
+            number of bath sites
+
+.. admonition:: bath_fit: 
+ 
+            gg*type= bool 
+            default=False*
+
+            DiscretizeBath vs BathFitter
+
+.. admonition:: refine_factor: 
+ 
+            gg*type= int, optional 
+            default=1*
+
+            rerun ftps cycle with increased accuracy
+
+.. admonition:: ph_symm: 
+ 
+            gg*type= bool, optional 
+            default=False*
+
+            particle-hole symmetric problem
+
+.. admonition:: calc_me: 
+ 
+            gg*type= bool, optional 
+            default=True*
+
+            calculate only symmetry-inequivalent spins/orbitals, symmetrized afterwards
+
+.. admonition:: enforce_gap: 
+ 
+            gg*type= list of floats, optional 
+            default='none'*
+
+            enforce gap in DiscretizeBath between interval
+
+.. admonition:: ignore_weight: 
+ 
+            gg*type= float, optional 
+            default=0.0*
+
+            ignore weight of peaks for bath fitter
+
+.. admonition:: dt: 
+ 
+            *type= float*
+
+            time step
+
+.. admonition:: state_storage: 
+ 
+            gg*type= string 
+            default = './'*
+
+            location of large MPS states
+
+.. admonition:: path_to_gs: 
+ 
+            gg*type= string 
+            default = 'none'*
+
+            location of GS if already present. Use 'postprocess' to skip solver and go directly to post-processing
+            of previously terminated time-evolved state
+
+.. admonition:: sweeps: 
+ 
+            gg*type= int, optional 
+            default = 10*
+
+            Number of DMRG sweeps
+
+.. admonition:: maxmI: 
+ 
+            gg*type= int, optional 
+            default = 100*
+
+            maximal imp-imp bond dimensions
+
+.. admonition:: maxmIB: 
+ 
+            gg*type= int, optional 
+            default = 100*
+
+            maximal imp-bath bond dimensions
+
+.. admonition:: maxmB: 
+ 
+            gg*type= int, optional 
+            default = 100*
+
+            maximal bath-bath bond dimensions
+
+.. admonition:: tw: 
+ 
+            gg*type= float 
+            default 1E-9*
+
+            truncated weight for every link
+
+.. admonition:: dmrg_maxmI: 
+ 
+            gg*type= int, optional 
+            default = 100*
+
+            maximal imp-imp bond dimensions
+
+.. admonition:: dmrg_maxmIB: 
+ 
+            gg*type= int, optional 
+            default = 100*
+
+            maximal imp-bath bond dimensions
+
+.. admonition:: dmrg_maxmB: 
+ 
+            gg*type= int, optional 
+            default = 100*
+
+            maximal bath-bath bond dimensions
+
+.. admonition:: dmrg_tw: 
+ 
+            gg*type= float 
+            default 1E-9*
+
+            truncated weight for every link
+
+ctseg parameters
+================
+
+.. admonition:: measure_hist: 
+ 
+            gg*type= bool, optional 
+            default=False*
+
+               measure perturbation_order histograms
+
+.. admonition:: improved_estimator : 
+ 
+            gg*type= bool, optional 
+            default=False*
+
+              measure improved estimators
+              Sigma_iw will automatically be calculated via
+              http://dx.doi.org/10.1103/PhysRevB.85.205106
+
+dft
+---
+
+.. admonition:: dft_code: 
+ 
+            *type= string*
+
+           'vasp' or 'qe'
+
+.. admonition:: n_cores: 
+ 
+            *type= int*
+
+            number of cores for the DFT code (VASP)
+
+.. admonition:: n_iter: 
+ 
+            gg*type= int, optional 
+            default = 6*
+
+            number of dft iterations per cycle
+
+.. admonition:: dft_exec: 
+ 
+            gg*type= string 
+            default= 'vasp_std'*
+
+            command for the DFT / VASP executable
+
+.. admonition:: store_eigenvals: 
+ 
+            gg*type= bool, optional 
+            default= False*
+
+            stores the dft eigenvals from LOCPROJ (projector_type=plo) or
+            wannier90.eig (projector_type=w90) file in h5 archive
+
+.. admonition:: mpi_env: 
+ 
+            gg*type= string 
+            default= 'local'*
+
+            selection for mpi env for DFT / VASP in default this will only call VASP as mpirun -np n_cores_dft dft_exec
+
+.. admonition:: projector_type: 
+ 
+            gg*type= string, optional 
+            default = 'plo'*
+
+            plo: uses VASP's PLO formalism, requires LOCPROJ in the INCAR
+            w90: uses Wannier90, requires LWANNIER90 in the INCAR
+
+.. admonition:: w90_exec: 
+ 
+            gg*type= string 
+            default='wannier90.x'*
+
+            the command to start a single-core wannier run
+
+.. admonition:: w90_tolerance: 
+ 
+            gg*type= float 
+            default=1e-6*
+
+            threshold for mapping of shells and checks of the Hamiltonian
+
+advanced
+--------
+
+.. admonition:: dc_factor: 
+ 
+            gg*type= float, optional 
+            default = 'none' (corresponds to 1)*
+
+            If given, scales the dc energy by multiplying with this factor, usually < 1
+
+.. admonition:: dc_fixed_value: 
+ 
+            gg*type= float, optional 
+            default = 'none'*
+
+            If given, it sets the DC (energy/imp) to this fixed value. Overwrites EVERY other DC configuration parameter if DC is turned on
+
+.. admonition:: dc_fixed_occ: 
+ 
+            gg*type= list of float, optional 
+            defaul = 'none'*
+
+            If given, the occupation for the DC for each impurity is set to the provided value.
+            Still uses the same kind of DC!
+
+.. admonition:: dc_U: 
+ 
+            gg*type= float or comma seperated list of floats, optional 
+            default = general_params['U']*
+
+            U values for DC determination if only one value is given, the same U is assumed for all impurities
+
+.. admonition:: dc_J: 
+ 
+            gg*type= float or comma seperated list of floats, optional 
+            default = general_params['J']*
+
+            J values for DC determination if only one value is given, the same J is assumed for all impurities
+
+.. admonition:: map_solver_struct: 
+ 
+            gg*type= dict, optional 
+            default=no additional mapping*
+
+            Additional manual mapping of the solver block structure, applied
+            after the block structure finder to all impurities.
+
+.. admonition:: mapped_solver_struct_degeneracies: 
+ 
+            gg*type= list, optional 
+            default=none*
+
+            Degeneracies applied when using map_solver_struct, same for all inmpurities.
+            If not given and map_solver_struct is used, no symmetrization will happen.
+"""

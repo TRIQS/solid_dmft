@@ -15,6 +15,8 @@ more details in the reference manual below.
 
 To get started with the code after a successful :ref:`installation`, take a look at the :ref:`tutorials` section. Here we provide further special information and a reference manual for all available functions.
 
+
+
 DFT interface notes
 ===================
 
@@ -24,6 +26,13 @@ DFT interface notes
     md_notes/w90_interface.md
     md_notes/vasp_csc.md
     cRPA_VASP/README.md
+
+Input/Output
+===================
+.. toctree::
+    :maxdepth: 1
+
+    input_output/DMFT_input/input
 
 Further details for running
 ===========================
