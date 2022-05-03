@@ -82,6 +82,7 @@ html_theme_options = {
 }
 
 html_show_sphinx = True
+nbsphinx_allow_errors = True
 html_context = {'header_title': '@PROJECT_NAME@'}
 html_static_path = ['@CMAKE_CURRENT_SOURCE_DIR@/_static']
 html_sidebars = {'index': ['sideb.html', 'searchbox.html']}

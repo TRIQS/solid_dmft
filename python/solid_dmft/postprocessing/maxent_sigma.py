@@ -66,6 +66,8 @@ def _read_h5(external_path, iteration=None):
         Double counting for each impurity
     chemical_potential : float
         The chemical potential of the problem. Should be approximately real
+    chemical_potential_zero : float
+        The chemical potential at 0 iteration. Should be approximately real
     """
 
     h5_internal_path = 'DMFT_results/' + ('last_iter' if iteration is None
@@ -87,11 +89,12 @@ def _read_h5(external_path, iteration=None):
         else:
             # Old name for chemical_potential_post
             chemical_potential = archive[h5_internal_path]['chemical_potential']
+        chemical_potential_zero = archive['DMFT_results/observables']['mu'][0]
 
-    return sigma_iw, dc_potential, chemical_potential
+    return sigma_iw, dc_potential, chemical_potential, chemical_potential_zero
 
 
-def _create_sigma_continuator(sigma_iw, dc_potential, chemical_potential, continuator_type):
+def _create_sigma_continuator(sigma_iw, dc_potential, chemical_potential, chemical_potential_zero, continuator_type):
     """
     Initializes the inversion and direct sigma continuator. Returns a list of
     continuators. Types of supported auxiliary Green's functions:
@@ -115,7 +118,7 @@ def _create_sigma_continuator(sigma_iw, dc_potential, chemical_potential, contin
         continuators = [InversionSigmaContinuator(sigma_imp, shift)
                         for sigma_imp, shift in zip(sigma_iw, shifts)]
     elif continuator_type == 'inversion_sigmainf':
-        shifts = [{key: sigma_block.data[-1].real + chemical_potential
+        shifts = [{key: sigma_block.data[-1].real + (chemical_potential - chemical_potential_zero)
                    for key, sigma_block in sigma_imp} for sigma_imp in sigma_iw]
         continuators = [InversionSigmaContinuator(sigma_imp, shift)
                         for sigma_imp, shift in zip(sigma_iw, shifts)]
@@ -295,10 +298,10 @@ def main(external_path, iteration=None, continuator_type='inversion_sigmainf', m
     start_time = time.time()
     continuators = None
     if mpi.is_master_node():
-        sigma_iw, dc_potential, chemical_potential = _read_h5(external_path, iteration)
+        sigma_iw, dc_potential, chemical_potential, chemical_potential_zero = _read_h5(external_path, iteration)
         mpi.report('Finished reading h5 archive. Found {} impurities.'.format(len(sigma_iw)))
         continuators = _create_sigma_continuator(sigma_iw, dc_potential,
-                                                 chemical_potential, continuator_type)
+                                                 chemical_potential, chemical_potential_zero, continuator_type)
     continuators = mpi.bcast(continuators)
     init_end_time = time.time()
 
