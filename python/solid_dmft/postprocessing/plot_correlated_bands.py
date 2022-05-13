@@ -117,7 +117,7 @@ def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, block, orbital_orde
                     raise KeyError('Provide either "Sigma_freq_0" in real frequency or "Sigma_maxent_0".')
             dc = ar['DMFT_results'][specs['it']]['DC_pot'][0][spin][0,0]
             mu = ar['DMFT_results'][specs['it']]['chemical_potential_post']
-            dft_mu = ar['DMFT_results']['it_1']['chemical_potential_pre']
+            dft_mu = ar['DMFT_results/observables']['mu'][0]
 
     else:
         print('Setting Sigma from memory')
