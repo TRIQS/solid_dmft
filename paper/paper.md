@@ -55,7 +55,7 @@ Even though, these solvers operate very differently solid\_dmft allows to seamle
 solid\_dmft allows also to perform inhomogenous DMFT calculations, i.e. treatment of multiple correlated and uncorrelated shells (impurity problems), converging one shared dynamic Weiss field. 
 After self-consistency is reached, either via full CSC, or just within the DMFT cycle, postprocessing scripts are available to perform analytic continuation of imaginary Green's functions and to calculate spectral functions. 
 
-![Full CSC DFT+DFMT cycle\label{fig:downfolding}](downfolding.png){ width=100% }
+![Full CSC DFT+DFMT cycle. Starting from a DFT calculation (top left), a downfolded Hamiltonian or projector functions are created via triqs/dfttools (top right). By specifying an interaction Hamiltonian $H_\text{int}$ a full interacting electron problem is created, which is solved via the DMFT equations (bottom). After convergence in DMFT is reached, physical observables are calculated (bottom left), and if wanted a full CSC calculation is performed by adding a charge density correction to DFT and the cycle is restarted.\label{fig:downfolding}](downfolding.png){ width=100% }
 
 The idea is to provide the full functionality of a full a DFT+DMFT calculation, bringing together the state-of-the-art implementations provided by the triqs library and its applications. 
 This allows to implement and test new features of triqs or benchmark new solvers against existing ones.
@@ -64,12 +64,17 @@ solid\_dmft can run the DFT calculations, create the downfolded Hamiltonian, sol
 
 The modularity of the program also allows to run for example only the DMFT loop via a single function with well defined input and output without running solid_dmft as a monolithic code, making it easy to be used in other projects.
 
-As of now solid\_dmft has been successfully used in various peer reviewed research studies[@Beck:2022], and provides stable releases matching the releases of the TRIQS library, that are well tested. We provide a full documentation including tutorials, and a reference manual. Furthermore, we utilize an extensive CI workflow on github to test every PR and commit.
+As of now solid\_dmft has been successfully used in various peer reviewed research studies [@Beck:2022; @Hampel:2019; @Hampel:2020; @Hampel:2021], and provides stable releases matching the releases of the TRIQS library, that are well tested. 
+We provide a full documentation including tutorials, and a reference manual. Furthermore, we utilize an extensive CI workflow on github to test every PR and commit.
 
 
 # Statement of need
 
-As already mentioned the number of ready to use DFT+DMFT codes is rather limited, and all codes are rather recent. Most of them are completely black boxed, e.g. EDMFT, Amulet, DMFT implementation in Abinit. Other implementation like DFTwDMFT and DCORE follow a very similar strategy but do not implement different impurity solvers as of now. solid\_dmft provides a flagship implementation of the TRIQS functionality to perform DFT+DMFT calculation and is ready to be extend to beyond DMFT formalisms. This is beneficial both for developers of TRIQS applications, by enabling them to test their applications in a well tested framework, and for users, as they benefit of the most recent features of TRIQS.
+As already mentioned the number of ready to use DFT+DMFT codes is rather limited, and all codes are rather recent. 
+Most of them are completely black boxed, e.g. EDMFT, Amulet, DMFT implementation in Abinit. 
+Other implementation like DFTwDMFT and DCORE follow a very similar strategy as solid\_dmft but do not implement different impurity solvers as of now. 
+solid\_dmft provides a flagship implementation of the TRIQS functionality to perform DFT+DMFT calculation and is ready to be extended to beyond DMFT formalisms. 
+This is beneficial both for developers of TRIQS applications, by enabling them to test their applications in a well tested framework, and for users, as they benefit of the most recent features of TRIQS.
 
 # Acknowledgements
 
