@@ -46,7 +46,7 @@ from triqs_maxent.logtaker import VerbosityFlags
 from h5 import HDFArchive
 
 
-def _read_h5(external_path, iteration=None):
+def _read_h5(external_path, iteration):
     """
     Reads the h5 archive to get the Matsubara self energy, the double-counting potential
     and the chemical potential.
@@ -71,7 +71,7 @@ def _read_h5(external_path, iteration=None):
     """
 
     h5_internal_path = 'DMFT_results/' + ('last_iter' if iteration is None
-                                          else 'it_{}'.format(iteration))
+                                          else f'it_{iteration}')
 
     with HDFArchive(external_path, 'r') as archive:
         impurity_paths = [key for key in archive[h5_internal_path].keys() if 'Sigma_freq_' in key]
@@ -184,7 +184,7 @@ def _run_maxent(continuators, error, omega_min, omega_max, n_points_maxent,
                 assert result.analyzer_results[k][j][1] == {}, 'Result should not be complex'
                 opt_alphas[i][k, j] = result.analyzer_results[k][j][0][analyzer]['alpha_index']
 
-    # Synchronizes information between branches
+    # Synchronizes information between ranks
     for i in imps_blocks_indices:
         spectral_funcs[i] = mpi.all_reduce(mpi.world, spectral_funcs[i], lambda x, y: x+y)
         opt_alphas[i] = mpi.all_reduce(mpi.world, opt_alphas[i], lambda x, y: x+y)
@@ -219,7 +219,7 @@ def _get_sigma_omega_from_aux(continuators, aux_spectral_funcs, aux_omega_mesh,
 def _write_sigma_omega_to_h5(g_aux_w, sigma_w, external_path, iteration):
     """ Writes real-frequency self energy to h5 archive. """
     h5_internal_path = 'DMFT_results/' + ('last_iter' if iteration is None
-                                          else 'it_{}'.format(iteration))
+                                          else f'it_{iteration}')
 
     with HDFArchive(external_path, 'a') as archive:
         for i, (g_aux_imp, sigma_imp) in enumerate(zip(g_aux_w, sigma_w)):
