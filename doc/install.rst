@@ -22,9 +22,9 @@ Installation steps
 
      $ git clone https://github.com/flatironinstitute/solid_dmft solid_dmft.src
 
-#. checkout the branch of solid_dmft matching your triqs version. For example if you use the `3.0.x` branch of triqs, dfttools. and cthyb: 
+#. checkout the branch of solid_dmft matching your triqs version. For example if you use the `3.1.x` branch of triqs, dfttools. and cthyb:
 
-    $ git checkout 3.0.x
+    $ git checkout 3.1.x
 
 #. Create and move to a new directory where you will compile the code::
 
@@ -68,7 +68,7 @@ To use a particular version, go into the directory with the sources, and look at
 
 Checkout the version of the code that you want::
 
-     $ git checkout 3.0.x
+     $ git checkout 3.1.x
 
 and follow steps 3 to 6 above to compile the code.
 
