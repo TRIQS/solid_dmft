@@ -4,8 +4,8 @@
 Documentation
 ***************
 
-Code structure:
-===============
+Code structure
+==============
 
 .. image:: _static/code_structure.png
    :width: 100%
