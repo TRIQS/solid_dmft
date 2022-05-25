@@ -153,22 +153,23 @@ def read_dft_energy_qe(seedname):
     """
     RYDBERG = 13.605698066 # eV
 
-    try:
-        with open('{}.scf.out'.format(seedname), 'r') as file:
-            dft_output = file.readlines()
-        for line in dft_output:
-            if 'total energy' in line:
-                dft_energy = float(line.split()[-2]) * RYDBERG
-                break
-    except FileNotFoundError:
-        print('{}.scf.out not found, cannot read DFT energy.'.format(seedname))
-        return None
-    except ValueError:
-        print('Failed to read DFT energy from {}.scf.out, '.format(seedname))
-        return None
+    for mode in ['mod_scf', 'scf']:
+        try:
+            with open(f'{seedname}.{mode}.out', 'r') as file:
+                dft_output = file.readlines()
+            for line in dft_output:
+                if 'total energy' in line:
+                    dft_energy = float(line.split()[-2]) * RYDBERG
+            break
+        except FileNotFoundError:
+            if mode == 'scf':
+                print(f'{seedname}.{mode}.out not found, cannot read DFT energy.')
+        except ValueError:
+            pass
 
-    print('DFT energy read from {}.scf.out'.format(seedname))
+    print(f'DFT energy read from {seedname}.{mode}.out')
     return dft_energy
+
 
 def _set_projections_suppressed(suppressed):
     if mpi.is_master_node():
