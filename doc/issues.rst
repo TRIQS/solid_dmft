@@ -1,11 +1,26 @@
 .. _issues:
 
+*****************
+How to contribute
+*****************
+
+
+Improving solid_dmft
+====================
+
+solid_dmft is targeted at experienced users of DMFT. If you have suggestions or
+questions, please use github discussion
+`<https://github.com/flatironinstitute/solid_dmft/discussions>`_.
+
+We encourage pull requests with new features or helpful postprocessing scripts.
+
+
 Reporting issues
 ================
 
 Please report all problems and bugs directly at the github issue page
-`<https://github.com/flatironinstitute/solid_dmft/issues>`_.  In order to make it easier for us
-to solve the issue please follow these guidelines:
+`<https://github.com/flatironinstitute/solid_dmft/issues>`_.  In order to make
+it easier for us to solve the issue please follow these guidelines:
 
 #. In all cases specify which version of the application you are using. You can
    find the version number in the file :file:`CMakeLists.txt` at the root of the
