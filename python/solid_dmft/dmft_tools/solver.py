@@ -341,22 +341,16 @@ class SolverStructure:
 
             # Solve the impurity problem for icrsh shell
             # *************************************
-            if mpi.is_master_node():
-                self.triqs_solver.solve(h_int=self.h_int, calc_gtau=self.solver_params['measure_G_tau'],
-                                        calc_gw=True, calc_gl=self.solver_params['measure_G_l'],
-                                        calc_dm=self.solver_params['measure_density_matrix'])
-                # if density matrix is measured, get this too. Needs to be done here,
-                # because solver property 'dm' is not initialized/broadcastable
-                if self.solver_params['measure_density_matrix']:
-                    self.density_matrix = self.triqs_solver.dm
-                    self.h_loc_diagonalization = self.triqs_solver.ad
-            # *************************************
-            # solver runs only on main node, therefore broadcasting everything:
-            self.triqs_solver = mpi.bcast(self.triqs_solver)
+            # this is done on every node due to very slow bcast of the AtomDiag object as of now
+            self.triqs_solver.solve(h_int=self.h_int, calc_gtau=self.solver_params['measure_G_tau'],
+                                    calc_gw=True, calc_gl=self.solver_params['measure_G_l'],
+                                    calc_dm=self.solver_params['measure_density_matrix'])
+            # if density matrix is measured, get this too. Needs to be done here,
+            # because solver property 'dm' is not initialized/broadcastable
             if self.solver_params['measure_density_matrix']:
-                self.density_matrix = mpi.bcast(self.density_matrix)
-                self.h_loc_diagonalization = mpi.bcast(self.h_loc_diagonalization)
-            mpi.barrier()
+                self.density_matrix = self.triqs_solver.dm
+                self.h_loc_diagonalization = self.triqs_solver.ad
+            # *************************************
 
             # call postprocessing
             self._hubbardI_postprocessing()
