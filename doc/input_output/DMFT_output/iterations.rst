@@ -1,5 +1,5 @@
 
-[dft]: DFT related inputs
+Iterations
 ------
 
 List of parameters that relate to the DFT calculation, useful mostly when doing CSC.

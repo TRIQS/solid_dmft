@@ -20,7 +20,7 @@ cat > input.rst << EOF
 DMFT input
 ------------------------
 
-In this section all the 
+The aim of this section is to provide a comprehensive listing of all the input flags available for the \`dmft_config.ini\` input file. We begin by listing the possible sections and follow with the input parameters.
 
 Input/Output
 ===================
@@ -53,11 +53,11 @@ EOF
 awk '/\[  general  \]/{flag=1; c=0} flag; /\[ /&& ++c==2{flag=0}' matches_comments.txt | head -n -2 | tail -n +3 > general.tmp
 grep '::' general.tmp | grep -o '::\(.*\):' | sed 's/:: //g' | tr ':\n' '; ' > general_list.tmp
 awk '/\[  solver  \]/{flag=1; c=0} flag; /\[ /&& ++c==2{flag=0}' matches_comments.txt | head -n -2 | tail -n +3 > solver.tmp
-grep '::' general.tmp | grep -o '::\(.*\):' | sed 's/:: //g' | tr ':\n' '; ' > solver_list.tmp
+grep '::' solver.tmp | grep -o '::\(.*\):' | sed 's/:: //g' | tr ':\n' '; ' > solver_list.tmp
 awk '/\[  dft  \]/{flag=1; c=0} flag; /\[ /&& ++c==2{flag=0}' matches_comments.txt | head -n -2 | tail -n +3 > dft.tmp
-grep '::' general.tmp | grep -o '::\(.*\):' | sed 's/:: //g' | tr ':\n' '; ' > dft_list.tmp
+grep '::' dft.tmp | grep -o '::\(.*\):' | sed 's/:: //g' | tr ':\n' '; ' > dft_list.tmp
 awk '/\[  advanced  \]/{flag=1; c=0} flag; /\[ /&& ++c==2{flag=0}' matches_comments.txt | head -n -2 | tail -n +3 > advanced.tmp
-grep '::' general.tmp | grep -o '::\(.*\):' | sed 's/:: //g' | tr ':\n' '; ' > advanced_list.tmp
+grep '::' advanced.tmp | grep -o '::\(.*\):' | sed 's/:: //g' | tr ':\n' '; ' > advanced_list.tmp
 
 
 cat general_list.tmp >> input.rst
