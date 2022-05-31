@@ -33,6 +33,7 @@ Input/Output
     :maxdepth: 1
 
     input_output/DMFT_input/input
+    input_output/DMFT_output/results
 
 Further details for running
 ===========================

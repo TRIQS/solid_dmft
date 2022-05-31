@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   version="1"
+   viewBox="0 0 1244.8508 487.43164"
+   enable-background="new 0 0 48 48"
+   id="svg6"
+   sodipodi:docname="group_structure.svg"
+   width="1244.8508"
+   height="487.43164"
+   inkscape:version="1.1.2 (1:1.1+202202050852+0a00cf5339)"
+   inkscape:export-filename="/home/acarta/Gitlab_projects/solid_dmft/doc/input_output/DMFT_output/group_structure.png"
+   inkscape:export-xdpi="192"
+   inkscape:export-ydpi="192"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs10">
+    <rect
+       x="1075.71"
+       y="332.51483"
+       width="133.952"
+       height="56.877499"
+       id="rect32767" />
+  </defs>
+  <sodipodi:namedview
+     id="namedview8"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:zoom="1.1915234"
+     inkscape:cx="594.19729"
+     inkscape:cy="378.92666"
+     inkscape:window-width="1684"
+     inkscape:window-height="1369"
+     inkscape:window-x="72"
+     inkscape:window-y="34"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg6"
+     showguides="true"
+     inkscape:guide-bbox="true">
+    <sodipodi:guide
+       position="357.94511,226.00162"
+       orientation="1,0"
+       id="guide128927" />
+  </sodipodi:namedview>
+  <rect
+     style="opacity:0.578755;fill:#8f9a9d;fill-opacity:0.295189;stroke:#0099ff;stroke-width:5.585;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:0.580392;stroke-miterlimit:4;stroke-dasharray:none"
+     id="rect112620"
+     width="290.31174"
+     height="265.04343"
+     x="401.93402"
+     y="9.2546215" />
+  <g
+     id="g16322"
+     transform="matrix(1.3856869,0,0,1.3856869,514.16917,65.154368)"
+     style="opacity:0.578755">
+    <path
+       fill="#FFA000"
+       d="M 40,12 H 22 L 18,8 H 8 C 5.8,8 4,9.8 4,12 v 8 h 40 v -4 c 0,-2.2 -1.8,-4 -4,-4 z"
+       id="path2"
+       style="fill:#009aff;fill-opacity:1" />
+    <path
+       fill="#FFCA28"
+       d="M 40,12 H 8 c -2.2,0 -4,1.8 -4,4 v 20 c 0,2.2 1.8,4 4,4 h 32 c 2.2,0 4,-1.8 4,-4 V 16 c 0,-2.2 -1.8,-4 -4,-4 z"
+       id="path4"
+       style="fill:#28d3ff;fill-opacity:1" />
+  </g>
+  <g
+     id="g16322-0"
+     transform="matrix(1.3856869,0,0,1.3856869,514.16917,115.05059)"
+     style="opacity:0.578755">
+    <path
+       fill="#FFA000"
+       d="M 40,12 H 22 L 18,8 H 8 C 5.8,8 4,9.8 4,12 v 8 h 40 v -4 c 0,-2.2 -1.8,-4 -4,-4 z"
+       id="path2-9"
+       style="fill:#009aff;fill-opacity:1" />
+    <path
+       fill="#FFCA28"
+       d="M 40,12 H 8 c -2.2,0 -4,1.8 -4,4 v 20 c 0,2.2 1.8,4 4,4 h 32 c 2.2,0 4,-1.8 4,-4 V 16 c 0,-2.2 -1.8,-4 -4,-4 z"
+       id="path4-3"
+       style="fill:#28d3ff;fill-opacity:1" />
+  </g>
+  <g
+     id="g16322-2-2"
+     transform="matrix(1.3856869,0,0,1.3856869,515.21571,205.84624)"
+     style="opacity:0.578755">
+    <path
+       fill="#FFA000"
+       d="M 40,12 H 22 L 18,8 H 8 C 5.8,8 4,9.8 4,12 v 8 h 40 v -4 c 0,-2.2 -1.8,-4 -4,-4 z"
+       id="path2-61-9"
+       style="fill:#009aff;fill-opacity:1" />
+    <path
+       fill="#FFCA28"
+       d="M 40,12 H 8 c -2.2,0 -4,1.8 -4,4 v 20 c 0,2.2 1.8,4 4,4 h 32 c 2.2,0 4,-1.8 4,-4 V 16 c 0,-2.2 -1.8,-4 -4,-4 z"
+       id="path4-8-3"
+       style="fill:#28d3ff;fill-opacity:1" />
+  </g>
+  <g
+     id="g16322-3"
+     transform="matrix(2.2005665,0,0,2.2005665,409.85849,281.48114)">
+    <path
+       fill="#FFA000"
+       d="M 40,12 H 22 L 18,8 H 8 C 5.8,8 4,9.8 4,12 v 8 h 40 v -4 c 0,-2.2 -1.8,-4 -4,-4 z"
+       id="path2-6"
+       style="fill:#009aff;fill-opacity:1" />
+    <path
+       fill="#FFCA28"
+       d="M 40,12 H 8 c -2.2,0 -4,1.8 -4,4 v 20 c 0,2.2 1.8,4 4,4 h 32 c 2.2,0 4,-1.8 4,-4 V 16 c 0,-2.2 -1.8,-4 -4,-4 z"
+       id="path4-7"
+       style="fill:#28d3ff;fill-opacity:1" />
+  </g>
+  <g
+     id="g16322-5"
+     transform="matrix(2.2005665,0,0,2.2005665,409.85849,399.40897)">
+    <path
+       fill="#FFA000"
+       d="M 40,12 H 22 L 18,8 H 8 C 5.8,8 4,9.8 4,12 v 8 h 40 v -4 c 0,-2.2 -1.8,-4 -4,-4 z"
+       id="path2-3"
+       style="fill:#009aff;fill-opacity:1" />
+    <path
+       fill="#FFCA28"
+       d="M 40,12 H 8 c -2.2,0 -4,1.8 -4,4 v 20 c 0,2.2 1.8,4 4,4 h 32 c 2.2,0 4,-1.8 4,-4 V 16 c 0,-2.2 -1.8,-4 -4,-4 z"
+       id="path4-5"
+       style="fill:#28d3ff;fill-opacity:1" />
+  </g>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:37.3333px;line-height:1.25;font-family:'Ubuntu m';-inkscape-font-specification:'Ubuntu m'"
+     x="-3.6640594"
+     y="270.27954"
+     id="text5944"><tspan
+       sodipodi:role="line"
+       id="tspan5942"
+       x="-3.6640594"
+       y="270.27954"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Ubuntu m';-inkscape-font-specification:'Ubuntu m'">DMFT_results</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:37.3333px;line-height:1.25;font-family:'Ubuntu m';-inkscape-font-specification:'Ubuntu m'"
+     x="530.60089"
+     y="343.75229"
+     id="text5944-6"><tspan
+       sodipodi:role="line"
+       id="tspan5942-2"
+       x="530.60089"
+       y="343.75229"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Ubuntu m';-inkscape-font-specification:'Ubuntu m'">observables</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:37.3333px;line-height:1.25;font-family:'Ubuntu m';-inkscape-font-specification:'Ubuntu m'"
+     x="415.28314"
+     y="47.978226"
+     id="text5944-6-22"><tspan
+       sodipodi:role="line"
+       id="tspan5942-2-8"
+       x="415.28314"
+       y="47.978226"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Ubuntu m';-inkscape-font-specification:'Ubuntu m'">iterations</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24.1971px;line-height:1.25;font-family:'Ubuntu m';-inkscape-font-specification:'Ubuntu m';stroke-width:0.648139"
+     x="579.6311"
+     y="108.92175"
+     id="text5944-6-2"><tspan
+       sodipodi:role="line"
+       id="tspan5942-2-7"
+       x="579.6311"
+       y="108.92175"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Ubuntu m';-inkscape-font-specification:'Ubuntu m';stroke-width:0.648139">it_1</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24px;line-height:1.45;font-family:'Ubuntu m';-inkscape-font-specification:'Ubuntu m';stroke-width:0.648139"
+     x="883.81396"
+     y="289.24765"
+     id="text5944-6-2-7"><tspan
+       sodipodi:role="line"
+       x="883.81396"
+       y="289.24765"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24px;font-family:'Ubuntu m';-inkscape-font-specification:'Ubuntu m';stroke-width:0.648139"
+       id="tspan68551">• Mu (chem. potential)</tspan><tspan
+       sodipodi:role="line"
+       x="883.81396"
+       y="324.04764"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24px;font-family:'Ubuntu m';-inkscape-font-specification:'Ubuntu m';stroke-width:0.648139"
+       id="tspan28125">• G(beta/2)</tspan><tspan
+       sodipodi:role="line"
+       x="883.81396"
+       y="358.84766"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24px;font-family:'Ubuntu m';-inkscape-font-specification:'Ubuntu m';stroke-width:0.648139"
+       id="tspan26893">• Orbital occupation</tspan><tspan
+       sodipodi:role="line"
+       x="883.81396"
+       y="393.64764"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24px;font-family:'Ubuntu m';-inkscape-font-specification:'Ubuntu m';stroke-width:0.648139"
+       id="tspan92803">  ...</tspan><tspan
+       sodipodi:role="line"
+       x="883.81396"
+       y="428.44766"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24px;font-family:'Ubuntu m';-inkscape-font-specification:'Ubuntu m';stroke-width:0.648139"
+       id="tspan39727">• Total energy (in CSC)</tspan><tspan
+       sodipodi:role="line"
+       x="883.81396"
+       y="463.24765"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24px;font-family:'Ubuntu m';-inkscape-font-specification:'Ubuntu m';stroke-width:0.648139"
+       id="tspan39725" /></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24px;line-height:1.45;font-family:'Ubuntu m';-inkscape-font-specification:'Ubuntu m';stroke-width:0.648139"
+     x="814.6438"
+     y="56.385624"
+     id="text5944-6-2-7-3"><tspan
+       sodipodi:role="line"
+       x="814.6438"
+       y="56.385624"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24px;font-family:'Ubuntu m';-inkscape-font-specification:'Ubuntu m';stroke-width:0.648139"
+       id="tspan68551-6">• G0 (Weiss field)</tspan><tspan
+       sodipodi:role="line"
+       x="814.6438"
+       y="91.185623"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24px;font-family:'Ubuntu m';-inkscape-font-specification:'Ubuntu m';stroke-width:0.648139"
+       id="tspan28125-0">• G ( Single particle Green function)</tspan><tspan
+       sodipodi:role="line"
+       x="814.6438"
+       y="125.98563"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24px;font-family:'Ubuntu m';-inkscape-font-specification:'Ubuntu m';stroke-width:0.648139"
+       id="tspan26893-5">• Sigma (Self-energy)</tspan><tspan
+       sodipodi:role="line"
+       x="814.6438"
+       y="160.78563"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24px;font-family:'Ubuntu m';-inkscape-font-specification:'Ubuntu m';stroke-width:0.648139"
+       id="tspan92803-0">  ...</tspan><tspan
+       sodipodi:role="line"
+       x="814.6438"
+       y="195.58563"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24px;font-family:'Ubuntu m';-inkscape-font-specification:'Ubuntu m';stroke-width:0.648139"
+       id="tspan39727-2">• Density Matrix</tspan><tspan
+       sodipodi:role="line"
+       x="814.6438"
+       y="230.38564"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24px;font-family:'Ubuntu m';-inkscape-font-specification:'Ubuntu m';stroke-width:0.648139"
+       id="tspan39725-9" /></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24.1971px;line-height:1.25;font-family:'Ubuntu m';-inkscape-font-specification:'Ubuntu m';stroke-width:0.648139"
+     x="580.97876"
+     y="159.05989"
+     id="text5944-6-2-1"><tspan
+       sodipodi:role="line"
+       id="tspan5942-2-7-9"
+       x="580.97876"
+       y="159.05989"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Ubuntu m';-inkscape-font-specification:'Ubuntu m';stroke-width:0.648139">it_2</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24.1971px;line-height:1.25;font-family:'Ubuntu m';-inkscape-font-specification:'Ubuntu m';stroke-width:0.648139"
+     x="579.6311"
+     y="247.37994"
+     id="text5944-6-2-9"><tspan
+       sodipodi:role="line"
+       id="tspan5942-2-7-7"
+       x="579.6311"
+       y="247.37994"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Ubuntu m';-inkscape-font-specification:'Ubuntu m';stroke-width:0.648139">last_iter</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:37.3333px;line-height:1.25;font-family:'Ubuntu m';-inkscape-font-specification:'Ubuntu m'"
+     x="530.60089"
+     y="471.87067"
+     id="text5944-6-9"><tspan
+       sodipodi:role="line"
+       id="tspan5942-2-1"
+       x="530.60089"
+       y="471.87067"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Ubuntu m';-inkscape-font-specification:'Ubuntu m'">convergence_obs</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-size:37.3333px;line-height:1.25;font-family:impact;-inkscape-font-specification:impact"
+     x="646.31647"
+     y="331.04794"
+     id="text18932"><tspan
+       sodipodi:role="line"
+       id="tspan18930"
+       x="646.31647"
+       y="331.04794" /></text>
+  <circle
+     style="opacity:0.578755;fill:#28d2ff;fill-opacity:0.580392;stroke:#0a49dd;stroke-width:0.861166;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+     id="path51053"
+     cx="532.19592"
+     cy="195.65155"
+     r="4.7751675" />
+  <circle
+     style="opacity:0.578755;fill:#28d2ff;fill-opacity:0.580392;stroke:#0a49dd;stroke-width:0.861166;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+     id="path51053-4"
+     cx="550.77917"
+     cy="195.65155"
+     r="4.7751675" />
+  <circle
+     style="opacity:0.578755;fill:#28d2ff;fill-opacity:0.580392;stroke:#0a49dd;stroke-width:0.861166;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+     id="path51053-7"
+     cx="569.36243"
+     cy="195.65155"
+     r="4.7751675" />
+  <path
+     style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     d="m 395.17954,33.117267 c -133.63194,0 -32.70679,225.367663 -134.57881,225.367663 102.36119,0 1.03942,222.11817 139.57705,222.11817"
+     id="path63635"
+     sodipodi:nodetypes="ccc" />
+  <path
+     style="fill:none;stroke:#000000;stroke-width:1.2038;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     d="m 870.06045,274.83282 c -88.07163,-0.46494 -22.68243,65.52591 -87.39701,65.52591 63.67791,0 -0.39679,77.80735 92.58294,77.09804"
+     id="path63635-3"
+     sodipodi:nodetypes="ccc" />
+  <path
+     style="fill:none;stroke:#000000;stroke-width:1.2038;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     d="m 804.42682,34.551235 c -97.1306,0.919386 -12.42184,118.316895 -95.46035,114.532915 82.39712,0.77597 1.76647,65.12779 103.07888,65.96705"
+     id="path63635-3-6"
+     sodipodi:nodetypes="ccc" />
+  <text
+     xml:space="preserve"
+     id="text32765"
+     style="font-size:37.3333px;line-height:1.25;font-family:impact;-inkscape-font-specification:impact;white-space:pre;shape-inside:url(#rect32767)" />
+</svg>
