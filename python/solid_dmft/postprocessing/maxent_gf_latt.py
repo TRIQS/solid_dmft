@@ -62,7 +62,7 @@ def _read_h5(external_path, iteration):
     external_path : string
         path to h5 archive
     iteration : int
-        The iteration that is being read from, default is 'last_iter'
+        The iteration that is being read from, None corresponds to 'last_iter'
 
     Returns
     -------
@@ -229,6 +229,7 @@ def main(external_path, iteration=None, sum_spins=False, maxent_error=.02,
         on the diagonal entries in the hopping matrix but at least to -20...20 eV.
     omega_max : float
         Upper end of range where the GF is being continued. See omega_min.
+
     Returns
     -------
     unpacked_results : dict

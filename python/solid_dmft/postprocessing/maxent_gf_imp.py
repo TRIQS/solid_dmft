@@ -46,6 +46,22 @@ from triqs.gf import BlockGf
 
 
 def _read_h5(external_path, iteration):
+    """
+    Reads the h5 archive to get the impurity Green's functions.
+
+    Parameters
+    ----------
+    external_path : string
+        path to h5 archive
+    iteration : int
+        The iteration that is being read from, None corresponds to 'last_iter'
+
+    Returns
+    -------
+    gf_imp_tau : list
+        Impurity Green's function as block Green's function for each impurity
+    """
+
     """Reads the block Green's function G(tau) from h5 archive."""
 
     h5_internal_path = 'DMFT_results/' + ('last_iter' if iteration is None
@@ -96,7 +112,7 @@ def _sum_greens_functions(block_gf, sum_spins):
 def _run_maxent(gf_imp_tau, maxent_error, n_points_maxent, n_points_alpha,
                 omega_min, omega_max):
     """
-    Runs maxent to get the spectral function from the list of block GF.
+    Runs maxent to get the spectral functions from the list of block GFs.
     """
 
     omega_mesh = HyperbolicOmegaMesh(omega_min=omega_min, omega_max=omega_max,
@@ -154,20 +170,38 @@ def _write_spectral_function_to_h5(unpacked_results, external_path, iteration):
 def main(external_path, iteration=None, sum_spins=False, maxent_error=0.02,
          n_points_maxent=200, n_points_alpha=50, omega_min=-20, omega_max=20):
     """
-    Main function that reads the impurity Greens function from h5, analytically continues it
-    and writes the result back to the h5 archive.
+    Main function that reads the impurity Greens (GF) function from h5,
+    analytically continues it, writes the result back to the h5 archive and
+    also returns the results.
 
     Parameters
     ----------
-    external_path: string, path of the h5 archive
-    iteration: int/string, optional, iteration to read from and write to
+    external_path : string
+        Path to the h5 archive to read from and write to.
+    iteration : int/string
+        Iteration to read from and write to. Defaults to last_iter.
+    sum_spins : bool
+        Whether to sum over the spins or continue the impurity GF
+        for the up and down spin separately, for example for magnetized results.
+    maxent_error : float
+        The error that is used for the analyzers.
+    n_points_maxent : int
+        Number of omega points on the hyperbolic mesh used in the continuation.
+    n_points_alpha : int
+        Number of points that the MaxEnt alpha parameter is varied on logarithmically.
+    omega_min : float
+        Lower end of range where the GF is being continued. Range has to comprise
+        all features of the impurity GF for correct normalization.
+    omega_max : float
+        Upper end of range where the GF is being continued. See omega_min.
 
     Returns
     -------
-    list of dict, per impurity: dict containing the omega mesh
-        and A_imp from two different analyzers
+    unpacked_results : list
+        The omega mesh and impurity spectral function from two different analyzers
+        in a dict for each impurity
     """
-    # TODO: update doc string
+
     start_time = time.time()
 
     gf_imp_tau = None

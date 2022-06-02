@@ -31,6 +31,10 @@ mpi parallelized for the maxent routine over all blocks and for the continuator
 extraction over omega points.
 
 Author: Maximilian Merkel, Materials Theory Group, ETH Zurich, 2020 - 2022
+
+Warnings:
+    * When using this on self-energies with SOC, please check that the formalism,
+    in particular the Kramers-Kronig relation.
 """
 
 import time
@@ -56,7 +60,7 @@ def _read_h5(external_path, iteration):
     external_path : string
         path to h5 archive
     iteration : int
-        The iteration that is being read from, default is 'last_iter'
+        The iteration that is being read from, None corresponds to 'last_iter'
 
     Returns:
     --------
@@ -157,7 +161,7 @@ def _run_maxent(continuators, error, omega_min, omega_max, n_points_maxent,
 
     # Initializes arrays to save results in
     spectral_funcs = [np.zeros(1)] * len(imps_blocks)
-    opt_alphas = [np.zeros(1)] * len(imps_blocks)
+    opt_alphas = [np.zeros(1, dtype=int)] * len(imps_blocks)
     omega_mesh = HyperbolicOmegaMesh(omega_min=omega_min, omega_max=omega_max, n_points=n_points_maxent)
 
     # Runs MaxEnt while parallelizing over impurities and blocks
@@ -178,18 +182,24 @@ def _run_maxent(continuators, error, omega_min, omega_max, n_points_maxent,
 
         spectral_funcs[i] = result.get_A_out(analyzer)
 
-        opt_alphas[i] = np.full(g_aux_block.data.shape[1:], -1, dtype=int)
+        opt_alphas[i] = np.full(g_aux_block.data.shape[1:] + (2, ), -1, dtype=int)
         for j in range(opt_alphas[i].shape[0]):
             for k in range(j+1):
-                assert result.analyzer_results[k][j][1] == {}, 'Result should not be complex'
-                opt_alphas[i][k, j] = result.analyzer_results[k][j][0][analyzer]['alpha_index']
+                for l in range(2): # loop over complex numbers
+                    if result.analyzer_results[k][j][l] == {}:
+                        continue
+                    opt_alphas[i][k, j, l] = result.analyzer_results[k][j][l][analyzer]['alpha_index']
 
     # Synchronizes information between ranks
     for i in imps_blocks_indices:
         spectral_funcs[i] = mpi.all_reduce(mpi.world, spectral_funcs[i], lambda x, y: x+y)
         opt_alphas[i] = mpi.all_reduce(mpi.world, opt_alphas[i], lambda x, y: x+y)
 
-    mpi.report('Optimal alphas: {}'.format(opt_alphas))
+    for i, block_index in enumerate(imps_blocks):
+        mpi.report(f'Optimal alphas, block {block_index}:')
+        mpi.report('--- Real part ---', opt_alphas[i][:, :, 0])
+        if np.any(opt_alphas[i][:, :, 1] != -1):
+            mpi.report('--- Imag part ---', opt_alphas[i][:, :, 1])
 
     # Sorts results into original order of impurities and blocks
     # and adds information from Hermitian conjugate of off-diagonal elements
@@ -198,8 +208,10 @@ def _run_maxent(continuators, error, omega_min, omega_max, n_points_maxent,
         for i in range(val.shape[0]):
             for j in range(i):
                 val[i, j] = val[j, i].conj()
-        assert np.allclose(val.imag, 0), 'Result should not be complex'
-        sorted_spectral_funcs[imp][block] = val.real
+        if not np.allclose(val.imag, 0):
+            mpi.report('The result is complex. This might be correct but comes '
+                       + 'without guarantuee of formal correctness.')
+        sorted_spectral_funcs[imp][block] = val
 
     return sorted_spectral_funcs, omega_mesh
 
