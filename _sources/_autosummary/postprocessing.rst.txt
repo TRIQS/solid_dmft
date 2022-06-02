@@ -27,7 +27,6 @@
 
     
     postprocessing.eval_U_cRPA_Vasp
-    postprocessing.make_spaghetti
     postprocessing.maxent_gf_imp
     postprocessing.maxent_gf_latt
     postprocessing.maxent_sigma
