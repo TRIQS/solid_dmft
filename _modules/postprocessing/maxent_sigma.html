@@ -265,6 +265,10 @@
 <span class="sd">extraction over omega points.</span>
 
 <span class="sd">Author: Maximilian Merkel, Materials Theory Group, ETH Zurich, 2020 - 2022</span>
+
+<span class="sd">Warnings:</span>
+<span class="sd">    * When using this on self-energies with SOC, please check that the formalism,</span>
+<span class="sd">    in particular the Kramers-Kronig relation.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">time</span>
@@ -280,7 +284,7 @@
 <span class="kn">from</span> <span class="nn">h5</span> <span class="kn">import</span> <span class="n">HDFArchive</span>
 
 
-<span class="k">def</span> <span class="nf">_read_h5</span><span class="p">(</span><span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_read_h5</span><span class="p">(</span><span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Reads the h5 archive to get the Matsubara self energy, the double-counting potential</span>
 <span class="sd">    and the chemical potential.</span>
@@ -290,7 +294,7 @@
 <span class="sd">    external_path : string</span>
 <span class="sd">        path to h5 archive</span>
 <span class="sd">    iteration : int</span>
-<span class="sd">        The iteration that is being read from, default is &#39;last_iter&#39;</span>
+<span class="sd">        The iteration that is being read from, None corresponds to &#39;last_iter&#39;</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">    --------</span>
@@ -305,7 +309,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">h5_internal_path</span> <span class="o">=</span> <span class="s1">&#39;DMFT_results/&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;last_iter&#39;</span> <span class="k">if</span> <span class="n">iteration</span> <span class="ow">is</span> <span class="kc">None</span>
-                                          <span class="k">else</span> <span class="s1">&#39;it_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">iteration</span><span class="p">))</span>
+                                          <span class="k">else</span> <span class="sa">f</span><span class="s1">&#39;it_</span><span class="si">{</span><span class="n">iteration</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
     <span class="k">with</span> <span class="n">HDFArchive</span><span class="p">(</span><span class="n">external_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">archive</span><span class="p">:</span>
         <span class="n">impurity_paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">archive</span><span class="p">[</span><span class="n">h5_internal_path</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="s1">&#39;Sigma_freq_&#39;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">]</span>
@@ -391,7 +395,7 @@
 
     <span class="c1"># Initializes arrays to save results in</span>
     <span class="n">spectral_funcs</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">)]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">imps_blocks</span><span class="p">)</span>
-    <span class="n">opt_alphas</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">)]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">imps_blocks</span><span class="p">)</span>
+    <span class="n">opt_alphas</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">imps_blocks</span><span class="p">)</span>
     <span class="n">omega_mesh</span> <span class="o">=</span> <span class="n">HyperbolicOmegaMesh</span><span class="p">(</span><span class="n">omega_min</span><span class="o">=</span><span class="n">omega_min</span><span class="p">,</span> <span class="n">omega_max</span><span class="o">=</span><span class="n">omega_max</span><span class="p">,</span> <span class="n">n_points</span><span class="o">=</span><span class="n">n_points_maxent</span><span class="p">)</span>
 
     <span class="c1"># Runs MaxEnt while parallelizing over impurities and blocks</span>
@@ -412,18 +416,24 @@
 
         <span class="n">spectral_funcs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get_A_out</span><span class="p">(</span><span class="n">analyzer</span><span class="p">)</span>
 
-        <span class="n">opt_alphas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">g_aux_block</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">opt_alphas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">g_aux_block</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">opt_alphas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
-                <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">analyzer_results</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="p">{},</span> <span class="s1">&#39;Result should not be complex&#39;</span>
-                <span class="n">opt_alphas</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">k</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">analyzer_results</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">analyzer</span><span class="p">][</span><span class="s1">&#39;alpha_index&#39;</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span> <span class="c1"># loop over complex numbers</span>
+                    <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">analyzer_results</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="n">l</span><span class="p">]</span> <span class="o">==</span> <span class="p">{}:</span>
+                        <span class="k">continue</span>
+                    <span class="n">opt_alphas</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">k</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">analyzer_results</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="n">l</span><span class="p">][</span><span class="n">analyzer</span><span class="p">][</span><span class="s1">&#39;alpha_index&#39;</span><span class="p">]</span>
 
-    <span class="c1"># Synchronizes information between branches</span>
+    <span class="c1"># Synchronizes information between ranks</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">imps_blocks_indices</span><span class="p">:</span>
         <span class="n">spectral_funcs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">mpi</span><span class="o">.</span><span class="n">all_reduce</span><span class="p">(</span><span class="n">mpi</span><span class="o">.</span><span class="n">world</span><span class="p">,</span> <span class="n">spectral_funcs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="p">)</span>
         <span class="n">opt_alphas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">mpi</span><span class="o">.</span><span class="n">all_reduce</span><span class="p">(</span><span class="n">mpi</span><span class="o">.</span><span class="n">world</span><span class="p">,</span> <span class="n">opt_alphas</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="p">)</span>
 
-    <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;Optimal alphas: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">opt_alphas</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">block_index</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">imps_blocks</span><span class="p">):</span>
+        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Optimal alphas, block </span><span class="si">{</span><span class="n">block_index</span><span class="si">}</span><span class="s1">:&#39;</span><span class="p">)</span>
+        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;--- Real part ---&#39;</span><span class="p">,</span> <span class="n">opt_alphas</span><span class="p">[</span><span class="n">i</span><span class="p">][:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">opt_alphas</span><span class="p">[</span><span class="n">i</span><span class="p">][:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;--- Imag part ---&#39;</span><span class="p">,</span> <span class="n">opt_alphas</span><span class="p">[</span><span class="n">i</span><span class="p">][:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">])</span>
 
     <span class="c1"># Sorts results into original order of impurities and blocks</span>
     <span class="c1"># and adds information from Hermitian conjugate of off-diagonal elements</span>
@@ -432,8 +442,10 @@
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
                 <span class="n">val</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">imag</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;Result should not be complex&#39;</span>
-        <span class="n">sorted_spectral_funcs</span><span class="p">[</span><span class="n">imp</span><span class="p">][</span><span class="n">block</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">real</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">imag</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;The result is complex. This might be correct but comes &#39;</span>
+                       <span class="o">+</span> <span class="s1">&#39;without guarantuee of formal correctness.&#39;</span><span class="p">)</span>
+        <span class="n">sorted_spectral_funcs</span><span class="p">[</span><span class="n">imp</span><span class="p">][</span><span class="n">block</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
 
     <span class="k">return</span> <span class="n">sorted_spectral_funcs</span><span class="p">,</span> <span class="n">omega_mesh</span>
 
@@ -453,7 +465,7 @@
 <span class="k">def</span> <span class="nf">_write_sigma_omega_to_h5</span><span class="p">(</span><span class="n">g_aux_w</span><span class="p">,</span> <span class="n">sigma_w</span><span class="p">,</span> <span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Writes real-frequency self energy to h5 archive. &quot;&quot;&quot;</span>
     <span class="n">h5_internal_path</span> <span class="o">=</span> <span class="s1">&#39;DMFT_results/&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;last_iter&#39;</span> <span class="k">if</span> <span class="n">iteration</span> <span class="ow">is</span> <span class="kc">None</span>
-                                          <span class="k">else</span> <span class="s1">&#39;it_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">iteration</span><span class="p">))</span>
+                                          <span class="k">else</span> <span class="sa">f</span><span class="s1">&#39;it_</span><span class="si">{</span><span class="n">iteration</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
     <span class="k">with</span> <span class="n">HDFArchive</span><span class="p">(</span><span class="n">external_path</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">archive</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">g_aux_imp</span><span class="p">,</span> <span class="n">sigma_imp</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">g_aux_w</span><span class="p">,</span> <span class="n">sigma_w</span><span class="p">)):</span>

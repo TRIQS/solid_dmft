@@ -263,24 +263,60 @@
 <span id="postprocessing-maxent-gf-imp"></span><h1>postprocessing.maxent_gf_imp<a class="headerlink" href="#module-postprocessing.maxent_gf_imp" title="Permalink to this headline">¶</a></h1>
 <p>Analytic continuation of the impurity Green’s function to the impurity spectral
 function using maxent.</p>
-<p>Reads G_imp(i omega) from the h5 archive and writes A_imp(omega) back.</p>
-<p>Author: Max Merkel, 2020</p>
+<p>Reads G_imp(i omega) from the h5 archive and writes A_imp(omega) back. See
+the docstring of main() for more information.</p>
+<p>Not mpi parallelized.</p>
+<p>Author: Maximilian Merkel, Materials Theory Group, ETH Zurich, 2020 - 2022</p>
 <dl class="py function">
 <dt id="postprocessing.maxent_gf_imp.main">
-<code class="descclassname"><span class="pre">postprocessing.maxent_gf_imp.</span></code><code class="descname"><span class="pre">main</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">external_path</span></span></em>, <em><span class="n"><span class="pre">iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/postprocessing/maxent_gf_imp.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#postprocessing.maxent_gf_imp.main" title="Permalink to this definition">¶</a></dt>
-<dd><p>Main function that reads the impurity Greens function from h5, analytically continues it
-and writes the result back to the h5 archive.</p>
+<code class="descclassname"><span class="pre">postprocessing.maxent_gf_imp.</span></code><code class="descname"><span class="pre">main</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">external_path</span></span></em>, <em><span class="n"><span class="pre">iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em><span class="n"><span class="pre">sum_spins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em><span class="n"><span class="pre">maxent_error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.02</span></span></em>, <em><span class="n"><span class="pre">n_points_maxent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em><span class="n"><span class="pre">n_points_alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em><span class="n"><span class="pre">omega_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">20</span></span></em>, <em><span class="n"><span class="pre">omega_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/postprocessing/maxent_gf_imp.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#postprocessing.maxent_gf_imp.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main function that reads the impurity Greens (GF) function from h5,
+analytically continues it, writes the result back to the h5 archive and
+also returns the results.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>external_path: string, path of the h5 archive</strong> :</p>
-<p><strong>iteration: int/string, optional, iteration to read from and write to</strong> :</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>external_path</strong> : string</p>
+<blockquote>
+<div><p>Path to the h5 archive to read from and write to.</p>
+</div></blockquote>
+<p><strong>iteration</strong> : int/string</p>
+<blockquote>
+<div><p>Iteration to read from and write to. Defaults to last_iter.</p>
+</div></blockquote>
+<p><strong>sum_spins</strong> : bool</p>
+<blockquote>
+<div><p>Whether to sum over the spins or continue the impurity GF
+for the up and down spin separately, for example for magnetized results.</p>
+</div></blockquote>
+<p><strong>maxent_error</strong> : float</p>
+<blockquote>
+<div><p>The error that is used for the analyzers.</p>
+</div></blockquote>
+<p><strong>n_points_maxent</strong> : int</p>
+<blockquote>
+<div><p>Number of omega points on the hyperbolic mesh used in the continuation.</p>
+</div></blockquote>
+<p><strong>n_points_alpha</strong> : int</p>
+<blockquote>
+<div><p>Number of points that the MaxEnt alpha parameter is varied on logarithmically.</p>
+</div></blockquote>
+<p><strong>omega_min</strong> : float</p>
+<blockquote>
+<div><p>Lower end of range where the GF is being continued. Range has to comprise
+all features of the impurity GF for correct normalization.</p>
+</div></blockquote>
+<p><strong>omega_max</strong> : float</p>
+<blockquote>
+<div><p>Upper end of range where the GF is being continued. See omega_min.</p>
+</div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>list of dict, per impurity: dict containing the omega mesh</strong> :</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>unpacked_results</strong> : list</p>
 <blockquote class="last">
-<div><p>and A_imp from two different analyzers</p>
+<div><p>The omega mesh and impurity spectral function from two different analyzers
+in a dict for each impurity</p>
 </div></blockquote>
 </td>
 </tr>

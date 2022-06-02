@@ -232,9 +232,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for postprocessing.maxent_gf_imp</h1><div class="highlight"><pre>
-<span></span><span class="ch">#!/usr/bin/env python3</span>
-<span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="c1">################################################################################</span>
+<span></span><span class="c1">################################################################################</span>
 <span class="c1">#</span>
 <span class="c1"># TRIQS: a Toolbox for Research in Interacting Quantum Systems</span>
 <span class="c1">#</span>
@@ -260,29 +258,48 @@
 <span class="sd">Analytic continuation of the impurity Green&#39;s function to the impurity spectral</span>
 <span class="sd">function using maxent.</span>
 
-<span class="sd">Reads G_imp(i omega) from the h5 archive and writes A_imp(omega) back.</span>
+<span class="sd">Reads G_imp(i omega) from the h5 archive and writes A_imp(omega) back. See</span>
+<span class="sd">the docstring of main() for more information.</span>
 
-<span class="sd">Author: Max Merkel, 2020</span>
+<span class="sd">Not mpi parallelized.</span>
+
+<span class="sd">Author: Maximilian Merkel, Materials Theory Group, ETH Zurich, 2020 - 2022</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">import</span> <span class="nn">glob</span>
-<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Pool</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">import</span> <span class="nn">distutils.util</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">from</span> <span class="nn">triqs_maxent.elementwise_maxent</span> <span class="kn">import</span> <span class="n">PoormanMaxEnt</span>
 <span class="kn">from</span> <span class="nn">triqs_maxent.omega_meshes</span> <span class="kn">import</span> <span class="n">HyperbolicOmegaMesh</span>
 <span class="kn">from</span> <span class="nn">triqs_maxent.alpha_meshes</span> <span class="kn">import</span> <span class="n">LogAlphaMesh</span>
 <span class="kn">from</span> <span class="nn">h5</span> <span class="kn">import</span> <span class="n">HDFArchive</span>
+<span class="kn">from</span> <span class="nn">triqs.utility</span> <span class="kn">import</span> <span class="n">mpi</span>
+<span class="kn">from</span> <span class="nn">triqs.gf</span> <span class="kn">import</span> <span class="n">BlockGf</span>
 
 
-<span class="k">def</span> <span class="nf">_read_h5</span><span class="p">(</span><span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_read_h5</span><span class="p">(</span><span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reads the h5 archive to get the impurity Green&#39;s functions.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    external_path : string</span>
+<span class="sd">        path to h5 archive</span>
+<span class="sd">    iteration : int</span>
+<span class="sd">        The iteration that is being read from, None corresponds to &#39;last_iter&#39;</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    gf_imp_tau : list</span>
+<span class="sd">        Impurity Green&#39;s function as block Green&#39;s function for each impurity</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="sd">&quot;&quot;&quot;Reads the block Green&#39;s function G(tau) from h5 archive.&quot;&quot;&quot;</span>
 
     <span class="n">h5_internal_path</span> <span class="o">=</span> <span class="s1">&#39;DMFT_results/&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;last_iter&#39;</span> <span class="k">if</span> <span class="n">iteration</span> <span class="ow">is</span> <span class="kc">None</span>
-                                          <span class="k">else</span> <span class="s1">&#39;it_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">iteration</span><span class="p">))</span>
+                                          <span class="k">else</span> <span class="sa">f</span><span class="s1">&#39;it_</span><span class="si">{</span><span class="n">iteration</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
     <span class="k">with</span> <span class="n">HDFArchive</span><span class="p">(</span><span class="n">external_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">archive</span><span class="p">:</span>
         <span class="n">impurity_paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">archive</span><span class="p">[</span><span class="n">h5_internal_path</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
@@ -295,135 +312,174 @@
     <span class="k">return</span> <span class="n">gf_imp_tau</span>
 
 
-<span class="k">def</span> <span class="nf">_get_nondegenerate_greens_functions</span><span class="p">(</span><span class="n">spins_degenerate</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span> <span class="n">block_gf</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_sum_greens_functions</span><span class="p">(</span><span class="n">block_gf</span><span class="p">,</span> <span class="n">sum_spins</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    If spins_degenerate and there is a corresponding up, down pair (same names),</span>
-<span class="sd">    it returns the averaged from up and down for the up index and None for the down</span>
-<span class="sd">    index. This way, the gf will only be continued analytically once for each spin pair.</span>
+<span class="sd">    Sums over spin channels if sum_spins. It combines &quot;up&quot; and &quot;down&quot; into one</span>
+<span class="sd">    block &quot;total&quot;, or for SOC, simply renames the blocks ud into &quot;total&quot;.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">if</span> <span class="n">spins_degenerate</span><span class="p">:</span>
-        <span class="k">if</span> <span class="s1">&#39;up&#39;</span> <span class="ow">in</span> <span class="n">block</span><span class="p">:</span>
-            <span class="n">degenerate_block</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;up&#39;</span><span class="p">,</span> <span class="s1">&#39;down&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">degenerate_block</span> <span class="ow">in</span> <span class="n">block_gf</span><span class="o">.</span><span class="n">indices</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">*</span><span class="mi">10</span> <span class="o">+</span> <span class="s1">&#39;Block </span><span class="si">{}</span><span class="s1">: &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>
-                      <span class="o">+</span> <span class="s1">&#39;using average with degenerate block </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">degenerate_block</span><span class="p">))</span>
-                <span class="k">return</span> <span class="p">(</span><span class="n">block_gf</span><span class="p">[</span><span class="n">block</span><span class="p">]</span> <span class="o">+</span> <span class="n">block_gf</span><span class="p">[</span><span class="n">degenerate_block</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
-        <span class="k">elif</span> <span class="s1">&#39;down&#39;</span> <span class="ow">in</span> <span class="n">block</span> <span class="ow">and</span> <span class="n">block</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;down&#39;</span><span class="p">,</span> <span class="s1">&#39;up&#39;</span><span class="p">)</span> <span class="ow">in</span> <span class="n">block_gf</span><span class="o">.</span><span class="n">indices</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">*</span><span class="mi">10</span> <span class="o">+</span> <span class="s1">&#39;Block </span><span class="si">{}</span><span class="s1">: skipping, same as degenerate up state.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">block</span><span class="p">))</span>
-            <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">sum_spins</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">block_gf</span>
 
-    <span class="k">return</span> <span class="n">block_gf</span><span class="p">[</span><span class="n">block</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">block_gf</span><span class="o">.</span><span class="n">indices</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ind</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;up_&#39;</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="n">ind</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;up&#39;</span><span class="p">,</span> <span class="s1">&#39;down&#39;</span><span class="p">)</span> <span class="ow">in</span> <span class="n">block_gf</span><span class="o">.</span><span class="n">indices</span>
+        <span class="k">elif</span> <span class="n">ind</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;down_&#39;</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="n">ind</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;down&#39;</span><span class="p">,</span> <span class="s1">&#39;up&#39;</span><span class="p">)</span> <span class="ow">in</span> <span class="n">block_gf</span><span class="o">.</span><span class="n">indices</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">ind</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;ud_&#39;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Block </span><span class="si">{</span><span class="n">ind</span><span class="si">}</span><span class="s1"> in G(tau) has unknown spin type. &#39;</span>
+                             <span class="o">+</span> <span class="s1">&#39;Check G(tau) or turn off sum_spins.&#39;</span><span class="p">)</span>
+
+    <span class="n">summed_gf_imp</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">for</span> <span class="n">block_name</span><span class="p">,</span> <span class="n">block</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">block_gf</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">block_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;up_&#39;</span><span class="p">):</span>
+            <span class="n">new_block_name</span> <span class="o">=</span> <span class="n">block_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;up&#39;</span><span class="p">,</span> <span class="s1">&#39;total&#39;</span><span class="p">)</span>
+            <span class="n">opp_spin_block_name</span> <span class="o">=</span> <span class="n">block_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;up&#39;</span><span class="p">,</span> <span class="s1">&#39;down&#39;</span><span class="p">)</span>
+            <span class="n">summed_gf_imp</span><span class="p">[</span><span class="n">new_block_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">block</span> <span class="o">+</span> <span class="n">block_gf</span><span class="p">[</span><span class="n">opp_spin_block_name</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">block_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;ud_&#39;</span><span class="p">):</span>
+            <span class="n">summed_gf_imp</span><span class="p">[</span><span class="n">block_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;ud&#39;</span><span class="p">,</span> <span class="s1">&#39;total&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">block</span>
+
+    <span class="k">return</span> <span class="n">BlockGf</span><span class="p">(</span><span class="n">name_list</span><span class="o">=</span><span class="n">summed_gf_imp</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">block_list</span><span class="o">=</span><span class="n">summed_gf_imp</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
 
 
-<span class="k">def</span> <span class="nf">_run_maxent</span><span class="p">(</span><span class="n">gf_imp_tau</span><span class="p">,</span> <span class="n">spins_degenerate</span><span class="p">,</span> <span class="n">maxent_error</span><span class="o">=.</span><span class="mi">03</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_run_maxent</span><span class="p">(</span><span class="n">gf_imp_tau</span><span class="p">,</span> <span class="n">maxent_error</span><span class="p">,</span> <span class="n">n_points_maxent</span><span class="p">,</span> <span class="n">n_points_alpha</span><span class="p">,</span>
+                <span class="n">omega_min</span><span class="p">,</span> <span class="n">omega_max</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Runs maxent to get the spectral function from the list of block GF.</span>
-<span class="sd">    If spins_degenerate, pairs with the same name except up&lt;-&gt;down switched</span>
-<span class="sd">    will only be calculated once.</span>
+<span class="sd">    Runs maxent to get the spectral functions from the list of block GFs.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="n">omega_mesh</span> <span class="o">=</span> <span class="n">HyperbolicOmegaMesh</span><span class="p">(</span><span class="n">omega_min</span><span class="o">=</span><span class="n">omega_min</span><span class="p">,</span> <span class="n">omega_max</span><span class="o">=</span><span class="n">omega_max</span><span class="p">,</span>
+                                     <span class="n">n_points</span><span class="o">=</span><span class="n">n_points_maxent</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">omega_mesh</span>
+
+    <span class="c1"># Initializes and runs the maxent solver</span>
+    <span class="c1"># TODO: parallelization over blocks</span>
     <span class="n">results</span> <span class="o">=</span> <span class="p">[{}</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">gf_imp_tau</span><span class="p">))]</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">block_gf</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">gf_imp_tau</span><span class="p">):</span>
-        <span class="c1"># Prints information on the impurity and blocks found</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="o">*</span><span class="mi">50</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Solving impurity </span><span class="si">{}</span><span class="s1">/</span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">gf_imp_tau</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span><span class="o">*</span><span class="mi">50</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Found blocks </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">block_gf</span><span class="o">.</span><span class="n">indices</span><span class="p">)))</span>
-        <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">block_gf</span><span class="o">.</span><span class="n">indices</span><span class="p">:</span>
-            <span class="c1"># Checks if gf is part of a degenerate pair</span>
-            <span class="n">gf</span> <span class="o">=</span> <span class="n">_get_nondegenerate_greens_functions</span><span class="p">(</span><span class="n">spins_degenerate</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span> <span class="n">block_gf</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">gf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">results</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">block</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="k">continue</span>
-
-            <span class="c1"># Initializes and runs the maxent solver</span>
+        <span class="k">for</span> <span class="n">block</span><span class="p">,</span> <span class="n">gf</span> <span class="ow">in</span> <span class="n">block_gf</span><span class="p">:</span>
             <span class="n">solver</span> <span class="o">=</span> <span class="n">PoormanMaxEnt</span><span class="p">(</span><span class="n">use_complex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">solver</span><span class="o">.</span><span class="n">set_G_tau</span><span class="p">(</span><span class="n">gf</span><span class="p">)</span>
-            <span class="n">solver</span><span class="o">.</span><span class="n">omega</span> <span class="o">=</span> <span class="n">HyperbolicOmegaMesh</span><span class="p">(</span><span class="n">omega_min</span><span class="o">=-</span><span class="mi">20</span><span class="p">,</span> <span class="n">omega_max</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">n_points</span><span class="o">=</span><span class="mi">160</span><span class="p">)</span>
-            <span class="n">solver</span><span class="o">.</span><span class="n">alpha_mesh</span> <span class="o">=</span> <span class="n">LogAlphaMesh</span><span class="p">(</span><span class="n">alpha_min</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">alpha_max</span><span class="o">=</span><span class="mf">1e2</span><span class="p">,</span> <span class="n">n_points</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
             <span class="n">solver</span><span class="o">.</span><span class="n">set_error</span><span class="p">(</span><span class="n">maxent_error</span><span class="p">)</span>
+            <span class="n">solver</span><span class="o">.</span><span class="n">omega</span> <span class="o">=</span> <span class="n">omega_mesh</span>
+            <span class="n">solver</span><span class="o">.</span><span class="n">alpha_mesh</span> <span class="o">=</span> <span class="n">LogAlphaMesh</span><span class="p">(</span><span class="n">alpha_min</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">alpha_max</span><span class="o">=</span><span class="mf">1e2</span><span class="p">,</span>
+                                             <span class="n">n_points</span><span class="o">=</span><span class="n">n_points_alpha</span><span class="p">)</span>
             <span class="n">results</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">block</span><span class="p">]</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 
-        <span class="c1"># Assign up&#39;s solution to down result for degenerate calculations</span>
-        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">results</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
-            <span class="k">if</span> <span class="n">results</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">results</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;down&#39;</span><span class="p">,</span> <span class="s1">&#39;up&#39;</span><span class="p">)]</span>
-
-    <span class="k">return</span> <span class="n">results</span>
+    <span class="k">return</span> <span class="n">results</span><span class="p">,</span> <span class="n">omega_mesh</span>
 
 
-<span class="k">def</span> <span class="nf">_unpack_maxent_results</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_unpack_maxent_results</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">omega_mesh</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Converts maxent result to impurity list of dict with mesh</span>
 <span class="sd">    and spectral function from each analyzer.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">mesh</span> <span class="o">=</span> <span class="p">[{</span><span class="n">key</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">omega</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">block_res</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span> <span class="k">for</span> <span class="n">block_res</span> <span class="ow">in</span> <span class="n">results</span><span class="p">]</span>
     <span class="n">data_linefit</span> <span class="o">=</span> <span class="p">[{</span><span class="n">key</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">get_A_out</span><span class="p">(</span><span class="s1">&#39;LineFitAnalyzer&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">block_res</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
                     <span class="k">for</span> <span class="n">block_res</span> <span class="ow">in</span> <span class="n">results</span><span class="p">]</span>
     <span class="n">data_chi2</span> <span class="o">=</span> <span class="p">[{</span><span class="n">key</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">get_A_out</span><span class="p">(</span><span class="s1">&#39;Chi2CurvatureAnalyzer&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">block_res</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
                  <span class="k">for</span> <span class="n">block_res</span> <span class="ow">in</span> <span class="n">results</span><span class="p">]</span>
 
-    <span class="n">data_per_impurity</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;mesh&#39;</span><span class="p">:</span> <span class="n">m</span><span class="p">,</span> <span class="s1">&#39;Aimp_w_line_fit&#39;</span><span class="p">:</span> <span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;Aimp_w_chi2_curvature&#39;</span><span class="p">:</span> <span class="n">dc</span><span class="p">}</span>
-                         <span class="k">for</span> <span class="n">m</span><span class="p">,</span> <span class="n">dl</span><span class="p">,</span> <span class="n">dc</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">data_linefit</span><span class="p">,</span> <span class="n">data_chi2</span><span class="p">)]</span>
+    <span class="n">data_per_impurity</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;mesh&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">omega_mesh</span><span class="p">),</span> <span class="s1">&#39;Aimp_w_line_fit&#39;</span><span class="p">:</span> <span class="n">dl</span><span class="p">,</span>
+                          <span class="s1">&#39;Aimp_w_chi2_curvature&#39;</span><span class="p">:</span> <span class="n">dc</span><span class="p">}</span>
+                         <span class="k">for</span> <span class="n">dl</span><span class="p">,</span> <span class="n">dc</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">data_linefit</span><span class="p">,</span> <span class="n">data_chi2</span><span class="p">)]</span>
     <span class="k">return</span> <span class="n">data_per_impurity</span>
 
 
-<span class="k">def</span> <span class="nf">_write_spectral_function_to_h5</span><span class="p">(</span><span class="n">unpacked_results</span><span class="p">,</span> <span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_write_spectral_function_to_h5</span><span class="p">(</span><span class="n">unpacked_results</span><span class="p">,</span> <span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Writes the mesh and the maxent result for each analyzer to h5 archive. &quot;&quot;&quot;</span>
 
     <span class="n">h5_internal_path</span> <span class="o">=</span> <span class="s1">&#39;DMFT_results/&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;last_iter&#39;</span> <span class="k">if</span> <span class="n">iteration</span> <span class="ow">is</span> <span class="kc">None</span>
-                                          <span class="k">else</span> <span class="s1">&#39;it_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">iteration</span><span class="p">))</span>
+                                          <span class="k">else</span> <span class="sa">f</span><span class="s1">&#39;it_</span><span class="si">{</span><span class="n">iteration</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
     <span class="k">with</span> <span class="n">HDFArchive</span><span class="p">(</span><span class="n">external_path</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">archive</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">res</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">unpacked_results</span><span class="p">):</span>
-            <span class="n">impurity_path</span> <span class="o">=</span> <span class="s1">&#39;Aimp_w_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-            <span class="n">archive</span><span class="p">[</span><span class="n">h5_internal_path</span><span class="p">][</span><span class="n">impurity_path</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span>
+            <span class="n">archive</span><span class="p">[</span><span class="n">h5_internal_path</span><span class="p">][</span><span class="sa">f</span><span class="s1">&#39;Aimp_maxent_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span>
 
 
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../_autosummary/postprocessing.maxent_gf_imp.html#postprocessing.maxent_gf_imp.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../_autosummary/postprocessing.maxent_gf_imp.html#postprocessing.maxent_gf_imp.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sum_spins</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">maxent_error</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span>
+         <span class="n">n_points_maxent</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">n_points_alpha</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">omega_min</span><span class="o">=-</span><span class="mi">20</span><span class="p">,</span> <span class="n">omega_max</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Main function that reads the impurity Greens function from h5, analytically continues it</span>
-<span class="sd">    and writes the result back to the h5 archive.</span>
+<span class="sd">    Main function that reads the impurity Greens (GF) function from h5,</span>
+<span class="sd">    analytically continues it, writes the result back to the h5 archive and</span>
+<span class="sd">    also returns the results.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    external_path: string, path of the h5 archive</span>
-<span class="sd">    iteration: int/string, optional, iteration to read from and write to</span>
+<span class="sd">    external_path : string</span>
+<span class="sd">        Path to the h5 archive to read from and write to.</span>
+<span class="sd">    iteration : int/string</span>
+<span class="sd">        Iteration to read from and write to. Defaults to last_iter.</span>
+<span class="sd">    sum_spins : bool</span>
+<span class="sd">        Whether to sum over the spins or continue the impurity GF</span>
+<span class="sd">        for the up and down spin separately, for example for magnetized results.</span>
+<span class="sd">    maxent_error : float</span>
+<span class="sd">        The error that is used for the analyzers.</span>
+<span class="sd">    n_points_maxent : int</span>
+<span class="sd">        Number of omega points on the hyperbolic mesh used in the continuation.</span>
+<span class="sd">    n_points_alpha : int</span>
+<span class="sd">        Number of points that the MaxEnt alpha parameter is varied on logarithmically.</span>
+<span class="sd">    omega_min : float</span>
+<span class="sd">        Lower end of range where the GF is being continued. Range has to comprise</span>
+<span class="sd">        all features of the impurity GF for correct normalization.</span>
+<span class="sd">    omega_max : float</span>
+<span class="sd">        Upper end of range where the GF is being continued. See omega_min.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    list of dict, per impurity: dict containing the omega mesh</span>
-<span class="sd">        and A_imp from two different analyzers</span>
+<span class="sd">    unpacked_results : list</span>
+<span class="sd">        The omega mesh and impurity spectral function from two different analyzers</span>
+<span class="sd">        in a dict for each impurity</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 
-    <span class="n">gf_imp_tau</span> <span class="o">=</span> <span class="n">_read_h5</span><span class="p">(</span><span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="p">)</span>
-    <span class="n">maxent_results</span> <span class="o">=</span> <span class="n">_run_maxent</span><span class="p">(</span><span class="n">gf_imp_tau</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
-    <span class="n">unpacked_results</span> <span class="o">=</span> <span class="n">_unpack_maxent_results</span><span class="p">(</span><span class="n">maxent_results</span><span class="p">)</span>
-    <span class="n">_write_spectral_function_to_h5</span><span class="p">(</span><span class="n">unpacked_results</span><span class="p">,</span> <span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="p">)</span>
+    <span class="n">gf_imp_tau</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
+        <span class="n">gf_imp_tau</span> <span class="o">=</span> <span class="n">_read_h5</span><span class="p">(</span><span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">gf</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">gf_imp_tau</span><span class="p">):</span>
+            <span class="n">gf_imp_tau</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">_sum_greens_functions</span><span class="p">(</span><span class="n">gf</span><span class="p">,</span> <span class="n">sum_spins</span><span class="p">)</span>
+    <span class="n">gf_imp_tau</span> <span class="o">=</span> <span class="n">mpi</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">gf_imp_tau</span><span class="p">)</span>
+
+    <span class="n">maxent_results</span><span class="p">,</span> <span class="n">omega_mesh</span> <span class="o">=</span> <span class="n">_run_maxent</span><span class="p">(</span><span class="n">gf_imp_tau</span><span class="p">,</span> <span class="n">maxent_error</span><span class="p">,</span> <span class="n">n_points_maxent</span><span class="p">,</span>
+                                             <span class="n">n_points_alpha</span><span class="p">,</span> <span class="n">omega_min</span><span class="p">,</span> <span class="n">omega_max</span><span class="p">)</span>
+
+    <span class="n">unpacked_results</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
+        <span class="n">unpacked_results</span> <span class="o">=</span> <span class="n">_unpack_maxent_results</span><span class="p">(</span><span class="n">maxent_results</span><span class="p">,</span> <span class="n">omega_mesh</span><span class="p">)</span>
+        <span class="n">_write_spectral_function_to_h5</span><span class="p">(</span><span class="n">unpacked_results</span><span class="p">,</span> <span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="p">)</span>
+    <span class="n">unpacked_results</span> <span class="o">=</span> <span class="n">mpi</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">unpacked_results</span><span class="p">)</span>
 
     <span class="n">total_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="o">*</span><span class="mi">50</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">DONE&#39;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The program took </span><span class="si">{:.0f}</span><span class="s1"> s.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">total_time</span><span class="p">))</span>
+    <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="o">*</span><span class="mi">80</span><span class="p">,</span> <span class="s1">&#39;DONE&#39;</span><span class="p">)</span>
+    <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Total run time: </span><span class="si">{</span><span class="n">total_time</span><span class="si">:</span><span class="s1">.0f</span><span class="si">}</span><span class="s1"> s.&#39;</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">unpacked_results</span></div>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Please give the h5 name (and optionally the iteration). Exiting.&#39;</span><span class="p">)</span>
-        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="c1"># Casts input parameters</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;none&#39;</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">distutils</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">strtobool</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">6</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">7</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">7</span><span class="p">])</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">8</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">8</span><span class="p">])</span>
 
-    <span class="n">files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">pool</span> <span class="o">=</span> <span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)))</span>
-
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="n">function</span> <span class="o">=</span> <span class="n">main</span>
-    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-        <span class="n">function</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">main</span><span class="p">,</span> <span class="n">iteration</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
-
-    <span class="n">pool</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">files</span><span class="p">)</span>
-
-    <span class="n">pool</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">main</span><span class="p">(</span><span class="o">*</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
 </pre></div>
 
            </div>
