@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 ################################################################################
 #
 # TRIQS: a Toolbox for Research in Interacting Quantum Systems
@@ -26,7 +24,7 @@
 Analytic continuation of the lattice Green's function to the lattice spectral
 function using maxent.
 
-Reads G_latt(i omega) from the h5 archive and writes A_latt(omega) back.  See
+Reads G_latt(i omega) from the h5 archive and writes A_latt(omega) back. See
 the docstring of main() for more information.
 
 mpi parallelized for the generation of the imaginary-frequency lattice GF over
@@ -54,11 +52,33 @@ from triqs.utility import mpi
 from triqs.gf import GfImFreq, BlockGf
 
 
-def _read_h5(external_path, iteration=None):
-    """ Reads the block Green's function G(tau) from h5 archive. """
+def _read_h5(external_path, iteration):
+    """
+    Reads the h5 archive to get the Matsubara self energy, the double-counting potential,
+    the chemical potential and the block structure.
+
+    Parameters
+    ----------
+    external_path : string
+        path to h5 archive
+    iteration : int
+        The iteration that is being read from, None corresponds to 'last_iter'
+
+    Returns
+    -------
+    sigma_iw : list
+        Self energy as block Green's function for each impurity
+    chemical_potential : float
+        The chemical potential of the problem. Should be approximately real
+    dc_potential : list
+        Double counting for each impurity
+    block_structure : triqs_dft_tools.BlockStructure
+        Block structure mapping from the DMFT calculation
+
+    """
 
     h5_internal_path = 'DMFT_results/' + ('last_iter' if iteration is None
-                                          else 'it_{}'.format(iteration))
+                                          else f'it_{iteration}')
 
     with HDFArchive(external_path, 'r') as archive:
         impurity_paths = [key for key in archive[h5_internal_path].keys() if 'Sigma_freq_' in key]
@@ -85,6 +105,10 @@ def _read_h5(external_path, iteration=None):
 
 
 def _generate_lattice_gf(sum_k, sum_spins):
+    """
+    Generates the lattice GF from the SumkDFT object. If sum_spins, it
+    has one block "total". Otherwise, the block names are the spins.
+    """
     # Initializes lattice GF to zero for each process
     spin_blocks = ['total'] if sum_spins else sum_k.spin_block_names[sum_k.SO]
     mesh = sum_k.Sigma_imp_iw[0].mesh
@@ -96,23 +120,26 @@ def _generate_lattice_gf(sum_k, sum_spins):
     for ik in mpi.slice_array(np.arange(sum_k.n_k)):
         gf_latt = sum_k.lattice_gf(ik) * sum_k.bz_weights[ik]
         if sum_spins:
-            trace_gf_latt['total'].data[:] += np.trace(sum(g.data for _, g in gf_latt), axis1=1, axis2=2).reshape(-1, 1, 1)
+            trace_gf_latt['total'].data[:] += np.trace(sum(g.data for _, g in gf_latt),
+                                                       axis1=1, axis2=2).reshape(-1, 1, 1)
         else:
             for s in spin_blocks:
-                trace_gf_latt[s].data[:] += np.trace(gf_latt[s].data, axis1=1, axis2=2).reshape(-1, 1, 1)
+                trace_gf_latt[s].data[:] += np.trace(gf_latt[s].data,
+                                                     axis1=1, axis2=2).reshape(-1, 1, 1)
 
     for s in spin_blocks:
         trace_gf_latt[s] << mpi.all_reduce(mpi.world, trace_gf_latt[s], lambda x, y: x + y)
 
     # Lattice GF as BlockGf, required for compatibility with MaxEnt functions
-    gf_lattice_iw = BlockGf(name_list=trace_gf_latt.keys(), block_list=trace_gf_latt.values())
+    gf_lattice_iw = BlockGf(name_list=trace_gf_latt.keys(),
+                            block_list=trace_gf_latt.values())
     return gf_lattice_iw
 
 
 def _run_maxent(gf_lattice_iw, sum_k, error, omega_min, omega_max,
                 n_points_maxent, n_points_alpha):
     """
-    Runs maxent to get the spectral function from the list of block GF.
+    Runs maxent to get the spectral function from the block GF.
     """
 
     # Automatic determination of energy range from hopping matrix
@@ -125,7 +152,6 @@ def _run_maxent(gf_lattice_iw, sum_k, error, omega_min, omega_max,
         omega_max = max(20, hopping_max - sum_k.chemical_potential)
         mpi.report('Set omega range to {:.3f}...{:.3f} eV'.format(omega_min, omega_max))
 
-
     # Prints information on the blocks found
     mpi.report('Found blocks {}'.format(list(gf_lattice_iw.indices)))
 
@@ -137,7 +163,8 @@ def _run_maxent(gf_lattice_iw, sum_k, error, omega_min, omega_max,
         solver = TauMaxEnt()
         solver.set_G_iw(gf)
         solver.set_error(error)
-        solver.omega = HyperbolicOmegaMesh(omega_min=omega_min, omega_max=omega_max, n_points=n_points_maxent)
+        solver.omega = HyperbolicOmegaMesh(omega_min=omega_min, omega_max=omega_max,
+                                           n_points=n_points_maxent)
         solver.alpha_mesh = LogAlphaMesh(alpha_min=1e-6, alpha_max=1e2, n_points=n_points_alpha)
         results[block] = solver.run()
 
@@ -145,7 +172,10 @@ def _run_maxent(gf_lattice_iw, sum_k, error, omega_min, omega_max,
 
 
 def _unpack_maxent_results(results):
-    """ Converts maxent result to impurity list of dict with mesh and spectral function from each analyzer """
+    """
+    Converts maxent result to dict with mesh and spectral function from each
+    analyzer.
+    """
     mesh = {key: np.array(r.omega) for key, r in results.items()}
     data_linefit = {}
     data_chi2 = {}
@@ -158,11 +188,11 @@ def _unpack_maxent_results(results):
     return data_per_impurity
 
 
-def _write_spectral_function_to_h5(unpacked_results, external_path, iteration=None):
+def _write_spectral_function_to_h5(unpacked_results, external_path, iteration):
     """ Writes the mesh and the maxent result for each analyzer to h5 archive. """
 
     h5_internal_path = 'DMFT_results/' + ('last_iter' if iteration is None
-                                          else 'it_{}'.format(iteration))
+                                          else f'it_{iteration}')
 
     with HDFArchive(external_path, 'a') as archive:
         archive[h5_internal_path]['Alatt_maxent'] = unpacked_results
@@ -199,6 +229,7 @@ def main(external_path, iteration=None, sum_spins=False, maxent_error=.02,
         on the diagonal entries in the hopping matrix but at least to -20...20 eV.
     omega_max : float
         Upper end of range where the GF is being continued. See omega_min.
+
     Returns
     -------
     unpacked_results : dict
@@ -237,7 +268,7 @@ def main(external_path, iteration=None, sum_spins=False, maxent_error=.02,
 
     total_time = time.time() - start_time
     mpi.report('-'*80, 'DONE')
-    mpi.report('Total run time: {:.0f} s.'.format(total_time))
+    mpi.report(f'Total run time: {total_time:.0f} s.')
 
     return unpacked_results
 

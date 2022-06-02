@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 ################################################################################
 #
 # TRIQS: a Toolbox for Research in Interacting Quantum Systems
@@ -26,29 +24,48 @@
 Analytic continuation of the impurity Green's function to the impurity spectral
 function using maxent.
 
-Reads G_imp(i omega) from the h5 archive and writes A_imp(omega) back.
+Reads G_imp(i omega) from the h5 archive and writes A_imp(omega) back. See
+the docstring of main() for more information.
 
-Author: Max Merkel, 2020
+Not mpi parallelized.
+
+Author: Maximilian Merkel, Materials Theory Group, ETH Zurich, 2020 - 2022
 """
 
 import sys
 import time
-import glob
-from multiprocessing import Pool
-from functools import partial
+import distutils.util
 import numpy as np
 
 from triqs_maxent.elementwise_maxent import PoormanMaxEnt
 from triqs_maxent.omega_meshes import HyperbolicOmegaMesh
 from triqs_maxent.alpha_meshes import LogAlphaMesh
 from h5 import HDFArchive
+from triqs.utility import mpi
+from triqs.gf import BlockGf
 
 
-def _read_h5(external_path, iteration=None):
+def _read_h5(external_path, iteration):
+    """
+    Reads the h5 archive to get the impurity Green's functions.
+
+    Parameters
+    ----------
+    external_path : string
+        path to h5 archive
+    iteration : int
+        The iteration that is being read from, None corresponds to 'last_iter'
+
+    Returns
+    -------
+    gf_imp_tau : list
+        Impurity Green's function as block Green's function for each impurity
+    """
+
     """Reads the block Green's function G(tau) from h5 archive."""
 
     h5_internal_path = 'DMFT_results/' + ('last_iter' if iteration is None
-                                          else 'it_{}'.format(iteration))
+                                          else f'it_{iteration}')
 
     with HDFArchive(external_path, 'r') as archive:
         impurity_paths = [key for key in archive[h5_internal_path].keys()
@@ -61,132 +78,171 @@ def _read_h5(external_path, iteration=None):
     return gf_imp_tau
 
 
-def _get_nondegenerate_greens_functions(spins_degenerate, block, block_gf):
+def _sum_greens_functions(block_gf, sum_spins):
     """
-    If spins_degenerate and there is a corresponding up, down pair (same names),
-    it returns the averaged from up and down for the up index and None for the down
-    index. This way, the gf will only be continued analytically once for each spin pair.
-    """
-
-    if spins_degenerate:
-        if 'up' in block:
-            degenerate_block = block.replace('up', 'down')
-            if degenerate_block in block_gf.indices:
-                print(' '*10 + 'Block {}: '.format(block)
-                      + 'using average with degenerate block {}.'.format(degenerate_block))
-                return (block_gf[block] + block_gf[degenerate_block]) / 2
-        elif 'down' in block and block.replace('down', 'up') in block_gf.indices:
-            print(' '*10 + 'Block {}: skipping, same as degenerate up state.'.format(block))
-            return None
-
-    return block_gf[block]
-
-
-def _run_maxent(gf_imp_tau, spins_degenerate, maxent_error=.03):
-    """
-    Runs maxent to get the spectral function from the list of block GF.
-    If spins_degenerate, pairs with the same name except up<->down switched
-    will only be calculated once.
+    Sums over spin channels if sum_spins. It combines "up" and "down" into one
+    block "total", or for SOC, simply renames the blocks ud into "total".
     """
 
+    if not sum_spins:
+        return block_gf
+
+    for ind in block_gf.indices:
+        if ind.startswith('up_'):
+            assert ind.replace('up', 'down') in block_gf.indices
+        elif ind.startswith('down_'):
+            assert ind.replace('down', 'up') in block_gf.indices
+        elif not ind.startswith('ud_'):
+            raise ValueError(f'Block {ind} in G(tau) has unknown spin type. '
+                             + 'Check G(tau) or turn off sum_spins.')
+
+    summed_gf_imp = {}
+
+    for block_name, block in sorted(block_gf):
+        if block_name.startswith('up_'):
+            new_block_name = block_name.replace('up', 'total')
+            opp_spin_block_name = block_name.replace('up', 'down')
+            summed_gf_imp[new_block_name] = block + block_gf[opp_spin_block_name]
+        elif block_name.startswith('ud_'):
+            summed_gf_imp[block_name.replace('ud', 'total')] = block
+
+    return BlockGf(name_list=summed_gf_imp.keys(), block_list=summed_gf_imp.values())
+
+
+def _run_maxent(gf_imp_tau, maxent_error, n_points_maxent, n_points_alpha,
+                omega_min, omega_max):
+    """
+    Runs maxent to get the spectral functions from the list of block GFs.
+    """
+
+    omega_mesh = HyperbolicOmegaMesh(omega_min=omega_min, omega_max=omega_max,
+                                     n_points=n_points_maxent)
+
+    if not mpi.is_master_node():
+        return None, omega_mesh
+
+    # Initializes and runs the maxent solver
+    # TODO: parallelization over blocks
     results = [{} for _ in range(len(gf_imp_tau))]
     for i, block_gf in enumerate(gf_imp_tau):
-        # Prints information on the impurity and blocks found
         print('-'*50 + '\nSolving impurity {}/{}\n'.format(i+1, len(gf_imp_tau)) + '-'*50)
         print('Found blocks {}'.format(list(block_gf.indices)))
-        for block in block_gf.indices:
-            # Checks if gf is part of a degenerate pair
-            gf = _get_nondegenerate_greens_functions(spins_degenerate, block, block_gf)
-            if gf is None:
-                results[i][block] = None
-                continue
-
-            # Initializes and runs the maxent solver
+        for block, gf in block_gf:
             solver = PoormanMaxEnt(use_complex=True)
             solver.set_G_tau(gf)
-            solver.omega = HyperbolicOmegaMesh(omega_min=-20, omega_max=20, n_points=160)
-            solver.alpha_mesh = LogAlphaMesh(alpha_min=1e-4, alpha_max=1e2, n_points=50)
             solver.set_error(maxent_error)
+            solver.omega = omega_mesh
+            solver.alpha_mesh = LogAlphaMesh(alpha_min=1e-6, alpha_max=1e2,
+                                             n_points=n_points_alpha)
             results[i][block] = solver.run()
 
-        # Assign up's solution to down result for degenerate calculations
-        for key in results[i]:
-            if results[i][key] is None:
-                results[i][key] = results[i][key.replace('down', 'up')]
-
-    return results
+    return results, omega_mesh
 
 
-def _unpack_maxent_results(results):
+def _unpack_maxent_results(results, omega_mesh):
     """
     Converts maxent result to impurity list of dict with mesh
     and spectral function from each analyzer.
     """
 
-    mesh = [{key: np.array(r.omega) for key, r in block_res.items()} for block_res in results]
     data_linefit = [{key: r.get_A_out('LineFitAnalyzer') for key, r in block_res.items()}
                     for block_res in results]
     data_chi2 = [{key: r.get_A_out('Chi2CurvatureAnalyzer') for key, r in block_res.items()}
                  for block_res in results]
 
-    data_per_impurity = [{'mesh': m, 'Aimp_w_line_fit': dl, 'Aimp_w_chi2_curvature': dc}
-                         for m, dl, dc in zip(mesh, data_linefit, data_chi2)]
+    data_per_impurity = [{'mesh': np.array(omega_mesh), 'Aimp_w_line_fit': dl,
+                          'Aimp_w_chi2_curvature': dc}
+                         for dl, dc in zip(data_linefit, data_chi2)]
     return data_per_impurity
 
 
-def _write_spectral_function_to_h5(unpacked_results, external_path, iteration=None):
+def _write_spectral_function_to_h5(unpacked_results, external_path, iteration):
     """ Writes the mesh and the maxent result for each analyzer to h5 archive. """
 
     h5_internal_path = 'DMFT_results/' + ('last_iter' if iteration is None
-                                          else 'it_{}'.format(iteration))
+                                          else f'it_{iteration}')
 
     with HDFArchive(external_path, 'a') as archive:
         for i, res in enumerate(unpacked_results):
-            impurity_path = 'Aimp_w_{}'.format(i)
-            archive[h5_internal_path][impurity_path] = res
+            archive[h5_internal_path][f'Aimp_maxent_{i}'] = res
 
 
-def main(external_path, iteration=None):
+def main(external_path, iteration=None, sum_spins=False, maxent_error=0.02,
+         n_points_maxent=200, n_points_alpha=50, omega_min=-20, omega_max=20):
     """
-    Main function that reads the impurity Greens function from h5, analytically continues it
-    and writes the result back to the h5 archive.
+    Main function that reads the impurity Greens (GF) function from h5,
+    analytically continues it, writes the result back to the h5 archive and
+    also returns the results.
 
     Parameters
     ----------
-    external_path: string, path of the h5 archive
-    iteration: int/string, optional, iteration to read from and write to
+    external_path : string
+        Path to the h5 archive to read from and write to.
+    iteration : int/string
+        Iteration to read from and write to. Defaults to last_iter.
+    sum_spins : bool
+        Whether to sum over the spins or continue the impurity GF
+        for the up and down spin separately, for example for magnetized results.
+    maxent_error : float
+        The error that is used for the analyzers.
+    n_points_maxent : int
+        Number of omega points on the hyperbolic mesh used in the continuation.
+    n_points_alpha : int
+        Number of points that the MaxEnt alpha parameter is varied on logarithmically.
+    omega_min : float
+        Lower end of range where the GF is being continued. Range has to comprise
+        all features of the impurity GF for correct normalization.
+    omega_max : float
+        Upper end of range where the GF is being continued. See omega_min.
 
     Returns
     -------
-    list of dict, per impurity: dict containing the omega mesh
-        and A_imp from two different analyzers
+    unpacked_results : list
+        The omega mesh and impurity spectral function from two different analyzers
+        in a dict for each impurity
     """
+
     start_time = time.time()
 
-    gf_imp_tau = _read_h5(external_path, iteration)
-    maxent_results = _run_maxent(gf_imp_tau, True)
-    unpacked_results = _unpack_maxent_results(maxent_results)
-    _write_spectral_function_to_h5(unpacked_results, external_path, iteration)
+    gf_imp_tau = None
+    if mpi.is_master_node():
+        gf_imp_tau = _read_h5(external_path, iteration)
+        for i, gf in enumerate(gf_imp_tau):
+            gf_imp_tau[i] = _sum_greens_functions(gf, sum_spins)
+    gf_imp_tau = mpi.bcast(gf_imp_tau)
+
+    maxent_results, omega_mesh = _run_maxent(gf_imp_tau, maxent_error, n_points_maxent,
+                                             n_points_alpha, omega_min, omega_max)
+
+    unpacked_results = None
+    if mpi.is_master_node():
+        unpacked_results = _unpack_maxent_results(maxent_results, omega_mesh)
+        _write_spectral_function_to_h5(unpacked_results, external_path, iteration)
+    unpacked_results = mpi.bcast(unpacked_results)
 
     total_time = time.time() - start_time
-    print('-'*50 + '\nDONE')
-    print('The program took {:.0f} s.'.format(total_time))
+    mpi.report('-'*80, 'DONE')
+    mpi.report(f'Total run time: {total_time:.0f} s.')
+
     return unpacked_results
 
 
 if __name__ == '__main__':
-    if len(sys.argv) not in (2, 3):
-        print('Please give the h5 name (and optionally the iteration). Exiting.')
-        sys.exit(2)
+    # Casts input parameters
+    if len(sys.argv) > 2:
+        if sys.argv[2].lower() == 'none':
+            sys.argv[2] = None
+    if len(sys.argv) > 3:
+        sys.argv[3] = distutils.util.strtobool(sys.argv[3])
+    if len(sys.argv) > 4:
+        sys.argv[4] = float(sys.argv[4])
+    if len(sys.argv) > 5:
+        sys.argv[5] = int(sys.argv[5])
+    if len(sys.argv) > 6:
+        sys.argv[6] = int(sys.argv[6])
+    if len(sys.argv) > 7:
+        sys.argv[7] = float(sys.argv[7])
+    if len(sys.argv) > 8:
+        sys.argv[8] = float(sys.argv[8])
 
-    files = glob.glob(sys.argv[1])
-    pool = Pool(processes=min(8, len(files)))
-
-    if len(sys.argv) == 2:
-        function = main
-    elif len(sys.argv) == 3:
-        function = partial(main, iteration=sys.argv[2])
-
-    pool.map(function, files)
-
-    pool.close()
+    main(*sys.argv[1:])
