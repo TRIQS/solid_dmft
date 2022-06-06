@@ -69,7 +69,7 @@ n_cores              32
 n_iter               15  
 dft_exec             vasp_std
 store_eigenvals      True
-mpi_env              local
+mpi_env              default
 projector_type       plo 
 -------------------------
 Advanced parameters, don't change them unless you know what you are doing:
