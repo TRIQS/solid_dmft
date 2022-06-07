@@ -318,7 +318,7 @@ store_eigenvals : bool, optional, default= False
             wannier90.eig (projector_type=w90) file in h5 archive
 mpi_env : string, default= 'default'
             selection for mpi env for DFT in default this will only call DFT as mpirun -np n_cores_dft dft_exec
-            other options exist for openmpi, openmpi-intro (no internode communication), mpich
+            other options exist for 'openmpi', 'openmpi-intra' (no internode communication), 'mpich'
             these are tested with a specfic network fabric only but should give a good indicator how to setup
             your own mpi_env
 projector_type : string, optional, default = 'plo'

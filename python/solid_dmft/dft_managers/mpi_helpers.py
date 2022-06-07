@@ -160,5 +160,3 @@ def poll_barrier(comm, poll_interval=0.1):
     req = comm.Ibarrier()
     while not req.Test():
         time.sleep(poll_interval)
-
-    return None
