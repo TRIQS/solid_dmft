@@ -202,6 +202,8 @@
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-3-1-1">Version 3.1.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-3-1-0">Version 3.1.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-3-0-0">Version 3.0.0</a></li>
 </ul>
 </li>
@@ -257,6 +259,73 @@
 </style>
 <div class="tex2jax_ignore mathjax_ignore section" id="changelog">
 <span id="id1"></span><h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="version-3-1-1">
+<h2>Version 3.1.1<a class="headerlink" href="#version-3-1-1" title="Permalink to this headline">¶</a></h2>
+<p>solid_dmft version 3.1.1 is a patch-release that improves / fixes the following issues:</p>
+<ul class="simple">
+<li>delete obsolete make_spaghetti.py</li>
+<li>SOC self energies can be continued in maxent</li>
+<li>run hubbardI solver on all nodes due to slow bcast performance of atomdiag object</li>
+<li>fix DFT energy read when running CSC QE</li>
+<li>updated documentation, small fixes to tutorials</li>
+<li>exposed params of maxent_gf_imp</li>
+<li>fix the way dft_mu is loaded in PCB</li>
+<li>fix executable in SVO tutorial</li>
+<li>fix shift in sigma continuator to remove dft_mu</li>
+<li>fix chemical potential in plot Akw and minor fixes</li>
+<li>correct plotlabels in postprocessing</li>
+<li>tiny modification of printing H_loc in postprocessing</li>
+</ul>
+<p>Contributors: Sophie Beck, Alberto Carta, Max Merkel</p>
+</div>
+<div class="section" id="version-3-1-0">
+<h2>Version 3.1.0<a class="headerlink" href="#version-3-1-0" title="Permalink to this headline">¶</a></h2>
+<p>solid_dmft version 3.1.0 is a major release that provides tutorials in the documentation, changes to app4triqs skeleton, allows CSC calculations with QE, improves postprocessing routines, and add functionality for SOC calculations.</p>
+<ul class="simple">
+<li>all new tutorials</li>
+<li>generalize measure_chi functionality</li>
+<li>CSC with Vasp 6.3.0 works, examples updated</li>
+<li>fix two bugs in w90 interface in vasp</li>
+<li>Renamed files</li>
+<li>fix Fermi level print in mlwf.F LPRJ_WRITE call</li>
+<li>Automatic patching of vasp 6.3.0 with Docker</li>
+<li>Updated tutorial</li>
+<li>Added check on all mpi ranks if dmft_config exists at beginning of run</li>
+<li>fix small bug in <a class="reference external" href="http://convergence.py" rel="noopener noreferrer" target="_blank">convergence.py</a> thanks &#64;merkelm</li>
+<li>Rework convergence metrics</li>
+<li>remove gf_struct_flatten from solver in accordance with latest dfttools version</li>
+<li>Renaming to solid_dmft</li>
+<li>Update of maxent_gf_latt.py: more parameters exposed and spin averaging is not default anymore</li>
+<li>fix bug in afm calculation when measuring density matrix</li>
+<li>Add w90_tolerance flag for CSC</li>
+<li>use sphinx autosummary for module reference</li>
+<li>small changes in IO, additional mpi barriers in csc flow for better stability</li>
+<li>With SOC now program prints real and imag part of matrices</li>
+<li>Fixed creation of Kanamori Hamiltonian with SOC</li>
+<li>Improvements in plot_correlated_bands.py and updated tutorial</li>
+<li>change output name of MaxEnt Sigma to Sigma_maxent</li>
+<li>change to develop version of w90 because of mpi bug in openmpi dockerfile</li>
+<li>bugfix in plot_correlated_bands and cleaning up</li>
+<li>update OpenMPI Dockerfile to latest Ubuntu</li>
+<li>Tutorial to explore correlated bands using the postprocessing script</li>
+<li>check in CSC with QE if optional files are presesnt, otherwise skip calculation</li>
+<li>Updated maxent_sigma: mpi parallelization, continuator types, bug fixes, parameters exposed</li>
+<li>update installation instructions</li>
+<li>add workflow and code structure images</li>
+<li>Updated maxent sigma script</li>
+<li>W90 runs in parallel</li>
+<li>Fixing a bug related to measure_pert_order and measure_chi_SzSz for afm_order</li>
+<li>add vasp crpa scripts and tutorials</li>
+<li>add delta interface for cthyb</li>
+<li>fix get_dmft_bands and pass eta to alatt_k_w correctly</li>
+<li>allows to recompute rotation matrix even if W90 is used</li>
+<li>bugfix in initial_self_energies.py in case dc = False</li>
+<li>flatten gf_struct for triqs solvers to remove depracted warning</li>
+<li>add example files for SVO and LNO</li>
+<li>bump triqs and package version to 3.1</li>
+</ul>
+<p>Contributors: Sophie Beck, Alberto Carta, Max Merkel</p>
+</div>
 <div class="section" id="version-3-0-0">
 <h2>Version 3.0.0<a class="headerlink" href="#version-3-0-0" title="Permalink to this headline">¶</a></h2>
 <p>solid_dmft version 3.0.0 is a compatibility
