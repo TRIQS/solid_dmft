@@ -33,8 +33,8 @@ extraction over omega points.
 Author: Maximilian Merkel, Materials Theory Group, ETH Zurich, 2020 - 2022
 
 Warnings:
-    * When using this on self-energies with SOC, please check that the formalism,
-    in particular the Kramers-Kronig relation.
+    * When using this on self-energies with SOC, please check that the formalism
+      is correct, in particular the Kramers-Kronig relation.
 """
 
 import time

@@ -52,6 +52,10 @@ Workflow of DFT+DMFT calculations with solid_dmft
 
 .. image:: logos/flatiron.png
    :width: 300
-   :align: center
+   :align: left
    :target: https://www.simonsfoundation.org/flatiron/center-for-computational-quantum-physics
+.. image:: logos/eth_logo_kurz_pos.png
+   :width: 300
+   :align: right
+   :target: https://theory.mat.ethz.ch
 
