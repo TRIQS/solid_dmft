@@ -152,6 +152,9 @@ def _run_maxent(gf_lattice_iw, sum_k, error, omega_min, omega_max,
         omega_max = max(20, hopping_max - sum_k.chemical_potential)
         mpi.report('Set omega range to {:.3f}...{:.3f} eV'.format(omega_min, omega_max))
 
+    omega_mesh = HyperbolicOmegaMesh(omega_min=omega_min, omega_max=omega_max,
+                                     n_points=n_points_maxent)
+
     # Prints information on the blocks found
     mpi.report('Found blocks {}'.format(list(gf_lattice_iw.indices)))
 
@@ -163,29 +166,27 @@ def _run_maxent(gf_lattice_iw, sum_k, error, omega_min, omega_max,
         solver = TauMaxEnt()
         solver.set_G_iw(gf)
         solver.set_error(error)
-        solver.omega = HyperbolicOmegaMesh(omega_min=omega_min, omega_max=omega_max,
-                                           n_points=n_points_maxent)
+        solver.omega = omega_mesh
         solver.alpha_mesh = LogAlphaMesh(alpha_min=1e-6, alpha_max=1e2, n_points=n_points_alpha)
         results[block] = solver.run()
 
-    return results
+    return results, omega_mesh
 
 
-def _unpack_maxent_results(results):
+def _unpack_maxent_results(results, omega_mesh):
     """
     Converts maxent result to dict with mesh and spectral function from each
     analyzer.
     """
-    mesh = {key: np.array(r.omega) for key, r in results.items()}
     data_linefit = {}
     data_chi2 = {}
     for key, result in results.items():
         data_linefit[key] = result.get_A_out('LineFitAnalyzer')
         data_chi2[key] = result.get_A_out('Chi2CurvatureAnalyzer')
 
-    data_per_impurity = {'mesh': mesh, 'Alatt_w_line_fit': data_linefit,
-                         'Alatt_w_chi2_curvature': data_chi2}
-    return data_per_impurity
+    data = {'mesh': np.array(omega_mesh), 'Alatt_w_line_fit': data_linefit,
+            'Alatt_w_chi2_curvature': data_chi2}
+    return data
 
 
 def _write_spectral_function_to_h5(unpacked_results, external_path, iteration):
@@ -260,9 +261,10 @@ def main(external_path, iteration=None, sum_spins=False, maxent_error=.02,
     # Runs MaxEnt
     unpacked_results = None
     if mpi.is_master_node():
-        maxent_results = _run_maxent(gf_lattice_iw, sum_k, maxent_error, omega_min,
-                                     omega_max, n_points_maxent, n_points_alpha)
-        unpacked_results = _unpack_maxent_results(maxent_results)
+        maxent_results, omega_mesh = _run_maxent(gf_lattice_iw, sum_k, maxent_error,
+                                                 omega_min, omega_max, n_points_maxent,
+                                                 n_points_alpha)
+        unpacked_results = _unpack_maxent_results(maxent_results, omega_mesh)
         _write_spectral_function_to_h5(unpacked_results, external_path, iteration)
     unpacked_results = mpi.bcast(unpacked_results)
 
