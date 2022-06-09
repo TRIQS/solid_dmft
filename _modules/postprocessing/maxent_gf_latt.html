@@ -387,6 +387,9 @@
         <span class="n">omega_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="n">hopping_max</span> <span class="o">-</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">chemical_potential</span><span class="p">)</span>
         <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;Set omega range to </span><span class="si">{:.3f}</span><span class="s1">...</span><span class="si">{:.3f}</span><span class="s1"> eV&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">omega_min</span><span class="p">,</span> <span class="n">omega_max</span><span class="p">))</span>
 
+    <span class="n">omega_mesh</span> <span class="o">=</span> <span class="n">HyperbolicOmegaMesh</span><span class="p">(</span><span class="n">omega_min</span><span class="o">=</span><span class="n">omega_min</span><span class="p">,</span> <span class="n">omega_max</span><span class="o">=</span><span class="n">omega_max</span><span class="p">,</span>
+                                     <span class="n">n_points</span><span class="o">=</span><span class="n">n_points_maxent</span><span class="p">)</span>
+
     <span class="c1"># Prints information on the blocks found</span>
     <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;Found blocks </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">gf_lattice_iw</span><span class="o">.</span><span class="n">indices</span><span class="p">)))</span>
 
@@ -398,29 +401,27 @@
         <span class="n">solver</span> <span class="o">=</span> <span class="n">TauMaxEnt</span><span class="p">()</span>
         <span class="n">solver</span><span class="o">.</span><span class="n">set_G_iw</span><span class="p">(</span><span class="n">gf</span><span class="p">)</span>
         <span class="n">solver</span><span class="o">.</span><span class="n">set_error</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
-        <span class="n">solver</span><span class="o">.</span><span class="n">omega</span> <span class="o">=</span> <span class="n">HyperbolicOmegaMesh</span><span class="p">(</span><span class="n">omega_min</span><span class="o">=</span><span class="n">omega_min</span><span class="p">,</span> <span class="n">omega_max</span><span class="o">=</span><span class="n">omega_max</span><span class="p">,</span>
-                                           <span class="n">n_points</span><span class="o">=</span><span class="n">n_points_maxent</span><span class="p">)</span>
+        <span class="n">solver</span><span class="o">.</span><span class="n">omega</span> <span class="o">=</span> <span class="n">omega_mesh</span>
         <span class="n">solver</span><span class="o">.</span><span class="n">alpha_mesh</span> <span class="o">=</span> <span class="n">LogAlphaMesh</span><span class="p">(</span><span class="n">alpha_min</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">alpha_max</span><span class="o">=</span><span class="mf">1e2</span><span class="p">,</span> <span class="n">n_points</span><span class="o">=</span><span class="n">n_points_alpha</span><span class="p">)</span>
         <span class="n">results</span><span class="p">[</span><span class="n">block</span><span class="p">]</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 
-    <span class="k">return</span> <span class="n">results</span>
+    <span class="k">return</span> <span class="n">results</span><span class="p">,</span> <span class="n">omega_mesh</span>
 
 
-<span class="k">def</span> <span class="nf">_unpack_maxent_results</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_unpack_maxent_results</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">omega_mesh</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Converts maxent result to dict with mesh and spectral function from each</span>
 <span class="sd">    analyzer.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">mesh</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">omega</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
     <span class="n">data_linefit</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">data_chi2</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">data_linefit</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get_A_out</span><span class="p">(</span><span class="s1">&#39;LineFitAnalyzer&#39;</span><span class="p">)</span>
         <span class="n">data_chi2</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get_A_out</span><span class="p">(</span><span class="s1">&#39;Chi2CurvatureAnalyzer&#39;</span><span class="p">)</span>
 
-    <span class="n">data_per_impurity</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;mesh&#39;</span><span class="p">:</span> <span class="n">mesh</span><span class="p">,</span> <span class="s1">&#39;Alatt_w_line_fit&#39;</span><span class="p">:</span> <span class="n">data_linefit</span><span class="p">,</span>
-                         <span class="s1">&#39;Alatt_w_chi2_curvature&#39;</span><span class="p">:</span> <span class="n">data_chi2</span><span class="p">}</span>
-    <span class="k">return</span> <span class="n">data_per_impurity</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;mesh&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">omega_mesh</span><span class="p">),</span> <span class="s1">&#39;Alatt_w_line_fit&#39;</span><span class="p">:</span> <span class="n">data_linefit</span><span class="p">,</span>
+            <span class="s1">&#39;Alatt_w_chi2_curvature&#39;</span><span class="p">:</span> <span class="n">data_chi2</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">data</span>
 
 
 <span class="k">def</span> <span class="nf">_write_spectral_function_to_h5</span><span class="p">(</span><span class="n">unpacked_results</span><span class="p">,</span> <span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="p">):</span>
@@ -495,9 +496,10 @@
     <span class="c1"># Runs MaxEnt</span>
     <span class="n">unpacked_results</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
-        <span class="n">maxent_results</span> <span class="o">=</span> <span class="n">_run_maxent</span><span class="p">(</span><span class="n">gf_lattice_iw</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span> <span class="n">maxent_error</span><span class="p">,</span> <span class="n">omega_min</span><span class="p">,</span>
-                                     <span class="n">omega_max</span><span class="p">,</span> <span class="n">n_points_maxent</span><span class="p">,</span> <span class="n">n_points_alpha</span><span class="p">)</span>
-        <span class="n">unpacked_results</span> <span class="o">=</span> <span class="n">_unpack_maxent_results</span><span class="p">(</span><span class="n">maxent_results</span><span class="p">)</span>
+        <span class="n">maxent_results</span><span class="p">,</span> <span class="n">omega_mesh</span> <span class="o">=</span> <span class="n">_run_maxent</span><span class="p">(</span><span class="n">gf_lattice_iw</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span> <span class="n">maxent_error</span><span class="p">,</span>
+                                                 <span class="n">omega_min</span><span class="p">,</span> <span class="n">omega_max</span><span class="p">,</span> <span class="n">n_points_maxent</span><span class="p">,</span>
+                                                 <span class="n">n_points_alpha</span><span class="p">)</span>
+        <span class="n">unpacked_results</span> <span class="o">=</span> <span class="n">_unpack_maxent_results</span><span class="p">(</span><span class="n">maxent_results</span><span class="p">,</span> <span class="n">omega_mesh</span><span class="p">)</span>
         <span class="n">_write_spectral_function_to_h5</span><span class="p">(</span><span class="n">unpacked_results</span><span class="p">,</span> <span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="p">)</span>
     <span class="n">unpacked_results</span> <span class="o">=</span> <span class="n">mpi</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">unpacked_results</span><span class="p">)</span>
 
