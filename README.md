@@ -14,6 +14,9 @@ Copyright (C) 2021, The Simons Foundation
   authors: A. Hampel, S. Beck, M. Merkel, and A. Carta
 (see LICENSE.txt for details)
 
+Developed by the Materials Theory Group, ETH Zurich
+and the Center for Computational Quantum Physics, Flatiron Institute.
+
 If you are using this code for your research, please cite it with this
 [bib file](cite_solid_dmft.bib).
 
