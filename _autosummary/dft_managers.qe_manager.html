@@ -17,7 +17,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="dft_managers.vasp_manager" href="dft_managers.vasp_manager.html" />
-    <link rel="prev" title="dft_managers" href="dft_managers.html" /> 
+    <link rel="prev" title="dft_managers.mpi_helpers" href="dft_managers.mpi_helpers.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -95,6 +95,7 @@
 <li class="toctree-l2 current"><a class="reference internal" href="../documentation.html#module-reference-manual">Module reference manual</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="csc_flow.html">csc_flow</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="dft_managers.html">dft_managers</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="dft_managers.mpi_helpers.html">dft_managers.mpi_helpers</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">dft_managers.qe_manager</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dft_managers.vasp_manager.html">dft_managers.vasp_manager</a></li>
 </ul>
@@ -265,25 +266,8 @@
 <p>Contains the handling of the QE process. It can start QE, reactivate it,
 check if the lock file is there and finally kill QE. Needed for CSC calculations.</p>
 <dl class="py function">
-<dt id="dft_managers.qe_manager.poll_barrier">
-<code class="descclassname"><span class="pre">dft_managers.qe_manager.</span></code><code class="descname"><span class="pre">poll_barrier</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">comm</span></span></em>, <em><span class="n"><span class="pre">poll_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dft_managers/qe_manager.html#poll_barrier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dft_managers.qe_manager.poll_barrier" title="Permalink to this definition">¶</a></dt>
-<dd><p>Use asynchronous synchronization, otherwise mpi.barrier uses up all the CPU time during
-the run of subprocess.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>comm: MPI communicator</strong> :</p>
-<p class="last"><strong>poll_interval: float, time step for pinging the status of the sleeping ranks</strong> :</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="py function">
 <dt id="dft_managers.qe_manager.start">
-<code class="descclassname"><span class="pre">dft_managers.qe_manager.</span></code><code class="descname"><span class="pre">start</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">number_cores</span></span></em>, <em><span class="n"><span class="pre">qe_file_ext</span></span></em>, <em><span class="n"><span class="pre">qe_exec</span></span></em>, <em><span class="n"><span class="pre">cluster_name</span></span></em>, <em><span class="n"><span class="pre">seedname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dft_managers/qe_manager.html#start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dft_managers.qe_manager.start" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname"><span class="pre">dft_managers.qe_manager.</span></code><code class="descname"><span class="pre">start</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">number_cores</span></span></em>, <em><span class="n"><span class="pre">qe_file_ext</span></span></em>, <em><span class="n"><span class="pre">qe_exec</span></span></em>, <em><span class="n"><span class="pre">mpi_profile</span></span></em>, <em><span class="n"><span class="pre">seedname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dft_managers/qe_manager.html#start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dft_managers.qe_manager.start" title="Permalink to this definition">¶</a></dt>
 <dd><p>Starts the VASP child process. Takes care of initializing a clean
 environment for the child process. This is needed so that VASP does not
 get confused with all the standard slurm environment variables.</p>
@@ -292,8 +276,9 @@ get confused with all the standard slurm environment variables.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>number_cores: int, the number of cores that vasp runs on</strong> :</p>
-<p><strong>vasp_command: string, the command to start vasp</strong> :</p>
-<p class="last"><strong>cluster_name: string, name of the cluster so that settings can be tailored to it</strong> :</p>
+<p><strong>qe_file_ext: string, qe executable</strong> :</p>
+<p><strong>qe_exec: string, path to qe executables</strong> :</p>
+<p class="last"><strong>mpi_profile: string, name of the cluster so that settings can be tailored to it</strong> :</p>
 </td>
 </tr>
 </tbody>
@@ -306,7 +291,7 @@ get confused with all the standard slurm environment variables.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="dft_managers.html" class="btn btn-neutral float-left" title="dft_managers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="dft_managers.mpi_helpers.html" class="btn btn-neutral float-left" title="dft_managers.mpi_helpers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="dft_managers.vasp_manager.html" class="btn btn-neutral float-right" title="dft_managers.vasp_manager" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

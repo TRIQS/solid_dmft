@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dmft_tools.convergence &mdash; solid_dmft  documentation</title><link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <title>dft_managers.mpi_helpers &mdash; solid_dmft  documentation</title><link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /><link rel="shortcut icon" href="../_static/favicon.ico"/>
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
@@ -16,8 +16,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="dmft_tools.formatter" href="dmft_tools.formatter.html" />
-    <link rel="prev" title="dmft_tools.afm_mapping" href="dmft_tools.afm_mapping.html" /> 
+    <link rel="next" title="dft_managers.qe_manager" href="dft_managers.qe_manager.html" />
+    <link rel="prev" title="dft_managers" href="dft_managers.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -94,16 +94,16 @@
 </li>
 <li class="toctree-l2 current"><a class="reference internal" href="../documentation.html#module-reference-manual">Module reference manual</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="csc_flow.html">csc_flow</a></li>
-<li class="toctree-l3"><a class="reference internal" href="dft_managers.html">dft_managers</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="dft_managers.mpi_helpers.html">dft_managers.mpi_helpers</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="dft_managers.html">dft_managers</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">dft_managers.mpi_helpers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dft_managers.qe_manager.html">dft_managers.qe_manager</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dft_managers.vasp_manager.html">dft_managers.vasp_manager</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="dmft_cycle.html">dmft_cycle</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="dmft_tools.html">dmft_tools</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="dmft_tools.html">dmft_tools</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="dmft_tools.afm_mapping.html">dmft_tools.afm_mapping</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">dmft_tools.convergence</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dmft_tools.convergence.html">dmft_tools.convergence</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dmft_tools.formatter.html">dmft_tools.formatter</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dmft_tools.greens_functions_mixer.html">dmft_tools.greens_functions_mixer</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dmft_tools.initial_self_energies.html">dmft_tools.initial_self_energies</a></li>
@@ -226,10 +226,10 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="../documentation.html">Documentation</a> &raquo;</li>
-          <li><a href="dmft_tools.html">dmft_tools</a> &raquo;</li>
-      <li>dmft_tools.convergence</li>
+          <li><a href="dft_managers.html">dft_managers</a> &raquo;</li>
+      <li>dft_managers.mpi_helpers</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/_autosummary/dmft_tools.convergence.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/_autosummary/dft_managers.mpi_helpers.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -261,50 +261,25 @@
     text-align: unset;
 }
 </style>
-<div class="section" id="module-dmft_tools.convergence">
-<span id="dmft-tools-convergence"></span><h1>dmft_tools.convergence<a class="headerlink" href="#module-dmft_tools.convergence" title="Permalink to this headline">¶</a></h1>
-<p>contain helper functions to check convergence</p>
+<div class="section" id="module-dft_managers.mpi_helpers">
+<span id="dft-managers-mpi-helpers"></span><h1>dft_managers.mpi_helpers<a class="headerlink" href="#module-dft_managers.mpi_helpers" title="Permalink to this headline">¶</a></h1>
+<p>Contains the handling of the QE process. It can start QE, reactivate it,
+check if the lock file is there and finally kill QE. Needed for CSC calculations.</p>
 <dl class="py function">
-<dt id="dmft_tools.convergence.calc_convergence_quantities">
-<code class="descclassname"><span class="pre">dmft_tools.convergence.</span></code><code class="descname"><span class="pre">calc_convergence_quantities</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">sum_k</span></span></em>, <em><span class="n"><span class="pre">general_params</span></span></em>, <em><span class="n"><span class="pre">conv_obs</span></span></em>, <em><span class="n"><span class="pre">observables</span></span></em>, <em><span class="n"><span class="pre">solvers</span></span></em>, <em><span class="n"><span class="pre">G0_old</span></span></em>, <em><span class="n"><span class="pre">G_loc_all</span></span></em>, <em><span class="n"><span class="pre">Sigma_freq_previous</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dmft_tools/convergence.html#calc_convergence_quantities"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dmft_tools.convergence.calc_convergence_quantities" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculations convergence quantities, i.e. the difference in observables
-between the last and second to last iteration.</p>
+<dt id="dft_managers.mpi_helpers.create_hostfile">
+<code class="descclassname"><span class="pre">dft_managers.mpi_helpers.</span></code><code class="descname"><span class="pre">create_hostfile</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">number_cores</span></span></em>, <em><span class="n"><span class="pre">cluster_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dft_managers/mpi_helpers.html#create_hostfile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dft_managers.mpi_helpers.create_hostfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes a host file for the mpirun. This tells mpi which nodes to ssh into
+and start VASP on. The format of the hist file depends on the type of MPI
+that is used.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>sum_k</strong> : SumK Object instances</p>
-<p><strong>general_params</strong> : dict</p>
-<blockquote>
-<div><p>general parameters as a dict</p>
-</div></blockquote>
-<p><strong>conv_obs</strong> : list of dicts</p>
-<blockquote>
-<div><p>convergence observable arrays</p>
-</div></blockquote>
-<p><strong>observables</strong> : list of dicts</p>
-<blockquote>
-<div><p>observable arrays</p>
-</div></blockquote>
-<p><strong>solvers</strong> : solver objects</p>
-<p><strong>G0_old</strong> : list of block Gf object</p>
-<blockquote>
-<div><p>last G0_freq</p>
-</div></blockquote>
-<p><strong>G_loc_all</strong> : list of block Gf objects</p>
-<blockquote>
-<div><p>G_loc extracted from before imp solver</p>
-</div></blockquote>
-<p><strong>Sigma_freq_previous</strong> : list of block Gf objects</p>
-<blockquote>
-<div><p>previous impurity sigma to compare with</p>
-</div></blockquote>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>number_cores: int, the number of cores that vasp runs on</strong> :</p>
+<p><strong>cluster_name: string, the name of the server</strong> :</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>conv_obs</strong> : list of dicts</p>
-<blockquote class="last">
-<div><p>updated convergence observable arrays</p>
-</div></blockquote>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>string: name of the hostfile if not run locally and if called by master node</strong> :</p>
 </td>
 </tr>
 </tbody>
@@ -312,32 +287,19 @@ between the last and second to last iteration.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="dmft_tools.convergence.check_convergence">
-<code class="descclassname"><span class="pre">dmft_tools.convergence.</span></code><code class="descname"><span class="pre">check_convergence</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">n_inequiv_shells</span></span></em>, <em><span class="n"><span class="pre">general_params</span></span></em>, <em><span class="n"><span class="pre">conv_obs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dmft_tools/convergence.html#check_convergence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dmft_tools.convergence.check_convergence" title="Permalink to this definition">¶</a></dt>
-<dd><p>check last iteration for convergence</p>
+<dt id="dft_managers.mpi_helpers.find_path_to_mpi_command">
+<code class="descclassname"><span class="pre">dft_managers.mpi_helpers.</span></code><code class="descname"><span class="pre">find_path_to_mpi_command</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">env_vars</span></span></em>, <em><span class="n"><span class="pre">mpi_exe</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dft_managers/mpi_helpers.html#find_path_to_mpi_command"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dft_managers.mpi_helpers.find_path_to_mpi_command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the complete path for the mpi executable by scanning the directories
+of $PATH.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>n_inequiv_shells</strong> : int</p>
-<blockquote>
-<div><p>Number of inequivalent shells as saved in SumkDFT object</p>
-</div></blockquote>
-<p><strong>general_params</strong> : dict</p>
-<blockquote>
-<div><p>general parameters as a dict</p>
-</div></blockquote>
-<p><strong>conv_obs</strong> : list of dicts</p>
-<blockquote>
-<div><p>convergence observable arrays</p>
-</div></blockquote>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>env_vars: dict of string, environment variables containing PATH</strong> :</p>
+<p><strong>mpi_exe: string, mpi command</strong> :</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>is_converged</strong> : bool</p>
-<blockquote class="last">
-<div><p>true if desired accuracy is reached. None if no convergence criterion
-is set</p>
-</div></blockquote>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>string: absolute path to mpi command</strong> :</p>
 </td>
 </tr>
 </tbody>
@@ -345,32 +307,23 @@ is set</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="dmft_tools.convergence.max_G_diff">
-<code class="descclassname"><span class="pre">dmft_tools.convergence.</span></code><code class="descname"><span class="pre">max_G_diff</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">G1</span></span></em>, <em><span class="n"><span class="pre">G2</span></span></em>, <em><span class="n"><span class="pre">norm_temp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dmft_tools/convergence.html#max_G_diff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dmft_tools.convergence.max_G_diff" title="Permalink to this definition">¶</a></dt>
-<dd><p>calculates difference between two block Gfs
-uses numpy linalg norm on the last two indices first
-and then the norm along the mesh axis. The result is divided
-by sqrt(beta) for MeshImFreq and by sqrt(beta/#taupoints) for
-MeshImTime.</p>
-<p>1/ (2* sqrt(beta)) sqrt( sum_n sum_ij [abs(G1 - G2)_ij(w_n)]^2 )</p>
-<p>this is only done for MeshImFreq Gf objects, for all other
-meshes the weights are set to 1</p>
+<dt id="dft_managers.mpi_helpers.get_mpi_arguments">
+<code class="descclassname"><span class="pre">dft_managers.mpi_helpers.</span></code><code class="descname"><span class="pre">get_mpi_arguments</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">mpi_profile</span></span></em>, <em><span class="n"><span class="pre">mpi_exe</span></span></em>, <em><span class="n"><span class="pre">number_cores</span></span></em>, <em><span class="n"><span class="pre">dft_exe</span></span></em>, <em><span class="n"><span class="pre">hostfile</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dft_managers/mpi_helpers.html#get_mpi_arguments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dft_managers.mpi_helpers.get_mpi_arguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Depending on the settings of the cluster and the type of MPI used,
+the arguments to the mpi call have to be different. The most technical part
+of the vasp handler.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>G1</strong> : Gf or BlockGf to compare</p>
-<p><strong>G2</strong> : Gf or BlockGf to compare</p>
-<p><strong>norm_temp: bool, default = True</strong> :</p>
-<blockquote>
-<div><p>divide by an additional sqrt(beta) to account for temperature scaling
-only correct for uniformly distributed error.</p>
-</div></blockquote>
-<p><strong>__Returns:__</strong> :</p>
-<p><strong>diff</strong> : float</p>
-<blockquote class="last">
-<div><p>difference between the two Gfs</p>
-</div></blockquote>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cluster_name: string, name of the cluster so that settings can be tailored to it</strong> :</p>
+<p><strong>mpi_exe: string, mpi command</strong> :</p>
+<p><strong>number_cores: int, the number of cores that vasp runs on</strong> :</p>
+<p><strong>dft_exe: string, the command to start the DFT code</strong> :</p>
+<p><strong>hostfile: string, name of the hostfile</strong> :</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>list of string: arguments to start mpi with</strong> :</p>
 </td>
 </tr>
 </tbody>
@@ -378,69 +331,16 @@ only correct for uniformly distributed error.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="dmft_tools.convergence.prep_conv_file">
-<code class="descclassname"><span class="pre">dmft_tools.convergence.</span></code><code class="descname"><span class="pre">prep_conv_file</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">general_params</span></span></em>, <em><span class="n"><span class="pre">sum_k</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dmft_tools/convergence.html#prep_conv_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dmft_tools.convergence.prep_conv_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Writes the header to the conv files</p>
+<dt id="dft_managers.mpi_helpers.poll_barrier">
+<code class="descclassname"><span class="pre">dft_managers.mpi_helpers.</span></code><code class="descname"><span class="pre">poll_barrier</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">comm</span></span></em>, <em><span class="n"><span class="pre">poll_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dft_managers/mpi_helpers.html#poll_barrier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dft_managers.mpi_helpers.poll_barrier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use asynchronous synchronization, otherwise mpi.barrier uses up all the CPU time during
+the run of subprocess.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>general_params</strong> : dict</p>
-<blockquote>
-<div><p>general parameters as a dict</p>
-</div></blockquote>
-<p><strong>n_inequiv_shells</strong> : int</p>
-<blockquote>
-<div><p>number of impurities for calculations</p>
-</div></blockquote>
-<p><strong>__Returns:__</strong> :</p>
-<p class="last"><strong>nothing</strong> :</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="py function">
-<dt id="dmft_tools.convergence.prep_conv_obs">
-<code class="descclassname"><span class="pre">dmft_tools.convergence.</span></code><code class="descname"><span class="pre">prep_conv_obs</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">h5_archive</span></span></em>, <em><span class="n"><span class="pre">sum_k</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dmft_tools/convergence.html#prep_conv_obs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dmft_tools.convergence.prep_conv_obs" title="Permalink to this definition">¶</a></dt>
-<dd><p>prepares the conv arrays and files for the DMFT calculation</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>h5_archive: hdf archive instance</strong> :</p>
-<blockquote>
-<div><p>hdf archive for calculation</p>
-</div></blockquote>
-<p><strong>sum_k</strong> : SumK Object instances</p>
-<p><strong>__Returns:__</strong> :</p>
-<p><strong>conv_obs</strong> : dict</p>
-<blockquote class="last">
-<div><p>conv array for calculation</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="py function">
-<dt id="dmft_tools.convergence.write_conv">
-<code class="descclassname"><span class="pre">dmft_tools.convergence.</span></code><code class="descname"><span class="pre">write_conv</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">conv_obs</span></span></em>, <em><span class="n"><span class="pre">sum_k</span></span></em>, <em><span class="n"><span class="pre">general_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dmft_tools/convergence.html#write_conv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dmft_tools.convergence.write_conv" title="Permalink to this definition">¶</a></dt>
-<dd><p>writes the last entries of the conv arrays to the files</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>conv_obs</strong> : list of dicts</p>
-<blockquote>
-<div><p>convergence observable arrays/dicts</p>
-</div></blockquote>
-<p><strong>sum_k</strong> : SumK Object instances</p>
-<p><strong>general_params</strong> : dict</p>
-<p><strong>__Returns:__</strong> :</p>
-<p class="last"><strong>nothing</strong> :</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>comm: MPI communicator</strong> :</p>
+<p class="last"><strong>poll_interval: float, time step for pinging the status of the sleeping ranks</strong> :</p>
 </td>
 </tr>
 </tbody>
@@ -453,8 +353,8 @@ only correct for uniformly distributed error.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="dmft_tools.afm_mapping.html" class="btn btn-neutral float-left" title="dmft_tools.afm_mapping" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="dmft_tools.formatter.html" class="btn btn-neutral float-right" title="dmft_tools.formatter" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="dft_managers.html" class="btn btn-neutral float-left" title="dft_managers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="dft_managers.qe_manager.html" class="btn btn-neutral float-right" title="dft_managers.qe_manager" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

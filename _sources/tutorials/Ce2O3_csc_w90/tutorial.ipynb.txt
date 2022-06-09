@@ -172,7 +172,7 @@
       "[dft]\n",
       "dft_code = qe\n",
       "n_cores = 10\n",
-      "mpi_env = rusty\n",
+      "mpi_env = default\n",
       "projector_type = w90\n",
       "dft_exec = \n",
       "w90_exec = wannier90.x\n",

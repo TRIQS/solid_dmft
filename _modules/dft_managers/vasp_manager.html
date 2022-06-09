@@ -93,6 +93,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../documentation.html#module-reference-manual">Module reference manual</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/csc_flow.html">csc_flow</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/dft_managers.html">dft_managers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dft_managers.mpi_helpers.html">dft_managers.mpi_helpers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dft_managers.qe_manager.html">dft_managers.qe_manager</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dft_managers.vasp_manager.html">dft_managers.vasp_manager</a></li>
 </ul>
@@ -265,121 +266,12 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">socket</span>
 <span class="kn">import</span> <span class="nn">signal</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 
 <span class="kn">import</span> <span class="nn">triqs.utility.mpi</span> <span class="k">as</span> <span class="nn">mpi</span>
 
+<span class="kn">from</span> <span class="nn">solid_dmft.dft_managers</span> <span class="kn">import</span> <span class="n">mpi_helpers</span>
 
-<span class="k">def</span> <span class="nf">_create_hostfile</span><span class="p">(</span><span class="n">number_cores</span><span class="p">,</span> <span class="n">cluster_name</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Writes a host file for the mpirun. This tells mpi which nodes to ssh into</span>
-<span class="sd">    and start VASP on. The format of the hist file depends on the type of MPI</span>
-<span class="sd">    that is used.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    number_cores: int, the number of cores that vasp runs on</span>
-<span class="sd">    cluster_name: string, the name of the server</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    string: name of the hostfile if not run locally and if called by master node</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">if</span> <span class="n">cluster_name</span> <span class="o">==</span> <span class="s1">&#39;local&#39;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">None</span>
-
-    <span class="n">hostnames</span> <span class="o">=</span> <span class="n">mpi</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">(),</span> <span class="n">root</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
-        <span class="c1"># create hostfile based on first number_cores ranks</span>
-        <span class="n">hosts</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">hostname</span> <span class="ow">in</span> <span class="n">hostnames</span><span class="p">[:</span><span class="n">number_cores</span><span class="p">]:</span>
-            <span class="n">hosts</span><span class="p">[</span><span class="n">hostname</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
-
-        <span class="n">mask_hostfile</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;rusty&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> slots=</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="c1"># OpenMPI format</span>
-                         <span class="s1">&#39;rusty-intra&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> slots=</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="c1">#OpenMPI format</span>
-                         <span class="s1">&#39;rusty-ompi2&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> slots=</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="c1"># OpenMPI format</span>
-                         <span class="s1">&#39;daint&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">:</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="c1"># MPICH format</span>
-                        <span class="p">}[</span><span class="n">cluster_name</span><span class="p">]</span>
-
-        <span class="n">hostfile</span> <span class="o">=</span> <span class="s1">&#39;vasp.hostfile&#39;</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">hostfile</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
-            <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mask_hostfile</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">hosts</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
-        <span class="k">return</span> <span class="n">hostfile</span>
-
-    <span class="k">return</span> <span class="kc">None</span>
-
-<span class="k">def</span> <span class="nf">_find_path_to_mpi_command</span><span class="p">(</span><span class="n">env_vars</span><span class="p">,</span> <span class="n">mpi_exe</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Finds the complete path for the mpi executable by scanning the directories</span>
-<span class="sd">    of $PATH.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    env_vars: dict of string, environment variables containing PATH</span>
-<span class="sd">    mpi_exe: string, mpi command</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    string: absolute path to mpi command</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">for</span> <span class="n">path_directory</span> <span class="ow">in</span> <span class="n">env_vars</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;PATH&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">pathsep</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">path_directory</span><span class="p">:</span>
-            <span class="n">potential_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_directory</span><span class="p">,</span> <span class="n">mpi_exe</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">potential_path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">F_OK</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">X_OK</span><span class="p">):</span>
-                <span class="k">return</span> <span class="n">potential_path</span>
-
-    <span class="k">return</span> <span class="kc">None</span>
-
-<span class="k">def</span> <span class="nf">_get_mpi_arguments</span><span class="p">(</span><span class="n">cluster_name</span><span class="p">,</span> <span class="n">mpi_exe</span><span class="p">,</span> <span class="n">number_cores</span><span class="p">,</span> <span class="n">vasp_command</span><span class="p">,</span> <span class="n">hostfile</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Depending on the settings of the cluster and the type of MPI used,</span>
-<span class="sd">    the arguments to the mpi call have to be different. The most technical part</span>
-<span class="sd">    of the vasp handler.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    cluster_name: string, name of the cluster so that settings can be tailored to it</span>
-<span class="sd">    mpi_exe: string, mpi command</span>
-<span class="sd">    number_cores: int, the number of cores that vasp runs on</span>
-<span class="sd">    vasp_command: string, the command to start vasp</span>
-<span class="sd">    hostfile: string, name of the hostfile</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    list of string: arguments to start mpi with</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">if</span> <span class="n">cluster_name</span> <span class="o">==</span> <span class="s1">&#39;local&#39;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">mpi_exe</span><span class="p">,</span> <span class="s1">&#39;-np&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">number_cores</span><span class="p">),</span> <span class="n">vasp_command</span><span class="p">]</span>
-
-    <span class="c1"># For the second node, mpirun starts VASP by using ssh</span>
-    <span class="c1"># Therefore we need to handover the env variables with -x</span>
-    <span class="k">if</span> <span class="n">cluster_name</span> <span class="o">==</span> <span class="s1">&#39;rusty&#39;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">mpi_exe</span><span class="p">,</span> <span class="s1">&#39;-hostfile&#39;</span><span class="p">,</span> <span class="n">hostfile</span><span class="p">,</span> <span class="s1">&#39;-np&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">number_cores</span><span class="p">),</span>
-                <span class="s1">&#39;-mca&#39;</span><span class="p">,</span> <span class="s1">&#39;mtl&#39;</span><span class="p">,</span> <span class="s1">&#39;^psm,psm2,ofi&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;-mca&#39;</span><span class="p">,</span> <span class="s1">&#39;btl&#39;</span><span class="p">,</span> <span class="s1">&#39;^vader,openib,usnix&#39;</span> <span class="p">,</span>
-                <span class="s1">&#39;-x&#39;</span><span class="p">,</span> <span class="s1">&#39;LD_LIBRARY_PATH&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;-x&#39;</span><span class="p">,</span> <span class="s1">&#39;PATH&#39;</span><span class="p">,</span> <span class="s1">&#39;-x&#39;</span><span class="p">,</span> <span class="s1">&#39;OMP_NUM_THREADS&#39;</span><span class="p">,</span> <span class="n">vasp_command</span><span class="p">]</span>
-    <span class="c1"># Run mpi with intra-node communication among ranks (on a single node).</span>
-    <span class="k">if</span> <span class="n">cluster_name</span> <span class="o">==</span> <span class="s1">&#39;rusty-intra&#39;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">mpi_exe</span><span class="p">,</span> <span class="s1">&#39;-np&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">number_cores</span><span class="p">),</span>
-                <span class="s1">&#39;--mca&#39;</span><span class="p">,</span> <span class="s1">&#39;pml&#39;</span><span class="p">,</span> <span class="s1">&#39;ob1&#39;</span><span class="p">,</span> <span class="s1">&#39;--mca&#39;</span><span class="p">,</span> <span class="s1">&#39;btl&#39;</span><span class="p">,</span> <span class="s1">&#39;self,vader&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;-x&#39;</span><span class="p">,</span> <span class="s1">&#39;LD_LIBRARY_PATH&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;-x&#39;</span><span class="p">,</span> <span class="s1">&#39;PATH&#39;</span><span class="p">,</span> <span class="s1">&#39;-x&#39;</span><span class="p">,</span> <span class="s1">&#39;OMP_NUM_THREADS&#39;</span><span class="p">,</span> <span class="n">vasp_command</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">cluster_name</span> <span class="o">==</span> <span class="s1">&#39;rusty-ompi2&#39;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">mpi_exe</span><span class="p">,</span> <span class="s1">&#39;-hostfile&#39;</span><span class="p">,</span> <span class="n">hostfile</span><span class="p">,</span> <span class="s1">&#39;-np&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">number_cores</span><span class="p">),</span>
-                <span class="s1">&#39;-mca&#39;</span><span class="p">,</span> <span class="s1">&#39;mtl&#39;</span><span class="p">,</span> <span class="s1">&#39;^psm2,ofi&#39;</span><span class="p">,</span> <span class="s1">&#39;-mca&#39;</span><span class="p">,</span> <span class="s1">&#39;btl&#39;</span><span class="p">,</span> <span class="s1">&#39;^vader&#39;</span> <span class="p">,</span><span class="s1">&#39;-x&#39;</span><span class="p">,</span> <span class="s1">&#39;LD_LIBRARY_PATH&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;-x&#39;</span><span class="p">,</span> <span class="s1">&#39;PATH&#39;</span><span class="p">,</span> <span class="s1">&#39;-x&#39;</span><span class="p">,</span> <span class="s1">&#39;OMP_NUM_THREADS&#39;</span><span class="p">,</span> <span class="n">vasp_command</span><span class="p">]</span>
-
-    <span class="k">if</span> <span class="n">cluster_name</span> <span class="o">==</span> <span class="s1">&#39;daint&#39;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">mpi_exe</span><span class="p">,</span> <span class="s1">&#39;-launcher&#39;</span><span class="p">,</span> <span class="s1">&#39;ssh&#39;</span><span class="p">,</span> <span class="s1">&#39;-hostfile&#39;</span><span class="p">,</span> <span class="n">hostfile</span><span class="p">,</span>
-                <span class="s1">&#39;-np&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">number_cores</span><span class="p">),</span> <span class="s1">&#39;-envlist&#39;</span><span class="p">,</span> <span class="s1">&#39;PATH&#39;</span><span class="p">,</span> <span class="n">vasp_command</span><span class="p">]</span>
-
-    <span class="k">return</span> <span class="kc">None</span>
 
 <span class="k">def</span> <span class="nf">_fork_and_start_vasp</span><span class="p">(</span><span class="n">mpi_exe</span><span class="p">,</span> <span class="n">arguments</span><span class="p">,</span> <span class="n">env_vars</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -438,7 +330,7 @@
     <span class="c1"># get MPI env</span>
     <span class="n">vasp_process_id</span> <span class="o">=</span> <span class="mi">0</span>
 
-    <span class="n">hostfile</span> <span class="o">=</span> <span class="n">_create_hostfile</span><span class="p">(</span><span class="n">number_cores</span><span class="p">,</span> <span class="n">cluster_name</span><span class="p">)</span>
+    <span class="n">hostfile</span> <span class="o">=</span> <span class="n">mpi_helpers</span><span class="o">.</span><span class="n">create_hostfile</span><span class="p">(</span><span class="n">number_cores</span><span class="p">,</span> <span class="n">cluster_name</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
         <span class="c1"># clean environment</span>
@@ -450,13 +342,12 @@
                 <span class="n">env_vars</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">var</span>
 
         <span class="c1"># assuming that mpirun points to the correct mpi env</span>
-        <span class="n">mpi_exe</span> <span class="o">=</span> <span class="n">_find_path_to_mpi_command</span><span class="p">(</span><span class="n">env_vars</span><span class="p">,</span> <span class="s1">&#39;mpirun&#39;</span><span class="p">)</span>
+        <span class="n">mpi_exe</span> <span class="o">=</span> <span class="n">mpi_helpers</span><span class="o">.</span><span class="n">find_path_to_mpi_command</span><span class="p">(</span><span class="n">env_vars</span><span class="p">,</span> <span class="s1">&#39;mpirun&#39;</span><span class="p">)</span>
 
-        <span class="n">arguments</span> <span class="o">=</span> <span class="n">_get_mpi_arguments</span><span class="p">(</span><span class="n">cluster_name</span><span class="p">,</span> <span class="n">mpi_exe</span><span class="p">,</span> <span class="n">number_cores</span><span class="p">,</span> <span class="n">vasp_command</span><span class="p">,</span> <span class="n">hostfile</span><span class="p">)</span>
+        <span class="n">arguments</span> <span class="o">=</span> <span class="n">mpi_helpers</span><span class="o">.</span><span class="n">get_mpi_arguments</span><span class="p">(</span><span class="n">cluster_name</span><span class="p">,</span> <span class="n">mpi_exe</span><span class="p">,</span> <span class="n">number_cores</span><span class="p">,</span> <span class="n">vasp_command</span><span class="p">,</span> <span class="n">hostfile</span><span class="p">)</span>
         <span class="n">vasp_process_id</span> <span class="o">=</span> <span class="n">_fork_and_start_vasp</span><span class="p">(</span><span class="n">mpi_exe</span><span class="p">,</span> <span class="n">arguments</span><span class="p">,</span> <span class="n">env_vars</span><span class="p">)</span>
 
-
-    <span class="n">mpi</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
+    <span class="n">mpi_helpers</span><span class="o">.</span><span class="n">poll_barrier</span><span class="p">(</span><span class="n">mpi</span><span class="o">.</span><span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span><span class="p">)</span>
     <span class="n">vasp_process_id</span> <span class="o">=</span> <span class="n">mpi</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">vasp_process_id</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">vasp_process_id</span></div>

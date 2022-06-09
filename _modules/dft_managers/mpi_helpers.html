@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dmft_tools.afm_mapping &mdash; solid_dmft  documentation</title><link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+  <title>dft_managers.mpi_helpers &mdash; solid_dmft  documentation</title><link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" /><link rel="shortcut icon" href="../../_static/favicon.ico"/>
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
@@ -224,7 +224,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="../index.html">Module code</a> &raquo;</li>
-      <li>dmft_tools.afm_mapping</li>
+      <li>dft_managers.mpi_helpers</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -233,8 +233,10 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>Source code for dmft_tools.afm_mapping</h1><div class="highlight"><pre>
-<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+  <h1>Source code for dft_managers.mpi_helpers</h1><div class="highlight"><pre>
+<span></span>
+<span class="c1">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="c1">################################################################################</span>
 <span class="c1">#</span>
 <span class="c1"># solid_dmft - A versatile python wrapper to perform DFT+DMFT calculations</span>
@@ -259,107 +261,141 @@
 <span class="c1">#</span>
 <span class="c1">################################################################################</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Contains the handling of the QE process. It can start QE, reactivate it,</span>
+<span class="sd">check if the lock file is there and finally kill QE. Needed for CSC calculations.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">import</span> <span class="nn">shlex</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
 <span class="kn">import</span> <span class="nn">triqs.utility.mpi</span> <span class="k">as</span> <span class="nn">mpi</span>
 
-<div class="viewcode-block" id="determine"><a class="viewcode-back" href="../../_autosummary/dmft_tools.afm_mapping.html#dmft_tools.afm_mapping.determine">[docs]</a><span class="k">def</span> <span class="nf">determine</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">archive</span><span class="p">,</span> <span class="n">n_inequiv_shells</span><span class="p">):</span>
+
+<div class="viewcode-block" id="create_hostfile"><a class="viewcode-back" href="../../_autosummary/dft_managers.mpi_helpers.html#dft_managers.mpi_helpers.create_hostfile">[docs]</a><span class="k">def</span> <span class="nf">create_hostfile</span><span class="p">(</span><span class="n">number_cores</span><span class="p">,</span> <span class="n">cluster_name</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Determines the symmetries that are used in AFM calculations. These</span>
-<span class="sd">    symmetries can then be used to copy the self-energies from one impurity to</span>
-<span class="sd">    another by exchanging up/down channels for speedup and accuracy.</span>
+<span class="sd">    Writes a host file for the mpirun. This tells mpi which nodes to ssh into</span>
+<span class="sd">    and start VASP on. The format of the hist file depends on the type of MPI</span>
+<span class="sd">    that is used.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    number_cores: int, the number of cores that vasp runs on</span>
+<span class="sd">    cluster_name: string, the name of the server</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    string: name of the hostfile if not run locally and if called by master node</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">afm_mapping</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">cluster_name</span> <span class="o">==</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="n">hostnames</span> <span class="o">=</span> <span class="n">mpi</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">(),</span> <span class="n">root</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
-        <span class="c1"># Reads mapping from h5 archive if it exists already from a previous run</span>
-        <span class="k">if</span> <span class="s1">&#39;afm_mapping&#39;</span> <span class="ow">in</span> <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input&#39;</span><span class="p">]:</span>
-            <span class="n">afm_mapping</span> <span class="o">=</span> <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input&#39;</span><span class="p">][</span><span class="s1">&#39;afm_mapping&#39;</span><span class="p">]</span>
-        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;magmom&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="n">n_inequiv_shells</span><span class="p">:</span>
-            <span class="c1"># find equal or opposite spin imps, where we use the magmom array to</span>
-            <span class="c1"># identity those with equal numbers or opposite</span>
-            <span class="c1"># [copy Yes/False, from where, switch up/down channel]</span>
-            <span class="n">afm_mapping</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_inequiv_shells</span>
-            <span class="n">abs_moms</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;magmom&#39;</span><span class="p">])</span>
+        <span class="c1"># create hostfile based on first number_cores ranks</span>
+        <span class="n">hosts</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">hostname</span> <span class="ow">in</span> <span class="n">hostnames</span><span class="p">[:</span><span class="n">number_cores</span><span class="p">]:</span>
+            <span class="n">hosts</span><span class="p">[</span><span class="n">hostname</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
 
-            <span class="k">for</span> <span class="n">icrsh</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_inequiv_shells</span><span class="p">):</span>
-                <span class="c1"># if the moment was seen before ...</span>
-                <span class="n">previous_occurences</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">abs_moms</span><span class="p">[:</span><span class="n">icrsh</span><span class="p">],</span> <span class="n">abs_moms</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]))[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">previous_occurences</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="c1"># find the source imp to copy from</span>
-                    <span class="n">source</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">previous_occurences</span><span class="p">)</span>
-                    <span class="c1"># determine if we need to switch up and down channel</span>
-                    <span class="n">switch</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;magmom&#39;</span><span class="p">][</span><span class="n">icrsh</span><span class="p">],</span> <span class="o">-</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;magmom&#39;</span><span class="p">][</span><span class="n">source</span><span class="p">])</span>
+        <span class="n">mask_hostfile</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;openmpi&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> slots=</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span>  <span class="c1"># OpenMPI format</span>
+                         <span class="s1">&#39;openmpi-intra&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> slots=</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span>  <span class="c1"># OpenMPI format</span>
+                         <span class="s1">&#39;mpich&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">:</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span>  <span class="c1"># MPICH format</span>
+                         <span class="p">}[</span><span class="n">cluster_name</span><span class="p">]</span>
 
-                    <span class="n">afm_mapping</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">switch</span><span class="p">]</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">afm_mapping</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="n">icrsh</span><span class="p">,</span> <span class="kc">False</span><span class="p">]</span>
+        <span class="n">hostfile</span> <span class="o">=</span> <span class="s1">&#39;dft.hostfile&#39;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">hostfile</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mask_hostfile</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">hosts</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+        <span class="k">return</span> <span class="n">hostfile</span>
+
+    <span class="k">return</span> <span class="kc">None</span></div>
 
 
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;AFM calculation selected, mapping self energies as follows:&#39;</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;imp  [copy sigma, source imp, switch up/down]&#39;</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;---------------------------------------------&#39;</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">elem</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">afm_mapping</span><span class="p">):</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">elem</span><span class="p">))</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="find_path_to_mpi_command"><a class="viewcode-back" href="../../_autosummary/dft_managers.mpi_helpers.html#dft_managers.mpi_helpers.find_path_to_mpi_command">[docs]</a><span class="k">def</span> <span class="nf">find_path_to_mpi_command</span><span class="p">(</span><span class="n">env_vars</span><span class="p">,</span> <span class="n">mpi_exe</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Finds the complete path for the mpi executable by scanning the directories</span>
+<span class="sd">    of $PATH.</span>
 
-            <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input&#39;</span><span class="p">][</span><span class="s1">&#39;afm_mapping&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">afm_mapping</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    env_vars: dict of string, environment variables containing PATH</span>
+<span class="sd">    mpi_exe: string, mpi command</span>
 
-        <span class="c1"># if anything did not work set afm_order false</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;WARNING: couldn</span><span class="se">\&#39;</span><span class="s1">t determine afm mapping. No mapping used.&#39;</span><span class="p">)</span>
-            <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;afm_order&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    string: absolute path to mpi command</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;afm_order&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mpi</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;afm_order&#39;</span><span class="p">])</span>
-    <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;afm_order&#39;</span><span class="p">]:</span>
-        <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;afm_mapping&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mpi</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">afm_mapping</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">path_directory</span> <span class="ow">in</span> <span class="n">env_vars</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;PATH&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">pathsep</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">path_directory</span><span class="p">:</span>
+            <span class="n">potential_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_directory</span><span class="p">,</span> <span class="n">mpi_exe</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">potential_path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">F_OK</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">X_OK</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">potential_path</span>
 
-    <span class="k">return</span> <span class="n">general_params</span></div>
+    <span class="k">return</span> <span class="kc">None</span></div>
 
 
-<span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">solver_params</span><span class="p">,</span> <span class="n">icrsh</span><span class="p">,</span> <span class="n">gf_struct_solver</span><span class="p">,</span> <span class="n">solvers</span><span class="p">):</span>
-    <span class="n">imp_source</span> <span class="o">=</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;afm_mapping&#39;</span><span class="p">][</span><span class="n">icrsh</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">invert_spin</span> <span class="o">=</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;afm_mapping&#39;</span><span class="p">][</span><span class="n">icrsh</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
-    <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">copying the self-energy for shell </span><span class="si">{}</span><span class="s1"> from shell </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">icrsh</span><span class="p">,</span> <span class="n">imp_source</span><span class="p">))</span>
-    <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;inverting spin channels: &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">invert_spin</span><span class="p">))</span>
+<div class="viewcode-block" id="get_mpi_arguments"><a class="viewcode-back" href="../../_autosummary/dft_managers.mpi_helpers.html#dft_managers.mpi_helpers.get_mpi_arguments">[docs]</a><span class="k">def</span> <span class="nf">get_mpi_arguments</span><span class="p">(</span><span class="n">mpi_profile</span><span class="p">,</span> <span class="n">mpi_exe</span><span class="p">,</span> <span class="n">number_cores</span><span class="p">,</span> <span class="n">dft_exe</span><span class="p">,</span> <span class="n">hostfile</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Depending on the settings of the cluster and the type of MPI used,</span>
+<span class="sd">    the arguments to the mpi call have to be different. The most technical part</span>
+<span class="sd">    of the vasp handler.</span>
 
-    <span class="k">if</span> <span class="n">invert_spin</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">spin_channel</span> <span class="ow">in</span> <span class="n">gf_struct_solver</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="k">if</span> <span class="s1">&#39;up&#39;</span> <span class="ow">in</span> <span class="n">spin_channel</span><span class="p">:</span>
-                <span class="n">target_channel</span> <span class="o">=</span> <span class="n">spin_channel</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;up&#39;</span><span class="p">,</span> <span class="s1">&#39;down&#39;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">target_channel</span> <span class="o">=</span> <span class="n">spin_channel</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;down&#39;</span><span class="p">,</span> <span class="s1">&#39;up&#39;</span><span class="p">)</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cluster_name: string, name of the cluster so that settings can be tailored to it</span>
+<span class="sd">    mpi_exe: string, mpi command</span>
+<span class="sd">    number_cores: int, the number of cores that vasp runs on</span>
+<span class="sd">    dft_exe: string, the command to start the DFT code</span>
+<span class="sd">    hostfile: string, name of the hostfile</span>
 
-            <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">Sigma_freq</span><span class="p">[</span><span class="n">spin_channel</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="n">solvers</span><span class="p">[</span><span class="n">imp_source</span><span class="p">]</span><span class="o">.</span><span class="n">Sigma_freq</span><span class="p">[</span><span class="n">target_channel</span><span class="p">]</span>
-            <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">G_freq</span><span class="p">[</span><span class="n">spin_channel</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="n">solvers</span><span class="p">[</span><span class="n">imp_source</span><span class="p">]</span><span class="o">.</span><span class="n">G_freq</span><span class="p">[</span><span class="n">target_channel</span><span class="p">]</span>
-            <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">G_freq_unsym</span><span class="p">[</span><span class="n">spin_channel</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="n">solvers</span><span class="p">[</span><span class="n">imp_source</span><span class="p">]</span><span class="o">.</span><span class="n">G_freq_unsym</span><span class="p">[</span><span class="n">target_channel</span><span class="p">]</span>
-            <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">G0_freq</span><span class="p">[</span><span class="n">spin_channel</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="n">solvers</span><span class="p">[</span><span class="n">imp_source</span><span class="p">]</span><span class="o">.</span><span class="n">G0_freq</span><span class="p">[</span><span class="n">target_channel</span><span class="p">]</span>
-            <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">G_time</span><span class="p">[</span><span class="n">spin_channel</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="n">solvers</span><span class="p">[</span><span class="n">imp_source</span><span class="p">]</span><span class="o">.</span><span class="n">G_time</span><span class="p">[</span><span class="n">target_channel</span><span class="p">]</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list of string: arguments to start mpi with</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
-            <span class="k">if</span> <span class="n">solver_params</span><span class="p">[</span><span class="s1">&#39;measure_pert_order&#39;</span><span class="p">]:</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">],</span> <span class="s1">&#39;perturbation_order&#39;</span><span class="p">):</span>
-                    <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">perturbation_order</span> <span class="o">=</span> <span class="p">{}</span>
-                <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">perturbation_order</span><span class="p">[</span><span class="n">spin_channel</span><span class="p">]</span> <span class="o">=</span> <span class="n">solvers</span><span class="p">[</span><span class="n">imp_source</span><span class="p">]</span><span class="o">.</span><span class="n">perturbation_order</span><span class="p">[</span><span class="n">target_channel</span><span class="p">]</span>
-                <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">perturbation_order_total</span> <span class="o">=</span> <span class="n">solvers</span><span class="p">[</span><span class="n">imp_source</span><span class="p">]</span><span class="o">.</span><span class="n">perturbation_order_total</span>
+    <span class="k">if</span> <span class="n">mpi_profile</span> <span class="o">==</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">mpi_exe</span><span class="p">,</span> <span class="s1">&#39;-np&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">number_cores</span><span class="p">)]</span> <span class="o">+</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">dft_exe</span><span class="p">)</span>
 
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">Sigma_freq</span> <span class="o">&lt;&lt;</span> <span class="n">solvers</span><span class="p">[</span><span class="n">imp_source</span><span class="p">]</span><span class="o">.</span><span class="n">Sigma_freq</span>
-        <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">G_freq</span> <span class="o">&lt;&lt;</span> <span class="n">solvers</span><span class="p">[</span><span class="n">imp_source</span><span class="p">]</span><span class="o">.</span><span class="n">G_freq</span>
-        <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">G_freq_unsym</span> <span class="o">&lt;&lt;</span> <span class="n">solvers</span><span class="p">[</span><span class="n">imp_source</span><span class="p">]</span><span class="o">.</span><span class="n">G_freq_unsym</span>
-        <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">G0_freq</span> <span class="o">&lt;&lt;</span> <span class="n">solvers</span><span class="p">[</span><span class="n">imp_source</span><span class="p">]</span><span class="o">.</span><span class="n">G0_freq</span>
-        <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">G_time</span> <span class="o">&lt;&lt;</span> <span class="n">solvers</span><span class="p">[</span><span class="n">imp_source</span><span class="p">]</span><span class="o">.</span><span class="n">G_time</span>
+    <span class="c1"># For the second node, mpirun starts DFT by using ssh</span>
+    <span class="c1"># Therefore we need to handover the env variables with -x</span>
+    <span class="k">if</span> <span class="n">mpi_profile</span> <span class="o">==</span> <span class="s1">&#39;openmpi&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">mpi_exe</span><span class="p">,</span> <span class="s1">&#39;-hostfile&#39;</span><span class="p">,</span> <span class="n">hostfile</span><span class="p">,</span> <span class="s1">&#39;-np&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">number_cores</span><span class="p">),</span>
+                <span class="s1">&#39;-mca&#39;</span><span class="p">,</span> <span class="s1">&#39;mtl&#39;</span><span class="p">,</span> <span class="s1">&#39;^psm,psm2,ofi&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;-mca&#39;</span><span class="p">,</span> <span class="s1">&#39;btl&#39;</span><span class="p">,</span> <span class="s1">&#39;^vader,openib,usnix&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;-x&#39;</span><span class="p">,</span> <span class="s1">&#39;LD_LIBRARY_PATH&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;-x&#39;</span><span class="p">,</span> <span class="s1">&#39;PATH&#39;</span><span class="p">,</span> <span class="s1">&#39;-x&#39;</span><span class="p">,</span> <span class="s1">&#39;OMP_NUM_THREADS&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">dft_exe</span><span class="p">)</span>
+    <span class="c1"># Run mpi with intra-node communication among ranks (on a single node).</span>
+    <span class="k">if</span> <span class="n">mpi_profile</span> <span class="o">==</span> <span class="s1">&#39;openmpi-intra&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">mpi_exe</span><span class="p">,</span> <span class="s1">&#39;-np&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">number_cores</span><span class="p">),</span>
+                <span class="s1">&#39;--mca&#39;</span><span class="p">,</span> <span class="s1">&#39;pml&#39;</span><span class="p">,</span> <span class="s1">&#39;ob1&#39;</span><span class="p">,</span> <span class="s1">&#39;--mca&#39;</span><span class="p">,</span> <span class="s1">&#39;btl&#39;</span><span class="p">,</span> <span class="s1">&#39;self,vader&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;-x&#39;</span><span class="p">,</span> <span class="s1">&#39;LD_LIBRARY_PATH&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;-x&#39;</span><span class="p">,</span> <span class="s1">&#39;PATH&#39;</span><span class="p">,</span> <span class="s1">&#39;-x&#39;</span><span class="p">,</span> <span class="s1">&#39;OMP_NUM_THREADS&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">dft_exe</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">solver_params</span><span class="p">[</span><span class="s1">&#39;measure_pert_order&#39;</span><span class="p">]:</span>
-            <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">perturbation_order</span> <span class="o">=</span> <span class="n">solvers</span><span class="p">[</span><span class="n">imp_source</span><span class="p">]</span><span class="o">.</span><span class="n">perturbation_order</span>
-            <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">perturbation_order_total</span> <span class="o">=</span> <span class="n">solvers</span><span class="p">[</span><span class="n">imp_source</span><span class="p">]</span><span class="o">.</span><span class="n">perturbation_order_total</span>
+    <span class="k">if</span> <span class="n">mpi_profile</span> <span class="o">==</span> <span class="s1">&#39;mpich&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">mpi_exe</span><span class="p">,</span> <span class="s1">&#39;-launcher&#39;</span><span class="p">,</span> <span class="s1">&#39;ssh&#39;</span><span class="p">,</span> <span class="s1">&#39;-hostfile&#39;</span><span class="p">,</span> <span class="n">hostfile</span><span class="p">,</span>
+                <span class="s1">&#39;-np&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">number_cores</span><span class="p">),</span> <span class="s1">&#39;-envlist&#39;</span><span class="p">,</span> <span class="s1">&#39;PATH&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">dft_exe</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">solver_params</span><span class="p">[</span><span class="s1">&#39;measure_density_matrix&#39;</span><span class="p">]:</span>
-        <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">density_matrix</span> <span class="o">=</span> <span class="n">solvers</span><span class="p">[</span><span class="n">imp_source</span><span class="p">]</span><span class="o">.</span><span class="n">density_matrix</span>
-        <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">h_loc_diagonalization</span> <span class="o">=</span> <span class="n">solvers</span><span class="p">[</span><span class="n">imp_source</span><span class="p">]</span><span class="o">.</span><span class="n">h_loc_diagonalization</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
 
-    <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;measure_chi&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;none&#39;</span><span class="p">:</span>
-        <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">O_time</span> <span class="o">=</span> <span class="n">solvers</span><span class="p">[</span><span class="n">imp_source</span><span class="p">]</span><span class="o">.</span><span class="n">O_time</span>
 
-    <span class="k">return</span> <span class="n">solvers</span>
+<div class="viewcode-block" id="poll_barrier"><a class="viewcode-back" href="../../_autosummary/dft_managers.mpi_helpers.html#dft_managers.mpi_helpers.poll_barrier">[docs]</a><span class="k">def</span> <span class="nf">poll_barrier</span><span class="p">(</span><span class="n">comm</span><span class="p">,</span> <span class="n">poll_interval</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Use asynchronous synchronization, otherwise mpi.barrier uses up all the CPU time during</span>
+<span class="sd">    the run of subprocess.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    comm: MPI communicator</span>
+<span class="sd">    poll_interval: float, time step for pinging the status of the sleeping ranks</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">req</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">Ibarrier</span><span class="p">()</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">req</span><span class="o">.</span><span class="n">Test</span><span class="p">():</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">poll_interval</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

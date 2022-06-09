@@ -95,6 +95,7 @@
 <li class="toctree-l2 current"><a class="reference internal" href="../documentation.html#module-reference-manual">Module reference manual</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="csc_flow.html">csc_flow</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dft_managers.html">dft_managers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dft_managers.mpi_helpers.html">dft_managers.mpi_helpers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dft_managers.qe_manager.html">dft_managers.qe_manager</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dft_managers.vasp_manager.html">dft_managers.vasp_manager</a></li>
 </ul>
@@ -451,7 +452,10 @@ Sigma_iw will automatically be calculated via
 <dt>dft_exec<span class="classifier">string, default= ‘vasp_std’</span></dt><dd>command for the DFT / VASP executable</dd>
 <dt>store_eigenvals<span class="classifier">bool, optional, default= False</span></dt><dd>stores the dft eigenvals from LOCPROJ (projector_type=plo) or
 wannier90.eig (projector_type=w90) file in h5 archive</dd>
-<dt>mpi_env<span class="classifier">string, default= ‘local’</span></dt><dd>selection for mpi env for DFT / VASP in default this will only call VASP as mpirun -np n_cores_dft dft_exec</dd>
+<dt>mpi_env<span class="classifier">string, default= ‘default’</span></dt><dd>selection for mpi env for DFT in default this will only call DFT as mpirun -np n_cores_dft dft_exec
+other options exist for ‘openmpi’, ‘openmpi-intra’ (no internode communication), ‘mpich’
+these are tested with a specfic network fabric only but should give a good indicator how to setup
+your own mpi_env</dd>
 <dt>projector_type<span class="classifier">string, optional, default = ‘plo’</span></dt><dd>plo: uses VASP’s PLO formalism, requires LOCPROJ in the INCAR
 w90: uses Wannier90, requires LWANNIER90 in the INCAR</dd>
 <dt>w90_exec<span class="classifier">string, default=’wannier90.x’</span></dt><dd>the command to start a single-core wannier run</dd>

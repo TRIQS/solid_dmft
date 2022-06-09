@@ -93,6 +93,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../documentation.html#module-reference-manual">Module reference manual</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/csc_flow.html">csc_flow</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/dft_managers.html">dft_managers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../_autosummary/dft_managers.mpi_helpers.html">dft_managers.mpi_helpers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../_autosummary/dft_managers.qe_manager.html">dft_managers.qe_manager</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../_autosummary/dft_managers.vasp_manager.html">dft_managers.vasp_manager</a></li>
 </ul>
@@ -551,8 +552,11 @@
 <span class="sd">store_eigenvals : bool, optional, default= False</span>
 <span class="sd">            stores the dft eigenvals from LOCPROJ (projector_type=plo) or</span>
 <span class="sd">            wannier90.eig (projector_type=w90) file in h5 archive</span>
-<span class="sd">mpi_env : string, default= &#39;local&#39;</span>
-<span class="sd">            selection for mpi env for DFT / VASP in default this will only call VASP as mpirun -np n_cores_dft dft_exec</span>
+<span class="sd">mpi_env : string, default= &#39;default&#39;</span>
+<span class="sd">            selection for mpi env for DFT in default this will only call DFT as mpirun -np n_cores_dft dft_exec</span>
+<span class="sd">            other options exist for &#39;openmpi&#39;, &#39;openmpi-intra&#39; (no internode communication), &#39;mpich&#39;</span>
+<span class="sd">            these are tested with a specfic network fabric only but should give a good indicator how to setup</span>
+<span class="sd">            your own mpi_env</span>
 <span class="sd">projector_type : string, optional, default = &#39;plo&#39;</span>
 <span class="sd">            plo: uses VASP&#39;s PLO formalism, requires LOCPROJ in the INCAR</span>
 <span class="sd">            w90: uses Wannier90, requires LWANNIER90 in the INCAR</span>
@@ -807,8 +811,8 @@
                                                  <span class="s1">&#39;used&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">params</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">][</span><span class="s1">&#39;csc&#39;</span><span class="p">],</span>
                                                  <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
 
-                             <span class="s1">&#39;mpi_env&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;valid for&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;local&#39;</span><span class="p">,</span> <span class="s1">&#39;rusty&#39;</span><span class="p">,</span> <span class="s1">&#39;rusty-intra&#39;</span><span class="p">,</span> <span class="s1">&#39;rusty-ompi2&#39;</span><span class="p">,</span> <span class="s1">&#39;daint&#39;</span><span class="p">),</span>
-                                         <span class="s1">&#39;used&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">params</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">][</span><span class="s1">&#39;csc&#39;</span><span class="p">],</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;local&#39;</span><span class="p">},</span>
+                             <span class="s1">&#39;mpi_env&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;valid for&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="s1">&#39;openmpi&#39;</span><span class="p">,</span> <span class="s1">&#39;openmpi-intra&#39;</span><span class="p">,</span> <span class="s1">&#39;mpich&#39;</span><span class="p">),</span>
+                                         <span class="s1">&#39;used&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">params</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">][</span><span class="s1">&#39;csc&#39;</span><span class="p">],</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;default&#39;</span><span class="p">},</span>
 
                              <span class="s1">&#39;projector_type&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;valid for&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;plo&#39;</span><span class="p">,</span> <span class="s1">&#39;w90&#39;</span><span class="p">),</span>
                                                 <span class="s1">&#39;used&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">params</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">][</span><span class="s1">&#39;csc&#39;</span><span class="p">],</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;plo&#39;</span><span class="p">},</span>
