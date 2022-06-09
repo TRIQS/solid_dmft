@@ -316,8 +316,11 @@ dft_exec :  string, default= 'vasp_std'
 store_eigenvals : bool, optional, default= False
             stores the dft eigenvals from LOCPROJ (projector_type=plo) or
             wannier90.eig (projector_type=w90) file in h5 archive
-mpi_env : string, default= 'local'
-            selection for mpi env for DFT / VASP in default this will only call VASP as mpirun -np n_cores_dft dft_exec
+mpi_env : string, default= 'default'
+            selection for mpi env for DFT in default this will only call DFT as mpirun -np n_cores_dft dft_exec
+            other options exist for 'openmpi', 'openmpi-intra' (no internode communication), 'mpich'
+            these are tested with a specfic network fabric only but should give a good indicator how to setup
+            your own mpi_env
 projector_type : string, optional, default = 'plo'
             plo: uses VASP's PLO formalism, requires LOCPROJ in the INCAR
             w90: uses Wannier90, requires LWANNIER90 in the INCAR
@@ -572,8 +575,8 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                                  'used': lambda params: params['general']['csc'],
                                                  'default': False},
 
-                             'mpi_env': {'valid for': lambda x, _: x in ('local', 'rusty', 'rusty-intra', 'rusty-ompi2', 'daint'),
-                                         'used': lambda params: params['general']['csc'], 'default': 'local'},
+                             'mpi_env': {'valid for': lambda x, _: x in ('default', 'openmpi', 'openmpi-intra', 'mpich'),
+                                         'used': lambda params: params['general']['csc'], 'default': 'default'},
 
                              'projector_type': {'valid for': lambda x, _: x in ('plo', 'w90'),
                                                 'used': lambda params: params['general']['csc'], 'default': 'plo'},

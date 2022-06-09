@@ -30,121 +30,12 @@ check if the lock file is there and finally kill VASP. Needed for CSC calculatio
 """
 
 import os
-import socket
 import signal
-from collections import defaultdict
 
 import triqs.utility.mpi as mpi
 
+from solid_dmft.dft_managers import mpi_helpers
 
-def _create_hostfile(number_cores, cluster_name):
-    """
-    Writes a host file for the mpirun. This tells mpi which nodes to ssh into
-    and start VASP on. The format of the hist file depends on the type of MPI
-    that is used.
-
-    Parameters
-    ----------
-    number_cores: int, the number of cores that vasp runs on
-    cluster_name: string, the name of the server
-
-    Returns
-    -------
-    string: name of the hostfile if not run locally and if called by master node
-    """
-
-    if cluster_name == 'local':
-        return None
-
-    hostnames = mpi.world.gather(socket.gethostname(), root=0)
-    if mpi.is_master_node():
-        # create hostfile based on first number_cores ranks
-        hosts = defaultdict(int)
-        for hostname in hostnames[:number_cores]:
-            hosts[hostname] += 1
-
-        mask_hostfile = {'rusty': '{} slots={}', # OpenMPI format
-                         'rusty-intra': '{} slots={}', #OpenMPI format
-                         'rusty-ompi2': '{} slots={}', # OpenMPI format
-                         'daint': '{}:{}', # MPICH format
-                        }[cluster_name]
-
-        hostfile = 'vasp.hostfile'
-        with open(hostfile, 'w') as file:
-            file.write('\n'.join(mask_hostfile.format(*i) for i in hosts.items()))
-        return hostfile
-
-    return None
-
-def _find_path_to_mpi_command(env_vars, mpi_exe):
-    """
-    Finds the complete path for the mpi executable by scanning the directories
-    of $PATH.
-
-    Parameters
-    ----------
-    env_vars: dict of string, environment variables containing PATH
-    mpi_exe: string, mpi command
-
-    Returns
-    -------
-    string: absolute path to mpi command
-    """
-
-    for path_directory in env_vars.get('PATH').split(os.pathsep):
-        if path_directory:
-            potential_path = os.path.join(path_directory, mpi_exe)
-            if os.access(potential_path, os.F_OK | os.X_OK):
-                return potential_path
-
-    return None
-
-def _get_mpi_arguments(cluster_name, mpi_exe, number_cores, vasp_command, hostfile):
-    """
-    Depending on the settings of the cluster and the type of MPI used,
-    the arguments to the mpi call have to be different. The most technical part
-    of the vasp handler.
-
-    Parameters
-    ----------
-    cluster_name: string, name of the cluster so that settings can be tailored to it
-    mpi_exe: string, mpi command
-    number_cores: int, the number of cores that vasp runs on
-    vasp_command: string, the command to start vasp
-    hostfile: string, name of the hostfile
-
-    Returns
-    -------
-    list of string: arguments to start mpi with
-    """
-
-    if cluster_name == 'local':
-        return [mpi_exe, '-np', str(number_cores), vasp_command]
-
-    # For the second node, mpirun starts VASP by using ssh
-    # Therefore we need to handover the env variables with -x
-    if cluster_name == 'rusty':
-        return [mpi_exe, '-hostfile', hostfile, '-np', str(number_cores),
-                '-mca', 'mtl', '^psm,psm2,ofi',
-                '-mca', 'btl', '^vader,openib,usnix' ,
-                '-x', 'LD_LIBRARY_PATH',
-                '-x', 'PATH', '-x', 'OMP_NUM_THREADS', vasp_command]
-    # Run mpi with intra-node communication among ranks (on a single node).
-    if cluster_name == 'rusty-intra':
-        return [mpi_exe, '-np', str(number_cores),
-                '--mca', 'pml', 'ob1', '--mca', 'btl', 'self,vader',
-                '-x', 'LD_LIBRARY_PATH',
-                '-x', 'PATH', '-x', 'OMP_NUM_THREADS', vasp_command]
-    if cluster_name == 'rusty-ompi2':
-        return [mpi_exe, '-hostfile', hostfile, '-np', str(number_cores),
-                '-mca', 'mtl', '^psm2,ofi', '-mca', 'btl', '^vader' ,'-x', 'LD_LIBRARY_PATH',
-                '-x', 'PATH', '-x', 'OMP_NUM_THREADS', vasp_command]
-
-    if cluster_name == 'daint':
-        return [mpi_exe, '-launcher', 'ssh', '-hostfile', hostfile,
-                '-np', str(number_cores), '-envlist', 'PATH', vasp_command]
-
-    return None
 
 def _fork_and_start_vasp(mpi_exe, arguments, env_vars):
     """
@@ -203,7 +94,7 @@ def start(number_cores, vasp_command, cluster_name):
     # get MPI env
     vasp_process_id = 0
 
-    hostfile = _create_hostfile(number_cores, cluster_name)
+    hostfile = mpi_helpers.create_hostfile(number_cores, cluster_name)
 
     if mpi.is_master_node():
         # clean environment
@@ -215,13 +106,12 @@ def start(number_cores, vasp_command, cluster_name):
                 env_vars[var_name] = var
 
         # assuming that mpirun points to the correct mpi env
-        mpi_exe = _find_path_to_mpi_command(env_vars, 'mpirun')
+        mpi_exe = mpi_helpers.find_path_to_mpi_command(env_vars, 'mpirun')
 
-        arguments = _get_mpi_arguments(cluster_name, mpi_exe, number_cores, vasp_command, hostfile)
+        arguments = mpi_helpers.get_mpi_arguments(cluster_name, mpi_exe, number_cores, vasp_command, hostfile)
         vasp_process_id = _fork_and_start_vasp(mpi_exe, arguments, env_vars)
 
-
-    mpi.barrier()
+    mpi_helpers.poll_barrier(mpi.MPI.COMM_WORLD)
     vasp_process_id = mpi.bcast(vasp_process_id)
 
     return vasp_process_id
