@@ -66,7 +66,7 @@ A fully charge self-consistent (CSC) interface is implemented for Quantum ESPRES
 solid\_dmft allows also to perform inhomogenous DMFT calculations, i.e. the treatment of multiple correlated and uncorrelated shells (impurity problems) while converging the full lattice self-energy.
 After self-consistency is reached, either via full CSC or just within the DMFT cycle, postprocessing scripts are available to perform analytic continuation of imaginary Green's functions, and to calculate spectral functions.
 
-As of now, solid\_dmft has been successfully used in various peer-reviewed research studies [@Beck:2022; @Hampel:2019; @Hampel:2020; @Hampel:2021], and provides stable releases matching the releases of the TRIQS library.
+As of now, solid\_dmft has been successfully used in various peer-reviewed research studies [@Beck:2022; @Hampel:2019; @Hampel:2020; @Hampel:2021; @merkel_charge_2021; @zhang_training_2022], and provides stable releases matching the releases of the TRIQS library.
 We provide a full documentation including several tutorials and a reference manual.
 Examples and benchmark calculations can be found in the tutorials section of the documentation.
 Furthermore, we utilize an extensive CI workflow on github to test every pull request and commit.
@@ -74,8 +74,8 @@ Furthermore, we utilize an extensive CI workflow on github to test every pull re
 # Statement of need
 
 The number of ready-to-use DFT+DMFT codes is small, and all codes have been developed rather recently.
-Some of these operate in a black-box way, such as, for example, EDMFT, Amulet[@amulet] and the DMFT implementation included in Abinit[@Aldo:2020].
-Other software packages like DFTwDMFT[@Singh:2021] and DCORE[@Shinaoka:2021] follow a very similar strategy as solid\_dmft but have not implemented different impurity solvers as of now.
+Some of these operate in a black-box way, such as, for example, EDMFT, Amulet [@amulet] and the DMFT implementation included in Abinit [@Aldo:2020].
+Other software packages like DFTwDMFT [@Singh:2021] and DCORE [@Shinaoka:2021] follow a very similar strategy as solid\_dmft but have not implemented different impurity solvers as of now.
 solid\_dmft provides a flagship implementation of the TRIQS functionality to perform DFT+DMFT calculation and is easily extended to beyond-DMFT formalisms.
 This is beneficial both to developers of TRIQS applications, by enabling them to benchmark their applications in a well-tested framework, and to users, who benefit from the most recent features of TRIQS.
 Via the gray-box approach the software provides a robust and flexible implementation of the DFT+DMFT method, controlled via a single input file.
@@ -83,6 +83,6 @@ It is developed in the spirit of a community code and supports external contribu
 
 # Acknowledgements
 
-The Flatiron Institute is a division of the Simons Foundation.
+This research was supported by ETH Zurich and the NCCR MARVEL, a National Centre of Competence in Research, funded by the Swiss National Science Foundation (grant number 182892). The Flatiron Institute is a division of the Simons Foundation.
 
 # References
