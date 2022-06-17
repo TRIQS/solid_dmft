@@ -35,12 +35,15 @@ bibliography: paper.bib
 
 Although density functional theory (DFT) plus dynamical mean-field theory (DMFT) has proven successful in describing correlated electron systems for over two decades, it has only been very recently that ready-to-use software packages began to become available, with most scientific research carried out by self-written codes developed and used in research groups.
 Given the complexity of the method, there is also the question of whether a black-box approach is beneficial to the community or whether users should be able to implement the formalism themselves.
+
 The goal of solid\_dmft is to find a middle ground, i.e. a gray-box tool as a ready-to-use implementation.
-The package is an MPI-parallelized scientific simulation code written in Python 3, allowing to perform ab initio DFT+DMFT calculations.
-solid\_dmft utilizes the TRIQS software library [@triqs:2015], which handles most numerical operations.
-The philosophy of the package is to increase reproducibility of DFT+DMFT calculations, provide clearer convergence metrics, and allow to run calculations for a large variety of systems without adapting the code manually, i.e. on this level similar to widely available DFT simulation packages.
+This means that even if the code provides all functions needed for many standard DMFT calculations, the code is highly modular, based on open-source and community-developed software and therefore easily adjustable for specific applications and needs.
 Hence, the targeted user group of this software project is researchers that aim to perform DMFT calculations on top of their DFT simulations to describe the physics of strongly correlated electron systems, without the need of elaborate coding, but rather using a standardized input file to control the calculation.
-On the other hand, the code is highly modular, based on open-source and community-developed software and therefore easily adjustable for specific applications and needs.
+On the other hand, they can easily go beyond the implemented behavior by modifying the corresponding modules in the code.
+
+The package is an MPI-parallelized scientific simulation code written in Python 3, allowing to perform ab initio DFT+DMFT calculations.
+solid\_dmft utilizes the publicly available TRIQS software library [@triqs:2015], which handles most numerical operations.
+The philosophy of the package is to increase reproducibility of DFT+DMFT calculations, provide clearer convergence metrics, and allow to run calculations for a large variety of systems without adapting the code manually, i.e. on this level similar to widely available DFT simulation packages.
 
 ## Design Principles
 
@@ -69,7 +72,7 @@ After self-consistency is reached, either via full CSC or just within the DMFT c
 As of now, solid\_dmft has been successfully used in various peer-reviewed research studies [@Beck:2022; @Hampel:2019; @Hampel:2020; @Hampel:2021; @merkel_charge_2021; @zhang_training_2022], and provides stable releases matching the releases of the TRIQS library.
 We provide a full documentation including several tutorials and a reference manual.
 Examples and benchmark calculations can be found in the tutorials section of the documentation.
-Furthermore, we utilize an extensive CI workflow on github to test every pull request and commit.
+Furthermore, we utilize an extensive CI workflow on GitHub to test every pull request and commit.
 
 # Statement of need
 

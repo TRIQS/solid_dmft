@@ -7,3 +7,5 @@ ipynb_checkpoints
 doc/cpp2rst_generated
 .spyproject
 __pycache__
+paper.jats
+
