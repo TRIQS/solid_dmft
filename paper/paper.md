@@ -77,7 +77,7 @@ Furthermore, we utilize an extensive CI workflow on GitHub to test every pull re
 # Statement of need
 
 The number of ready-to-use DFT+DMFT codes is small, and all codes have been developed rather recently.
-Some of these operate in a black-box way, such as, for example, EDMFT, Amulet [@amulet] and the DMFT implementation included in Abinit [@Aldo:2020].
+Some of these operate in a black-box way, such as, for example, EDMFT [@Haule:2010], Amulet [@amulet] and the DMFT implementation included in Abinit [@Aldo:2020].
 Other software packages like DFTwDMFT [@Singh:2021] and DCORE [@Shinaoka:2021] follow a very similar strategy as solid\_dmft but have not implemented different impurity solvers as of now.
 solid\_dmft provides a flagship implementation of the TRIQS functionality to perform DFT+DMFT calculation and is easily extended to beyond-DMFT formalisms.
 This is beneficial both to developers of TRIQS applications, by enabling them to benchmark their applications in a well-tested framework, and to users, who benefit from the most recent features of TRIQS.
