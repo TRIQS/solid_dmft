@@ -33,20 +33,21 @@ bibliography: paper.bib
 
 # Summary
 
+Strongly correlated systems are a class of materials whose electronic structure is heavily influenced by the effect of electron-electron interactions. While in more commonly used materials, such as copper or silicon, electrons can be considered as essentially independent of each other, in strongly correlated systems (like SrVO$_3$ or UO$_2$​) the high localization of the  *d* and *f* orbitals forces one to explicitly take into account coulombic and exchange effects. Even though the study of strongly correlated systems can be interesting from a purely theoretical standpoint, applying these theoretical notions to real materials comes with important technological implications. In fact, the so called *Mott-tronic* devices promise to deliver significant technical advances, both in the field of electronics and photovoltaics.**[CITE]** 
+
 Although density functional theory (DFT) plus dynamical mean-field theory (DMFT) has proven successful in describing correlated electron systems for over two decades, it has only been very recently that ready-to-use software packages began to become available, with most scientific research carried out by self-written codes developed and used in research groups.
 Given the complexity of the method, there is also the question of whether a black-box approach is beneficial to the community or whether users should be able to implement the formalism themselves.
 
-The goal of solid\_dmft is to find a middle ground, i.e. a gray-box tool as a ready-to-use implementation.
+The goal of solid\_dmft is to find a middle ground, i.e. a *gray-box* tool as a ready-to-use implementation.
 This means that even if the code provides all functions needed for many standard DMFT calculations, the code is highly modular, based on open-source and community-developed software and therefore easily adjustable for specific applications and needs.
-Hence, the targeted user group of this software project is researchers that aim to perform DMFT calculations on top of their DFT simulations to describe the physics of strongly correlated electron systems, without the need of elaborate coding, but rather using a standardized input file to control the calculation.
-On the other hand, they can easily go beyond the implemented behavior by modifying the corresponding modules in the code.
+Hence, this project is targeted towards researchers aiming to apply DMFT methods on top of their DFT simulations to describe the physics of strongly correlated electron systems.
+While our approach allows one to fully perform these computations using standardized input flags to control the calculation without further need for elaborate coding, the final user can easily extend the implemented behavior by modifying the corresponding modules in the code.
 
 The package is an MPI-parallelized scientific simulation code written in Python 3, allowing to perform ab initio DFT+DMFT calculations.
-solid\_dmft utilizes the publicly available TRIQS software library [@triqs:2015], which handles most numerical operations.
+solid\_dmft utilizes the publicly available TRIQS software library [@triqs:2015], which handles most of the numerics.**(maybe i am being pedantic is this technically correct? I would say the solver does most of the heavy lifting, but  they are triqs applications...**
 The philosophy of the package is to increase reproducibility of DFT+DMFT calculations, provide clearer convergence metrics, and allow to run calculations for a large variety of systems without adapting the code manually, i.e. on this level similar to widely available DFT simulation packages.
 
 ## Design Principles
-
 
 The idea is to provide the full functionality of a full a DFT+DMFT calculation by merging the state-of-the-art implementations provided by the TRIQS library and its applications.
 This allows to easily run ab initio calculations for strongly correlated materials, as well as implement and test new features of TRIQS or benchmark new solvers against existing ones.
@@ -63,7 +64,7 @@ The code is designed to be modular in the same philosophy as the TRIQS software 
 Therefore, we split each part of the simulation into separate stand-alone functions, to limit statefulness to a minimum and allow for an easy extension to include new features.
 The modularity of the program also allows to run, for example, the DMFT loop only via a call of a single function with well-defined input and output, i.e. without running solid\_dmft as a monolithic code.
 This ensures that the code can be used in other projects.
-A abstracted `solver` class implements the various impurity solvers available in triqs: cthyb, HubbardI, ForkTPS, ctint, and ctseg.
+A abstracted `solver` class implements the various impurity solvers available in triqs: his class implements the various impurity solvers available in triqs: from exact **AC: check this statement** but computationally expensive quantum monte carlo solver such as  cthyb, ctint, and ctseg, to lightweight approximate solvers, such as  HubbardI and more advanced semi-analytical solvers, such as the recent ForkTPS. **AC: i feel like we should cite some of the solvers here**
 Even though these solvers operate differently, solid\_dmft allows to seamlessly switch impurity solvers, with a simple input flag and adjusting the solver paramters.
 A fully charge self-consistent (CSC) interface is implemented for Quantum ESPRESSO and the Vienna ab-initio simulation package (VASP).
 solid\_dmft allows also to perform inhomogenous DMFT calculations, i.e. the treatment of multiple correlated and uncorrelated shells (impurity problems) while converging the full lattice self-energy.
@@ -77,11 +78,11 @@ Furthermore, we utilize an extensive CI workflow on GitHub to test every pull re
 # Statement of need
 
 The number of ready-to-use DFT+DMFT codes is small, and all codes have been developed rather recently.
-Some of these operate in a black-box way, such as, for example, EDMFT [@Haule:2010], Amulet [@amulet] and the DMFT implementation included in Abinit [@Aldo:2020].
-Other software packages like DFTwDMFT [@Singh:2021] and DCORE [@Shinaoka:2021] follow a very similar strategy as solid\_dmft but have not implemented different impurity solvers as of now.
-solid\_dmft provides a flagship implementation of the TRIQS functionality to perform DFT+DMFT calculation and is easily extended to beyond-DMFT formalisms.
-This is beneficial both to developers of TRIQS applications, by enabling them to benchmark their applications in a well-tested framework, and to users, who benefit from the most recent features of TRIQS.
-Via the gray-box approach the software provides a robust and flexible implementation of the DFT+DMFT method, controlled via a single input file.
+Crucially, most of these codes adopt a black-box approach, where the complexity of the DMFT part is abstracted away from the final user (as in  EDMFT [@Haule:2010], Amulet [@amulet] or the DMFT implementation in Abinit [@Aldo:2020]) and while such a strategy can reduce the numbers of free parameters to tune, it also inevitably hinders the flexibility of the approach. 
+Other software packages like DFTwDMFT [@Singh:2021] and DCORE [@Shinaoka:2021] follow a very similar strategy as solid\_dmft but ~~do not implement different impurity solvers as of now~~ **AC: DCORE does, they even have an  ED solver with pomerol, i don't think dcore has CSC implemented though**. 
+Most notably, solid\_dmft provides a flagship implementation of the TRIQS functionality to perform DFT+DMFT calculation and is easily extended to beyond-DMFT formalisms**AC: what do we mean here?**
+The benefits of this approach are twofold: on one hand, developers of TRIQS applications are able to benchmark their applications in a well tested framework. On the other hand, users can benefit from a standardized input-output structure compatible with the rest of the TRIQS ecosystem.
+Via the gray-box approach the software provides a robust and flexible implementation of the DFT+DMFT method, all controlled via a single input file **AC: i think this is a little misleading, only the DMFT part has a single input file**.
 It is developed in the spirit of a community code and supports external contributions that advance the capabilities of the program.
 
 # Acknowledgements
