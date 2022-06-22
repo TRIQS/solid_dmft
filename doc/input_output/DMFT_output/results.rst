@@ -1,8 +1,8 @@
 .. _documentation:
 
-***************
-DMFT_results
-***************
+*************************************
+solid_dmft results
+*************************************
 The *DMFT_results* group contains the output of the DMFT iterations. The subgroups contained here fall under two main categories:
 
 * **Iterations**: relevant quantities for the DMFT solutions, such as Weiss field, Green function, extracted self-energy, etc.

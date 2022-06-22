@@ -17,6 +17,7 @@ Legend:
 ============
 
 .. admonition:: iteration: 
+  :class: intag
  
             **type=** arr(int);
 
@@ -25,6 +26,7 @@ Legend:
             Number of the iteration.
 
 .. admonition:: mu: 
+  :class: intag
  
             **type=** arr(float);
 
@@ -33,6 +35,7 @@ Legend:
             Chemical potential fed to the solver at the present iteration (pre-dichotomy adjustment).
 
 .. admonition:: orb_gb2: 
+  :class: intag
  
             **type=** arr(dict)
 
@@ -41,6 +44,7 @@ Legend:
             Orbital resolved G(beta/2), proxy for projected density of states at the Fermi level. Low value of orb_gb2 correlate with the presence of a gap.
 
 .. admonition:: imp_gb2: 
+  :class: intag
  
             **type=** arr(dict)
 
@@ -49,6 +53,7 @@ Legend:
             Site G(beta/2), proxy for total density of states at the Fermi level. Low values correlate with the presence of a gap.
 
 .. admonition:: orb_Z: 
+  :class: intag
  
             **type=** arr(dict)
 
@@ -62,6 +67,7 @@ Legend:
 
 
 .. admonition:: orb_occ: 
+  :class: intag
  
             **type=** arr(dict)
 
@@ -70,6 +76,7 @@ Legend:
             Orbital resolved mean site occupation.
 
 .. admonition:: imp_occ: 
+  :class: intag
  
             **type=** arr(dict)
 
@@ -79,6 +86,7 @@ Legend:
 
 
 .. admonition:: E_tot: 
+  :class: intag
  
             **type=** arr(float)
 
@@ -92,6 +100,7 @@ Legend:
 
 
 .. admonition:: E_dft: 
+  :class: intag
  
             **type=** arr(float)
 
@@ -102,6 +111,7 @@ Legend:
 
 
 .. admonition:: E_bandcorr: 
+  :class: intag
  
             **type=** arr(float)
 
@@ -110,14 +120,16 @@ Legend:
             :math:`E_{corr}` in the total energy expression. DMFT correction to the kinetic energy.
 
 .. admonition:: E_corr_en: 
+  :class: intag
  
             **type=** arr(float)
 
             **indices=** [iiter]
 
-            :math:`E_{corr}` in the total energy expression. DMFT correction to the kinetic energy. **DIFFERENCE WITH E_bandcorr? in paper we have only 4 contributions**
+            Sum of the E_DC and E_int_imp terms.
 
 .. admonition:: E_int_imp: 
+  :class: intag
  
             **type=** arr(float)
 
@@ -127,6 +139,7 @@ Legend:
 
 
 .. admonition:: E_DC: 
+  :class: intag
  
             **type=** arr(float)
 
@@ -141,6 +154,7 @@ Legend:
 ============
 
 .. admonition:: iteration: 
+  :class: intag
  
             **type=** arr(int);
 
@@ -149,6 +163,7 @@ Legend:
             Number of the iteration.
 
 .. admonition:: d_mu: 
+  :class: intag
  
             **type=** arr(float)
 
@@ -158,6 +173,7 @@ Legend:
 
 
 .. admonition:: d_orb_occ: 
+  :class: intag
  
             **type=** arr(dict)
 
@@ -166,6 +182,7 @@ Legend:
             Orbital occupation stepwise difference.
 
 .. admonition:: d_imp_occ: 
+  :class: intag
  
             **type=** arr(dict)
 
@@ -174,6 +191,7 @@ Legend:
             Impurity occupation stepwise difference.
 
 .. admonition:: d_Etot: 
+  :class: intag
  
             **type=** arr(float)
 
@@ -182,4 +200,3 @@ Legend:
             Total energy stepwise difference.
             
 
-What is the way the difference between successive green functions is defined? Froebenius norm? Some other matrix norm?

@@ -34,6 +34,9 @@ saved in an h5 archive (in the framework that we are using).
 
 List of all parameters, sorted by sections:
 
+---XXX---start
+List of all parameters, sorted by sections:
+
 [  general  ]
 -------
 
@@ -336,12 +339,9 @@ dft_exec :  string, default= 'vasp_std'
 store_eigenvals : bool, optional, default= False
             stores the dft eigenvals from LOCPROJ (projector_type=plo) or
             wannier90.eig (projector_type=w90) file in h5 archive
-mpi_env : string, default= 'default'
-            selection for mpi env for DFT in default this will only call DFT as mpirun -np n_cores_dft dft_exec
-            other options exist for 'openmpi', 'openmpi-intra' (no internode communication), 'mpich'
-            these are tested with a specfic network fabric only but should give a good indicator how to setup
-            your own mpi_env
-projector_type : string, optional, default = 'plo'
+mpi_env : string, default= 'local'
+            selection for mpi env for DFT / VASP in default this will only call VASP as mpirun -np n_cores_dft dft_exec
+projector_type : string, optional, default= 'plo'
             plo: uses VASP's PLO formalism, requires LOCPROJ in the INCAR
             w90: uses Wannier90, requires LWANNIER90 in the INCAR
 w90_exec :  string, default='wannier90.x'
@@ -368,6 +368,9 @@ map_solver_struct : dict, optional, default=no additional mapping
 mapped_solver_struct_degeneracies : list, optional, default=none
             Degeneracies applied when using map_solver_struct, same for all inmpurities.
             If not given and map_solver_struct is used, no symmetrization will happen.
+            
+---XXX---end
+
 """
 
 from configparser import ConfigParser
