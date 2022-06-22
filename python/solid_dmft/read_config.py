@@ -34,6 +34,9 @@ saved in an h5 archive (in the framework that we are using).
 
 List of all parameters, sorted by sections:
 
+---XXX---start
+List of all parameters, sorted by sections:
+
 [  general  ]
 -------
 
@@ -54,7 +57,7 @@ h_int_type : string
             * crpa: use the cRPA matrix as interaction Hamiltonian
             * crpa_density_density: use the density-density terms of the cRPA matrix
             * dynamic: use dynamic U from h5 archive
-            
+
             Needs to be stored as Matsubara Gf under dynamic_U/U_iw in the input h5
 U :  float or comma separated list of floats
             U values for impurities if only one value is given, the same U is assumed for all impurities
@@ -338,7 +341,7 @@ store_eigenvals : bool, optional, default= False
             wannier90.eig (projector_type=w90) file in h5 archive
 mpi_env : string, default= 'local'
             selection for mpi env for DFT / VASP in default this will only call VASP as mpirun -np n_cores_dft dft_exec
-projector_type : string, optional, default = 'plo'
+projector_type : string, optional, default= 'plo'
             plo: uses VASP's PLO formalism, requires LOCPROJ in the INCAR
             w90: uses Wannier90, requires LWANNIER90 in the INCAR
 w90_exec :  string, default='wannier90.x'
@@ -365,6 +368,9 @@ map_solver_struct : dict, optional, default=no additional mapping
 mapped_solver_struct_degeneracies : list, optional, default=none
             Degeneracies applied when using map_solver_struct, same for all inmpurities.
             If not given and map_solver_struct is used, no symmetrization will happen.
+
+---XXX---end
+
 """
 
 from configparser import ConfigParser
