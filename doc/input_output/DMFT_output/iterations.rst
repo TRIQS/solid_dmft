@@ -21,7 +21,7 @@ Legend:
 
 
 [observables]
-============
+=============
 
 .. admonition:: chemical_potential_pre: 
   :class: intag
