@@ -38,7 +38,7 @@ List of all parameters, sorted by sections:
 List of all parameters, sorted by sections:
 
 [  general  ]
--------
+-------------
 
 seedname : str or list of str
             seedname for h5 archive or for multiple if calculations should be connected
@@ -216,7 +216,7 @@ mu_gap_occ_deviation : float, optional, default=none
             avoid getting stuck in an insulating state with wrong occupation.
 
 [  solver  ]
-------
+------------
 store_solver : bool, optional default= False
             store the whole solver object under DMFT_input in h5 archive
 
@@ -322,7 +322,7 @@ improved_estimator  : bool, optional, default=False
               http://dx.doi.org/10.1103/PhysRevB.85.205106
 
 [  dft  ]
----
+---------
 dft_code : string
             Choose the DFT code interface, for now Quantum Espresso and Vasp are available.
 
@@ -350,7 +350,7 @@ w90_tolerance :  float, default=1e-6
             threshold for mapping of shells and checks of the Hamiltonian
 
 [  advanced  ]
---------
+--------------
 dc_factor : float, optional, default= 'none' (corresponds to 1)
             If given, scales the dc energy by multiplying with this factor, usually < 1
 dc_fixed_value : float, optional, default= 'none'

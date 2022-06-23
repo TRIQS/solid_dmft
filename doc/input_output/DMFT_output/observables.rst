@@ -1,6 +1,6 @@
 
 Observables/convergence_obs
-------
+---------------------------
 
 List of the single-particle observables obtained in a single DMFT iteration
 
@@ -14,7 +14,7 @@ Legend:
 
 
 [observables]
-============
+=============
 
 .. admonition:: iteration: 
   :class: intag
@@ -151,7 +151,7 @@ Legend:
 
 
 [convergence_obs]
-============
+=================
 
 .. admonition:: iteration: 
   :class: intag

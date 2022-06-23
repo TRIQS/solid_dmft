@@ -49,7 +49,7 @@ Module reference manual
 =======================
 
 .. autosummary::
-    :toctree: _autosummary
+    :toctree: _ref
     :template: autosummary_module_template.rst
     :recursive:
 
