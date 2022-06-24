@@ -13,9 +13,11 @@ List of the main outputs for solid_dmft for every iteration.
 Legend:
 
 * iiter = iteration number: range(0, n_dmft_iter)
-* iimp = impurity number: range(0, n_imp)
+* ish = shell number: range(0, n_shells)
+* icrsh = correlated shell number: range(0, n_corr_shells)
+* iineq = inequivalent correlated shell number: range(0, n_inequiv_shells)
 * iorb = orbital number: range(0, n_orbitals)
-* ispin = spin label, 'up' or 'down' in collinear calculations
+* sp = spin label
 * ikpt = k-point label, the order is the same as given in the wannier90 input: range(0, n_kpt)
 * iband = band label before downfolding, n_bands = number of bands included in the disentanglement window during the wannierization: range(0, n_bands)
 
