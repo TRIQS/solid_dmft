@@ -29,7 +29,7 @@ import os.path
 import numpy as np
 
 # triqs
-from triqs.gf import MeshImFreq, MeshImTime, MeshReFreq, BlockGf, make_zero_tail
+from triqs.gf import MeshImFreq, MeshImTime, MeshReFreq, BlockGf
 
 def _generate_header(general_params, sum_k):
     """

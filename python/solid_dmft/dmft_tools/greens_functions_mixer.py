@@ -28,8 +28,9 @@ import numpy as np
 
 # triqs
 import triqs.utility.mpi as mpi
-from triqs.gf import MeshImFreq, GfImTime, make_gf_from_fourier
+from triqs.gf import MeshImFreq, MeshImTime, Gf, make_gf_from_fourier
 from triqs.gf.descriptors import Fourier
+from triqs.gf.tools import inverse
 
 from . import legendre_filter
 
@@ -222,10 +223,12 @@ def mix_sigma(general_params, n_inequiv_shells, solvers, Sigma_freq_previous):
 
 def init_cpa(sum_k, solvers, general_params):
     # initialize cpa_G_time, cpa_G0_freq; extract cpa_G_loc
-    cpa_G_time = sum_k.block_structure.create_gf(ish=0, gf_function=GfImTime, space='solver', beta=general_params['beta'],
-                                                 n_points=general_params['n_tau'])
+    cpa_G_time = sum_k.block_structure.create_gf(ish=0, gf_function=Gf, space='solver',
+                                                 mesh=MeshImTime(beta=general_params['beta'],
+                                                                 S='Fermion', n_tau=general_params['n_tau'])
+                                                 )
     cpa_G0_freq = [solvers[iineq].G0_freq.copy() for iineq in range(sum_k.n_inequiv_shells)]
-    cpa_G_loc = sum_k.extract_G_loc(iw_or_w='iw', with_Sigma=True, with_dc=False)
+    cpa_G_loc = sum_k.extract_G_loc(with_Sigma=True, with_dc=False)
 
     return cpa_G_loc
 

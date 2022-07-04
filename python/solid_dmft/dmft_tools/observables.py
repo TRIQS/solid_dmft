@@ -524,9 +524,7 @@ def calc_dft_kin_en(general_params, sum_k, dft_mu):
         nb = int(sum_k.n_orbitals[ik])
         # calculate lattice greens function need here to set sigma other n_iw is assumend to be 1025!
         # TODO: implement here version for FTPS!
-        G_freq_lat = sum_k.lattice_gf(ik,
-                                    beta=general_params['beta'],
-                                    with_Sigma=True, mu=dft_mu).copy()
+        G_freq_lat = sum_k.lattice_gf(ik, with_Sigma=True, mu=dft_mu).copy()
         # # calculate G(beta) via the function density, which is the same as fourier trafo G(w) and taking G(b)
         G_freq_lat_beta = G_freq_lat.density()
         for spin in sum_k.spin_block_names[sum_k.SO]:
@@ -575,7 +573,7 @@ def calc_bandcorr_man(general_params, sum_k, E_kin_dft):
     for ik in mpi.slice_array(ikarray):
         nb = int(sum_k.n_orbitals[ik])
         # calculate lattice greens function
-        G_freq_lat = sum_k.lattice_gf(ik, beta=general_params['beta'], with_Sigma=True, with_dc=True).copy()
+        G_freq_lat = sum_k.lattice_gf(ik, with_Sigma=True, with_dc=True).copy()
         # calculate G(beta) via the function density, which is the same as fourier trafo G(w) and taking G(b)
         G_freq_lat_beta = G_freq_lat.density()
         for spin in sum_k.spin_block_names[sum_k.SO]:

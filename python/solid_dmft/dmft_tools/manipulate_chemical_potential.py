@@ -302,10 +302,9 @@ def set_initial_mu(general_params, sum_k, iteration_offset, archive, shell_multi
         if general_params['dc'] and general_params['dc_type'] == 4:
             return sum_k
         if general_params['solver_type'] in ['ftps']:
-            sum_k.calc_mu(precision=general_params['prec_mu'],
-                          iw_or_w='w', broadening=general_params['eta'])
+            sum_k.calc_mu(precision=general_params['prec_mu'], broadening=general_params['eta'])
         else:
-            sum_k.calc_mu(precision=general_params['prec_mu'], iw_or_w='iw')
+            sum_k.calc_mu(precision=general_params['prec_mu'])
         return sum_k
 
     # If continuing calculation and not updating mu, loads sold value
@@ -347,10 +346,9 @@ def set_initial_mu(general_params, sum_k, iteration_offset, archive, shell_multi
 
     # If system not gapped, gets chemical potential from dichotomy method
     if general_params['solver_type'] in ['ftps']:
-        sum_k.calc_mu(precision=general_params['prec_mu'],
-                      iw_or_w='w', broadening=general_params['eta'])
+        sum_k.calc_mu(precision=general_params['prec_mu'], broadening=general_params['eta'])
     else:
-        sum_k.calc_mu(precision=general_params['prec_mu'], iw_or_w='iw')
+        sum_k.calc_mu(precision=general_params['prec_mu'])
 
     # Applies mu mixing to dichotomy result
     sum_k.chemical_potential = _mix_chemical_potential(general_params, occupation,
@@ -422,10 +420,9 @@ def update_mu(general_params, sum_k, it, archive):
     # If system not gapped, gets chemical potential from dichotomy method
     previous_mu = sum_k.chemical_potential
     if general_params['solver_type'] in ['ftps']:
-        sum_k.calc_mu(precision=general_params['prec_mu'],
-                      iw_or_w='w', broadening=general_params['eta'])
+        sum_k.calc_mu(precision=general_params['prec_mu'], broadening=general_params['eta'])
     else:
-        sum_k.calc_mu(precision=general_params['prec_mu'], iw_or_w='iw')
+        sum_k.calc_mu(precision=general_params['prec_mu'])
 
     # Applies mu mixing to dichotomy result
     sum_k.chemical_potential = _mix_chemical_potential(general_params, occupation,

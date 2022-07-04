@@ -24,7 +24,7 @@
 import numpy as np
 from itertools import product
 
-from triqs.gf import GfImTime, GfReTime, GfImFreq, GfReFreq, GfLegendre, BlockGf, make_hermitian, Omega, iOmega_n, make_gf_from_fourier, fit_hermitian_tail
+from triqs.gf import MeshImTime, MeshReTime, MeshReFreq, MeshLegendre, Gf, BlockGf, make_hermitian, Omega, iOmega_n, make_gf_from_fourier, fit_hermitian_tail
 from triqs.gf.tools import inverse, make_zero_tail
 from triqs.gf.descriptors import Fourier
 from triqs.operators import c_dag, c, Operator
@@ -195,8 +195,8 @@ class SolverStructure:
 
         # create all ImFreq instances
         self.n_iw = self.general_params['n_iw']
-        self.G_freq = self.sum_k.block_structure.create_gf(ish=self.icrsh, gf_function=GfImFreq, space='solver',
-                                                           beta=self.general_params['beta'], n_points=self.n_iw)
+        self.G_freq = self.sum_k.block_structure.create_gf(ish=self.icrsh, gf_function=Gf, space='solver',
+                                                           mesh=self.sum_k.mesh)
         # copy
         self.Sigma_freq = self.G_freq.copy()
         self.G0_freq = self.G_freq.copy()
@@ -205,8 +205,10 @@ class SolverStructure:
 
         # create all ImTime instances
         self.n_tau = self.general_params['n_tau']
-        self.G_time = self.sum_k.block_structure.create_gf(ish=self.icrsh, gf_function=GfImTime, space='solver',
-                                                           beta=self.general_params['beta'], n_points=self.n_tau)
+        self.G_time = self.sum_k.block_structure.create_gf(ish=self.icrsh, gf_function=Gf, space='solver',
+                                                           mesh=MeshImTime(beta=self.general_params['beta'],
+                                                                           S='Fermion', n_tau=self.n_tau)
+                                                           )
         # copy
         self.Delta_time = self.G_time.copy()
 
@@ -218,8 +220,10 @@ class SolverStructure:
             or self.general_params['solver_type'] == 'hubbardI' and self.solver_params['measure_G_l']):
 
             self.n_l = self.general_params['n_l']
-            self.G_l = self.sum_k.block_structure.create_gf(ish=self.icrsh, gf_function=GfLegendre, space='solver',
-                                                            beta=self.general_params['beta'], n_points=self.n_l)
+            self.G_l = self.sum_k.block_structure.create_gf(ish=self.icrsh, gf_function=Gf, space='solver',
+                                                            mesh=MeshLegendre(beta=self.general_params['beta'],
+                                                                              max_n=self.n_l, S='Fermion')
+                                                            )
             # move original G_freq to G_freq_orig
             self.G_time_orig = self.G_time.copy()
 
@@ -237,8 +241,8 @@ class SolverStructure:
 
         # create all ReFreq instances
         self.n_w = self.general_params['n_w']
-        self.G_freq = self.sum_k.block_structure.create_gf(ish=self.icrsh, gf_function=GfReFreq, space='solver',
-                                                           n_points=self.n_w, window = self.general_params['w_range'])
+        self.G_freq = self.sum_k.block_structure.create_gf(ish=self.icrsh, gf_function=Gf, space='solver',
+                                                           mesh=self.sum_k.mesh)
         # copy
         self.Sigma_freq = self.G_freq.copy()
         self.G0_freq = self.G_freq.copy()
@@ -248,7 +252,7 @@ class SolverStructure:
         # create another Delta_freq for the solver, which uses different spin indices
         n_orb = self.sum_k.corr_shells[self.icrsh]['dim']
         n_orb = n_orb//2 if self.sum_k.corr_shells[self.icrsh]['SO'] else n_orb
-        gf = GfReFreq(target_shape = (n_orb, n_orb), n_points = self.n_w, window = self.general_params['w_range'])
+        gf = Gf(target_shape = (n_orb, n_orb), mesh=MeshReFreq(n_w=self.n_w, window=self.general_params['w_range']))
 
         self.Delta_freq_solver = BlockGf(name_list =tuple([block[0] for block in self.gf_struct]), block_list = (gf, gf), make_copies = True)
 
@@ -256,8 +260,10 @@ class SolverStructure:
         # FIXME: dummy G_time, since time_steps will be recalculated during run
         #time_steps = int(2 * self.solver_params['time_steps'] * self.solver_params['refine_factor']) if self.solver_params['n_bath'] != 0 else int(2 * self.solver_params['time_steps'])
         time_steps = int(2 * 1 * self.solver_params['refine_factor']) if self.solver_params['n_bath'] != 0 else int(2 * 1)
-        self.G_time = self.sum_k.block_structure.create_gf(ish=self.icrsh, gf_function=GfReTime, space='solver', n_points=time_steps+1,
+        self.G_time = self.sum_k.block_structure.create_gf(ish=self.icrsh, gf_function=Gf, space='solver',
+                                                           mesh=MeshReTime(n_t=time_steps+1,
                                                            window=[0,time_steps*self.solver_params['dt']])
+                                                           )
 
     def _init_ReFreq_hubbardI(self):
         r'''
@@ -266,8 +272,9 @@ class SolverStructure:
 
         # create all ReFreq instances
         self.n_w = self.general_params['n_w']
-        self.G_Refreq = self.sum_k.block_structure.create_gf(ish=self.icrsh, gf_function=GfReFreq, space='solver',
-                                                             n_points=self.n_w, window = self.general_params['w_range'])
+        self.G_Refreq = self.sum_k.block_structure.create_gf(ish=self.icrsh, gf_function=Gf, space='solver',
+                                                             mesh=MeshReFreq(n_w=self.n_w, window=self.general_params['w_range'])
+                                                             )
         # copy
         self.Sigma_Refreq = self.G_Refreq.copy()
         self.G0_Refreq = self.G_Refreq.copy()
@@ -434,8 +441,10 @@ class SolverStructure:
                                                                                                          self.solver_params['dt']))
             # need to update tevo_params and G_time
             self.tevo_params.time_steps = time_steps
-            self.G_time = self.sum_k.block_structure.create_gf(ish=self.icrsh, gf_function=GfReTime, space='solver', n_points=2*time_steps+1,
-                                                               window=[0,2*time_steps*self.solver_params['dt']])
+            self.G_time = self.sum_k.block_structure.create_gf(ish=self.icrsh, gf_function=Gf, space='solver',
+                                                               mesh=MeshReTime(n_t=2*time_steps+1,
+                                                                               window=[0,2*time_steps*self.solver_params['dt']])
+                                                               )
 
 
             # fill Hloc FTPS object
@@ -951,8 +960,8 @@ class SolverStructure:
                 for i, bl in enumerate(self.F_freq.indices):
                     self.F_freq[bl] << Fourier(self.triqs_solver.F_tau[bl], F_known_moments[i])
                 # fit tail of improved estimator and G_freq
-                self.F_freq << Gf_fit_tail_fraction(self.F_freq, fraction=0.9, replace=0.5, known_moments=F_known_moments)
-                self.G_freq << Gf_fit_tail_fraction(self.G_freq ,fraction=0.9, replace=0.5, known_moments=Gf_known_moments)
+                self.F_freq << _gf_fit_tail_fraction(self.F_freq, fraction=0.9, replace=0.5, known_moments=F_known_moments)
+                self.G_freq << _gf_fit_tail_fraction(self.G_freq ,fraction=0.9, replace=0.5, known_moments=Gf_known_moments)
 
             self.F_freq << mpi.bcast(self.F_freq)
             self.G_freq << mpi.bcast(self.G_freq)

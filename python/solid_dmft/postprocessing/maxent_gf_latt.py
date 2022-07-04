@@ -49,7 +49,7 @@ from triqs_maxent.alpha_meshes import LogAlphaMesh
 from triqs_dft_tools.sumk_dft import SumkDFT
 from h5 import HDFArchive
 from triqs.utility import mpi
-from triqs.gf import GfImFreq, BlockGf
+from triqs.gf import Gf, BlockGf
 
 
 def _read_h5(external_path, iteration):
@@ -112,7 +112,7 @@ def _generate_lattice_gf(sum_k, sum_spins):
     # Initializes lattice GF to zero for each process
     spin_blocks = ['total'] if sum_spins else sum_k.spin_block_names[sum_k.SO]
     mesh = sum_k.Sigma_imp_iw[0].mesh
-    trace_gf_latt = {key: GfImFreq(mesh=mesh, data=np.zeros((len(mesh), 1, 1), dtype=complex))
+    trace_gf_latt = {key: Gf(mesh=mesh, data=np.zeros((len(mesh), 1, 1), dtype=complex))
                      for key in spin_blocks}
 
     # Takes trace over orbitals (and spins). Individual entries do not make sense
@@ -244,7 +244,7 @@ def main(external_path, iteration=None, sum_spins=False, maxent_error=.02,
     start_time = time.time()
 
     # Sets up the SumkDFT object
-    sum_k = SumkDFT(external_path, use_dft_blocks=False)
+    sum_k = SumkDFT(external_path, mesh=sigma_iw.mesh, use_dft_blocks=False)
     h5_content = None
     if mpi.is_master_node():
         h5_content = _read_h5(external_path, iteration)
