@@ -304,7 +304,6 @@ def _set_loaded_sigma(sum_k, loaded_sigma, loaded_dc_imp, general_params):
     sum_k.dc_imp = [{channel: np.array(loaded_dc_shell[channel]) - np.array(calc_dc_shell[channel])
                      for channel in loaded_dc_shell}
                     for calc_dc_shell, loaded_dc_shell in zip(sum_k.dc_imp, loaded_dc_imp)]
-    freq = 'w' if general_params['solver_type'] in ['ftps'] else 'iw'
     start_sigma = sum_k.add_dc()
     start_sigma = _sumk_sigma_to_solver_struct(sum_k, start_sigma)
 
@@ -317,7 +316,7 @@ def _set_loaded_sigma(sum_k, loaded_sigma, loaded_dc_imp, general_params):
 
     # Cleans up
     sum_k.dc_imp = calculated_dc_imp
-    if freq == 'w':
+    if general_params['solver_type'] in ['ftps']:
         sumk_sigma = sum_k.Sigma_imp_w
     else:
         sumk_sigma = sum_k.Sigma_imp_iw
