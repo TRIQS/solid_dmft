@@ -1,4 +1,4 @@
-FROM ubuntu:21.10
+FROM ubuntu:22.04
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
       cmake \
@@ -74,7 +74,7 @@ ENV CPATH=/triqs/include:${CPATH} \
     PATH=/triqs/bin:${PATH} \
     LIBRARY_PATH=/triqs/lib:${LIBRARY_PATH} \
     LD_LIBRARY_PATH=/triqs/lib:${LD_LIBRARY_PATH} \
-    PYTHONPATH=/triqs/lib/python3.9/site-packages:${PYTHONPATH} \
+    PYTHONPATH=/triqs/lib/python3.10/site-packages:${PYTHONPATH} \
     CMAKE_PREFIX_PATH=/triqs/share/cmake:${CMAKE_PREFIX_PATH} \
     TRIQS_ROOT=/triqs
 
@@ -87,7 +87,7 @@ RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/triqs
 RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/dft_tools.git dft_tools.src \
     && mkdir -p dft_tools.build && cd dft_tools.build \
     && cmake ../dft_tools.src -DMPIEXEC_PREFLAGS='--allow-run-as-root' \
-    && make -j$NCORES && make test && make install
+    && make -j$NCORES && ctest -V -R Py_srvo3_Gloc && make install
 
 # cthyb
 RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/cthyb.git cthyb.src \

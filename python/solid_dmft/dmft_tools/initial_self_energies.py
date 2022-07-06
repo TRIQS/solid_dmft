@@ -35,8 +35,7 @@ import numpy as np
 # triqs
 from h5 import HDFArchive
 import triqs.utility.mpi as mpi
-from triqs.gf import BlockGf, GfImFreq, GfReFreq
-from triqs_dft_tools.sumk_dft import SumkDFT
+from triqs.gf import BlockGf, Gf
 
 
 def calculate_double_counting(sum_k, density_matrix, general_params, advanced_params):
@@ -222,7 +221,7 @@ def _sumk_sigma_to_solver_struct(sum_k, start_sigma):
     """
 
     Sigma_local = [start_sigma[icrsh].copy() for icrsh in range(sum_k.n_corr_shells)]
-    Sigma_inequiv = [BlockGf(name_block_generator=[(block, GfImFreq(indices=inner, mesh=Sigma_local[0].mesh))
+    Sigma_inequiv = [BlockGf(name_block_generator=[(block, Gf(indices=inner, mesh=Sigma_local[0].mesh))
                                                    for block, inner in sum_k.gf_struct_solver[ish].items()],
                              make_copies=False) for ish in range(sum_k.n_inequiv_shells)]
 
@@ -305,8 +304,7 @@ def _set_loaded_sigma(sum_k, loaded_sigma, loaded_dc_imp, general_params):
     sum_k.dc_imp = [{channel: np.array(loaded_dc_shell[channel]) - np.array(calc_dc_shell[channel])
                      for channel in loaded_dc_shell}
                     for calc_dc_shell, loaded_dc_shell in zip(sum_k.dc_imp, loaded_dc_imp)]
-    freq = 'w' if general_params['solver_type'] in ['ftps'] else 'iw'
-    start_sigma = sum_k.add_dc(iw_or_w = freq)
+    start_sigma = sum_k.add_dc()
     start_sigma = _sumk_sigma_to_solver_struct(sum_k, start_sigma)
 
     # Prints information on correction of Hartree shift
@@ -318,7 +316,7 @@ def _set_loaded_sigma(sum_k, loaded_sigma, loaded_dc_imp, general_params):
 
     # Cleans up
     sum_k.dc_imp = calculated_dc_imp
-    if freq == 'w':
+    if general_params['solver_type'] in ['ftps']:
         sumk_sigma = sum_k.Sigma_imp_w
     else:
         sumk_sigma = sum_k.Sigma_imp_iw
@@ -409,14 +407,11 @@ def determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
 
             # initialize Sigma from sum_k
             if general_params['solver_type'] in ['ftps']:
-                start_sigma = [sum_k.block_structure.create_gf(ish=iineq, gf_function=GfReFreq, space='solver',
-                                                               window = general_params['w_range'],
-                                                               n_points = general_params['n_w'])
+                start_sigma = [sum_k.block_structure.create_gf(ish=iineq, gf_function=Gf, space='solver',
+                                                               mesh=sum_k.mesh)
                                for iineq in range(sum_k.n_inequiv_shells)]
             else:
-                start_sigma = [sum_k.block_structure.create_gf(ish=iineq, beta=general_params['beta'],
-                                                               space='solver',
-                                                               n_points = general_params['n_iw'])
+                start_sigma = [sum_k.block_structure.create_gf(ish=iineq, space='solver', mesh=sum_k.mesh)
                                for iineq in range(sum_k.n_inequiv_shells)]
             for icrsh in range(sum_k.n_inequiv_shells):
                 dc_value = sum_k.dc_imp[sum_k.inequiv_to_corr[icrsh]][sum_k.spin_block_names[sum_k.SO][0]][0, 0]
@@ -439,14 +434,11 @@ def determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
         # Sets Sigma to zero because neither initial Sigma nor DC given
         else:
             if general_params['solver_type'] in ['ftps']:
-                start_sigma = [sum_k.block_structure.create_gf(ish=iineq, gf_function=GfReFreq, space='solver',
-                                                               window = general_params['w_range'],
-                                                               n_points = general_params['n_w'])
+                start_sigma = [sum_k.block_structure.create_gf(ish=iineq, gf_function=Gf, space='solver',
+                                                               mesh=sum_k.mesh)
                                for iineq in range(sum_k.n_inequiv_shells)]
             else:
-                start_sigma = [sum_k.block_structure.create_gf(ish=iineq, beta=general_params['beta'],
-                                                               space='solver',
-                                                               n_points = general_params['n_iw'])
+                start_sigma = [sum_k.block_structure.create_gf(ish=iineq, space='solver', mesh=sum_k.mesh)
                                for iineq in range(sum_k.n_inequiv_shells)]
 
     # Adds random, frequency-independent noise in zeroth iteration to break symmetries
@@ -458,7 +450,7 @@ def determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
                                              size=block.data.shape[1:])
                     # Makes the noise hermitian
                     noise = np.broadcast_to(.5 * (noise + noise.T), block.data.shape)
-                    block += GfImFreq(indices=block.indices, mesh=block.mesh, data=noise)
+                    block += Gf(indices=block.indices, mesh=block.mesh, data=noise)
 
     # bcast everything to other nodes
     sum_k.dc_imp = mpi.bcast(sum_k.dc_imp)

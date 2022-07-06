@@ -37,7 +37,7 @@ from triqs.operators.util.observables import S_op, N_op
 from triqs.version import git_hash as triqs_hash
 from h5 import HDFArchive
 import triqs.utility.mpi as mpi
-from triqs.gf import BlockGf, GfReFreq, make_hermitian
+from triqs.gf import Gf, make_hermitian, MeshReFreq, MeshImFreq
 from triqs.gf.tools import inverse
 from triqs_dft_tools.sumk_dft import SumkDFT
 
@@ -76,22 +76,14 @@ def _determine_block_structure(sum_k, general_params, advanced_params):
     # this returns a list of dicts (one entry for each corr shell)
     # the dict contains one entry for up and one for down
     # each entry is a square complex numpy matrix with dim=corr_shell['dim']
-    # GfReFreq for ftps, GfImFreq else
+    zero_Sigma = [sum_k.block_structure.create_gf(ish=iineq, gf_function=Gf, mesh=sum_k.mesh)
+                  for iineq in range(sum_k.n_inequiv_shells)]
+    sum_k.put_Sigma(zero_Sigma)
     if general_params['solver_type'] in ['ftps']:
-        zero_Sigma_w = [sum_k.block_structure.create_gf(ish=iineq, gf_function=GfReFreq,
-                                                        window = general_params['w_range'],
-                                                        n_points = general_params['n_w'])
-                        for iineq in range(sum_k.n_inequiv_shells)]
-        sum_k.put_Sigma(zero_Sigma_w)
-        G_loc_all = sum_k.extract_G_loc(iw_or_w='w', broadening = general_params['eta'], transform_to_solver_blocks=False)
+        G_loc_all = sum_k.extract_G_loc(broadening=general_params['eta'], transform_to_solver_blocks=False)
         dens_mat = [G_loc_all[iineq].density() for iineq in range(sum_k.n_inequiv_shells)]
     else:
-        zero_Sigma_iw = [sum_k.block_structure.create_gf(ish=iineq,
-                                                         beta=general_params['beta'],
-                                                         n_points = general_params['n_iw'])
-                         for iineq in range(sum_k.n_inequiv_shells)]
-        sum_k.put_Sigma(zero_Sigma_iw)
-        dens_mat = sum_k.density_matrix(method='using_gf', beta=general_params['beta'])
+        dens_mat = sum_k.density_matrix(method='using_gf')
 
     original_dens_mat = deepcopy(dens_mat)
 
@@ -168,7 +160,7 @@ def _calculate_rotation_matrix(general_params, sum_k):
     if general_params['set_rot'] == 'hloc':
         q_diag = sum_k.eff_atomic_levels()
     elif general_params['set_rot'] == 'den':
-        q_diag = sum_k.density_matrix(method='using_gf', beta=general_params['beta'])
+        q_diag = sum_k.density_matrix(method='using_gf')
     else:
         raise ValueError('Parameter set_rot set to wrong value.')
 
@@ -269,12 +261,22 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
 
     # create Sumk object
     # TODO: use_dft_blocks=True yields inconsistent number of blocks!
+
+    # first we have to determine the mesh
+    if general_params['solver_type'] in ['ftps']:
+        sumk_mesh = MeshReFreq(window=general_params['w_range'],
+                               n_w=general_params['n_w'])
+    else:
+        sumk_mesh = MeshImFreq(beta=general_params['beta'],
+                               S='Fermion',
+                               n_iw=general_params['n_iw'])
+
     if general_params['csc']:
         sum_k = SumkDFT(hdf_file=general_params['seedname']+'.h5', use_dft_blocks=False,
-                        h_field=general_params['h_field'])
+                        mesh=sumk_mesh, h_field=general_params['h_field'])
     else:
         sum_k = SumkDFT(hdf_file=general_params['jobname']+'/'+general_params['seedname']+'.h5',
-                        use_dft_blocks=False, h_field=general_params['h_field'])
+                        mesh=sumk_mesh, use_dft_blocks=False, h_field=general_params['h_field'])
         # This is a quick-and-dirty feature for a magnetic field with spin-orbit coupling
         # TODO: replace by more elegant implementation, e.g. new field in h5 giving spin
         if general_params['energy_shift_orbitals'] != 'none':
@@ -314,18 +316,9 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
 
     # need to set sigma immediately here, otherwise mesh in unclear for sumK
     # Initializes empty Sigma for calculation of DFT density even if block structure changes later
-    if general_params['solver_type'] in ['ftps']:
-        zero_Sigma_w = [sum_k.block_structure.create_gf(ish=iineq, gf_function=GfReFreq,
-                                                        window = general_params['w_range'],
-                                                        n_points = general_params['n_w'])
-                        for iineq in range(sum_k.n_inequiv_shells)]
-        sum_k.put_Sigma(zero_Sigma_w)
-    else:
-        zero_Sigma_iw = [sum_k.block_structure.create_gf(ish=iineq,
-                                                         beta=general_params['beta'],
-                                                         n_points = general_params['n_iw'])
-                         for iineq in range(sum_k.n_inequiv_shells)]
-        sum_k.put_Sigma(zero_Sigma_iw)
+    zero_Sigma = [sum_k.block_structure.create_gf(ish=iineq, gf_function=Gf, mesh=sum_k.mesh)
+                  for iineq in range(sum_k.n_inequiv_shells)]
+    sum_k.put_Sigma(zero_Sigma)
 
     # Sets the chemical potential of the DFT calculation
     # Either directly from general parameters, if given, ...
@@ -339,9 +332,9 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
     else:
         if general_params['solver_type'] in ['ftps']:
             dft_mu = sum_k.calc_mu(precision=general_params['prec_mu'],
-                                   iw_or_w='w', broadening=general_params['eta'])
+                                   broadening=general_params['eta'])
         else:
-            dft_mu = sum_k.calc_mu(precision=general_params['prec_mu'], iw_or_w='iw')
+            dft_mu = sum_k.calc_mu(precision=general_params['prec_mu'])
 
     # calculate E_kin_dft for one shot calculations
     if not general_params['csc'] and general_params['calc_energies']:
@@ -433,30 +426,18 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
     shell_multiplicity = [sum_k.corr_to_inequiv.count(icrsh) for icrsh in range(sum_k.n_inequiv_shells)]
 
     # Initializes new empty Sigma with new blockstructure for calculation of DFT density
-    if general_params['solver_type'] in ['ftps']:
-        zero_Sigma_w = [sum_k.block_structure.create_gf(ish=iineq, gf_function=GfReFreq,
-                                                        window = general_params['w_range'],
-                                                        n_points = general_params['n_w'])
-                        for iineq in range(sum_k.n_inequiv_shells)]
-        sum_k.put_Sigma(zero_Sigma_w)
-    else:
-        zero_Sigma_iw = [sum_k.block_structure.create_gf(ish=iineq,
-                                                         beta=general_params['beta'],
-                                                         n_points = general_params['n_iw'])
-                         for iineq in range(sum_k.n_inequiv_shells)]
-        sum_k.put_Sigma(zero_Sigma_iw)
+    zero_Sigma = [sum_k.block_structure.create_gf(ish=iineq, gf_function=Gf, mesh=sum_k.mesh)
+                  for iineq in range(sum_k.n_inequiv_shells)]
+    sum_k.put_Sigma(zero_Sigma)
 
     # print block structure and DFT input quantitites!
     formatter.print_block_sym(sum_k, dm, general_params)
 
     # extract free lattice greens function
     if general_params['solver_type'] in ['ftps']:
-        G_loc_all_dft = sum_k.extract_G_loc(iw_or_w='w', broadening = general_params['eta'], with_Sigma=False,
-                                            mu=dft_mu,
-                                        )
+        G_loc_all_dft = sum_k.extract_G_loc(broadening=general_params['eta'], with_Sigma=False, mu=dft_mu)
     else:
-        # set here with_Sigma=True because otherwise extract_G_loc assumes n_iw=1025
-        G_loc_all_dft = sum_k.extract_G_loc(iw_or_w='iw', with_Sigma=True, mu=dft_mu)
+        G_loc_all_dft = sum_k.extract_G_loc(with_Sigma=False, mu=dft_mu)
     density_mat_dft = [G_loc_all_dft[iineq].density() for iineq in range(sum_k.n_inequiv_shells)]
 
     for iineq in range(sum_k.n_inequiv_shells):
@@ -610,9 +591,9 @@ def _dmft_step(sum_k, solvers, it, general_params,
 
     # Extracts G local
     if general_params['solver_type'] in ['ftps']:
-        G_loc_all = sum_k.extract_G_loc(iw_or_w='w', broadening=general_params['eta'])
+        G_loc_all = sum_k.extract_G_loc(broadening=general_params['eta'])
     else:
-        G_loc_all = sum_k.extract_G_loc(iw_or_w='iw')
+        G_loc_all = sum_k.extract_G_loc()
 
     # Copies Sigma and G0 before Solver run for mixing later
     Sigma_freq_previous = [solvers[iineq].Sigma_freq.copy() for iineq in range(sum_k.n_inequiv_shells)]
