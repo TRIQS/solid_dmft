@@ -1,13 +1,29 @@
-![logo_soliDMFT](doc/logos/logo_solid_dmft.png)
+![logo_soliDMFT](https://raw.githubusercontent.com/triqs/solid_dmft/unstable/doc/logos/logo_solid_dmft.png)
 
-This program allows to perform DFT+DMFT ''one-shot'' and CSC
-calculations from h5 archives, VASP, or Quantum Espresso for multiband systems using
-the TRIQS package, in combination with various impurity solvers and SumkDFT from
-DFT-tools. 
+![CI](https://github.com/triqs/solid_dmft/actions/workflows/build.yml/badge.svg)
+[![PyPI version](https://badge.fury.io/py/solid_dmft.svg)](https://badge.fury.io/py/solid_dmft)
+[![status](https://joss.theoj.org/papers/48eb529b08c6bb464b235ba919d78922/status.svg)](https://joss.theoj.org/papers/48eb529b08c6bb464b235ba919d78922)
 
-Runs with triqs 3.1.x
 
-To learn how to use solid_dmft, take a look at our [online documentation](https://triqs.github.io/solid_dmft/).
+---
+
+This program allows to perform DFT+DMFT one-shot and charge self-consistent (CSC) calculations from h5 archives or VASP/Quantum Espresso input files for multiband systems using the [TRIQS](https://triqs.github.io/triqs/latest/) software library, and the DFT code interface [TRIQS/DFTTools](https://triqs.github.io/dft_tools/latest/). solid_dmft takes advantage of various impurity solvers available in [TRIQS](https://triqs.github.io/triqs/unstable/applications.html#impurity-solvers). Postprocessing scripts are available to perform analytic continuation and calculate spectral functions.
+
+To learn how to use solid_dmft, take a look at the [online documentation](https://triqs.github.io/solid_dmft/).
+
+### Installation
+
+You can install the latest solid_dmft release simply via pip (PyPi):
+```
+pip install solid_dmft
+```
+However, please make sure that you have a valid TRIQS and TRIQS/DFTTools installation matching the version of solid_dmft. Furthermore, you need at least one of the supported DMFT impurity solvers installed to use solid_dmft. 
+
+A more thorough installation can be performed manually via `cmake`, which will also check if you have a working and matching TRIQS installation.
+
+Please check our [online documentation](https://triqs.github.io/solid_dmft/install.html) for more detailed installation instructions.
+
+---
 
 Copyright (C) 2018-2020, ETH Zurich
 Copyright (C) 2021, The Simons Foundation 

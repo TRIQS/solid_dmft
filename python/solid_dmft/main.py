@@ -45,7 +45,7 @@ from solid_dmft.dmft_cycle import dmft_cycle
 from solid_dmft.csc_flow import csc_flow_control
 
 
-def main(args):
+def main(argv=sys.argv):
     """The main function for one-shot and charge-self-consistent calculations"""
     # timing information
     if mpi.is_master_node():
@@ -56,8 +56,8 @@ def main(args):
     solver_params = None
     dft_params = None
     advanced_params = None
-    if len(args) > 1:
-        config_file_name = str(args[1])
+    if len(argv) > 1:
+        config_file_name = str(argv[1])
     else:
         config_file_name = 'dmft_config.ini'
     if not os.path.isfile(config_file_name):
