@@ -3,18 +3,22 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>5. Plotting the spectral function &mdash; solid_dmft  documentation</title><link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" /><link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  <title>5. Plotting the spectral function &mdash; solid_dmft  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/plot_directive.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
-  <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=default"></script>
-        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "tex2jax_process|mathjax_process|math|output_area"}})</script>
+        <script defer="defer" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=default"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -27,7 +31,8 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search"  style="background: #7E588A" >
-            <a href="../../index.html" class="icon icon-home"> solid_dmft<img src="../../_static/logo_no_text.png" class="logo" alt="Logo"/>
+            <a href="../../index.html" class="icon icon-home"> solid_dmft
+            <img src="../../_static/logo_no_text.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
                 3.1.0
@@ -75,6 +80,21 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#input-output">Input/Output</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../input_output/DMFT_input/input.html">Input</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_input/general.html">[general]: General parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_input/solver.html">[solver]: solver specific parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_input/dft.html">[dft]: DFT related inputs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_input/advanced.html">[advanced]: Advanced inputs</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../input_output/DMFT_output/results.html">Output / results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_output/results.html#group-structure">Group structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_output/results.html#subgroups">Subgroups</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation.html#further-details-for-running">Further details for running</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../md_notes/docker.html">Docker</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../md_notes/docker.html#building-the-docker-image">Building the docker image</a></li>
@@ -95,48 +115,48 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation.html#module-reference-manual">Module reference manual</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/csc_flow.html">csc_flow</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/dft_managers.html">dft_managers</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dft_managers.mpi_helpers.html">dft_managers.mpi_helpers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dft_managers.qe_manager.html">dft_managers.qe_manager</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dft_managers.vasp_manager.html">dft_managers.vasp_manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/csc_flow.html">csc_flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/dft_managers.html">dft_managers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dft_managers.mpi_helpers.html">dft_managers.mpi_helpers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dft_managers.qe_manager.html">dft_managers.qe_manager</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dft_managers.vasp_manager.html">dft_managers.vasp_manager</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/dmft_cycle.html">dmft_cycle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/dmft_tools.html">dmft_tools</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.afm_mapping.html">dmft_tools.afm_mapping</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.convergence.html">dmft_tools.convergence</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.formatter.html">dmft_tools.formatter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.greens_functions_mixer.html">dmft_tools.greens_functions_mixer</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.initial_self_energies.html">dmft_tools.initial_self_energies</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.interaction_hamiltonian.html">dmft_tools.interaction_hamiltonian</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.legendre_filter.html">dmft_tools.legendre_filter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.manipulate_chemical_potential.html">dmft_tools.manipulate_chemical_potential</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.observables.html">dmft_tools.observables</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.results_to_archive.html">dmft_tools.results_to_archive</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.solver.html">dmft_tools.solver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/dmft_cycle.html">dmft_cycle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/dmft_tools.html">dmft_tools</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.afm_mapping.html">dmft_tools.afm_mapping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.convergence.html">dmft_tools.convergence</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.formatter.html">dmft_tools.formatter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.greens_functions_mixer.html">dmft_tools.greens_functions_mixer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.initial_self_energies.html">dmft_tools.initial_self_energies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.interaction_hamiltonian.html">dmft_tools.interaction_hamiltonian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.legendre_filter.html">dmft_tools.legendre_filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.manipulate_chemical_potential.html">dmft_tools.manipulate_chemical_potential</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.observables.html">dmft_tools.observables</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.results_to_archive.html">dmft_tools.results_to_archive</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.solver.html">dmft_tools.solver</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/postprocessing.html">postprocessing</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/postprocessing.eval_U_cRPA_Vasp.html">postprocessing.eval_U_cRPA_Vasp</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/postprocessing.maxent_gf_imp.html">postprocessing.maxent_gf_imp</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/postprocessing.maxent_gf_latt.html">postprocessing.maxent_gf_latt</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/postprocessing.maxent_sigma.html">postprocessing.maxent_sigma</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/postprocessing.plot_correlated_bands.html">postprocessing.plot_correlated_bands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/postprocessing.html">postprocessing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.eval_U_cRPA_Vasp.html">postprocessing.eval_U_cRPA_Vasp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.maxent_gf_imp.html">postprocessing.maxent_gf_imp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.maxent_gf_latt.html">postprocessing.maxent_gf_latt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.maxent_sigma.html">postprocessing.maxent_sigma</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.plot_correlated_bands.html">postprocessing.plot_correlated_bands</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/read_config.html">read_config</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/read_config.html#general">general</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/read_config.html#solver">solver</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/read_config.html#dft">dft</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/read_config.html#advanced">advanced</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/read_config.html">read_config</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/read_config.html#general">[  general  ]</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/read_config.html#solver">[  solver  ]</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/read_config.html#dft">[  dft  ]</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/read_config.html#advanced">[  advanced  ]</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/util.html">util</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/util.symmetrize_gamma_file.html">util.symmetrize_gamma_file</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/util.update_dmft_config.html">util.update_dmft_config</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/util.update_results_h5.html">util.update_results_h5</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/util.write_kslice_to_h5.html">util.write_kslice_to_h5</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/util.html">util</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/util.symmetrize_gamma_file.html">util.symmetrize_gamma_file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/util.update_dmft_config.html">util.update_dmft_config</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/util.update_results_h5.html">util.update_results_h5</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/util.write_kslice_to_h5.html">util.write_kslice_to_h5</a></li>
 </ul>
 </li>
 </ul>
@@ -509,7 +529,7 @@ div.rendered_html tbody tr:hover {
 }
 </style>
 <div class="section" id="5.-Plotting-the-spectral-function">
-<h1>5. Plotting the spectral function<a class="headerlink" href="#5.-Plotting-the-spectral-function" title="Permalink to this headline">¶</a></h1>
+<h1>5. Plotting the spectral function<a class="headerlink" href="#5.-Plotting-the-spectral-function" title="Permalink to this headline"></a></h1>
 <p>In this tutorial we go through the steps to plot tight-binding bands from a Wannier90 Hamiltonian and spectralfunctions with analytically continued (real-frequency) self-energies obtained from DMFT.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -533,12 +553,12 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="section" id="1.-Configuration">
-<h2>1. Configuration<a class="headerlink" href="#1.-Configuration" title="Permalink to this headline">¶</a></h2>
+<h2>1. Configuration<a class="headerlink" href="#1.-Configuration" title="Permalink to this headline"></a></h2>
 <p>The script makes use of the <code class="docutils literal notranslate"><span class="pre">triqs.lattice.utils</span></code> class, which allows to set up a tight-binding model based on a Wannier90 Hamiltonian. Additionally, you may upload a self-energy in the usual <code class="docutils literal notranslate"><span class="pre">solid_dmft</span></code> format to compute correlated spectral properties. Currently, the following options are implemented:</p>
 <ol><li><p>bandstructure</p>
 </li><li><p>Fermi slice</p>
 </li></ol><div class="section" id="Basic-options">
-<h3>Basic options<a class="headerlink" href="#Basic-options" title="Permalink to this headline">¶</a></h3>
+<h3>Basic options<a class="headerlink" href="#Basic-options" title="Permalink to this headline"></a></h3>
 <div class="line-block">
 <div class="line">We start with configuring these options. For this example we try a tight-binding bandstructure including the correlated bands (<code class="docutils literal notranslate"><span class="pre">kslice</span> <span class="pre">=</span> <span class="pre">False</span></code>, <code class="docutils literal notranslate"><span class="pre">'tb':</span> <span class="pre">True</span></code>, <code class="docutils literal notranslate"><span class="pre">'alatt':</span> <span class="pre">True</span></code>), but feel free to come back here to explore. Alternatively to an intensity plot of the correlated bands (<code class="docutils literal notranslate"><span class="pre">qp_bands</span></code>), you can compute the correlated quasiparticle bands assuming a Fermi liquid regime.</div>
 <div class="line">The options for <span class="math notranslate nohighlight">\(\Sigma(\omega)\)</span> are <code class="docutils literal notranslate"><span class="pre">calc</span></code> or <code class="docutils literal notranslate"><span class="pre">model</span></code>, which performs a Fermi liquid linearization in the low-frequency regime. The latter will be reworked, so better stick with <code class="docutils literal notranslate"><span class="pre">calc</span></code> for now.</div>
@@ -558,7 +578,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="section" id="Wannier90">
-<h3>Wannier90<a class="headerlink" href="#Wannier90" title="Permalink to this headline">¶</a></h3>
+<h3>Wannier90<a class="headerlink" href="#Wannier90" title="Permalink to this headline"></a></h3>
 <p>Next we will set up the Wannier90 Input. Provide the path, seedname, chemical potential and orbital order used in Wannier90. You may add a spin-component, and any other local Hamiltonian. For <code class="docutils literal notranslate"><span class="pre">t2g</span></code> models the orbital order can be changed (to <code class="docutils literal notranslate"><span class="pre">orbital_order_to</span></code>) and a local spin-orbit coupling term can be added (<code class="docutils literal notranslate"><span class="pre">add_lambda</span></code>). The spectral properties can be viewed projected on a specific orbital.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
@@ -576,9 +596,9 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="section" id="BZ-configuration">
-<h3>BZ configuration<a class="headerlink" href="#BZ-configuration" title="Permalink to this headline">¶</a></h3>
+<h3>BZ configuration<a class="headerlink" href="#BZ-configuration" title="Permalink to this headline"></a></h3>
 <div class="section" id="Optional:-ASE-Brillouin-Zone">
-<h4>Optional: ASE Brillouin Zone<a class="headerlink" href="#Optional:-ASE-Brillouin-Zone" title="Permalink to this headline">¶</a></h4>
+<h4>Optional: ASE Brillouin Zone<a class="headerlink" href="#Optional:-ASE-Brillouin-Zone" title="Permalink to this headline"></a></h4>
 <p>It might be helpful to have a brief look at the Brillouin Zone by loading an input file of your favorite DFT code (Quantum Espresso in this case). ASE will write out the special <span class="math notranslate nohighlight">\(k\)</span>-points, which we can use to configure the BZ path. Alternatively, you can of course define the dictionary <code class="docutils literal notranslate"><span class="pre">kpts_dict</span></code> yourself. Careful, it might not define <span class="math notranslate nohighlight">\(Z\)</span>, which is needed and added below.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
@@ -651,7 +671,7 @@ of the plotted Brillouin zone, followed by the lower left corner and the lower r
 </div>
 </div>
 <div class="section" id="Self-energy">
-<h3>Self-energy<a class="headerlink" href="#Self-energy" title="Permalink to this headline">¶</a></h3>
+<h3>Self-energy<a class="headerlink" href="#Self-energy" title="Permalink to this headline"></a></h3>
 <p>Here we provide the info needed from the h5Archive, like the self-energy, iteration count, spin and block component and the frequency mesh used for the interpolation. The values for the mesh of course depend on the quantity of interest. For a kslice the resolution around <span class="math notranslate nohighlight">\(\omega=0\)</span> is crucial and we need only a small energy window, while for a bandstructure we are also interested in high energy features.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
@@ -705,7 +725,7 @@ of the plotted Brillouin zone, followed by the lower left corner and the lower r
 </div>
 </div>
 <div class="section" id="Plotting-options">
-<h3>Plotting options<a class="headerlink" href="#Plotting-options" title="Permalink to this headline">¶</a></h3>
+<h3>Plotting options<a class="headerlink" href="#Plotting-options" title="Permalink to this headline"></a></h3>
 <p>Finally, you can choose colormaps for each of the functionalities from any of the available on matplotlib colormaps. <code class="docutils literal notranslate"><span class="pre">vmin</span></code> determines the scaling of the logarithmically scaled colorplots. The corresponding tight-binding bands will have the maximum value of the colormap. By the way, colormaps can be reversed by appending <code class="docutils literal notranslate"><span class="pre">_r</span></code> to the identifier.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
@@ -721,7 +741,7 @@ of the plotted Brillouin zone, followed by the lower left corner and the lower r
 </div>
 </div>
 <div class="section" id="2.-Run-and-Plotting">
-<h2>2. Run and Plotting<a class="headerlink" href="#2.-Run-and-Plotting" title="Permalink to this headline">¶</a></h2>
+<h2>2. Run and Plotting<a class="headerlink" href="#2.-Run-and-Plotting" title="Permalink to this headline"></a></h2>
 <p>Now that everything is set up we may hit run. Caution, if you use a lot of <span class="math notranslate nohighlight">\(k\)</span>-points, this may take a while! In the current example, it should be done within a second.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:

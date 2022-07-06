@@ -3,12 +3,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dmft_tools.initial_self_energies &mdash; solid_dmft  documentation</title><link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" /><link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  <title>dmft_tools.initial_self_energies &mdash; solid_dmft  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/plot_directive.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
-  <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
@@ -23,7 +27,8 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search"  style="background: #7E588A" >
-            <a href="../../index.html" class="icon icon-home"> solid_dmft<img src="../../_static/logo_no_text.png" class="logo" alt="Logo"/>
+            <a href="../../index.html" class="icon icon-home"> solid_dmft
+            <img src="../../_static/logo_no_text.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
                 3.1.0
@@ -71,6 +76,21 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#input-output">Input/Output</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../input_output/DMFT_input/input.html">Input</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_input/general.html">[general]: General parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_input/solver.html">[solver]: solver specific parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_input/dft.html">[dft]: DFT related inputs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_input/advanced.html">[advanced]: Advanced inputs</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../input_output/DMFT_output/results.html">Output / results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_output/results.html#group-structure">Group structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_output/results.html#subgroups">Subgroups</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation.html#further-details-for-running">Further details for running</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../md_notes/docker.html">Docker</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../md_notes/docker.html#building-the-docker-image">Building the docker image</a></li>
@@ -91,48 +111,48 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation.html#module-reference-manual">Module reference manual</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/csc_flow.html">csc_flow</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/dft_managers.html">dft_managers</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dft_managers.mpi_helpers.html">dft_managers.mpi_helpers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dft_managers.qe_manager.html">dft_managers.qe_manager</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dft_managers.vasp_manager.html">dft_managers.vasp_manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/csc_flow.html">csc_flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/dft_managers.html">dft_managers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dft_managers.mpi_helpers.html">dft_managers.mpi_helpers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dft_managers.qe_manager.html">dft_managers.qe_manager</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dft_managers.vasp_manager.html">dft_managers.vasp_manager</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/dmft_cycle.html">dmft_cycle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/dmft_tools.html">dmft_tools</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.afm_mapping.html">dmft_tools.afm_mapping</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.convergence.html">dmft_tools.convergence</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.formatter.html">dmft_tools.formatter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.greens_functions_mixer.html">dmft_tools.greens_functions_mixer</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.initial_self_energies.html">dmft_tools.initial_self_energies</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.interaction_hamiltonian.html">dmft_tools.interaction_hamiltonian</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.legendre_filter.html">dmft_tools.legendre_filter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.manipulate_chemical_potential.html">dmft_tools.manipulate_chemical_potential</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.observables.html">dmft_tools.observables</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.results_to_archive.html">dmft_tools.results_to_archive</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.solver.html">dmft_tools.solver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/dmft_cycle.html">dmft_cycle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/dmft_tools.html">dmft_tools</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.afm_mapping.html">dmft_tools.afm_mapping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.convergence.html">dmft_tools.convergence</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.formatter.html">dmft_tools.formatter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.greens_functions_mixer.html">dmft_tools.greens_functions_mixer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.initial_self_energies.html">dmft_tools.initial_self_energies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.interaction_hamiltonian.html">dmft_tools.interaction_hamiltonian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.legendre_filter.html">dmft_tools.legendre_filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.manipulate_chemical_potential.html">dmft_tools.manipulate_chemical_potential</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.observables.html">dmft_tools.observables</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.results_to_archive.html">dmft_tools.results_to_archive</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.solver.html">dmft_tools.solver</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/postprocessing.html">postprocessing</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/postprocessing.eval_U_cRPA_Vasp.html">postprocessing.eval_U_cRPA_Vasp</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/postprocessing.maxent_gf_imp.html">postprocessing.maxent_gf_imp</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/postprocessing.maxent_gf_latt.html">postprocessing.maxent_gf_latt</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/postprocessing.maxent_sigma.html">postprocessing.maxent_sigma</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/postprocessing.plot_correlated_bands.html">postprocessing.plot_correlated_bands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/postprocessing.html">postprocessing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.eval_U_cRPA_Vasp.html">postprocessing.eval_U_cRPA_Vasp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.maxent_gf_imp.html">postprocessing.maxent_gf_imp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.maxent_gf_latt.html">postprocessing.maxent_gf_latt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.maxent_sigma.html">postprocessing.maxent_sigma</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.plot_correlated_bands.html">postprocessing.plot_correlated_bands</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/read_config.html">read_config</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/read_config.html#general">general</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/read_config.html#solver">solver</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/read_config.html#dft">dft</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/read_config.html#advanced">advanced</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/read_config.html">read_config</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/read_config.html#general">[  general  ]</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/read_config.html#solver">[  solver  ]</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/read_config.html#dft">[  dft  ]</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/read_config.html#advanced">[  advanced  ]</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/util.html">util</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/util.symmetrize_gamma_file.html">util.symmetrize_gamma_file</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/util.update_dmft_config.html">util.update_dmft_config</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/util.update_results_h5.html">util.update_results_h5</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/util.write_kslice_to_h5.html">util.write_kslice_to_h5</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/util.html">util</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/util.symmetrize_gamma_file.html">util.symmetrize_gamma_file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/util.update_dmft_config.html">util.update_dmft_config</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/util.update_results_h5.html">util.update_results_h5</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/util.write_kslice_to_h5.html">util.write_kslice_to_h5</a></li>
 </ul>
 </li>
 </ul>
@@ -271,11 +291,10 @@
 <span class="c1"># triqs</span>
 <span class="kn">from</span> <span class="nn">h5</span> <span class="kn">import</span> <span class="n">HDFArchive</span>
 <span class="kn">import</span> <span class="nn">triqs.utility.mpi</span> <span class="k">as</span> <span class="nn">mpi</span>
-<span class="kn">from</span> <span class="nn">triqs.gf</span> <span class="kn">import</span> <span class="n">BlockGf</span><span class="p">,</span> <span class="n">GfImFreq</span><span class="p">,</span> <span class="n">GfReFreq</span>
-<span class="kn">from</span> <span class="nn">triqs_dft_tools.sumk_dft</span> <span class="kn">import</span> <span class="n">SumkDFT</span>
+<span class="kn">from</span> <span class="nn">triqs.gf</span> <span class="kn">import</span> <span class="n">BlockGf</span><span class="p">,</span> <span class="n">Gf</span>
 
 
-<div class="viewcode-block" id="calculate_double_counting"><a class="viewcode-back" href="../../_autosummary/dmft_tools.initial_self_energies.html#dmft_tools.initial_self_energies.calculate_double_counting">[docs]</a><span class="k">def</span> <span class="nf">calculate_double_counting</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">density_matrix</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">advanced_params</span><span class="p">):</span>
+<div class="viewcode-block" id="calculate_double_counting"><a class="viewcode-back" href="../../_ref/dmft_tools.initial_self_energies.html#dmft_tools.initial_self_energies.calculate_double_counting">[docs]</a><span class="k">def</span> <span class="nf">calculate_double_counting</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">density_matrix</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">advanced_params</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates the double counting, including all manipulations from advanced_params.</span>
 
@@ -458,7 +477,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">Sigma_local</span> <span class="o">=</span> <span class="p">[</span><span class="n">start_sigma</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">icrsh</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_corr_shells</span><span class="p">)]</span>
-    <span class="n">Sigma_inequiv</span> <span class="o">=</span> <span class="p">[</span><span class="n">BlockGf</span><span class="p">(</span><span class="n">name_block_generator</span><span class="o">=</span><span class="p">[(</span><span class="n">block</span><span class="p">,</span> <span class="n">GfImFreq</span><span class="p">(</span><span class="n">indices</span><span class="o">=</span><span class="n">inner</span><span class="p">,</span> <span class="n">mesh</span><span class="o">=</span><span class="n">Sigma_local</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">mesh</span><span class="p">))</span>
+    <span class="n">Sigma_inequiv</span> <span class="o">=</span> <span class="p">[</span><span class="n">BlockGf</span><span class="p">(</span><span class="n">name_block_generator</span><span class="o">=</span><span class="p">[(</span><span class="n">block</span><span class="p">,</span> <span class="n">Gf</span><span class="p">(</span><span class="n">indices</span><span class="o">=</span><span class="n">inner</span><span class="p">,</span> <span class="n">mesh</span><span class="o">=</span><span class="n">Sigma_local</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">mesh</span><span class="p">))</span>
                                                    <span class="k">for</span> <span class="n">block</span><span class="p">,</span> <span class="n">inner</span> <span class="ow">in</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">gf_struct_solver</span><span class="p">[</span><span class="n">ish</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()],</span>
                              <span class="n">make_copies</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">ish</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">)]</span>
 
@@ -541,8 +560,7 @@
     <span class="n">sum_k</span><span class="o">.</span><span class="n">dc_imp</span> <span class="o">=</span> <span class="p">[{</span><span class="n">channel</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">loaded_dc_shell</span><span class="p">[</span><span class="n">channel</span><span class="p">])</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">calc_dc_shell</span><span class="p">[</span><span class="n">channel</span><span class="p">])</span>
                      <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">loaded_dc_shell</span><span class="p">}</span>
                     <span class="k">for</span> <span class="n">calc_dc_shell</span><span class="p">,</span> <span class="n">loaded_dc_shell</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">dc_imp</span><span class="p">,</span> <span class="n">loaded_dc_imp</span><span class="p">)]</span>
-    <span class="n">freq</span> <span class="o">=</span> <span class="s1">&#39;w&#39;</span> <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;solver_type&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ftps&#39;</span><span class="p">]</span> <span class="k">else</span> <span class="s1">&#39;iw&#39;</span>
-    <span class="n">start_sigma</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">add_dc</span><span class="p">(</span><span class="n">iw_or_w</span> <span class="o">=</span> <span class="n">freq</span><span class="p">)</span>
+    <span class="n">start_sigma</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">add_dc</span><span class="p">()</span>
     <span class="n">start_sigma</span> <span class="o">=</span> <span class="n">_sumk_sigma_to_solver_struct</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">start_sigma</span><span class="p">)</span>
 
     <span class="c1"># Prints information on correction of Hartree shift</span>
@@ -554,7 +572,7 @@
 
     <span class="c1"># Cleans up</span>
     <span class="n">sum_k</span><span class="o">.</span><span class="n">dc_imp</span> <span class="o">=</span> <span class="n">calculated_dc_imp</span>
-    <span class="k">if</span> <span class="n">freq</span> <span class="o">==</span> <span class="s1">&#39;w&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;solver_type&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ftps&#39;</span><span class="p">]:</span>
         <span class="n">sumk_sigma</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">Sigma_imp_w</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">sumk_sigma</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">Sigma_imp_iw</span>
@@ -563,7 +581,7 @@
     <span class="k">return</span> <span class="n">start_sigma</span>
 
 
-<div class="viewcode-block" id="determine_dc_and_initial_sigma"><a class="viewcode-back" href="../../_autosummary/dmft_tools.initial_self_energies.html#dmft_tools.initial_self_energies.determine_dc_and_initial_sigma">[docs]</a><span class="k">def</span> <span class="nf">determine_dc_and_initial_sigma</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">advanced_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span>
+<div class="viewcode-block" id="determine_dc_and_initial_sigma"><a class="viewcode-back" href="../../_ref/dmft_tools.initial_self_energies.html#dmft_tools.initial_self_energies.determine_dc_and_initial_sigma">[docs]</a><span class="k">def</span> <span class="nf">determine_dc_and_initial_sigma</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">advanced_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span>
                                    <span class="n">archive</span><span class="p">,</span> <span class="n">iteration_offset</span><span class="p">,</span> <span class="n">density_mat_dft</span><span class="p">,</span> <span class="n">solvers</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Determines the double counting (DC) and the initial Sigma. This can happen</span>
@@ -645,14 +663,11 @@
 
             <span class="c1"># initialize Sigma from sum_k</span>
             <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;solver_type&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ftps&#39;</span><span class="p">]:</span>
-                <span class="n">start_sigma</span> <span class="o">=</span> <span class="p">[</span><span class="n">sum_k</span><span class="o">.</span><span class="n">block_structure</span><span class="o">.</span><span class="n">create_gf</span><span class="p">(</span><span class="n">ish</span><span class="o">=</span><span class="n">iineq</span><span class="p">,</span> <span class="n">gf_function</span><span class="o">=</span><span class="n">GfReFreq</span><span class="p">,</span> <span class="n">space</span><span class="o">=</span><span class="s1">&#39;solver&#39;</span><span class="p">,</span>
-                                                               <span class="n">window</span> <span class="o">=</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;w_range&#39;</span><span class="p">],</span>
-                                                               <span class="n">n_points</span> <span class="o">=</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;n_w&#39;</span><span class="p">])</span>
+                <span class="n">start_sigma</span> <span class="o">=</span> <span class="p">[</span><span class="n">sum_k</span><span class="o">.</span><span class="n">block_structure</span><span class="o">.</span><span class="n">create_gf</span><span class="p">(</span><span class="n">ish</span><span class="o">=</span><span class="n">iineq</span><span class="p">,</span> <span class="n">gf_function</span><span class="o">=</span><span class="n">Gf</span><span class="p">,</span> <span class="n">space</span><span class="o">=</span><span class="s1">&#39;solver&#39;</span><span class="p">,</span>
+                                                               <span class="n">mesh</span><span class="o">=</span><span class="n">sum_k</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span>
                                <span class="k">for</span> <span class="n">iineq</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">)]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">start_sigma</span> <span class="o">=</span> <span class="p">[</span><span class="n">sum_k</span><span class="o">.</span><span class="n">block_structure</span><span class="o">.</span><span class="n">create_gf</span><span class="p">(</span><span class="n">ish</span><span class="o">=</span><span class="n">iineq</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">],</span>
-                                                               <span class="n">space</span><span class="o">=</span><span class="s1">&#39;solver&#39;</span><span class="p">,</span>
-                                                               <span class="n">n_points</span> <span class="o">=</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;n_iw&#39;</span><span class="p">])</span>
+                <span class="n">start_sigma</span> <span class="o">=</span> <span class="p">[</span><span class="n">sum_k</span><span class="o">.</span><span class="n">block_structure</span><span class="o">.</span><span class="n">create_gf</span><span class="p">(</span><span class="n">ish</span><span class="o">=</span><span class="n">iineq</span><span class="p">,</span> <span class="n">space</span><span class="o">=</span><span class="s1">&#39;solver&#39;</span><span class="p">,</span> <span class="n">mesh</span><span class="o">=</span><span class="n">sum_k</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span>
                                <span class="k">for</span> <span class="n">iineq</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">)]</span>
             <span class="k">for</span> <span class="n">icrsh</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">):</span>
                 <span class="n">dc_value</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">dc_imp</span><span class="p">[</span><span class="n">sum_k</span><span class="o">.</span><span class="n">inequiv_to_corr</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]][</span><span class="n">sum_k</span><span class="o">.</span><span class="n">spin_block_names</span><span class="p">[</span><span class="n">sum_k</span><span class="o">.</span><span class="n">SO</span><span class="p">][</span><span class="mi">0</span><span class="p">]][</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
@@ -675,14 +690,11 @@
         <span class="c1"># Sets Sigma to zero because neither initial Sigma nor DC given</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;solver_type&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ftps&#39;</span><span class="p">]:</span>
-                <span class="n">start_sigma</span> <span class="o">=</span> <span class="p">[</span><span class="n">sum_k</span><span class="o">.</span><span class="n">block_structure</span><span class="o">.</span><span class="n">create_gf</span><span class="p">(</span><span class="n">ish</span><span class="o">=</span><span class="n">iineq</span><span class="p">,</span> <span class="n">gf_function</span><span class="o">=</span><span class="n">GfReFreq</span><span class="p">,</span> <span class="n">space</span><span class="o">=</span><span class="s1">&#39;solver&#39;</span><span class="p">,</span>
-                                                               <span class="n">window</span> <span class="o">=</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;w_range&#39;</span><span class="p">],</span>
-                                                               <span class="n">n_points</span> <span class="o">=</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;n_w&#39;</span><span class="p">])</span>
+                <span class="n">start_sigma</span> <span class="o">=</span> <span class="p">[</span><span class="n">sum_k</span><span class="o">.</span><span class="n">block_structure</span><span class="o">.</span><span class="n">create_gf</span><span class="p">(</span><span class="n">ish</span><span class="o">=</span><span class="n">iineq</span><span class="p">,</span> <span class="n">gf_function</span><span class="o">=</span><span class="n">Gf</span><span class="p">,</span> <span class="n">space</span><span class="o">=</span><span class="s1">&#39;solver&#39;</span><span class="p">,</span>
+                                                               <span class="n">mesh</span><span class="o">=</span><span class="n">sum_k</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span>
                                <span class="k">for</span> <span class="n">iineq</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">)]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">start_sigma</span> <span class="o">=</span> <span class="p">[</span><span class="n">sum_k</span><span class="o">.</span><span class="n">block_structure</span><span class="o">.</span><span class="n">create_gf</span><span class="p">(</span><span class="n">ish</span><span class="o">=</span><span class="n">iineq</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">],</span>
-                                                               <span class="n">space</span><span class="o">=</span><span class="s1">&#39;solver&#39;</span><span class="p">,</span>
-                                                               <span class="n">n_points</span> <span class="o">=</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;n_iw&#39;</span><span class="p">])</span>
+                <span class="n">start_sigma</span> <span class="o">=</span> <span class="p">[</span><span class="n">sum_k</span><span class="o">.</span><span class="n">block_structure</span><span class="o">.</span><span class="n">create_gf</span><span class="p">(</span><span class="n">ish</span><span class="o">=</span><span class="n">iineq</span><span class="p">,</span> <span class="n">space</span><span class="o">=</span><span class="s1">&#39;solver&#39;</span><span class="p">,</span> <span class="n">mesh</span><span class="o">=</span><span class="n">sum_k</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span>
                                <span class="k">for</span> <span class="n">iineq</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">)]</span>
 
     <span class="c1"># Adds random, frequency-independent noise in zeroth iteration to break symmetries</span>
@@ -693,8 +705,8 @@
                     <span class="n">noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;noise_level_initial_sigma&#39;</span><span class="p">],</span>
                                              <span class="n">size</span><span class="o">=</span><span class="n">block</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
                     <span class="c1"># Makes the noise hermitian</span>
-                    <span class="n">noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span><span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="p">(</span><span class="n">noise</span> <span class="o">+</span> <span class="n">noise</span><span class="o">.</span><span class="n">T</span><span class="p">),</span> <span class="n">block</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-                    <span class="n">block</span> <span class="o">+=</span> <span class="n">GfImFreq</span><span class="p">(</span><span class="n">indices</span><span class="o">=</span><span class="n">block</span><span class="o">.</span><span class="n">indices</span><span class="p">,</span> <span class="n">mesh</span><span class="o">=</span><span class="n">block</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">noise</span><span class="p">)</span>
+                    <span class="n">noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span><span class="mf">.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">noise</span> <span class="o">+</span> <span class="n">noise</span><span class="o">.</span><span class="n">T</span><span class="p">),</span> <span class="n">block</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+                    <span class="n">block</span> <span class="o">+=</span> <span class="n">Gf</span><span class="p">(</span><span class="n">indices</span><span class="o">=</span><span class="n">block</span><span class="o">.</span><span class="n">indices</span><span class="p">,</span> <span class="n">mesh</span><span class="o">=</span><span class="n">block</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">noise</span><span class="p">)</span>
 
     <span class="c1"># bcast everything to other nodes</span>
     <span class="n">sum_k</span><span class="o">.</span><span class="n">dc_imp</span> <span class="o">=</span> <span class="n">mpi</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">dc_imp</span><span class="p">)</span>

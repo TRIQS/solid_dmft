@@ -3,12 +3,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installation &mdash; solid_dmft  documentation</title><link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" /><link rel="shortcut icon" href="_static/favicon.ico"/>
+  <title>Installation &mdash; solid_dmft  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+      <link rel="stylesheet" href="_static/plot_directive.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
-  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
@@ -25,7 +29,8 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search"  style="background: #7E588A" >
-            <a href="index.html" class="icon icon-home"> solid_dmft<img src="_static/logo_no_text.png" class="logo" alt="Logo"/>
+            <a href="index.html" class="icon icon-home"> solid_dmft
+            <img src="_static/logo_no_text.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
                 3.1.0
@@ -73,6 +78,21 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html#input-output">Input/Output</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="input_output/DMFT_input/input.html">Input</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="input_output/DMFT_input/general.html">[general]: General parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_output/DMFT_input/solver.html">[solver]: solver specific parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_output/DMFT_input/dft.html">[dft]: DFT related inputs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_output/DMFT_input/advanced.html">[advanced]: Advanced inputs</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="input_output/DMFT_output/results.html">Output / results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="input_output/DMFT_output/results.html#group-structure">Group structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_output/DMFT_output/results.html#subgroups">Subgroups</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="documentation.html#further-details-for-running">Further details for running</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="md_notes/docker.html">Docker</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="md_notes/docker.html#building-the-docker-image">Building the docker image</a></li>
@@ -93,48 +113,48 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="documentation.html#module-reference-manual">Module reference manual</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="_autosummary/csc_flow.html">csc_flow</a></li>
-<li class="toctree-l3"><a class="reference internal" href="_autosummary/dft_managers.html">dft_managers</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/dft_managers.mpi_helpers.html">dft_managers.mpi_helpers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/dft_managers.qe_manager.html">dft_managers.qe_manager</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/dft_managers.vasp_manager.html">dft_managers.vasp_manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_ref/csc_flow.html">csc_flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_ref/dft_managers.html">dft_managers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dft_managers.mpi_helpers.html">dft_managers.mpi_helpers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dft_managers.qe_manager.html">dft_managers.qe_manager</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dft_managers.vasp_manager.html">dft_managers.vasp_manager</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="_autosummary/dmft_cycle.html">dmft_cycle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="_autosummary/dmft_tools.html">dmft_tools</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/dmft_tools.afm_mapping.html">dmft_tools.afm_mapping</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/dmft_tools.convergence.html">dmft_tools.convergence</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/dmft_tools.formatter.html">dmft_tools.formatter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/dmft_tools.greens_functions_mixer.html">dmft_tools.greens_functions_mixer</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/dmft_tools.initial_self_energies.html">dmft_tools.initial_self_energies</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/dmft_tools.interaction_hamiltonian.html">dmft_tools.interaction_hamiltonian</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/dmft_tools.legendre_filter.html">dmft_tools.legendre_filter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/dmft_tools.manipulate_chemical_potential.html">dmft_tools.manipulate_chemical_potential</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/dmft_tools.observables.html">dmft_tools.observables</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/dmft_tools.results_to_archive.html">dmft_tools.results_to_archive</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/dmft_tools.solver.html">dmft_tools.solver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_ref/dmft_cycle.html">dmft_cycle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_ref/dmft_tools.html">dmft_tools</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.afm_mapping.html">dmft_tools.afm_mapping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.convergence.html">dmft_tools.convergence</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.formatter.html">dmft_tools.formatter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.greens_functions_mixer.html">dmft_tools.greens_functions_mixer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.initial_self_energies.html">dmft_tools.initial_self_energies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.interaction_hamiltonian.html">dmft_tools.interaction_hamiltonian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.legendre_filter.html">dmft_tools.legendre_filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.manipulate_chemical_potential.html">dmft_tools.manipulate_chemical_potential</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.observables.html">dmft_tools.observables</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.results_to_archive.html">dmft_tools.results_to_archive</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.solver.html">dmft_tools.solver</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="_autosummary/postprocessing.html">postprocessing</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/postprocessing.eval_U_cRPA_Vasp.html">postprocessing.eval_U_cRPA_Vasp</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/postprocessing.maxent_gf_imp.html">postprocessing.maxent_gf_imp</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/postprocessing.maxent_gf_latt.html">postprocessing.maxent_gf_latt</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/postprocessing.maxent_sigma.html">postprocessing.maxent_sigma</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/postprocessing.plot_correlated_bands.html">postprocessing.plot_correlated_bands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_ref/postprocessing.html">postprocessing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_ref/postprocessing.eval_U_cRPA_Vasp.html">postprocessing.eval_U_cRPA_Vasp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/postprocessing.maxent_gf_imp.html">postprocessing.maxent_gf_imp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/postprocessing.maxent_gf_latt.html">postprocessing.maxent_gf_latt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/postprocessing.maxent_sigma.html">postprocessing.maxent_sigma</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/postprocessing.plot_correlated_bands.html">postprocessing.plot_correlated_bands</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="_autosummary/read_config.html">read_config</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/read_config.html#general">general</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/read_config.html#solver">solver</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/read_config.html#dft">dft</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/read_config.html#advanced">advanced</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_ref/read_config.html">read_config</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_ref/read_config.html#general">[  general  ]</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/read_config.html#solver">[  solver  ]</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/read_config.html#dft">[  dft  ]</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/read_config.html#advanced">[  advanced  ]</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="_autosummary/util.html">util</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/util.symmetrize_gamma_file.html">util.symmetrize_gamma_file</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/util.update_dmft_config.html">util.update_dmft_config</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/util.update_results_h5.html">util.update_results_h5</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/util.write_kslice_to_h5.html">util.write_kslice_to_h5</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_ref/util.html">util</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_ref/util.symmetrize_gamma_file.html">util.symmetrize_gamma_file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/util.update_dmft_config.html">util.update_dmft_config</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/util.update_results_h5.html">util.update_results_h5</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/util.write_kslice_to_h5.html">util.write_kslice_to_h5</a></li>
 </ul>
 </li>
 </ul>
@@ -260,9 +280,9 @@
 }
 </style>
 <div class="section" id="installation">
-<span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline"></a></h1>
 <div class="section" id="prerequisites">
-<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline"></a></h2>
 <ol class="arabic">
 <li><p class="first">The <a class="reference external" href="https://triqs.github.io/triqs/latest/index.html#welcome" rel="noopener noreferrer" target="_blank" title="(in TRIQS v3.1.1)"><span class="xref std std-ref">TRIQS</span></a> library, see <a class="reference external" href="https://triqs.github.io/triqs/latest/install.html" rel="noopener noreferrer" target="_blank">TRIQS installation instruction</a>.
 In the following, we assume that <a class="reference external" href="https://triqs.github.io/triqs/latest/index.html#welcome" rel="noopener noreferrer" target="_blank" title="(in TRIQS v3.1.1)"><span class="xref std std-ref">TRIQS</span></a>, <a class="reference external" href="https://triqs.github.io/dft_tools" rel="noopener noreferrer" target="_blank">triqs/dft_tools</a>, and at least one of the impurity solvers <a class="reference external" href="https://triqs.github.io/triqs/latest/applications.html" rel="noopener noreferrer" target="_blank">available in TRIQS</a>, e.g. cthyb, HubbardI, ctseg, FTPS, or ctint is installed in the directory <code class="docutils literal notranslate"><span class="pre">path_to_triqs</span></code>.</p>
@@ -275,7 +295,7 @@ In the following, we assume that <a class="reference external" href="https://tri
 </ol>
 </div>
 <div class="section" id="installation-steps">
-<h2>Installation steps<a class="headerlink" href="#installation-steps" title="Permalink to this headline">¶</a></h2>
+<h2>Installation steps<a class="headerlink" href="#installation-steps" title="Permalink to this headline"></a></h2>
 <ol class="arabic">
 <li><p class="first">clone the <code class="docutils literal notranslate"><span class="pre">flatironinstitute/solid_dmft</span></code> repository from GitHub:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/flatironinstitute/solid_dmft solid_dmft.src
@@ -323,7 +343,7 @@ python packages are needed:</p>
 </div>
 </div>
 <div class="section" id="version-compatibility">
-<h2>Version compatibility<a class="headerlink" href="#version-compatibility" title="Permalink to this headline">¶</a></h2>
+<h2>Version compatibility<a class="headerlink" href="#version-compatibility" title="Permalink to this headline"></a></h2>
 <p>Keep in mind that the version of <code class="docutils literal notranslate"><span class="pre">solid_dmft</span></code> must be compatible with your TRIQS library version,
 see <a class="reference external" href="https://triqs.github.io/triqs/latest/versions.html#versions" rel="noopener noreferrer" target="_blank" title="(in TRIQS v3.1.1)"><span class="xref std std-ref">TRIQS website</span></a>.
 In particular the Major Version numbers have to be the same.
@@ -338,7 +358,7 @@ To use a particular version, go into the directory with the sources, and look at
 <p>and follow steps 3 to 6 above to compile the code.</p>
 </div>
 <div class="section" id="custom-cmake-options">
-<h2>Custom CMake options<a class="headerlink" href="#custom-cmake-options" title="Permalink to this headline">¶</a></h2>
+<h2>Custom CMake options<a class="headerlink" href="#custom-cmake-options" title="Permalink to this headline"></a></h2>
 <p>The compilation of <code class="docutils literal notranslate"><span class="pre">solid_dmft</span></code> can be configured using CMake-options:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake ../solid_dmft.src -DOPTION1<span class="o">=</span>value1 -DOPTION2<span class="o">=</span>value2 ...
 </pre></div>

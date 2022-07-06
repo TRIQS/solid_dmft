@@ -157,7 +157,7 @@
     "\n",
     "### Input files for CSC DMFT calculations\n",
     "\n",
-    "We first take a look into the input file [dmft_config.ini](2_dmft_csc/dmft_config.ini) and discuss some parameters. Please make sure you understand the role of the other parameters as well, as documented in the [reference manual of the read_config.py](https://triqs.github.io/solid_dmft/_autosummary/read_config.html) on the solid_dmft website. This is a selection of parameters from the dmft_config.ini:\n",
+    "We first take a look into the input file [dmft_config.ini](2_dmft_csc/dmft_config.ini) and discuss some parameters. Please make sure you understand the role of the other parameters as well, as documented in the [reference manual of the read_config.py](https://triqs.github.io/solid_dmft/_ref/read_config.html) on the solid_dmft website. This is a selection of parameters from the dmft_config.ini:\n",
     "\n",
     "Group [general]:\n",
     "\n",

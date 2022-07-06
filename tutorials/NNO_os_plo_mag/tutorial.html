@@ -3,18 +3,22 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>4. OS with VASP/PLOs and cthyb: AFM state of NdNiO2 &mdash; solid_dmft  documentation</title><link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" /><link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  <title>4. OS with VASP/PLOs and cthyb: AFM state of NdNiO2 &mdash; solid_dmft  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/plot_directive.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
-  <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=default"></script>
-        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "tex2jax_process|mathjax_process|math|output_area"}})</script>
+        <script defer="defer" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=default"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -27,7 +31,8 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search"  style="background: #7E588A" >
-            <a href="../../index.html" class="icon icon-home"> solid_dmft<img src="../../_static/logo_no_text.png" class="logo" alt="Logo"/>
+            <a href="../../index.html" class="icon icon-home"> solid_dmft
+            <img src="../../_static/logo_no_text.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
                 3.1.0
@@ -75,6 +80,21 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#input-output">Input/Output</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../input_output/DMFT_input/input.html">Input</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_input/general.html">[general]: General parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_input/solver.html">[solver]: solver specific parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_input/dft.html">[dft]: DFT related inputs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_input/advanced.html">[advanced]: Advanced inputs</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../input_output/DMFT_output/results.html">Output / results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_output/results.html#group-structure">Group structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_output/results.html#subgroups">Subgroups</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation.html#further-details-for-running">Further details for running</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../md_notes/docker.html">Docker</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../md_notes/docker.html#building-the-docker-image">Building the docker image</a></li>
@@ -95,48 +115,48 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation.html#module-reference-manual">Module reference manual</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/csc_flow.html">csc_flow</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/dft_managers.html">dft_managers</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dft_managers.mpi_helpers.html">dft_managers.mpi_helpers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dft_managers.qe_manager.html">dft_managers.qe_manager</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dft_managers.vasp_manager.html">dft_managers.vasp_manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/csc_flow.html">csc_flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/dft_managers.html">dft_managers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dft_managers.mpi_helpers.html">dft_managers.mpi_helpers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dft_managers.qe_manager.html">dft_managers.qe_manager</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dft_managers.vasp_manager.html">dft_managers.vasp_manager</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/dmft_cycle.html">dmft_cycle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/dmft_tools.html">dmft_tools</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.afm_mapping.html">dmft_tools.afm_mapping</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.convergence.html">dmft_tools.convergence</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.formatter.html">dmft_tools.formatter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.greens_functions_mixer.html">dmft_tools.greens_functions_mixer</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.initial_self_energies.html">dmft_tools.initial_self_energies</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.interaction_hamiltonian.html">dmft_tools.interaction_hamiltonian</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.legendre_filter.html">dmft_tools.legendre_filter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.manipulate_chemical_potential.html">dmft_tools.manipulate_chemical_potential</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.observables.html">dmft_tools.observables</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.results_to_archive.html">dmft_tools.results_to_archive</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.solver.html">dmft_tools.solver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/dmft_cycle.html">dmft_cycle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/dmft_tools.html">dmft_tools</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.afm_mapping.html">dmft_tools.afm_mapping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.convergence.html">dmft_tools.convergence</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.formatter.html">dmft_tools.formatter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.greens_functions_mixer.html">dmft_tools.greens_functions_mixer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.initial_self_energies.html">dmft_tools.initial_self_energies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.interaction_hamiltonian.html">dmft_tools.interaction_hamiltonian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.legendre_filter.html">dmft_tools.legendre_filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.manipulate_chemical_potential.html">dmft_tools.manipulate_chemical_potential</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.observables.html">dmft_tools.observables</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.results_to_archive.html">dmft_tools.results_to_archive</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.solver.html">dmft_tools.solver</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/postprocessing.html">postprocessing</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/postprocessing.eval_U_cRPA_Vasp.html">postprocessing.eval_U_cRPA_Vasp</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/postprocessing.maxent_gf_imp.html">postprocessing.maxent_gf_imp</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/postprocessing.maxent_gf_latt.html">postprocessing.maxent_gf_latt</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/postprocessing.maxent_sigma.html">postprocessing.maxent_sigma</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/postprocessing.plot_correlated_bands.html">postprocessing.plot_correlated_bands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/postprocessing.html">postprocessing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.eval_U_cRPA_Vasp.html">postprocessing.eval_U_cRPA_Vasp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.maxent_gf_imp.html">postprocessing.maxent_gf_imp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.maxent_gf_latt.html">postprocessing.maxent_gf_latt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.maxent_sigma.html">postprocessing.maxent_sigma</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.plot_correlated_bands.html">postprocessing.plot_correlated_bands</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/read_config.html">read_config</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/read_config.html#general">general</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/read_config.html#solver">solver</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/read_config.html#dft">dft</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/read_config.html#advanced">advanced</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/read_config.html">read_config</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/read_config.html#general">[  general  ]</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/read_config.html#solver">[  solver  ]</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/read_config.html#dft">[  dft  ]</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/read_config.html#advanced">[  advanced  ]</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/util.html">util</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/util.symmetrize_gamma_file.html">util.symmetrize_gamma_file</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/util.update_dmft_config.html">util.update_dmft_config</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/util.update_results_h5.html">util.update_results_h5</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/util.write_kslice_to_h5.html">util.write_kslice_to_h5</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/util.html">util</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/util.symmetrize_gamma_file.html">util.symmetrize_gamma_file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/util.update_dmft_config.html">util.update_dmft_config</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/util.update_results_h5.html">util.update_results_h5</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/util.write_kslice_to_h5.html">util.write_kslice_to_h5</a></li>
 </ul>
 </li>
 </ul>
@@ -548,7 +568,7 @@ Starting serial run at: 2022-03-10 17:08:16.981449
 </pre></div></div>
 </div>
 <div class="section" id="4.-OS-with-VASP/PLOs-and-cthyb:-AFM-state-of-NdNiO2">
-<h1>4. OS with VASP/PLOs and cthyb: AFM state of NdNiO2<a class="headerlink" href="#4.-OS-with-VASP/PLOs-and-cthyb:-AFM-state-of-NdNiO2" title="Permalink to this headline">¶</a></h1>
+<h1>4. OS with VASP/PLOs and cthyb: AFM state of NdNiO2<a class="headerlink" href="#4.-OS-with-VASP/PLOs-and-cthyb:-AFM-state-of-NdNiO2" title="Permalink to this headline"></a></h1>
 <p>In this tutorial we will take a look at a magnetic DMFT calculation for NdNiO2 in the antiferromagnetic phase. NdNiO2 shows a clear AFM phase at lower temperatures in DFT+DMFT calculation. The calculations will be performed for a large energy window with all Ni-<span class="math notranslate nohighlight">\(d\)</span> orbitals treated as interacting with a density-density type interaction.</p>
 <p>Disclaimer: the interaction values, results etc. might not be 100% physical and are only for demonstrative purposes!</p>
 <p>This tutorial will guide you through the following steps:</p>
@@ -571,11 +591,11 @@ Starting serial run at: 2022-03-10 17:08:16.981449
 </div>
 </div>
 <div class="section" id="1.-Run-DFT">
-<h2>1. Run DFT<a class="headerlink" href="#1.-Run-DFT" title="Permalink to this headline">¶</a></h2>
+<h2>1. Run DFT<a class="headerlink" href="#1.-Run-DFT" title="Permalink to this headline"></a></h2>
 <p>We start by running Vasp to create the raw projectors. The <a class="reference external" href="INCAR" rel="noopener noreferrer" target="_blank">INCAR</a>, <a class="reference external" href="POSCAR" rel="noopener noreferrer" target="_blank">POSCAR</a>, and <a class="reference external" href="KPOINTS" rel="noopener noreferrer" target="_blank">KPOINTS</a> file are kept relatively simple. For the POTCAR the <code class="docutils literal notranslate"><span class="pre">PBE</span> <span class="pre">Nd_3</span></code>, <code class="docutils literal notranslate"><span class="pre">PBE</span> <span class="pre">Ni_pv</span></code> and <code class="docutils literal notranslate"><span class="pre">PBE</span> <span class="pre">O</span></code> pseudo potentials are used. Here we make sure that the Kohn-Sham eigenstates are well converged (rms), by performing a few extra SCF steps by setting <code class="docutils literal notranslate"><span class="pre">NELMIN=30</span></code>. Then, the INCAR flag <code class="docutils literal notranslate"><span class="pre">LOCPROJ</span> <span class="pre">=</span> <span class="pre">LOCPROJ</span> <span class="pre">=</span> <span class="pre">3</span> <span class="pre">4</span> <span class="pre">:</span> <span class="pre">d</span> <span class="pre">:</span> <span class="pre">Pr</span></code> instructs Vasp to create projectors for the Ni-<span class="math notranslate nohighlight">\(d\)</span>
 shell of the two Ni sties. More information can be found on the <a class="reference external" href="https://triqs.github.io/dft_tools/unstable/guide/conv_vasp.html" rel="noopener noreferrer" target="_blank">DFTTools webpage of the Vasp converter</a>.</p>
 <p>Next, run Vasp with</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mpirun</span> <span class="n">vasp_std</span> <span class="mi">1</span><span class="o">&gt;</span><span class="n">out</span><span class="o">.</span><span class="n">vasp</span> <span class="mi">2</span><span class="o">&gt;</span><span class="n">err</span><span class="o">.</span><span class="n">vasp</span> <span class="o">&amp;</span>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>mpirun vasp_std 1&gt;out.vasp 2&gt;err.vasp &amp;
 </pre></div>
 </div>
 <p>and monitor the output. After Vasp is finished the result should look like this:</p>
@@ -651,7 +671,7 @@ DAV:  31    -0.569483098573E+02   -0.92768E-10    0.34212E-12 29024   0.218E-08
 <p>We see that the Ni-<span class="math notranslate nohighlight">\(d\)</span> states are entangled / hybridizing with O-<span class="math notranslate nohighlight">\(p\)</span> states and Nd-<span class="math notranslate nohighlight">\(d\)</span> states in the energy range between -9 and 9 eV. Hence, we orthonormalize our projectors considering all states in this energy window to create well localized real-space states. These projectors will be indeed quite similar to the internal DFT+<span class="math notranslate nohighlight">\(U\)</span> projectors used in VASP due to the large energy window.</p>
 </div>
 <div class="section" id="2.-Creating-the-hdf5-archive-/-DMFT-input">
-<h2>2. Creating the hdf5 archive / DMFT input<a class="headerlink" href="#2.-Creating-the-hdf5-archive-/-DMFT-input" title="Permalink to this headline">¶</a></h2>
+<h2>2. Creating the hdf5 archive / DMFT input<a class="headerlink" href="#2.-Creating-the-hdf5-archive-/-DMFT-input" title="Permalink to this headline"></a></h2>
 <p>Next we run the <a class="reference external" href="https://triqs.github.io/dft_tools/unstable/guide/conv_vasp.html" rel="noopener noreferrer" target="_blank">Vasp converter</a> to create an input h5 archive for solid_dmft. The <a class="reference external" href="plo.cfg" rel="noopener noreferrer" target="_blank">plo.cfg</a> looks like this:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
@@ -829,49 +849,49 @@ Reading input from nno.ctrl...
 research article <a class="reference external" href="https://doi.org/10.1103/PhysRevB.103.195101" rel="noopener noreferrer" target="_blank">PRB 103 195101 2021</a></p>
 </div>
 <div class="section" id="3.-Running-the-AFM-calculation">
-<h2>3. Running the AFM calculation<a class="headerlink" href="#3.-Running-the-AFM-calculation" title="Permalink to this headline">¶</a></h2>
+<h2>3. Running the AFM calculation<a class="headerlink" href="#3.-Running-the-AFM-calculation" title="Permalink to this headline"></a></h2>
 <p>now we run the calculation at around 290 K, which should be below the ordering temperature of NdNiO2 in DMFT. The config file <a class="reference external" href="config.ini" rel="noopener noreferrer" target="_blank">config.ini</a> for solid_dmft looks like this:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">general</span><span class="p">]</span>
-<span class="n">seedname</span> <span class="o">=</span> <span class="n">nno</span>
-<span class="n">jobname</span> <span class="o">=</span> <span class="n">NNO_AFM</span>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[general]
+seedname = nno
+jobname = NNO_AFM
 
-<span class="n">block_threshold</span> <span class="o">=</span> <span class="mf">0.001</span>
+block_threshold = 0.001
 
-<span class="n">solver_type</span> <span class="o">=</span> <span class="n">cthyb</span>
-<span class="n">n_iw</span> <span class="o">=</span> <span class="mi">8001</span>
-<span class="n">n_tau</span> <span class="o">=</span> <span class="mi">50001</span>
+solver_type = cthyb
+n_iw = 8001
+n_tau = 50001
 
-<span class="n">prec_mu</span> <span class="o">=</span> <span class="mf">0.001</span>
+prec_mu = 0.001
 
-<span class="n">h_int_type</span> <span class="o">=</span> <span class="n">density_density</span>
-<span class="n">U</span> <span class="o">=</span> <span class="mf">8.0</span>
-<span class="n">J</span> <span class="o">=</span> <span class="mf">1.0</span>
+h_int_type = density_density
+U = 8.0
+J = 1.0
 
-<span class="n">beta</span> <span class="o">=</span> <span class="mi">40</span>
+beta = 40
 
-<span class="n">magnetic</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="n">magmom</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.001</span>
-<span class="n">afm_order</span> <span class="o">=</span> <span class="kc">True</span>
+magnetic = True
+magmom = -0.001, 0.001
+afm_order = True
 
-<span class="n">n_iter_dmft</span> <span class="o">=</span> <span class="mi">12</span>
+n_iter_dmft = 12
 
-<span class="n">g0_mix</span> <span class="o">=</span> <span class="mf">0.9</span>
+g0_mix = 0.9
 
-<span class="n">dc_type</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">dc</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="n">dc_dmft</span> <span class="o">=</span> <span class="kc">False</span>
+dc_type = 0
+dc = True
+dc_dmft = False
 
-<span class="p">[</span><span class="n">solver</span><span class="p">]</span>
-<span class="n">length_cycle</span> <span class="o">=</span> <span class="mi">150</span>
-<span class="n">n_warmup_cycles</span> <span class="o">=</span> <span class="mi">10000</span>
-<span class="n">n_cycles_tot</span> <span class="o">=</span> <span class="mf">2e+8</span>
-<span class="n">imag_threshold</span> <span class="o">=</span> <span class="mf">1e-5</span>
+[solver]
+length_cycle = 150
+n_warmup_cycles = 10000
+n_cycles_tot = 2e+8
+imag_threshold = 1e-5
 
-<span class="n">perform_tail_fit</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="n">fit_max_moment</span> <span class="o">=</span> <span class="mi">6</span>
-<span class="n">fit_min_w</span> <span class="o">=</span> <span class="mi">8</span>
-<span class="n">fit_max_w</span> <span class="o">=</span> <span class="mi">14</span>
-<span class="n">measure_density_matrix</span> <span class="o">=</span> <span class="kc">True</span>
+perform_tail_fit = True
+fit_max_moment = 6
+fit_min_w = 8
+fit_max_w = 14
+measure_density_matrix = True
 </pre></div>
 </div>
 <p>Let’s go through some special options we set in the config file:</p>
@@ -889,18 +909,18 @@ research article <a class="reference external" href="https://doi.org/10.1103/Phy
 <p>By setting the flag magmom to a small value with a flipped sign on both sites we tell solid_dmft that both sites are related by flipping the down and up channel. Now we run solid_dmft simply by executing <code class="docutils literal notranslate"><span class="pre">mpirun</span> <span class="pre">solid_dmft</span> <span class="pre">config.ini</span></code>.</p>
 <p>Caution: this is a very heavy job, which should be submitted on a cluster.</p>
 <p>In the beginning of the calculation we find the following lines:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">AFM</span> <span class="n">calculation</span> <span class="n">selected</span><span class="p">,</span> <span class="n">mapping</span> <span class="bp">self</span> <span class="n">energies</span> <span class="k">as</span> <span class="n">follows</span><span class="p">:</span>
-<span class="n">imp</span>  <span class="p">[</span><span class="n">copy</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">source</span> <span class="n">imp</span><span class="p">,</span> <span class="n">switch</span> <span class="n">up</span><span class="o">/</span><span class="n">down</span><span class="p">]</span>
-<span class="o">---------------------------------------------</span>
-<span class="mi">0</span><span class="p">:</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">]</span>
-<span class="mi">1</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">True</span><span class="p">]</span>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>AFM calculation selected, mapping self energies as follows:
+imp  [copy sigma, source imp, switch up/down]
+---------------------------------------------
+0: [False, 0, False]
+1: [True, 0, True]
 </pre></div>
 </div>
 <p>this tells us that solid_dmft detected correctly how we want to orientate the spin moments. This also reflects itself during the iterations when the second impurity problem is not solved, but instead all properties of the first impurity are copied and the spin channels are flipped:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
-<span class="n">copying</span> <span class="n">the</span> <span class="bp">self</span><span class="o">-</span><span class="n">energy</span> <span class="k">for</span> <span class="n">shell</span> <span class="mi">1</span> <span class="kn">from</span> <span class="nn">shell</span> <span class="mi">0</span>
-<span class="n">inverting</span> <span class="n">spin</span> <span class="n">channels</span><span class="p">:</span> <span class="kc">False</span>
-<span class="o">...</span>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>...
+copying the self-energy for shell 1 from shell 0
+inverting spin channels: False
+...
 </pre></div>
 </div>
 <p>After the calculation is running or is finished we can take a look at the results:</p>
@@ -989,7 +1009,7 @@ research article <a class="reference external" href="https://doi.org/10.1103/Phy
 <span class="math notranslate nohighlight">\(d_{x^2-y^2}\)</span> orbital.</p>
 </div>
 <div class="section" id="5.-Multiplet-analysis">
-<h2>5. Multiplet analysis<a class="headerlink" href="#5.-Multiplet-analysis" title="Permalink to this headline">¶</a></h2>
+<h2>5. Multiplet analysis<a class="headerlink" href="#5.-Multiplet-analysis" title="Permalink to this headline"></a></h2>
 <p>We follow now the triqs/cthyb tutorial on the <a class="reference external" href="https://triqs.github.io/cthyb/unstable/guide/multiplet_analysis_notebook.html" rel="noopener noreferrer" target="_blank">multiplet analysis</a> to analyze the multiplets of the Ni-d orbitals:</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:

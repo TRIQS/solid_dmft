@@ -3,18 +3,22 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>1. OS with QE/W90 and cthyb: SrVO3 MIT &mdash; solid_dmft  documentation</title><link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" /><link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  <title>1. OS with QE/W90 and cthyb: SrVO3 MIT &mdash; solid_dmft  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/plot_directive.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
-  <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=default"></script>
-        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "tex2jax_process|mathjax_process|math|output_area"}})</script>
+        <script defer="defer" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=default"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -27,7 +31,8 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search"  style="background: #7E588A" >
-            <a href="../../index.html" class="icon icon-home"> solid_dmft<img src="../../_static/logo_no_text.png" class="logo" alt="Logo"/>
+            <a href="../../index.html" class="icon icon-home"> solid_dmft
+            <img src="../../_static/logo_no_text.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
                 3.1.0
@@ -75,6 +80,21 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#input-output">Input/Output</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../input_output/DMFT_input/input.html">Input</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_input/general.html">[general]: General parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_input/solver.html">[solver]: solver specific parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_input/dft.html">[dft]: DFT related inputs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_input/advanced.html">[advanced]: Advanced inputs</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../input_output/DMFT_output/results.html">Output / results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_output/results.html#group-structure">Group structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_output/results.html#subgroups">Subgroups</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation.html#further-details-for-running">Further details for running</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../md_notes/docker.html">Docker</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../md_notes/docker.html#building-the-docker-image">Building the docker image</a></li>
@@ -95,48 +115,48 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation.html#module-reference-manual">Module reference manual</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/csc_flow.html">csc_flow</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/dft_managers.html">dft_managers</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dft_managers.mpi_helpers.html">dft_managers.mpi_helpers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dft_managers.qe_manager.html">dft_managers.qe_manager</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dft_managers.vasp_manager.html">dft_managers.vasp_manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/csc_flow.html">csc_flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/dft_managers.html">dft_managers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dft_managers.mpi_helpers.html">dft_managers.mpi_helpers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dft_managers.qe_manager.html">dft_managers.qe_manager</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dft_managers.vasp_manager.html">dft_managers.vasp_manager</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/dmft_cycle.html">dmft_cycle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/dmft_tools.html">dmft_tools</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.afm_mapping.html">dmft_tools.afm_mapping</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.convergence.html">dmft_tools.convergence</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.formatter.html">dmft_tools.formatter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.greens_functions_mixer.html">dmft_tools.greens_functions_mixer</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.initial_self_energies.html">dmft_tools.initial_self_energies</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.interaction_hamiltonian.html">dmft_tools.interaction_hamiltonian</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.legendre_filter.html">dmft_tools.legendre_filter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.manipulate_chemical_potential.html">dmft_tools.manipulate_chemical_potential</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.observables.html">dmft_tools.observables</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.results_to_archive.html">dmft_tools.results_to_archive</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.solver.html">dmft_tools.solver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/dmft_cycle.html">dmft_cycle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/dmft_tools.html">dmft_tools</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.afm_mapping.html">dmft_tools.afm_mapping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.convergence.html">dmft_tools.convergence</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.formatter.html">dmft_tools.formatter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.greens_functions_mixer.html">dmft_tools.greens_functions_mixer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.initial_self_energies.html">dmft_tools.initial_self_energies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.interaction_hamiltonian.html">dmft_tools.interaction_hamiltonian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.legendre_filter.html">dmft_tools.legendre_filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.manipulate_chemical_potential.html">dmft_tools.manipulate_chemical_potential</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.observables.html">dmft_tools.observables</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.results_to_archive.html">dmft_tools.results_to_archive</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.solver.html">dmft_tools.solver</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/postprocessing.html">postprocessing</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/postprocessing.eval_U_cRPA_Vasp.html">postprocessing.eval_U_cRPA_Vasp</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/postprocessing.maxent_gf_imp.html">postprocessing.maxent_gf_imp</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/postprocessing.maxent_gf_latt.html">postprocessing.maxent_gf_latt</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/postprocessing.maxent_sigma.html">postprocessing.maxent_sigma</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/postprocessing.plot_correlated_bands.html">postprocessing.plot_correlated_bands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/postprocessing.html">postprocessing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.eval_U_cRPA_Vasp.html">postprocessing.eval_U_cRPA_Vasp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.maxent_gf_imp.html">postprocessing.maxent_gf_imp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.maxent_gf_latt.html">postprocessing.maxent_gf_latt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.maxent_sigma.html">postprocessing.maxent_sigma</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.plot_correlated_bands.html">postprocessing.plot_correlated_bands</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/read_config.html">read_config</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/read_config.html#general">general</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/read_config.html#solver">solver</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/read_config.html#dft">dft</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/read_config.html#advanced">advanced</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/read_config.html">read_config</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/read_config.html#general">[  general  ]</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/read_config.html#solver">[  solver  ]</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/read_config.html#dft">[  dft  ]</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/read_config.html#advanced">[  advanced  ]</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/util.html">util</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/util.symmetrize_gamma_file.html">util.symmetrize_gamma_file</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/util.update_dmft_config.html">util.update_dmft_config</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/util.update_results_h5.html">util.update_results_h5</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/util.write_kslice_to_h5.html">util.write_kslice_to_h5</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/util.html">util</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/util.symmetrize_gamma_file.html">util.symmetrize_gamma_file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/util.update_dmft_config.html">util.update_dmft_config</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/util.update_results_h5.html">util.update_results_h5</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/util.write_kslice_to_h5.html">util.write_kslice_to_h5</a></li>
 </ul>
 </li>
 </ul>
@@ -265,28 +285,28 @@
 <p><em>Disclaimer:</em></p>
 <p>Heavy calculations: Current tutorial is best performed on an HPC facility.</p>
 <div class="section" id="1.-OS-with-QE/W90-and-cthyb:-SrVO3-MIT">
-<h1>1. OS with QE/W90 and cthyb: SrVO3 MIT<a class="headerlink" href="#1.-OS-with-QE/W90-and-cthyb:-SrVO3-MIT" title="Permalink to this headline">¶</a></h1>
+<h1>1. OS with QE/W90 and cthyb: SrVO3 MIT<a class="headerlink" href="#1.-OS-with-QE/W90-and-cthyb:-SrVO3-MIT" title="Permalink to this headline"></a></h1>
 <p>Hello, welcome to the first part of the tutorial for solid_dmft. Here we will guide to set up and run your first DMFT calculations.</p>
 <p>To begin your DMFT journey we will immediately start a DMFT run on Strontium Vanadate (SVO). SVO is a member of a family of material known as complex perovskite oxides.</p>
 <p>In these materials, the electrons sitting on the transition metal ions (V in this case) are fairly localized, and the fully delocalized picture of DFT is insufficient to describe their physics. DMFT accounts for the electron-electron interaction by providing a fully interacting many body correction to the DFT non-interacting problem.</p>
 <hr class="docutils" />
 <div class="section" id="1.-Starting-out-with-DMFT">
-<h2>1. Starting out with DMFT<a class="headerlink" href="#1.-Starting-out-with-DMFT" title="Permalink to this headline">¶</a></h2>
+<h2>1. Starting out with DMFT<a class="headerlink" href="#1.-Starting-out-with-DMFT" title="Permalink to this headline"></a></h2>
 <p>To start your first calculation run:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mpirun</span> <span class="n">solid_dmft</span>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>mpirun solid_dmft
 </pre></div>
 </div>
 <p>Once the calculation is finished, inspect the <code class="docutils literal notranslate"><span class="pre">/out/</span></code> folder: our file of interest for the moment will be <code class="docutils literal notranslate"><span class="pre">observables_imp0.dat</span></code>, open the file:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">it</span> <span class="o">|</span>      <span class="n">mu</span> <span class="o">|</span>      <span class="n">G</span><span class="p">(</span><span class="n">beta</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="n">per</span> <span class="n">orbital</span>     <span class="o">|</span>          <span class="n">orbital</span> <span class="n">occs</span> <span class="n">up</span><span class="o">+</span><span class="n">down</span> <span class="o">|</span>  <span class="n">impurity</span> <span class="n">occ</span>
-<span class="mi">0</span>  <span class="o">|</span> <span class="mf">0.00612</span> <span class="o">|-</span><span class="mf">0.09865</span>  <span class="o">-</span><span class="mf">0.09865</span>     <span class="o">-</span><span class="mf">0.09865</span> <span class="o">|</span> <span class="mf">0.33326</span>  <span class="mf">0.33326</span>      <span class="mf">0.33326</span> <span class="o">|</span>       <span class="mf">0.99979</span>
-<span class="mi">1</span>  <span class="o">|</span> <span class="mf">0.00612</span> <span class="o">|-</span><span class="mf">0.08200</span>  <span class="o">-</span><span class="mf">0.08277</span>     <span class="o">-</span><span class="mf">0.08239</span> <span class="o">|</span> <span class="mf">0.31959</span>  <span class="mf">0.31995</span>      <span class="mf">0.32344</span> <span class="o">|</span>       <span class="mf">0.96298</span>
-<span class="mi">2</span>  <span class="o">|</span> <span class="mf">0.06456</span> <span class="o">|-</span><span class="mf">0.06893</span>  <span class="o">-</span><span class="mf">0.06847</span>     <span class="o">-</span><span class="mf">0.06900</span> <span class="o">|</span> <span class="mf">0.32333</span>  <span class="mf">0.31890</span>      <span class="mf">0.33503</span> <span class="o">|</span>       <span class="mf">0.97725</span>
-<span class="mi">3</span>  <span class="o">|</span> <span class="mf">0.08172</span> <span class="o">|-</span><span class="mf">0.06873</span>  <span class="o">-</span><span class="mf">0.06922</span>     <span class="o">-</span><span class="mf">0.06997</span> <span class="o">|</span> <span class="mf">0.33488</span>  <span class="mf">0.32465</span>      <span class="mf">0.32783</span> <span class="o">|</span>       <span class="mf">0.98735</span>
-<span class="mi">4</span>  <span class="o">|</span> <span class="mf">0.09147</span> <span class="o">|-</span><span class="mf">0.06892</span>  <span class="o">-</span><span class="mf">0.06967</span>     <span class="o">-</span><span class="mf">0.06909</span> <span class="o">|</span> <span class="mf">0.32308</span>  <span class="mf">0.32812</span>      <span class="mf">0.33074</span> <span class="o">|</span>       <span class="mf">0.98194</span>
-<span class="mi">5</span>  <span class="o">|</span> <span class="mf">0.10094</span> <span class="o">|-</span><span class="mf">0.06916</span>  <span class="o">-</span><span class="mf">0.06912</span>     <span class="o">-</span><span class="mf">0.06902</span> <span class="o">|</span> <span class="mf">0.32598</span>  <span class="mf">0.33605</span>      <span class="mf">0.32722</span> <span class="o">|</span>       <span class="mf">0.98925</span>
-<span class="mi">6</span>  <span class="o">|</span> <span class="mf">0.10848</span> <span class="o">|-</span><span class="mf">0.06926</span>  <span class="o">-</span><span class="mf">0.06942</span>     <span class="o">-</span><span class="mf">0.06928</span> <span class="o">|</span> <span class="mf">0.33359</span>  <span class="mf">0.32518</span>      <span class="mf">0.33127</span> <span class="o">|</span>       <span class="mf">0.99004</span>
-<span class="mi">7</span>  <span class="o">|</span> <span class="mf">0.11442</span> <span class="o">|-</span><span class="mf">0.06931</span>  <span class="o">-</span><span class="mf">0.06961</span>     <span class="o">-</span><span class="mf">0.06954</span> <span class="o">|</span> <span class="mf">0.32622</span>  <span class="mf">0.32944</span>      <span class="mf">0.32926</span> <span class="o">|</span>       <span class="mf">0.98492</span>
-<span class="mi">8</span>  <span class="o">|</span> <span class="mf">0.12258</span> <span class="o">|-</span><span class="mf">0.06935</span>  <span class="o">-</span><span class="mf">0.06951</span>     <span class="o">-</span><span class="mf">0.06986</span> <span class="o">|</span> <span class="mf">0.34122</span>  <span class="mf">0.33316</span>      <span class="mf">0.33515</span> <span class="o">|</span>       <span class="mf">1.00952</span>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>it |      mu |      G(beta/2) per orbital     |          orbital occs up+down |  impurity occ
+0  | 0.00612 |-0.09865  -0.09865     -0.09865 | 0.33326  0.33326      0.33326 |       0.99979
+1  | 0.00612 |-0.08200  -0.08277     -0.08239 | 0.31959  0.31995      0.32344 |       0.96298
+2  | 0.06456 |-0.06893  -0.06847     -0.06900 | 0.32333  0.31890      0.33503 |       0.97725
+3  | 0.08172 |-0.06873  -0.06922     -0.06997 | 0.33488  0.32465      0.32783 |       0.98735
+4  | 0.09147 |-0.06892  -0.06967     -0.06909 | 0.32308  0.32812      0.33074 |       0.98194
+5  | 0.10094 |-0.06916  -0.06912     -0.06902 | 0.32598  0.33605      0.32722 |       0.98925
+6  | 0.10848 |-0.06926  -0.06942     -0.06928 | 0.33359  0.32518      0.33127 |       0.99004
+7  | 0.11442 |-0.06931  -0.06961     -0.06954 | 0.32622  0.32944      0.32926 |       0.98492
+8  | 0.12258 |-0.06935  -0.06951     -0.06986 | 0.34122  0.33316      0.33515 |       1.00952
 </pre></div>
 </div>
 <p>The meaning of the column names is the following:</p>
@@ -304,7 +324,7 @@
 </ul>
 </div>
 <div class="section" id="2.-Looking-at-the-Metal-Insulator-Transition">
-<h2>2. Looking at the Metal-Insulator Transition<a class="headerlink" href="#2.-Looking-at-the-Metal-Insulator-Transition" title="Permalink to this headline">¶</a></h2>
+<h2>2. Looking at the Metal-Insulator Transition<a class="headerlink" href="#2.-Looking-at-the-Metal-Insulator-Transition" title="Permalink to this headline"></a></h2>
 <p>Strontium Vanadate (SVO) has 1 electron per d-orbital manifold. In the following steps we will try to drive the system towards a Mott-insulating state.</p>
 <p>Inspect the script <code class="docutils literal notranslate"><span class="pre">run_MIT_coarse.sh</span></code>, we iterate the same type of calculation that was performed in the last step for a series of value of U {2-10} and J {0.0-1.0}.</p>
 <p>Run the script, sit back and have a long coffee break, this is going to take a while (about 10 hours on 30 cores).</p>
@@ -317,14 +337,14 @@
 site, therefore the system has trouble converging and oscillate between a high occupation and a low occupation state.</p>
 </div>
 <div class="section" id="3.-Refinining-the-diagram">
-<h2>3. Refinining the diagram<a class="headerlink" href="#3.-Refinining-the-diagram" title="Permalink to this headline">¶</a></h2>
+<h2>3. Refinining the diagram<a class="headerlink" href="#3.-Refinining-the-diagram" title="Permalink to this headline"></a></h2>
 <p>In order to get better resolution in terms of the diagram you can run the script <code class="docutils literal notranslate"><span class="pre">run_MIT_fine.sh</span></code> and plot the result with</p>
 <p><code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">./collect_results_fine.py</span></code></p>
 <p>The result is also visible here:</p>
 <p><img alt="finegrid" src="../../_images/MIT_transition_fine.jpg" /></p>
 </div>
 <div class="section" id="4.-Plotting-the-spectral-function">
-<h2>4. Plotting the spectral function<a class="headerlink" href="#4.-Plotting-the-spectral-function" title="Permalink to this headline">¶</a></h2>
+<h2>4. Plotting the spectral function<a class="headerlink" href="#4.-Plotting-the-spectral-function" title="Permalink to this headline"></a></h2>
 <p>The spectral function in DMFT represents the local density of states of the impurity site. In order to plot it we need to use one of the scripts that implements the maximum entropy method ( <a class="reference external" href="https://triqs.github.io/maxent/latest/" rel="noopener noreferrer" target="_blank">Maxent</a> ), while in the folder run (sub <code class="docutils literal notranslate"><span class="pre">/path_to_solid_dmft/</span></code> with where you have installed solid_dmft) :</p>
 <p><code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">/path_to_solid_dmft/maxent_scripts/maxent_gf_imp.py</span> <span class="pre">./J0.0/U5/out/SCO.h5</span></code></p>
 <p>and plot the result by running in the docker container:</p>
@@ -333,10 +353,10 @@ site, therefore the system has trouble converging and oscillate between a high o
 <p>Take care to edit the values of J and U in the python file. What is happing to the spectral function (density of states) as one cranks U up?</p>
 </div>
 <div class="section" id="5-Visualizing-the-MIT">
-<h2>5 Visualizing the MIT<a class="headerlink" href="#5-Visualizing-the-MIT" title="Permalink to this headline">¶</a></h2>
+<h2>5 Visualizing the MIT<a class="headerlink" href="#5-Visualizing-the-MIT" title="Permalink to this headline"></a></h2>
 <p>We will now plot the spectral function at different U values for J = 0.0 eV:</p>
 <p>Run the script:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="n">read_spectral_function_transition</span><span class="o">.</span><span class="n">py</span>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>python3 read_spectral_function_transition.py
 </pre></div>
 </div>
 <p><img alt="MIT" src="../../_images/A_func_transition.jpg" /></p>

@@ -3,12 +3,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; solid_dmft  documentation</title><link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" /><link rel="shortcut icon" href="_static/favicon.ico"/>
+  <title>Index &mdash; solid_dmft  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+      <link rel="stylesheet" href="_static/plot_directive.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
-  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
@@ -23,7 +27,8 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search"  style="background: #7E588A" >
-            <a href="index.html" class="icon icon-home"> solid_dmft<img src="_static/logo_no_text.png" class="logo" alt="Logo"/>
+            <a href="index.html" class="icon icon-home"> solid_dmft
+            <img src="_static/logo_no_text.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
                 3.1.0
@@ -71,6 +76,21 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html#input-output">Input/Output</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="input_output/DMFT_input/input.html">Input</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="input_output/DMFT_input/general.html">[general]: General parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_output/DMFT_input/solver.html">[solver]: solver specific parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_output/DMFT_input/dft.html">[dft]: DFT related inputs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_output/DMFT_input/advanced.html">[advanced]: Advanced inputs</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="input_output/DMFT_output/results.html">Output / results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="input_output/DMFT_output/results.html#group-structure">Group structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_output/DMFT_output/results.html#subgroups">Subgroups</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="documentation.html#further-details-for-running">Further details for running</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="md_notes/docker.html">Docker</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="md_notes/docker.html#building-the-docker-image">Building the docker image</a></li>
@@ -91,48 +111,48 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="documentation.html#module-reference-manual">Module reference manual</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="_autosummary/csc_flow.html">csc_flow</a></li>
-<li class="toctree-l3"><a class="reference internal" href="_autosummary/dft_managers.html">dft_managers</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/dft_managers.mpi_helpers.html">dft_managers.mpi_helpers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/dft_managers.qe_manager.html">dft_managers.qe_manager</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/dft_managers.vasp_manager.html">dft_managers.vasp_manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_ref/csc_flow.html">csc_flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_ref/dft_managers.html">dft_managers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dft_managers.mpi_helpers.html">dft_managers.mpi_helpers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dft_managers.qe_manager.html">dft_managers.qe_manager</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dft_managers.vasp_manager.html">dft_managers.vasp_manager</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="_autosummary/dmft_cycle.html">dmft_cycle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="_autosummary/dmft_tools.html">dmft_tools</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/dmft_tools.afm_mapping.html">dmft_tools.afm_mapping</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/dmft_tools.convergence.html">dmft_tools.convergence</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/dmft_tools.formatter.html">dmft_tools.formatter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/dmft_tools.greens_functions_mixer.html">dmft_tools.greens_functions_mixer</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/dmft_tools.initial_self_energies.html">dmft_tools.initial_self_energies</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/dmft_tools.interaction_hamiltonian.html">dmft_tools.interaction_hamiltonian</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/dmft_tools.legendre_filter.html">dmft_tools.legendre_filter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/dmft_tools.manipulate_chemical_potential.html">dmft_tools.manipulate_chemical_potential</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/dmft_tools.observables.html">dmft_tools.observables</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/dmft_tools.results_to_archive.html">dmft_tools.results_to_archive</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/dmft_tools.solver.html">dmft_tools.solver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_ref/dmft_cycle.html">dmft_cycle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_ref/dmft_tools.html">dmft_tools</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.afm_mapping.html">dmft_tools.afm_mapping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.convergence.html">dmft_tools.convergence</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.formatter.html">dmft_tools.formatter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.greens_functions_mixer.html">dmft_tools.greens_functions_mixer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.initial_self_energies.html">dmft_tools.initial_self_energies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.interaction_hamiltonian.html">dmft_tools.interaction_hamiltonian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.legendre_filter.html">dmft_tools.legendre_filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.manipulate_chemical_potential.html">dmft_tools.manipulate_chemical_potential</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.observables.html">dmft_tools.observables</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.results_to_archive.html">dmft_tools.results_to_archive</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.solver.html">dmft_tools.solver</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="_autosummary/postprocessing.html">postprocessing</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/postprocessing.eval_U_cRPA_Vasp.html">postprocessing.eval_U_cRPA_Vasp</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/postprocessing.maxent_gf_imp.html">postprocessing.maxent_gf_imp</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/postprocessing.maxent_gf_latt.html">postprocessing.maxent_gf_latt</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/postprocessing.maxent_sigma.html">postprocessing.maxent_sigma</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/postprocessing.plot_correlated_bands.html">postprocessing.plot_correlated_bands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_ref/postprocessing.html">postprocessing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_ref/postprocessing.eval_U_cRPA_Vasp.html">postprocessing.eval_U_cRPA_Vasp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/postprocessing.maxent_gf_imp.html">postprocessing.maxent_gf_imp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/postprocessing.maxent_gf_latt.html">postprocessing.maxent_gf_latt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/postprocessing.maxent_sigma.html">postprocessing.maxent_sigma</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/postprocessing.plot_correlated_bands.html">postprocessing.plot_correlated_bands</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="_autosummary/read_config.html">read_config</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/read_config.html#general">general</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/read_config.html#solver">solver</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/read_config.html#dft">dft</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/read_config.html#advanced">advanced</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_ref/read_config.html">read_config</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_ref/read_config.html#general">[  general  ]</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/read_config.html#solver">[  solver  ]</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/read_config.html#dft">[  dft  ]</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/read_config.html#advanced">[  advanced  ]</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="_autosummary/util.html">util</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/util.symmetrize_gamma_file.html">util.symmetrize_gamma_file</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/util.update_dmft_config.html">util.update_dmft_config</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/util.update_results_h5.html">util.update_results_h5</a></li>
-<li class="toctree-l4"><a class="reference internal" href="_autosummary/util.write_kslice_to_h5.html">util.write_kslice_to_h5</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_ref/util.html">util</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_ref/util.symmetrize_gamma_file.html">util.symmetrize_gamma_file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/util.update_dmft_config.html">util.update_dmft_config</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/util.update_results_h5.html">util.update_results_h5</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/util.write_kslice_to_h5.html">util.write_kslice_to_h5</a></li>
 </ul>
 </li>
 </ul>
@@ -255,7 +275,7 @@
 <h2 id="_">_</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/dmft_tools.solver.SolverStructure.__init__.html#dmft_tools.solver.SolverStructure.__init__">__init__() (dmft_tools.solver.SolverStructure method)</a>
+      <li><a href="_ref/dmft_tools.solver.SolverStructure.__init__.html#dmft_tools.solver.SolverStructure.__init__">__init__() (dmft_tools.solver.SolverStructure method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -263,13 +283,13 @@
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/dmft_tools.observables.html#dmft_tools.observables.add_dft_values_as_zeroth_iteration">add_dft_values_as_zeroth_iteration() (in module dmft_tools.observables)</a>
+      <li><a href="_ref/dmft_tools.observables.html#dmft_tools.observables.add_dft_values_as_zeroth_iteration">add_dft_values_as_zeroth_iteration() (in module dmft_tools.observables)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/dmft_tools.observables.html#dmft_tools.observables.add_dmft_observables">add_dmft_observables() (in module dmft_tools.observables)</a>
+      <li><a href="_ref/dmft_tools.observables.html#dmft_tools.observables.add_dmft_observables">add_dmft_observables() (in module dmft_tools.observables)</a>
 </li>
-      <li><a href="_autosummary/dmft_tools.legendre_filter.html#dmft_tools.legendre_filter.apply">apply() (in module dmft_tools.legendre_filter)</a>
+      <li><a href="_ref/dmft_tools.legendre_filter.html#dmft_tools.legendre_filter.apply">apply() (in module dmft_tools.legendre_filter)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -277,38 +297,38 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/dmft_tools.observables.html#dmft_tools.observables.calc_bandcorr_man">calc_bandcorr_man() (in module dmft_tools.observables)</a>
+      <li><a href="_ref/dmft_tools.observables.html#dmft_tools.observables.calc_bandcorr_man">calc_bandcorr_man() (in module dmft_tools.observables)</a>
 </li>
-      <li><a href="_autosummary/dmft_tools.convergence.html#dmft_tools.convergence.calc_convergence_quantities">calc_convergence_quantities() (in module dmft_tools.convergence)</a>
+      <li><a href="_ref/dmft_tools.convergence.html#dmft_tools.convergence.calc_convergence_quantities">calc_convergence_quantities() (in module dmft_tools.convergence)</a>
 </li>
-      <li><a href="_autosummary/dmft_tools.observables.html#dmft_tools.observables.calc_dft_kin_en">calc_dft_kin_en() (in module dmft_tools.observables)</a>
+      <li><a href="_ref/dmft_tools.observables.html#dmft_tools.observables.calc_dft_kin_en">calc_dft_kin_en() (in module dmft_tools.observables)</a>
 </li>
-      <li><a href="_autosummary/postprocessing.eval_U_cRPA_Vasp.html#postprocessing.eval_U_cRPA_Vasp.calc_kan_params">calc_kan_params() (in module postprocessing.eval_U_cRPA_Vasp)</a>
+      <li><a href="_ref/postprocessing.eval_U_cRPA_Vasp.html#postprocessing.eval_U_cRPA_Vasp.calc_kan_params">calc_kan_params() (in module postprocessing.eval_U_cRPA_Vasp)</a>
 </li>
-      <li><a href="_autosummary/postprocessing.eval_U_cRPA_Vasp.html#postprocessing.eval_U_cRPA_Vasp.calc_u_avg_fulld">calc_u_avg_fulld() (in module postprocessing.eval_U_cRPA_Vasp)</a>
+      <li><a href="_ref/postprocessing.eval_U_cRPA_Vasp.html#postprocessing.eval_U_cRPA_Vasp.calc_u_avg_fulld">calc_u_avg_fulld() (in module postprocessing.eval_U_cRPA_Vasp)</a>
 </li>
-      <li><a href="_autosummary/dmft_tools.observables.html#dmft_tools.observables.calc_Z">calc_Z() (in module dmft_tools.observables)</a>
+      <li><a href="_ref/dmft_tools.observables.html#dmft_tools.observables.calc_Z">calc_Z() (in module dmft_tools.observables)</a>
 </li>
-      <li><a href="_autosummary/dmft_tools.initial_self_energies.html#dmft_tools.initial_self_energies.calculate_double_counting">calculate_double_counting() (in module dmft_tools.initial_self_energies)</a>
+      <li><a href="_ref/dmft_tools.initial_self_energies.html#dmft_tools.initial_self_energies.calculate_double_counting">calculate_double_counting() (in module dmft_tools.initial_self_energies)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/postprocessing.eval_U_cRPA_Vasp.html#postprocessing.eval_U_cRPA_Vasp.calculate_interaction_from_averaging">calculate_interaction_from_averaging() (in module postprocessing.eval_U_cRPA_Vasp)</a>
+      <li><a href="_ref/postprocessing.eval_U_cRPA_Vasp.html#postprocessing.eval_U_cRPA_Vasp.calculate_interaction_from_averaging">calculate_interaction_from_averaging() (in module postprocessing.eval_U_cRPA_Vasp)</a>
 </li>
-      <li><a href="_autosummary/dmft_tools.convergence.html#dmft_tools.convergence.check_convergence">check_convergence() (in module dmft_tools.convergence)</a>
+      <li><a href="_ref/dmft_tools.convergence.html#dmft_tools.convergence.check_convergence">check_convergence() (in module dmft_tools.convergence)</a>
 </li>
-      <li><a href="_autosummary/dmft_tools.interaction_hamiltonian.html#dmft_tools.interaction_hamiltonian.construct">construct() (in module dmft_tools.interaction_hamiltonian)</a>
+      <li><a href="_ref/dmft_tools.interaction_hamiltonian.html#dmft_tools.interaction_hamiltonian.construct">construct() (in module dmft_tools.interaction_hamiltonian)</a>
 </li>
-      <li><a href="_autosummary/dft_managers.mpi_helpers.html#dft_managers.mpi_helpers.create_hostfile">create_hostfile() (in module dft_managers.mpi_helpers)</a>
+      <li><a href="_ref/dft_managers.mpi_helpers.html#dft_managers.mpi_helpers.create_hostfile">create_hostfile() (in module dft_managers.mpi_helpers)</a>
 </li>
       <li>
     csc_flow
 
       <ul>
-        <li><a href="_autosummary/csc_flow.html#module-csc_flow">module</a>
+        <li><a href="_ref/csc_flow.html#module-csc_flow">module</a>
 </li>
       </ul></li>
-      <li><a href="_autosummary/csc_flow.html#csc_flow.csc_flow_control">csc_flow_control() (in module csc_flow)</a>
+      <li><a href="_ref/csc_flow.html#csc_flow.csc_flow_control">csc_flow_control() (in module csc_flow)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -316,66 +336,66 @@
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/dmft_tools.afm_mapping.html#dmft_tools.afm_mapping.determine">determine() (in module dmft_tools.afm_mapping)</a>
+      <li><a href="_ref/dmft_tools.afm_mapping.html#dmft_tools.afm_mapping.determine">determine() (in module dmft_tools.afm_mapping)</a>
 </li>
-      <li><a href="_autosummary/dmft_tools.initial_self_energies.html#dmft_tools.initial_self_energies.determine_dc_and_initial_sigma">determine_dc_and_initial_sigma() (in module dmft_tools.initial_self_energies)</a>
+      <li><a href="_ref/dmft_tools.initial_self_energies.html#dmft_tools.initial_self_energies.determine_dc_and_initial_sigma">determine_dc_and_initial_sigma() (in module dmft_tools.initial_self_energies)</a>
 </li>
       <li>
     dft_managers
 
       <ul>
-        <li><a href="_autosummary/dft_managers.html#module-dft_managers">module</a>
+        <li><a href="_ref/dft_managers.html#module-dft_managers">module</a>
 </li>
       </ul></li>
       <li>
     dft_managers.mpi_helpers
 
       <ul>
-        <li><a href="_autosummary/dft_managers.mpi_helpers.html#module-dft_managers.mpi_helpers">module</a>
+        <li><a href="_ref/dft_managers.mpi_helpers.html#module-dft_managers.mpi_helpers">module</a>
 </li>
       </ul></li>
       <li>
     dft_managers.qe_manager
 
       <ul>
-        <li><a href="_autosummary/dft_managers.qe_manager.html#module-dft_managers.qe_manager">module</a>
+        <li><a href="_ref/dft_managers.qe_manager.html#module-dft_managers.qe_manager">module</a>
 </li>
       </ul></li>
       <li>
     dft_managers.vasp_manager
 
       <ul>
-        <li><a href="_autosummary/dft_managers.vasp_manager.html#module-dft_managers.vasp_manager">module</a>
+        <li><a href="_ref/dft_managers.vasp_manager.html#module-dft_managers.vasp_manager">module</a>
 </li>
       </ul></li>
       <li>
     dmft_cycle
 
       <ul>
-        <li><a href="_autosummary/dmft_cycle.html#module-dmft_cycle">module</a>
+        <li><a href="_ref/dmft_cycle.html#module-dmft_cycle">module</a>
 </li>
       </ul></li>
-      <li><a href="_autosummary/dmft_cycle.html#dmft_cycle.dmft_cycle">dmft_cycle() (in module dmft_cycle)</a>
+      <li><a href="_ref/dmft_cycle.html#dmft_cycle.dmft_cycle">dmft_cycle() (in module dmft_cycle)</a>
 </li>
       <li>
     dmft_tools
 
       <ul>
-        <li><a href="_autosummary/dmft_tools.html#module-dmft_tools">module</a>
+        <li><a href="_ref/dmft_tools.html#module-dmft_tools">module</a>
 </li>
       </ul></li>
       <li>
     dmft_tools.afm_mapping
 
       <ul>
-        <li><a href="_autosummary/dmft_tools.afm_mapping.html#module-dmft_tools.afm_mapping">module</a>
+        <li><a href="_ref/dmft_tools.afm_mapping.html#module-dmft_tools.afm_mapping">module</a>
 </li>
       </ul></li>
       <li>
     dmft_tools.convergence
 
       <ul>
-        <li><a href="_autosummary/dmft_tools.convergence.html#module-dmft_tools.convergence">module</a>
+        <li><a href="_ref/dmft_tools.convergence.html#module-dmft_tools.convergence">module</a>
 </li>
       </ul></li>
   </ul></td>
@@ -384,63 +404,63 @@
     dmft_tools.formatter
 
       <ul>
-        <li><a href="_autosummary/dmft_tools.formatter.html#module-dmft_tools.formatter">module</a>
+        <li><a href="_ref/dmft_tools.formatter.html#module-dmft_tools.formatter">module</a>
 </li>
       </ul></li>
       <li>
     dmft_tools.greens_functions_mixer
 
       <ul>
-        <li><a href="_autosummary/dmft_tools.greens_functions_mixer.html#module-dmft_tools.greens_functions_mixer">module</a>
+        <li><a href="_ref/dmft_tools.greens_functions_mixer.html#module-dmft_tools.greens_functions_mixer">module</a>
 </li>
       </ul></li>
       <li>
     dmft_tools.initial_self_energies
 
       <ul>
-        <li><a href="_autosummary/dmft_tools.initial_self_energies.html#module-dmft_tools.initial_self_energies">module</a>
+        <li><a href="_ref/dmft_tools.initial_self_energies.html#module-dmft_tools.initial_self_energies">module</a>
 </li>
       </ul></li>
       <li>
     dmft_tools.interaction_hamiltonian
 
       <ul>
-        <li><a href="_autosummary/dmft_tools.interaction_hamiltonian.html#module-dmft_tools.interaction_hamiltonian">module</a>
+        <li><a href="_ref/dmft_tools.interaction_hamiltonian.html#module-dmft_tools.interaction_hamiltonian">module</a>
 </li>
       </ul></li>
       <li>
     dmft_tools.legendre_filter
 
       <ul>
-        <li><a href="_autosummary/dmft_tools.legendre_filter.html#module-dmft_tools.legendre_filter">module</a>
+        <li><a href="_ref/dmft_tools.legendre_filter.html#module-dmft_tools.legendre_filter">module</a>
 </li>
       </ul></li>
       <li>
     dmft_tools.manipulate_chemical_potential
 
       <ul>
-        <li><a href="_autosummary/dmft_tools.manipulate_chemical_potential.html#module-dmft_tools.manipulate_chemical_potential">module</a>
+        <li><a href="_ref/dmft_tools.manipulate_chemical_potential.html#module-dmft_tools.manipulate_chemical_potential">module</a>
 </li>
       </ul></li>
       <li>
     dmft_tools.observables
 
       <ul>
-        <li><a href="_autosummary/dmft_tools.observables.html#module-dmft_tools.observables">module</a>
+        <li><a href="_ref/dmft_tools.observables.html#module-dmft_tools.observables">module</a>
 </li>
       </ul></li>
       <li>
     dmft_tools.results_to_archive
 
       <ul>
-        <li><a href="_autosummary/dmft_tools.results_to_archive.html#module-dmft_tools.results_to_archive">module</a>
+        <li><a href="_ref/dmft_tools.results_to_archive.html#module-dmft_tools.results_to_archive">module</a>
 </li>
       </ul></li>
       <li>
     dmft_tools.solver
 
       <ul>
-        <li><a href="_autosummary/dmft_tools.solver.html#module-dmft_tools.solver">module</a>
+        <li><a href="_ref/dmft_tools.solver.html#module-dmft_tools.solver">module</a>
 </li>
       </ul></li>
   </ul></td>
@@ -449,11 +469,11 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/dft_managers.mpi_helpers.html#dft_managers.mpi_helpers.find_path_to_mpi_command">find_path_to_mpi_command() (in module dft_managers.mpi_helpers)</a>
+      <li><a href="_ref/dft_managers.mpi_helpers.html#dft_managers.mpi_helpers.find_path_to_mpi_command">find_path_to_mpi_command() (in module dft_managers.mpi_helpers)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/postprocessing.eval_U_cRPA_Vasp.html#postprocessing.eval_U_cRPA_Vasp.fit_slater_fulld">fit_slater_fulld() (in module postprocessing.eval_U_cRPA_Vasp)</a>
+      <li><a href="_ref/postprocessing.eval_U_cRPA_Vasp.html#postprocessing.eval_U_cRPA_Vasp.fit_slater_fulld">fit_slater_fulld() (in module postprocessing.eval_U_cRPA_Vasp)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -461,7 +481,7 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/dft_managers.mpi_helpers.html#dft_managers.mpi_helpers.get_mpi_arguments">get_mpi_arguments() (in module dft_managers.mpi_helpers)</a>
+      <li><a href="_ref/dft_managers.mpi_helpers.html#dft_managers.mpi_helpers.get_mpi_arguments">get_mpi_arguments() (in module dft_managers.mpi_helpers)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -469,7 +489,7 @@
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/dft_managers.vasp_manager.html#dft_managers.vasp_manager.is_lock_file_present">is_lock_file_present() (in module dft_managers.vasp_manager)</a>
+      <li><a href="_ref/dft_managers.vasp_manager.html#dft_managers.vasp_manager.is_lock_file_present">is_lock_file_present() (in module dft_managers.vasp_manager)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -477,7 +497,7 @@
 <h2 id="K">K</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/dft_managers.vasp_manager.html#dft_managers.vasp_manager.kill">kill() (in module dft_managers.vasp_manager)</a>
+      <li><a href="_ref/dft_managers.vasp_manager.html#dft_managers.vasp_manager.kill">kill() (in module dft_managers.vasp_manager)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -485,87 +505,87 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/postprocessing.maxent_gf_imp.html#postprocessing.maxent_gf_imp.main">main() (in module postprocessing.maxent_gf_imp)</a>
+      <li><a href="_ref/postprocessing.maxent_gf_imp.html#postprocessing.maxent_gf_imp.main">main() (in module postprocessing.maxent_gf_imp)</a>
 
       <ul>
-        <li><a href="_autosummary/postprocessing.maxent_gf_latt.html#postprocessing.maxent_gf_latt.main">(in module postprocessing.maxent_gf_latt)</a>
+        <li><a href="_ref/postprocessing.maxent_gf_latt.html#postprocessing.maxent_gf_latt.main">(in module postprocessing.maxent_gf_latt)</a>
 </li>
-        <li><a href="_autosummary/postprocessing.maxent_sigma.html#postprocessing.maxent_sigma.main">(in module postprocessing.maxent_sigma)</a>
+        <li><a href="_ref/postprocessing.maxent_sigma.html#postprocessing.maxent_sigma.main">(in module postprocessing.maxent_sigma)</a>
 </li>
-        <li><a href="_autosummary/util.update_dmft_config.html#util.update_dmft_config.main">(in module util.update_dmft_config)</a>
+        <li><a href="_ref/util.update_dmft_config.html#util.update_dmft_config.main">(in module util.update_dmft_config)</a>
 </li>
-        <li><a href="_autosummary/util.update_results_h5.html#util.update_results_h5.main">(in module util.update_results_h5)</a>
+        <li><a href="_ref/util.update_results_h5.html#util.update_results_h5.main">(in module util.update_results_h5)</a>
 </li>
-        <li><a href="_autosummary/util.write_kslice_to_h5.html#util.write_kslice_to_h5.main">(in module util.write_kslice_to_h5)</a>
+        <li><a href="_ref/util.write_kslice_to_h5.html#util.write_kslice_to_h5.main">(in module util.write_kslice_to_h5)</a>
 </li>
       </ul></li>
-      <li><a href="_autosummary/dmft_tools.convergence.html#dmft_tools.convergence.max_G_diff">max_G_diff() (in module dmft_tools.convergence)</a>
+      <li><a href="_ref/dmft_tools.convergence.html#dmft_tools.convergence.max_G_diff">max_G_diff() (in module dmft_tools.convergence)</a>
 </li>
       <li>
     module
 
       <ul>
-        <li><a href="_autosummary/csc_flow.html#module-csc_flow">csc_flow</a>
+        <li><a href="_ref/csc_flow.html#module-csc_flow">csc_flow</a>
 </li>
-        <li><a href="_autosummary/dft_managers.html#module-dft_managers">dft_managers</a>
+        <li><a href="_ref/dft_managers.html#module-dft_managers">dft_managers</a>
 </li>
-        <li><a href="_autosummary/dft_managers.mpi_helpers.html#module-dft_managers.mpi_helpers">dft_managers.mpi_helpers</a>
+        <li><a href="_ref/dft_managers.mpi_helpers.html#module-dft_managers.mpi_helpers">dft_managers.mpi_helpers</a>
 </li>
-        <li><a href="_autosummary/dft_managers.qe_manager.html#module-dft_managers.qe_manager">dft_managers.qe_manager</a>
+        <li><a href="_ref/dft_managers.qe_manager.html#module-dft_managers.qe_manager">dft_managers.qe_manager</a>
 </li>
-        <li><a href="_autosummary/dft_managers.vasp_manager.html#module-dft_managers.vasp_manager">dft_managers.vasp_manager</a>
+        <li><a href="_ref/dft_managers.vasp_manager.html#module-dft_managers.vasp_manager">dft_managers.vasp_manager</a>
 </li>
-        <li><a href="_autosummary/dmft_cycle.html#module-dmft_cycle">dmft_cycle</a>
+        <li><a href="_ref/dmft_cycle.html#module-dmft_cycle">dmft_cycle</a>
 </li>
-        <li><a href="_autosummary/dmft_tools.html#module-dmft_tools">dmft_tools</a>
+        <li><a href="_ref/dmft_tools.html#module-dmft_tools">dmft_tools</a>
 </li>
-        <li><a href="_autosummary/dmft_tools.afm_mapping.html#module-dmft_tools.afm_mapping">dmft_tools.afm_mapping</a>
+        <li><a href="_ref/dmft_tools.afm_mapping.html#module-dmft_tools.afm_mapping">dmft_tools.afm_mapping</a>
 </li>
-        <li><a href="_autosummary/dmft_tools.convergence.html#module-dmft_tools.convergence">dmft_tools.convergence</a>
+        <li><a href="_ref/dmft_tools.convergence.html#module-dmft_tools.convergence">dmft_tools.convergence</a>
 </li>
-        <li><a href="_autosummary/dmft_tools.formatter.html#module-dmft_tools.formatter">dmft_tools.formatter</a>
+        <li><a href="_ref/dmft_tools.formatter.html#module-dmft_tools.formatter">dmft_tools.formatter</a>
 </li>
-        <li><a href="_autosummary/dmft_tools.greens_functions_mixer.html#module-dmft_tools.greens_functions_mixer">dmft_tools.greens_functions_mixer</a>
+        <li><a href="_ref/dmft_tools.greens_functions_mixer.html#module-dmft_tools.greens_functions_mixer">dmft_tools.greens_functions_mixer</a>
 </li>
-        <li><a href="_autosummary/dmft_tools.initial_self_energies.html#module-dmft_tools.initial_self_energies">dmft_tools.initial_self_energies</a>
+        <li><a href="_ref/dmft_tools.initial_self_energies.html#module-dmft_tools.initial_self_energies">dmft_tools.initial_self_energies</a>
 </li>
-        <li><a href="_autosummary/dmft_tools.interaction_hamiltonian.html#module-dmft_tools.interaction_hamiltonian">dmft_tools.interaction_hamiltonian</a>
+        <li><a href="_ref/dmft_tools.interaction_hamiltonian.html#module-dmft_tools.interaction_hamiltonian">dmft_tools.interaction_hamiltonian</a>
 </li>
-        <li><a href="_autosummary/dmft_tools.legendre_filter.html#module-dmft_tools.legendre_filter">dmft_tools.legendre_filter</a>
+        <li><a href="_ref/dmft_tools.legendre_filter.html#module-dmft_tools.legendre_filter">dmft_tools.legendre_filter</a>
 </li>
-        <li><a href="_autosummary/dmft_tools.manipulate_chemical_potential.html#module-dmft_tools.manipulate_chemical_potential">dmft_tools.manipulate_chemical_potential</a>
+        <li><a href="_ref/dmft_tools.manipulate_chemical_potential.html#module-dmft_tools.manipulate_chemical_potential">dmft_tools.manipulate_chemical_potential</a>
 </li>
-        <li><a href="_autosummary/dmft_tools.observables.html#module-dmft_tools.observables">dmft_tools.observables</a>
+        <li><a href="_ref/dmft_tools.observables.html#module-dmft_tools.observables">dmft_tools.observables</a>
 </li>
-        <li><a href="_autosummary/dmft_tools.results_to_archive.html#module-dmft_tools.results_to_archive">dmft_tools.results_to_archive</a>
+        <li><a href="_ref/dmft_tools.results_to_archive.html#module-dmft_tools.results_to_archive">dmft_tools.results_to_archive</a>
 </li>
-        <li><a href="_autosummary/dmft_tools.solver.html#module-dmft_tools.solver">dmft_tools.solver</a>
+        <li><a href="_ref/dmft_tools.solver.html#module-dmft_tools.solver">dmft_tools.solver</a>
 </li>
-        <li><a href="_autosummary/postprocessing.html#module-postprocessing">postprocessing</a>
+        <li><a href="_ref/postprocessing.html#module-postprocessing">postprocessing</a>
 </li>
-        <li><a href="_autosummary/postprocessing.eval_U_cRPA_Vasp.html#module-postprocessing.eval_U_cRPA_Vasp">postprocessing.eval_U_cRPA_Vasp</a>
+        <li><a href="_ref/postprocessing.eval_U_cRPA_Vasp.html#module-postprocessing.eval_U_cRPA_Vasp">postprocessing.eval_U_cRPA_Vasp</a>
 </li>
-        <li><a href="_autosummary/postprocessing.maxent_gf_imp.html#module-postprocessing.maxent_gf_imp">postprocessing.maxent_gf_imp</a>
+        <li><a href="_ref/postprocessing.maxent_gf_imp.html#module-postprocessing.maxent_gf_imp">postprocessing.maxent_gf_imp</a>
 </li>
-        <li><a href="_autosummary/postprocessing.maxent_gf_latt.html#module-postprocessing.maxent_gf_latt">postprocessing.maxent_gf_latt</a>
+        <li><a href="_ref/postprocessing.maxent_gf_latt.html#module-postprocessing.maxent_gf_latt">postprocessing.maxent_gf_latt</a>
 </li>
-        <li><a href="_autosummary/postprocessing.maxent_sigma.html#module-postprocessing.maxent_sigma">postprocessing.maxent_sigma</a>
+        <li><a href="_ref/postprocessing.maxent_sigma.html#module-postprocessing.maxent_sigma">postprocessing.maxent_sigma</a>
 </li>
-        <li><a href="_autosummary/postprocessing.plot_correlated_bands.html#module-postprocessing.plot_correlated_bands">postprocessing.plot_correlated_bands</a>
+        <li><a href="_ref/postprocessing.plot_correlated_bands.html#module-postprocessing.plot_correlated_bands">postprocessing.plot_correlated_bands</a>
 </li>
-        <li><a href="_autosummary/read_config.html#module-read_config">read_config</a>
+        <li><a href="_ref/read_config.html#module-read_config">read_config</a>
 </li>
         <li><a href="index.html#module-solid_dmft">solid_dmft</a>
 </li>
-        <li><a href="_autosummary/util.html#module-util">util</a>
+        <li><a href="_ref/util.html#module-util">util</a>
 </li>
-        <li><a href="_autosummary/util.symmetrize_gamma_file.html#module-util.symmetrize_gamma_file">util.symmetrize_gamma_file</a>
+        <li><a href="_ref/util.symmetrize_gamma_file.html#module-util.symmetrize_gamma_file">util.symmetrize_gamma_file</a>
 </li>
-        <li><a href="_autosummary/util.update_dmft_config.html#module-util.update_dmft_config">util.update_dmft_config</a>
+        <li><a href="_ref/util.update_dmft_config.html#module-util.update_dmft_config">util.update_dmft_config</a>
 </li>
-        <li><a href="_autosummary/util.update_results_h5.html#module-util.update_results_h5">util.update_results_h5</a>
+        <li><a href="_ref/util.update_results_h5.html#module-util.update_results_h5">util.update_results_h5</a>
 </li>
-        <li><a href="_autosummary/util.write_kslice_to_h5.html#module-util.write_kslice_to_h5">util.write_kslice_to_h5</a>
+        <li><a href="_ref/util.write_kslice_to_h5.html#module-util.write_kslice_to_h5">util.write_kslice_to_h5</a>
 </li>
       </ul></li>
   </ul></td>
@@ -574,34 +594,34 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/dft_managers.mpi_helpers.html#dft_managers.mpi_helpers.poll_barrier">poll_barrier() (in module dft_managers.mpi_helpers)</a>
+      <li><a href="_ref/dft_managers.mpi_helpers.html#dft_managers.mpi_helpers.poll_barrier">poll_barrier() (in module dft_managers.mpi_helpers)</a>
 </li>
       <li>
     postprocessing
 
       <ul>
-        <li><a href="_autosummary/postprocessing.html#module-postprocessing">module</a>
+        <li><a href="_ref/postprocessing.html#module-postprocessing">module</a>
 </li>
       </ul></li>
       <li>
     postprocessing.eval_U_cRPA_Vasp
 
       <ul>
-        <li><a href="_autosummary/postprocessing.eval_U_cRPA_Vasp.html#module-postprocessing.eval_U_cRPA_Vasp">module</a>
+        <li><a href="_ref/postprocessing.eval_U_cRPA_Vasp.html#module-postprocessing.eval_U_cRPA_Vasp">module</a>
 </li>
       </ul></li>
       <li>
     postprocessing.maxent_gf_imp
 
       <ul>
-        <li><a href="_autosummary/postprocessing.maxent_gf_imp.html#module-postprocessing.maxent_gf_imp">module</a>
+        <li><a href="_ref/postprocessing.maxent_gf_imp.html#module-postprocessing.maxent_gf_imp">module</a>
 </li>
       </ul></li>
       <li>
     postprocessing.maxent_gf_latt
 
       <ul>
-        <li><a href="_autosummary/postprocessing.maxent_gf_latt.html#module-postprocessing.maxent_gf_latt">module</a>
+        <li><a href="_ref/postprocessing.maxent_gf_latt.html#module-postprocessing.maxent_gf_latt">module</a>
 </li>
       </ul></li>
   </ul></td>
@@ -610,25 +630,25 @@
     postprocessing.maxent_sigma
 
       <ul>
-        <li><a href="_autosummary/postprocessing.maxent_sigma.html#module-postprocessing.maxent_sigma">module</a>
+        <li><a href="_ref/postprocessing.maxent_sigma.html#module-postprocessing.maxent_sigma">module</a>
 </li>
       </ul></li>
       <li>
     postprocessing.plot_correlated_bands
 
       <ul>
-        <li><a href="_autosummary/postprocessing.plot_correlated_bands.html#module-postprocessing.plot_correlated_bands">module</a>
+        <li><a href="_ref/postprocessing.plot_correlated_bands.html#module-postprocessing.plot_correlated_bands">module</a>
 </li>
       </ul></li>
-      <li><a href="_autosummary/dmft_tools.convergence.html#dmft_tools.convergence.prep_conv_file">prep_conv_file() (in module dmft_tools.convergence)</a>
+      <li><a href="_ref/dmft_tools.convergence.html#dmft_tools.convergence.prep_conv_file">prep_conv_file() (in module dmft_tools.convergence)</a>
 </li>
-      <li><a href="_autosummary/dmft_tools.convergence.html#dmft_tools.convergence.prep_conv_obs">prep_conv_obs() (in module dmft_tools.convergence)</a>
+      <li><a href="_ref/dmft_tools.convergence.html#dmft_tools.convergence.prep_conv_obs">prep_conv_obs() (in module dmft_tools.convergence)</a>
 </li>
-      <li><a href="_autosummary/dmft_tools.observables.html#dmft_tools.observables.prep_observables">prep_observables() (in module dmft_tools.observables)</a>
+      <li><a href="_ref/dmft_tools.observables.html#dmft_tools.observables.prep_observables">prep_observables() (in module dmft_tools.observables)</a>
 </li>
-      <li><a href="_autosummary/dmft_tools.formatter.html#dmft_tools.formatter.print_block_sym">print_block_sym() (in module dmft_tools.formatter)</a>
+      <li><a href="_ref/dmft_tools.formatter.html#dmft_tools.formatter.print_block_sym">print_block_sym() (in module dmft_tools.formatter)</a>
 </li>
-      <li><a href="_autosummary/dmft_tools.formatter.html#dmft_tools.formatter.print_rotation_matrix">print_rotation_matrix() (in module dmft_tools.formatter)</a>
+      <li><a href="_ref/dmft_tools.formatter.html#dmft_tools.formatter.print_rotation_matrix">print_rotation_matrix() (in module dmft_tools.formatter)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -636,26 +656,26 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/dft_managers.vasp_manager.html#dft_managers.vasp_manager.reactivate">reactivate() (in module dft_managers.vasp_manager)</a>
+      <li><a href="_ref/dft_managers.vasp_manager.html#dft_managers.vasp_manager.reactivate">reactivate() (in module dft_managers.vasp_manager)</a>
 </li>
       <li>
     read_config
 
       <ul>
-        <li><a href="_autosummary/read_config.html#module-read_config">module</a>
+        <li><a href="_ref/read_config.html#module-read_config">module</a>
 </li>
       </ul></li>
-      <li><a href="_autosummary/read_config.html#read_config.read_config">read_config() (in module read_config)</a>
+      <li><a href="_ref/read_config.html#read_config.read_config">read_config() (in module read_config)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/csc_flow.html#csc_flow.read_dft_energy_qe">read_dft_energy_qe() (in module csc_flow)</a>
+      <li><a href="_ref/csc_flow.html#csc_flow.read_dft_energy_qe">read_dft_energy_qe() (in module csc_flow)</a>
 </li>
-      <li><a href="_autosummary/csc_flow.html#csc_flow.read_dft_energy_vasp">read_dft_energy_vasp() (in module csc_flow)</a>
+      <li><a href="_ref/csc_flow.html#csc_flow.read_dft_energy_vasp">read_dft_energy_vasp() (in module csc_flow)</a>
 </li>
-      <li><a href="_autosummary/postprocessing.eval_U_cRPA_Vasp.html#postprocessing.eval_U_cRPA_Vasp.read_uijkl">read_uijkl() (in module postprocessing.eval_U_cRPA_Vasp)</a>
+      <li><a href="_ref/postprocessing.eval_U_cRPA_Vasp.html#postprocessing.eval_U_cRPA_Vasp.read_uijkl">read_uijkl() (in module postprocessing.eval_U_cRPA_Vasp)</a>
 </li>
-      <li><a href="_autosummary/postprocessing.eval_U_cRPA_Vasp.html#postprocessing.eval_U_cRPA_Vasp.red_to_2ind">red_to_2ind() (in module postprocessing.eval_U_cRPA_Vasp)</a>
+      <li><a href="_ref/postprocessing.eval_U_cRPA_Vasp.html#postprocessing.eval_U_cRPA_Vasp.red_to_2ind">red_to_2ind() (in module postprocessing.eval_U_cRPA_Vasp)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -663,7 +683,7 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/dmft_tools.manipulate_chemical_potential.html#dmft_tools.manipulate_chemical_potential.set_initial_mu">set_initial_mu() (in module dmft_tools.manipulate_chemical_potential)</a>
+      <li><a href="_ref/dmft_tools.manipulate_chemical_potential.html#dmft_tools.manipulate_chemical_potential.set_initial_mu">set_initial_mu() (in module dmft_tools.manipulate_chemical_potential)</a>
 </li>
       <li><a href="index.html#index-0">solid_dmft</a>
 
@@ -673,14 +693,14 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/dmft_tools.solver.SolverStructure.solve.html#dmft_tools.solver.SolverStructure.solve">solve() (dmft_tools.solver.SolverStructure method)</a>, <a href="_autosummary/dmft_tools.solver.html#dmft_tools.solver.SolverStructure.solve">[1]</a>
+      <li><a href="_ref/dmft_tools.solver.SolverStructure.solve.html#dmft_tools.solver.SolverStructure.solve">solve() (dmft_tools.solver.SolverStructure method)</a>, <a href="_ref/dmft_tools.solver.html#dmft_tools.solver.SolverStructure.solve">[1]</a>
 </li>
-      <li><a href="_autosummary/dmft_tools.solver.html#dmft_tools.solver.SolverStructure">SolverStructure (class in dmft_tools.solver)</a>
+      <li><a href="_ref/dmft_tools.solver.html#dmft_tools.solver.SolverStructure">SolverStructure (class in dmft_tools.solver)</a>
 </li>
-      <li><a href="_autosummary/dft_managers.qe_manager.html#dft_managers.qe_manager.start">start() (in module dft_managers.qe_manager)</a>
+      <li><a href="_ref/dft_managers.qe_manager.html#dft_managers.qe_manager.start">start() (in module dft_managers.qe_manager)</a>
 
       <ul>
-        <li><a href="_autosummary/dft_managers.vasp_manager.html#dft_managers.vasp_manager.start">(in module dft_managers.vasp_manager)</a>
+        <li><a href="_ref/dft_managers.vasp_manager.html#dft_managers.vasp_manager.start">(in module dft_managers.vasp_manager)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -689,20 +709,20 @@
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/dmft_tools.manipulate_chemical_potential.html#dmft_tools.manipulate_chemical_potential.update_mu">update_mu() (in module dmft_tools.manipulate_chemical_potential)</a>
+      <li><a href="_ref/dmft_tools.manipulate_chemical_potential.html#dmft_tools.manipulate_chemical_potential.update_mu">update_mu() (in module dmft_tools.manipulate_chemical_potential)</a>
 </li>
       <li>
     util
 
       <ul>
-        <li><a href="_autosummary/util.html#module-util">module</a>
+        <li><a href="_ref/util.html#module-util">module</a>
 </li>
       </ul></li>
       <li>
     util.symmetrize_gamma_file
 
       <ul>
-        <li><a href="_autosummary/util.symmetrize_gamma_file.html#module-util.symmetrize_gamma_file">module</a>
+        <li><a href="_ref/util.symmetrize_gamma_file.html#module-util.symmetrize_gamma_file">module</a>
 </li>
       </ul></li>
   </ul></td>
@@ -711,21 +731,21 @@
     util.update_dmft_config
 
       <ul>
-        <li><a href="_autosummary/util.update_dmft_config.html#module-util.update_dmft_config">module</a>
+        <li><a href="_ref/util.update_dmft_config.html#module-util.update_dmft_config">module</a>
 </li>
       </ul></li>
       <li>
     util.update_results_h5
 
       <ul>
-        <li><a href="_autosummary/util.update_results_h5.html#module-util.update_results_h5">module</a>
+        <li><a href="_ref/util.update_results_h5.html#module-util.update_results_h5">module</a>
 </li>
       </ul></li>
       <li>
     util.write_kslice_to_h5
 
       <ul>
-        <li><a href="_autosummary/util.write_kslice_to_h5.html#module-util.write_kslice_to_h5">module</a>
+        <li><a href="_ref/util.write_kslice_to_h5.html#module-util.write_kslice_to_h5">module</a>
 </li>
       </ul></li>
   </ul></td>
@@ -734,15 +754,15 @@
 <h2 id="W">W</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/dmft_tools.results_to_archive.html#dmft_tools.results_to_archive.write">write() (in module dmft_tools.results_to_archive)</a>
+      <li><a href="_ref/dmft_tools.results_to_archive.html#dmft_tools.results_to_archive.write">write() (in module dmft_tools.results_to_archive)</a>
 </li>
-      <li><a href="_autosummary/dmft_tools.convergence.html#dmft_tools.convergence.write_conv">write_conv() (in module dmft_tools.convergence)</a>
+      <li><a href="_ref/dmft_tools.convergence.html#dmft_tools.convergence.write_conv">write_conv() (in module dmft_tools.convergence)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/dmft_tools.observables.html#dmft_tools.observables.write_header_to_file">write_header_to_file() (in module dmft_tools.observables)</a>
+      <li><a href="_ref/dmft_tools.observables.html#dmft_tools.observables.write_header_to_file">write_header_to_file() (in module dmft_tools.observables)</a>
 </li>
-      <li><a href="_autosummary/dmft_tools.observables.html#dmft_tools.observables.write_obs">write_obs() (in module dmft_tools.observables)</a>
+      <li><a href="_ref/dmft_tools.observables.html#dmft_tools.observables.write_obs">write_obs() (in module dmft_tools.observables)</a>
 </li>
   </ul></td>
 </tr></table>

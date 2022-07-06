@@ -1,0 +1,41 @@
+﻿dmft\_tools
+===========
+
+.. automodule:: dmft_tools
+    :members:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+    :toctree:
+    :template: autosummary_module_template.rst 
+    :recursive:
+
+    
+    dmft_tools.afm_mapping
+    dmft_tools.convergence
+    dmft_tools.formatter
+    dmft_tools.greens_functions_mixer
+    dmft_tools.initial_self_energies
+    dmft_tools.interaction_hamiltonian
+    dmft_tools.legendre_filter
+    dmft_tools.manipulate_chemical_potential
+    dmft_tools.observables
+    dmft_tools.results_to_archive
+    dmft_tools.solver
+
+

@@ -3,12 +3,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dmft_tools.observables &mdash; solid_dmft  documentation</title><link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" /><link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  <title>dmft_tools.observables &mdash; solid_dmft  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/plot_directive.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
-  <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
@@ -23,7 +27,8 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search"  style="background: #7E588A" >
-            <a href="../../index.html" class="icon icon-home"> solid_dmft<img src="../../_static/logo_no_text.png" class="logo" alt="Logo"/>
+            <a href="../../index.html" class="icon icon-home"> solid_dmft
+            <img src="../../_static/logo_no_text.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
                 3.1.0
@@ -71,6 +76,21 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#input-output">Input/Output</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../input_output/DMFT_input/input.html">Input</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_input/general.html">[general]: General parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_input/solver.html">[solver]: solver specific parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_input/dft.html">[dft]: DFT related inputs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_input/advanced.html">[advanced]: Advanced inputs</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../input_output/DMFT_output/results.html">Output / results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_output/results.html#group-structure">Group structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_output/results.html#subgroups">Subgroups</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation.html#further-details-for-running">Further details for running</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../md_notes/docker.html">Docker</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../md_notes/docker.html#building-the-docker-image">Building the docker image</a></li>
@@ -91,48 +111,48 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation.html#module-reference-manual">Module reference manual</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/csc_flow.html">csc_flow</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/dft_managers.html">dft_managers</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dft_managers.mpi_helpers.html">dft_managers.mpi_helpers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dft_managers.qe_manager.html">dft_managers.qe_manager</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dft_managers.vasp_manager.html">dft_managers.vasp_manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/csc_flow.html">csc_flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/dft_managers.html">dft_managers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dft_managers.mpi_helpers.html">dft_managers.mpi_helpers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dft_managers.qe_manager.html">dft_managers.qe_manager</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dft_managers.vasp_manager.html">dft_managers.vasp_manager</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/dmft_cycle.html">dmft_cycle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/dmft_tools.html">dmft_tools</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.afm_mapping.html">dmft_tools.afm_mapping</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.convergence.html">dmft_tools.convergence</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.formatter.html">dmft_tools.formatter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.greens_functions_mixer.html">dmft_tools.greens_functions_mixer</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.initial_self_energies.html">dmft_tools.initial_self_energies</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.interaction_hamiltonian.html">dmft_tools.interaction_hamiltonian</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.legendre_filter.html">dmft_tools.legendre_filter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.manipulate_chemical_potential.html">dmft_tools.manipulate_chemical_potential</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.observables.html">dmft_tools.observables</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.results_to_archive.html">dmft_tools.results_to_archive</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/dmft_tools.solver.html">dmft_tools.solver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/dmft_cycle.html">dmft_cycle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/dmft_tools.html">dmft_tools</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.afm_mapping.html">dmft_tools.afm_mapping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.convergence.html">dmft_tools.convergence</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.formatter.html">dmft_tools.formatter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.greens_functions_mixer.html">dmft_tools.greens_functions_mixer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.initial_self_energies.html">dmft_tools.initial_self_energies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.interaction_hamiltonian.html">dmft_tools.interaction_hamiltonian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.legendre_filter.html">dmft_tools.legendre_filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.manipulate_chemical_potential.html">dmft_tools.manipulate_chemical_potential</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.observables.html">dmft_tools.observables</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.results_to_archive.html">dmft_tools.results_to_archive</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.solver.html">dmft_tools.solver</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/postprocessing.html">postprocessing</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/postprocessing.eval_U_cRPA_Vasp.html">postprocessing.eval_U_cRPA_Vasp</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/postprocessing.maxent_gf_imp.html">postprocessing.maxent_gf_imp</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/postprocessing.maxent_gf_latt.html">postprocessing.maxent_gf_latt</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/postprocessing.maxent_sigma.html">postprocessing.maxent_sigma</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/postprocessing.plot_correlated_bands.html">postprocessing.plot_correlated_bands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/postprocessing.html">postprocessing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.eval_U_cRPA_Vasp.html">postprocessing.eval_U_cRPA_Vasp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.maxent_gf_imp.html">postprocessing.maxent_gf_imp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.maxent_gf_latt.html">postprocessing.maxent_gf_latt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.maxent_sigma.html">postprocessing.maxent_sigma</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.plot_correlated_bands.html">postprocessing.plot_correlated_bands</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/read_config.html">read_config</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/read_config.html#general">general</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/read_config.html#solver">solver</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/read_config.html#dft">dft</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/read_config.html#advanced">advanced</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/read_config.html">read_config</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/read_config.html#general">[  general  ]</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/read_config.html#solver">[  solver  ]</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/read_config.html#dft">[  dft  ]</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/read_config.html#advanced">[  advanced  ]</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/util.html">util</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/util.symmetrize_gamma_file.html">util.symmetrize_gamma_file</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/util.update_dmft_config.html">util.update_dmft_config</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/util.update_results_h5.html">util.update_results_h5</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/util.write_kslice_to_h5.html">util.write_kslice_to_h5</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/util.html">util</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/util.symmetrize_gamma_file.html">util.symmetrize_gamma_file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/util.update_dmft_config.html">util.update_dmft_config</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/util.update_results_h5.html">util.update_results_h5</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/util.write_kslice_to_h5.html">util.write_kslice_to_h5</a></li>
 </ul>
 </li>
 </ul>
@@ -277,7 +297,7 @@
 <span class="kn">from</span> <span class="nn">triqs.atom_diag</span> <span class="kn">import</span> <span class="n">trace_rho_op</span>
 <span class="kn">from</span> <span class="nn">triqs.gf.descriptors</span> <span class="kn">import</span> <span class="n">Fourier</span>
 
-<div class="viewcode-block" id="prep_observables"><a class="viewcode-back" href="../../_autosummary/dmft_tools.observables.html#dmft_tools.observables.prep_observables">[docs]</a><span class="k">def</span> <span class="nf">prep_observables</span><span class="p">(</span><span class="n">h5_archive</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">):</span>
+<div class="viewcode-block" id="prep_observables"><a class="viewcode-back" href="../../_ref/dmft_tools.observables.html#dmft_tools.observables.prep_observables">[docs]</a><span class="k">def</span> <span class="nf">prep_observables</span><span class="p">(</span><span class="n">h5_archive</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    prepares the observable arrays and files for the DMFT calculation</span>
 
@@ -363,7 +383,7 @@
     <span class="k">return</span> <span class="n">headers</span>
 
 
-<div class="viewcode-block" id="write_header_to_file"><a class="viewcode-back" href="../../_autosummary/dmft_tools.observables.html#dmft_tools.observables.write_header_to_file">[docs]</a><span class="k">def</span> <span class="nf">write_header_to_file</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">):</span>
+<div class="viewcode-block" id="write_header_to_file"><a class="viewcode-back" href="../../_ref/dmft_tools.observables.html#dmft_tools.observables.write_header_to_file">[docs]</a><span class="k">def</span> <span class="nf">write_header_to_file</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Writes the header to the observable files</span>
 
@@ -388,7 +408,7 @@
             <span class="n">obs_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">header</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="add_dft_values_as_zeroth_iteration"><a class="viewcode-back" href="../../_autosummary/dmft_tools.observables.html#dmft_tools.observables.add_dft_values_as_zeroth_iteration">[docs]</a><span class="k">def</span> <span class="nf">add_dft_values_as_zeroth_iteration</span><span class="p">(</span><span class="n">observables</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">dft_mu</span><span class="p">,</span> <span class="n">dft_energy</span><span class="p">,</span>
+<div class="viewcode-block" id="add_dft_values_as_zeroth_iteration"><a class="viewcode-back" href="../../_ref/dmft_tools.observables.html#dmft_tools.observables.add_dft_values_as_zeroth_iteration">[docs]</a><span class="k">def</span> <span class="nf">add_dft_values_as_zeroth_iteration</span><span class="p">(</span><span class="n">observables</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">dft_mu</span><span class="p">,</span> <span class="n">dft_energy</span><span class="p">,</span>
                                        <span class="n">sum_k</span><span class="p">,</span> <span class="n">G_loc_all_dft</span><span class="p">,</span> <span class="n">density_mat_dft</span><span class="p">,</span> <span class="n">shell_multiplicity</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates the DFT observables that should be written as the zeroth iteration.</span>
@@ -499,7 +519,7 @@
     <span class="k">return</span> <span class="n">observables</span></div>
 
 
-<div class="viewcode-block" id="add_dmft_observables"><a class="viewcode-back" href="../../_autosummary/dmft_tools.observables.html#dmft_tools.observables.add_dmft_observables">[docs]</a><span class="k">def</span> <span class="nf">add_dmft_observables</span><span class="p">(</span><span class="n">observables</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">solver_params</span><span class="p">,</span> <span class="n">dft_energy</span><span class="p">,</span> <span class="n">it</span><span class="p">,</span> <span class="n">solvers</span><span class="p">,</span> <span class="n">h_int</span><span class="p">,</span>
+<div class="viewcode-block" id="add_dmft_observables"><a class="viewcode-back" href="../../_ref/dmft_tools.observables.html#dmft_tools.observables.add_dmft_observables">[docs]</a><span class="k">def</span> <span class="nf">add_dmft_observables</span><span class="p">(</span><span class="n">observables</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">solver_params</span><span class="p">,</span> <span class="n">dft_energy</span><span class="p">,</span> <span class="n">it</span><span class="p">,</span> <span class="n">solvers</span><span class="p">,</span> <span class="n">h_int</span><span class="p">,</span>
                          <span class="n">previous_mu</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span> <span class="n">density_mat</span><span class="p">,</span> <span class="n">shell_multiplicity</span><span class="p">,</span> <span class="n">E_bandcorr</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    calculates the observables for given Input, I decided to calculate the observables</span>
@@ -640,7 +660,7 @@
 
     <span class="k">return</span> <span class="n">observables</span></div>
 
-<div class="viewcode-block" id="write_obs"><a class="viewcode-back" href="../../_autosummary/dmft_tools.observables.html#dmft_tools.observables.write_obs">[docs]</a><span class="k">def</span> <span class="nf">write_obs</span><span class="p">(</span><span class="n">observables</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span> <span class="n">general_params</span><span class="p">):</span>
+<div class="viewcode-block" id="write_obs"><a class="viewcode-back" href="../../_ref/dmft_tools.observables.html#dmft_tools.observables.write_obs">[docs]</a><span class="k">def</span> <span class="nf">write_obs</span><span class="p">(</span><span class="n">observables</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span> <span class="n">general_params</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    writes the last entries of the observable arrays to the files</span>
 
@@ -730,7 +750,7 @@
                 <span class="n">obs_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="calc_dft_kin_en"><a class="viewcode-back" href="../../_autosummary/dmft_tools.observables.html#dmft_tools.observables.calc_dft_kin_en">[docs]</a><span class="k">def</span> <span class="nf">calc_dft_kin_en</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span> <span class="n">dft_mu</span><span class="p">):</span>
+<div class="viewcode-block" id="calc_dft_kin_en"><a class="viewcode-back" href="../../_ref/dmft_tools.observables.html#dmft_tools.observables.calc_dft_kin_en">[docs]</a><span class="k">def</span> <span class="nf">calc_dft_kin_en</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span> <span class="n">dft_mu</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates the kinetic energy from DFT for target states</span>
 
@@ -760,9 +780,7 @@
         <span class="n">nb</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_orbitals</span><span class="p">[</span><span class="n">ik</span><span class="p">])</span>
         <span class="c1"># calculate lattice greens function need here to set sigma other n_iw is assumend to be 1025!</span>
         <span class="c1"># TODO: implement here version for FTPS!</span>
-        <span class="n">G_freq_lat</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">lattice_gf</span><span class="p">(</span><span class="n">ik</span><span class="p">,</span>
-                                    <span class="n">beta</span><span class="o">=</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">],</span>
-                                    <span class="n">with_Sigma</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">dft_mu</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">G_freq_lat</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">lattice_gf</span><span class="p">(</span><span class="n">ik</span><span class="p">,</span> <span class="n">with_Sigma</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">dft_mu</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="c1"># # calculate G(beta) via the function density, which is the same as fourier trafo G(w) and taking G(b)</span>
         <span class="n">G_freq_lat_beta</span> <span class="o">=</span> <span class="n">G_freq_lat</span><span class="o">.</span><span class="n">density</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">spin</span> <span class="ow">in</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">spin_block_names</span><span class="p">[</span><span class="n">sum_k</span><span class="o">.</span><span class="n">SO</span><span class="p">]:</span>
@@ -779,7 +797,7 @@
 
     <span class="k">return</span> <span class="n">E_kin_dft</span></div>
 
-<div class="viewcode-block" id="calc_bandcorr_man"><a class="viewcode-back" href="../../_autosummary/dmft_tools.observables.html#dmft_tools.observables.calc_bandcorr_man">[docs]</a><span class="k">def</span> <span class="nf">calc_bandcorr_man</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span> <span class="n">E_kin_dft</span><span class="p">):</span>
+<div class="viewcode-block" id="calc_bandcorr_man"><a class="viewcode-back" href="../../_ref/dmft_tools.observables.html#dmft_tools.observables.calc_bandcorr_man">[docs]</a><span class="k">def</span> <span class="nf">calc_bandcorr_man</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span> <span class="n">E_kin_dft</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates the correlated kinetic energy from DMFT for target states</span>
 <span class="sd">    and then determines the band correction energy</span>
@@ -811,7 +829,7 @@
     <span class="k">for</span> <span class="n">ik</span> <span class="ow">in</span> <span class="n">mpi</span><span class="o">.</span><span class="n">slice_array</span><span class="p">(</span><span class="n">ikarray</span><span class="p">):</span>
         <span class="n">nb</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_orbitals</span><span class="p">[</span><span class="n">ik</span><span class="p">])</span>
         <span class="c1"># calculate lattice greens function</span>
-        <span class="n">G_freq_lat</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">lattice_gf</span><span class="p">(</span><span class="n">ik</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">],</span> <span class="n">with_Sigma</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">with_dc</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">G_freq_lat</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">lattice_gf</span><span class="p">(</span><span class="n">ik</span><span class="p">,</span> <span class="n">with_Sigma</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">with_dc</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="c1"># calculate G(beta) via the function density, which is the same as fourier trafo G(w) and taking G(b)</span>
         <span class="n">G_freq_lat_beta</span> <span class="o">=</span> <span class="n">G_freq_lat</span><span class="o">.</span><span class="n">density</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">spin</span> <span class="ow">in</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">spin_block_names</span><span class="p">[</span><span class="n">sum_k</span><span class="o">.</span><span class="n">SO</span><span class="p">]:</span>
@@ -831,7 +849,7 @@
 
     <span class="k">return</span> <span class="n">E_bandcorr</span></div>
 
-<div class="viewcode-block" id="calc_Z"><a class="viewcode-back" href="../../_autosummary/dmft_tools.observables.html#dmft_tools.observables.calc_Z">[docs]</a><span class="k">def</span> <span class="nf">calc_Z</span><span class="p">(</span><span class="n">Sigma</span><span class="p">):</span>
+<div class="viewcode-block" id="calc_Z"><a class="viewcode-back" href="../../_ref/dmft_tools.observables.html#dmft_tools.observables.calc_Z">[docs]</a><span class="k">def</span> <span class="nf">calc_Z</span><span class="p">(</span><span class="n">Sigma</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    calculates the inverse mass enhancement from the impurity</span>
 <span class="sd">    self-energy by a simple estimate:</span>

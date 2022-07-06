@@ -1,0 +1,6 @@
+dmft\_tools.solver.SolverStructure.solve
+========================================
+
+.. currentmodule:: dmft_tools.solver
+
+.. automethod:: SolverStructure.solve

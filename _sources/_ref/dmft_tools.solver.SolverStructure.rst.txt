@@ -1,0 +1,24 @@
+dmft\_tools.solver.SolverStructure
+==================================
+
+.. currentmodule:: dmft_tools.solver
+
+.. autoclass:: SolverStructure
+    :members:                               
+    :show-inheritance:                     
+    :inherited-members:                   
+    :special-members: __init__
+    :noindex:
+
+
+
+.. autosummary::
+    :toctree:                             
+    
+      ~SolverStructure.__init__
+      ~SolverStructure.solve
+
+
+
+
+
