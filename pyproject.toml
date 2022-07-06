@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["python"]
+
+[project]
+name = "solid_dmft"
+version = "3.1.1"
+authors = [
+  { name="Alexander Hampel", email="ahampel@flatironinstitute.org" }
+]
+description = "solid_dmft: a versatile python wrapper to perform DFT+DMFT calculations utilizing the TRIQS software library"
+readme = "README.md"
+keywords = ["DMFT", "DFT", "triqs"]
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "numpy",
+    "scipy",
+    "pytest",
+    "scikit-image"
+]
+
+[project.urls]
+"Homepage" = "https://triqs.github.io/solid_dmft"
+"Bug Tracker" = "https://github.com/triqs/solid_dmft/issues"
+
+[project.scripts]
+solid_dmft = "solid_dmft.main:main"
+
