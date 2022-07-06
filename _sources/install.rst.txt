@@ -10,13 +10,26 @@ Prerequisites
 #. The :ref:`TRIQS <triqslibs:welcome>` library, see `TRIQS installation instruction <https://triqs.github.io/triqs/latest/install.html>`_.
    In the following, we assume that :ref:`TRIQS <triqslibs:welcome>`, `triqs/dft_tools <https://triqs.github.io/dft_tools>`_, and at least one of the impurity solvers `available in TRIQS <https://triqs.github.io/triqs/latest/applications.html>`_, e.g. cthyb, HubbardI, ctseg, FTPS, or ctint is installed in the directory ``path_to_triqs``.
 
-
-#. make sure to install besides the triqs requirements also the python packages::
+#. Make sure to install besides the triqs requirements also the python packages::
 
      $ pip3 install --user scipy argparse pytest
 
-Installation steps
-------------------
+#. To build the documentation the following extra python packages are needed::
+
+     $ pip3 install --user sphinx sphinx-autobuild pandoc nbsphinx linkify-it-py sphinx_rtd_theme myst-parser
+
+
+Installation via pip
+--------------------
+
+You can install the latest solid_dmft release simply via pip (PyPi):
+```
+pip install solid_dmft
+```
+However, please make sure that you have a valid TRIQS and TRIQS/DFTTools installation matching the version of solid_dmft. Furthermore, you need at least one of the supported DMFT impurity solvers installed to use solid_dmft. 
+
+Manual installation via CMake
+-----------------------------
 
 #. clone the ``flatironinstitute/solid_dmft`` repository from GitHub::
 
@@ -51,10 +64,7 @@ to build ``solid_dmft`` with documentation you should run::
      $ sphinx-autobuild path/to/solid_dmft.src/doc ./doc/html -c ./doc/
 
 The last line will automatically search for changes in your src dir, rebuild the documentation, 
-and serve it locally as under `127.0.0.1:8000`. To build the documentation the following extra 
-python packages are needed::
-
-     $ pip3 install --user sphinx sphinx-autobuild pandoc nbsphinx linkify-it-py sphinx_rtd_theme myst-parser
+and serve it locally as under `127.0.0.1:8000`. 
 
 Version compatibility
 ---------------------

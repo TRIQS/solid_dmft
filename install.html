@@ -46,7 +46,8 @@
               <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#installation-steps">Installation steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation-via-pip">Installation via pip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#manual-installation-via-cmake">Manual installation via CMake</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-compatibility">Version compatibility</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#custom-cmake-options">Custom CMake options</a></li>
 </ul>
@@ -287,15 +288,28 @@
 <li><p class="first">The <a class="reference external" href="https://triqs.github.io/triqs/latest/index.html#welcome" rel="noopener noreferrer" target="_blank" title="(in TRIQS v3.1.1)"><span class="xref std std-ref">TRIQS</span></a> library, see <a class="reference external" href="https://triqs.github.io/triqs/latest/install.html" rel="noopener noreferrer" target="_blank">TRIQS installation instruction</a>.
 In the following, we assume that <a class="reference external" href="https://triqs.github.io/triqs/latest/index.html#welcome" rel="noopener noreferrer" target="_blank" title="(in TRIQS v3.1.1)"><span class="xref std std-ref">TRIQS</span></a>, <a class="reference external" href="https://triqs.github.io/dft_tools" rel="noopener noreferrer" target="_blank">triqs/dft_tools</a>, and at least one of the impurity solvers <a class="reference external" href="https://triqs.github.io/triqs/latest/applications.html" rel="noopener noreferrer" target="_blank">available in TRIQS</a>, e.g. cthyb, HubbardI, ctseg, FTPS, or ctint is installed in the directory <code class="docutils literal notranslate"><span class="pre">path_to_triqs</span></code>.</p>
 </li>
-<li><p class="first">make sure to install besides the triqs requirements also the python packages:</p>
+<li><p class="first">Make sure to install besides the triqs requirements also the python packages:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ pip3 install --user scipy argparse pytest
+</pre></div>
+</div>
+</li>
+<li><p class="first">To build the documentation the following extra python packages are needed:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ pip3 install --user sphinx sphinx-autobuild pandoc nbsphinx linkify-it-py sphinx_rtd_theme myst-parser
 </pre></div>
 </div>
 </li>
 </ol>
 </div>
-<div class="section" id="installation-steps">
-<h2>Installation steps<a class="headerlink" href="#installation-steps" title="Permalink to this headline"></a></h2>
+<div class="section" id="installation-via-pip">
+<h2>Installation via pip<a class="headerlink" href="#installation-via-pip" title="Permalink to this headline"></a></h2>
+<p>You can install the latest solid_dmft release simply via pip (PyPi):
+<code class="docutils literal notranslate"><span class="pre">`</span>
+<span class="pre">pip</span> <span class="pre">install</span> <span class="pre">solid_dmft</span>
+<span class="pre">`</span></code>
+However, please make sure that you have a valid TRIQS and TRIQS/DFTTools installation matching the version of solid_dmft. Furthermore, you need at least one of the supported DMFT impurity solvers installed to use solid_dmft.</p>
+</div>
+<div class="section" id="manual-installation-via-cmake">
+<h2>Manual installation via CMake<a class="headerlink" href="#manual-installation-via-cmake" title="Permalink to this headline"></a></h2>
 <ol class="arabic">
 <li><p class="first">clone the <code class="docutils literal notranslate"><span class="pre">flatironinstitute/solid_dmft</span></code> repository from GitHub:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/flatironinstitute/solid_dmft solid_dmft.src
@@ -336,11 +350,7 @@ $ sphinx-autobuild path/to/solid_dmft.src/doc ./doc/html -c ./doc/
 </pre></div>
 </div>
 <p>The last line will automatically search for changes in your src dir, rebuild the documentation,
-and serve it locally as under <cite>127.0.0.1:8000</cite>. To build the documentation the following extra
-python packages are needed:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ pip3 install --user sphinx sphinx-autobuild pandoc nbsphinx linkify-it-py sphinx_rtd_theme myst-parser
-</pre></div>
-</div>
+and serve it locally as under <cite>127.0.0.1:8000</cite>.</p>
 </div>
 <div class="section" id="version-compatibility">
 <h2>Version compatibility<a class="headerlink" href="#version-compatibility" title="Permalink to this headline"></a></h2>
