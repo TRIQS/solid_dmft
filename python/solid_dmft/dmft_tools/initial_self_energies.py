@@ -35,7 +35,7 @@ import numpy as np
 # triqs
 from h5 import HDFArchive
 import triqs.utility.mpi as mpi
-from triqs.gf import BlockGf, GfImFreq, GfReFreq
+from triqs.gf import BlockGf, Gf, GfImFreq, GfReFreq
 from triqs_dft_tools.sumk_dft import SumkDFT
 
 
@@ -222,8 +222,8 @@ def _sumk_sigma_to_solver_struct(sum_k, start_sigma):
     """
 
     Sigma_local = [start_sigma[icrsh].copy() for icrsh in range(sum_k.n_corr_shells)]
-    Sigma_inequiv = [BlockGf(name_block_generator=[(block, GfImFreq(indices=inner, mesh=Sigma_local[0].mesh))
-                                                   for block, inner in sum_k.gf_struct_solver[ish].items()],
+    Sigma_inequiv = [BlockGf(name_block_generator=[(block, Gf(mesh=Sigma_local[0].mesh, target_shape=(dim, dim)))
+                                                   for block, dim in sum_k.gf_struct_solver[ish].items()],
                              make_copies=False) for ish in range(sum_k.n_inequiv_shells)]
 
     # G_loc is rotated to the local coordinate system
@@ -235,9 +235,9 @@ def _sumk_sigma_to_solver_struct(sum_k, start_sigma):
 
     # transform to CTQMC blocks
     for ish in range(sum_k.n_inequiv_shells):
-        for block, inner in sum_k.gf_struct_solver[ish].items():
-            for ind1 in inner:
-                for ind2 in inner:
+        for block, dim in sum_k.gf_struct_solver[ish].items():
+            for ind1 in range(dim):
+                for ind2 in range(dim):
                     block_sumk, ind1_sumk = sum_k.solver_to_sumk[ish][(block, ind1)]
                     block_sumk, ind2_sumk = sum_k.solver_to_sumk[ish][(block, ind2)]
                     Sigma_inequiv[ish][block][ind1, ind2] << Sigma_local[
