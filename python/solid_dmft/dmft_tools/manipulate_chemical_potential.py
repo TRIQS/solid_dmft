@@ -104,7 +104,7 @@ def _initialize_lattice_gf(sum_k, general_params):
     """
 
     # Initializes lattice GF to zero for each process
-    mesh = sum_k.Sigma_imp_iw[0].mesh
+    mesh = sum_k.Sigma_imp[0].mesh
     trace_gf_latt = GfImFreq(mesh=mesh, data=np.zeros((len(mesh), 1, 1), dtype=complex))
     occupation = 0
 

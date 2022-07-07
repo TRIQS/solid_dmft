@@ -316,11 +316,7 @@ def _set_loaded_sigma(sum_k, loaded_sigma, loaded_dc_imp, general_params):
 
     # Cleans up
     sum_k.dc_imp = calculated_dc_imp
-    if general_params['solver_type'] in ['ftps']:
-        sumk_sigma = sum_k.Sigma_imp_w
-    else:
-        sumk_sigma = sum_k.Sigma_imp_iw
-    [sigma_freq.zero() for sigma_freq in sumk_sigma]
+    [sigma_freq.zero() for sigma_freq in sum_k.Sigma_imp]
 
     return start_sigma
 

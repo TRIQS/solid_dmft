@@ -111,7 +111,7 @@ def _generate_lattice_gf(sum_k, sum_spins):
     """
     # Initializes lattice GF to zero for each process
     spin_blocks = ['total'] if sum_spins else sum_k.spin_block_names[sum_k.SO]
-    mesh = sum_k.Sigma_imp_iw[0].mesh
+    mesh = sum_k.Sigma_imp[0].mesh
     trace_gf_latt = {key: Gf(mesh=mesh, data=np.zeros((len(mesh), 1, 1), dtype=complex))
                      for key in spin_blocks}
 
