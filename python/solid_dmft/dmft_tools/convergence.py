@@ -139,7 +139,7 @@ def max_G_diff(G1, G2, norm_temp = True):
     if isinstance(G1, BlockGf):
         diff = 0.0
         for block, gf in G1:
-            diff += max_G_diff(G1[block], G2[block])
+            diff += max_G_diff(G1[block], G2[block], norm_temp)
         return diff
 
     assert G1.mesh == G2.mesh, 'mesh of two input Gfs does not match'
