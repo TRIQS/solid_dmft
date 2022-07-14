@@ -396,7 +396,7 @@
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">G1</span><span class="p">,</span> <span class="n">BlockGf</span><span class="p">):</span>
         <span class="n">diff</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="k">for</span> <span class="n">block</span><span class="p">,</span> <span class="n">gf</span> <span class="ow">in</span> <span class="n">G1</span><span class="p">:</span>
-            <span class="n">diff</span> <span class="o">+=</span> <span class="n">max_G_diff</span><span class="p">(</span><span class="n">G1</span><span class="p">[</span><span class="n">block</span><span class="p">],</span> <span class="n">G2</span><span class="p">[</span><span class="n">block</span><span class="p">])</span>
+            <span class="n">diff</span> <span class="o">+=</span> <span class="n">max_G_diff</span><span class="p">(</span><span class="n">G1</span><span class="p">[</span><span class="n">block</span><span class="p">],</span> <span class="n">G2</span><span class="p">[</span><span class="n">block</span><span class="p">],</span> <span class="n">norm_temp</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">diff</span>
 
     <span class="k">assert</span> <span class="n">G1</span><span class="o">.</span><span class="n">mesh</span> <span class="o">==</span> <span class="n">G2</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="s1">&#39;mesh of two input Gfs does not match&#39;</span>
