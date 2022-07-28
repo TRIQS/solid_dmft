@@ -120,14 +120,14 @@ def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, block, orbital_orde
                 except KeyError:
                     raise KeyError('Provide either "Sigma_freq_0" in real frequency or "Sigma_maxent_0".')
             dc = ar['DMFT_results'][specs['it']]['DC_pot'][0][spin][0, 0]
-            mu = ar['DMFT_results'][specs['it']]['chemical_potential_post']
+            mu_dmft = ar['DMFT_results'][specs['it']]['chemical_potential_post']
 
     else:
         print('Setting Sigma from memory')
 
         sigma = with_sigma
         dc = specs['dc'][0][spin][0, 0]
-        mu = specs['dmft_mu']
+        mu_dmft = specs['mu_dmft']
 
     block_spin = spin + '_' + str(block) if with_sigma == 'calc' else spin
     SOC = (spin == 'ud')
@@ -175,7 +175,7 @@ def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, block, orbital_orde
                 continue
             sigma_interpolated[ct1, ct2] = interpolate_sigma(w_mesh, w_mesh_dmft, ct1, ct2)
 
-    return sigma_interpolated, mu, freq_dict
+    return sigma_interpolated, mu_dmft, freq_dict
 
 
 def _sigma_from_model(n_orb, orbital_order, zeroth_order, first_order, eta=0.0, **w):
@@ -198,16 +198,16 @@ def _sigma_from_model(n_orb, orbital_order, zeroth_order, first_order, eta=0.0, 
     return sigma_interpolated, freq_dict
 
 
-def _calc_alatt(n_orb, mu, eta, e_mat, sigma, qp_bands=False, e_vecs=np.array([None]),
-                proj_knu=np.array([None]), trace=True, **freq_dict):
+def _calc_alatt(n_orb, mu, eta, e_mat, sigma, qp_bands=False, e_vecs=None,
+                proj_nuk=None, trace=True, **freq_dict):
     '''
-    calculate lattice spectral function for given TB dispersion / e_mat and self-energy
+    calculate slice of lattice spectral function for given TB dispersion / e_mat and self-energy
 
     Parameters
     ----------
     n_orb : int
           number of Wannier orbitals
-    proj_knu : optinal, 2D numpy array (n_k, n_orb)
+    proj_nuk : optinal, 2D numpy array (n_k, n_orb)
           projections to be applied on A(k,w) in band basis. Only works when band_basis=True
 
     Returns
@@ -221,7 +221,7 @@ def _calc_alatt(n_orb, mu, eta, e_mat, sigma, qp_bands=False, e_vecs=np.array([N
     def upscale(quantity, n_orb): return quantity * np.identity(n_orb)
     mu = upscale(mu, n_orb)
     eta = upscale(eta, n_orb)
-    if not e_vecs.any() is None:
+    if isinstance(e_vecs, np.ndarray):
         sigma_rot = np.zeros(sigma.shape, dtype=complex)
 
     w_vec = np.array([upscale(freq_dict['w_mesh'][w], n_orb) for w in range(freq_dict['n_w'])])
@@ -233,11 +233,11 @@ def _calc_alatt(n_orb, mu, eta, e_mat, sigma, qp_bands=False, e_vecs=np.array([N
         else:
             alatt_k_w = np.zeros((n_k, freq_dict['n_w'], n_orb))
 
-        def invert_and_trace(w, eta, mu, e_mat, sigma, trace, proj=np.array([None])):
+        def invert_and_trace(w, eta, mu, e_mat, sigma, trace, proj=None):
             # inversion is automatically vectorized over first axis of 3D array (omega first index now)
             Glatt = np.linalg.inv(w + eta[None, ...] + mu[None, ...] - e_mat[None, ...] - sigma.transpose(2, 0, 1))
             A_w_nu = -1.0/np.pi * np.diagonal(Glatt, axis1=1, axis2=2).imag
-            if not proj.any() is None:
+            if isinstance(proj, np.ndarray):
                 A_w_nu = A_w_nu * proj[None, :]
             if trace:
                 return np.sum(A_w_nu, axis=1)
@@ -246,10 +246,10 @@ def _calc_alatt(n_orb, mu, eta, e_mat, sigma, qp_bands=False, e_vecs=np.array([N
 
         for ik in range(n_k):
             # if evecs are given transform sigma into band basis
-            if not e_vecs.any() is None:
+            if isinstance(e_vecs, np.ndarray):
                 sigma_rot = np.einsum('ij,jkw->ikw', e_vecs[:, :, ik].conjugate().transpose(), np.einsum('ijw,jk->ikw', sigma, e_vecs[:, :, ik]))
-                if not proj_knu.any() is None:
-                    alatt_k_w[ik, :] = invert_and_trace(w_vec, eta, mu, e_mat[:, :, ik], sigma_rot, trace, proj_knu[ik])
+                if isinstance(proj_nuk, np.ndarray):
+                    alatt_k_w[ik, :] = invert_and_trace(w_vec, eta, mu, e_mat[:, :, ik], sigma_rot, trace, proj_nuk[ik])
                 else:
                     alatt_k_w[ik, :] = invert_and_trace(w_vec, eta, mu, e_mat[:, :, ik], sigma_rot, trace)
             else:
@@ -278,8 +278,7 @@ def _calc_alatt(n_orb, mu, eta, e_mat, sigma, qp_bands=False, e_vecs=np.array([N
     return alatt_k_w
 
 
-def _calc_kslice(n_orb, mu, eta, e_mat, sigma, qp_bands, e_vecs=np.array([None]),
-                 proj_knu=np.array([None]), **freq_dict):
+def _calc_kslice(n_orb, mu, eta, e_mat, sigma, qp_bands, e_vecs=None, proj_nuk=None, **freq_dict):
     '''
     calculate lattice spectral function for given TB dispersion / e_mat and self-energy
 
@@ -287,7 +286,7 @@ def _calc_kslice(n_orb, mu, eta, e_mat, sigma, qp_bands, e_vecs=np.array([None])
     ----------
     n_orb : int
           number of Wannier orbitals
-    proj_knu : optinal, 2D numpy array (n_k, n_orb)
+    proj_nuk : optinal, 2D numpy array (n_k, n_orb)
           projections to be applied on A(k,w) in band basis. Only works when band_basis=True
 
     Returns
@@ -305,7 +304,7 @@ def _calc_kslice(n_orb, mu, eta, e_mat, sigma, qp_bands, e_vecs=np.array([None])
     iw0 = np.where(np.sign(freq_dict['w_mesh']) == True)[0][0]-1
     print_matrix(sigma[:, :, iw0], n_orb, 'Zero-frequency Sigma')
 
-    if not e_vecs.any() is None:
+    if isinstance(e_vecs, np.ndarray):
         sigma_rot = np.zeros(sigma.shape, dtype=complex)
 
     n_kx, n_ky = e_mat.shape[2:4]
@@ -313,24 +312,24 @@ def _calc_kslice(n_orb, mu, eta, e_mat, sigma, qp_bands, e_vecs=np.array([None])
     if not qp_bands:
         alatt_k_w = np.zeros((n_kx, n_ky))
 
-        def invert_and_trace(w, eta, mu, e_mat, sigma, proj=np.array([None])):
+        def invert_and_trace(w, eta, mu, e_mat, sigma, proj=None):
             # inversion is automatically vectorized over first axis of 3D array (omega first index now)
             Glatt = np.linalg.inv(w + eta + mu - e_mat - sigma)
             A_nu = -1.0/np.pi * np.diagonal(Glatt).imag
-            if not proj.any() is None:
+            if isinstance(proj_nuk, np.ndarray):
                 A_nu = A_nu * proj
             return np.sum(A_nu)
 
         for ikx, iky in itertools.product(range(n_kx), range(n_ky)):
-            if not e_vecs.any() is None:
+            if isinstance(e_vecs, np.ndarray):
                 sigma_rot = np.einsum('ij,jk->ik',
                                       e_vecs[:, :, ikx, iky].conjugate().transpose(),
                                       np.einsum('ij,jk->ik', sigma[:, :, iw0], e_vecs[:, :, ikx, iky]))
             else:
                 sigma_rot = sigma[:, :, iw0]
 
-            if not proj_knu.any() is None:
-                alatt_k_w[ikx, iky] = invert_and_trace(upscale(freq_dict['w_mesh'][iw0], n_orb), eta, mu, e_mat[:, :, ikx, iky], sigma_rot, proj_knu[ikx, iky])
+            if isinstance(proj_nuk, np.ndarray):
+                alatt_k_w[ikx, iky] = invert_and_trace(upscale(freq_dict['w_mesh'][iw0], n_orb), eta, mu, e_mat[:, :, ikx, iky], sigma_rot, proj_nuk[ikx, iky])
             else:
                 alatt_k_w[ikx, iky] = invert_and_trace(upscale(freq_dict['w_mesh'][iw0], n_orb), eta, mu, e_mat[:, :, ikx, iky], sigma_rot)
 
@@ -382,28 +381,27 @@ def _get_tb_bands(e_mat, **specs):
 
     e_val = np.zeros((e_mat.shape), dtype=complex)
     e_vec = np.zeros((e_mat.shape), dtype=complex)
+    n_orb = e_mat.shape[0]
 
     for ikx in range(e_mat.shape[2]):
         # if we have a 2d kmesh e_mat is dim=4
         if len(e_mat.shape) == 4:
             for iky in range(e_mat.shape[3]):
-                eval_temp, e_vec[:, :, ikx, iky] = np.linalg.eigh(e_mat[:, :, ikx, iky])
-                np.fill_diagonal(e_val[:, :, ikx, iky], eval_temp)
+                e_val[range(n_orb), range(n_orb), ikx, iky], e_vec[:, :, ikx, iky] = np.linalg.eigh(e_mat[:, :, ikx, iky])
         else:
-            eval_temp, e_vec[:, :, ikx] = np.linalg.eigh(e_mat[:, :, ikx])
-            np.fill_diagonal(e_val[:, :, ikx], eval_temp)
+            e_val[range(n_orb), range(n_orb), ikx], e_vec[:, :, ikx] = np.linalg.eigh(e_mat[:, :, ikx])
 
     return e_val, e_vec
 
 
-def get_tb_kslice(tb, efermi, **specs):
+def get_tb_kslice(tb, mu_tb, **specs):
 
     w90_paths = list(map(lambda section: (np.array(specs[section[0]]), np.array(specs[section[1]])), specs['bands_path']))
     upper_left = np.diff(w90_paths[0][::-1], axis=0)[0]
     lower_right = np.diff(w90_paths[1], axis=0)[0]
     Z = np.array(specs['Z'])
 
-    FS_kx_ky, band_char = get_kx_ky_FS(lower_right, upper_left, Z, tb, N_kxy=specs['n_k'], kz=specs['kz'], fermi=efermi)
+    FS_kx_ky, band_char = get_kx_ky_FS(lower_right, upper_left, Z, tb, N_kxy=specs['n_k'], kz=specs['kz'], fermi=mu_tb)
 
     return FS_kx_ky, band_char
 
@@ -524,14 +522,10 @@ def plot_bands(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb, tb=True, alatt=Fal
                 ax.scatter(tb_data['k_mesh'], alatt_k_w[:, orb].T, c=np.array([eval('cm.'+plot_dict['colorscheme_qpbands'])(1.0)]), zorder=2., s=1.)
         else:
             kw_x, kw_y = np.meshgrid(tb_data['k_mesh'], freq_dict['w_mesh'])
-            if 'vmax' in plot_dict:
-                vmax = plot_dict['vmax']
-            else:
-                vmax = np.max(alatt_k_w)
-            if 'vmin' in plot_dict:
-                vmin = plot_dict['vmin']
-            else:
-                vmin = 0.0
+
+            vmax = plot_dict['vmax'] if 'vmax' in plot_dict else np.max(alatt_k_w)
+            vmin = plot_dict['vmin'] if 'vmin' in plot_dict else 0.0
+
             graph = ax.pcolormesh(kw_x, kw_y, alatt_k_w.T, cmap=plot_dict['colorscheme_alatt'],
                                   norm=Normalize(vmin=vmin, vmax=vmax), shading='gouraud')
             colorbar = plt.colorbar(graph)
@@ -542,13 +536,13 @@ def plot_bands(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb, tb=True, alatt=Fal
         for band in range(n_orb):
             if not proj_on_orb[0] is not None:
                 color = eval('cm.'+plot_dict['colorscheme_bands'])(1.0)
-                ax.plot(tb_data['k_mesh'], eps_nuk[band, band].real - tb_data['efermi'], c=color, label=r'tight-binding', zorder=1.)
+                ax.plot(tb_data['k_mesh'], eps_nuk[band, band].real - tb_data['mu_tb'], c=color, label=r'tight-binding', zorder=1.)
             else:
                 total_proj = np.zeros(np.shape(evec_nuk[0, band]))
                 for orb in proj_on_orb:
                     total_proj += np.real(evec_nuk[orb, band] * evec_nuk[orb, band].conjugate())
                 color = eval('cm.'+plot_dict['colorscheme_bands'])(total_proj)
-                ax.scatter(tb_data['k_mesh'], eps_nuk[band, band].real - tb_data['efermi'], c=color, s=1, label=r'tight-binding', zorder=1.)
+                ax.scatter(tb_data['k_mesh'], eps_nuk[band, band].real - tb_data['mu_tb'], c=color, s=1, label=r'tight-binding', zorder=1.)
 
     _setup_plot_bands(ax, tb_data['special_k'], tb_data['k_points_labels'], freq_dict)
 
@@ -562,14 +556,8 @@ def plot_kslice(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb, tb_dict, tb=True,
     four_quarters = list(itertools.product(*quarters))
     used_quarters = [four_quarters[x] for x in quarter]
 
-    if 'vmax' in plot_dict:
-        vmax = plot_dict['vmax']
-    else:
-        vmax = np.max(alatt_k_w)
-    if 'vmin' in plot_dict:
-        vmin = plot_dict['vmin']
-    else:
-        vmin = 0.0
+    vmax = plot_dict['vmax'] if 'vmax' in plot_dict else np.max(alatt_k_w)
+    vmin = plot_dict['vmin'] if 'vmin' in plot_dict else 0.0
 
     if alatt:
         if alatt_k_w is None:
@@ -590,7 +578,7 @@ def plot_kslice(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb, tb_dict, tb=True,
                 #colorbar.set_label(r'$A(k, 0$)')
 
     if tb:
-        FS_kx_ky, band_char = get_tb_kslice(tb_data['tb'], tb_data['efermi'], **tb_dict)
+        FS_kx_ky, band_char = get_tb_kslice(tb_data['tb'], tb_data['mu_tb'], **tb_dict)
         for sheet in FS_kx_ky.keys():
             for k_on_sheet in range(FS_kx_ky[sheet].shape[0]):
                 if not proj_on_orb[0] is not None:
@@ -612,10 +600,10 @@ def plot_kslice(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb, tb_dict, tb=True,
     return ax
 
 
-def get_dmft_bands(n_orb, w90_path, w90_seed, tb_mu, add_spin=False, add_lambda=None,
+def get_dmft_bands(n_orb, w90_path, w90_seed, mu_tb, add_spin=False, add_lambda=None,
                    with_sigma=None, fermi_slice=False, qp_bands=False, orbital_order_to=None,
-                   add_tb_mu=False, band_basis=False, trace=True, eta=0.0, mu_shift=0.0,
-                   proj_knu=np.array([None]), **specs):
+                   add_mu_tb=False, band_basis=False, trace=True, eta=0.0, mu_shift=0.0,
+                   proj_nuk=None, **specs):
     '''
     Extract tight-binding from given w90 seed_hr.dat and seed.wout files, and then extract from
     given solid_dmft calculation the self-energy and construct the spectral function A(k,w) on
@@ -639,11 +627,9 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, tb_mu, add_spin=False, add_lambda=
         'calc' reads results from h5 archive (solid_dmft)
         in case 'calc' or 'model' are specified a extra kwargs dict has
         to be given sigma_dict containing information about the self-energy
-
-    add_tb_mu : bool, default=True
+    add_mu_tb : bool, default=False
         Add the TB specified chemical potential to the lattice Green function
-        set to False if DMFT calculation has beend performed with DFT fermi
-        subracted.
+        set to True if DMFT calculation was performed with DFT fermi subtracted.
     trace : bool, default=True
         Return trace over orbitals for spectral function. For special
         post-processing purposes this can be set to False giving the returned
@@ -653,7 +639,7 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, tb_mu, add_spin=False, add_lambda=
         if with_sigma=None it has to be provided !=0.0
     mu_shift : float, default=0.0
         Manual extra shift when calculating the spectral function
-    proj_knu : numpy array, default [None]
+    proj_nuk : numpy array, default [None]
         Extra projections to be applied to the final spectral function
         per k-point and orbital. Has to match shape of final lattice Green
         function.
@@ -677,10 +663,10 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, tb_mu, add_spin=False, add_lambda=
     assert set(specs['orbital_order_w90']) == set(orbital_order_to), f'Identifiers of orbital_order_to and orbital_order_w90'\
         f'do not match! orbital_order_to is {orbital_order_to}, but orbital_order_w90 is {specs["orbital_order_w90"]}.'
 
-    assert with_sigma and eta != 0.0, 'if no Sigma is provided eta has to be different from 0.0'
+    assert with_sigma or eta != 0.0, 'if no Sigma is provided eta has to be different from 0.0'
 
     if not orbital_order_to:
-        orbital_order_to = list(range(n_orb))
+        orbital_order_to = specs['orbital_order_w90']
 
     # set up Wannier Hamiltonian
     n_orb_rescale = 2 * n_orb if add_spin else n_orb
@@ -713,7 +699,7 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, tb_mu, add_spin=False, add_lambda=
         if band_basis:
             e_mat, e_vecs = _get_tb_bands(e_mat)
         else:
-            e_vecs = np.array([None])
+            e_vecs = None
     else:
         assert 'Z' in specs, 'Please provide Z point coordinate in tb_data_dict as input coordinate'
         Z = np.array(specs['Z'])
@@ -734,7 +720,7 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, tb_mu, add_spin=False, add_lambda=
         if band_basis:
             e_mat, e_vecs = _get_tb_bands(e_mat)
         else:
-            e_vecs = np.array([None])
+            e_vecs = None
 
     # dmft output
     if with_sigma:
@@ -748,51 +734,46 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, tb_mu, add_spin=False, add_lambda=
         # get sigma
         if with_sigma == 'model':
             delta_sigma, freq_dict = _sigma_from_model(n_orb, orbital_order_to, **specs)
-            mu = tb_mu + mu_shift
+            mu = mu_tb + mu_shift
         # else is from dmft or memory:
         else:
-            delta_sigma, mu, freq_dict = _sigma_from_dmft(n_orb, orbital_order_to, with_sigma, **specs)
-            mu = mu + mu_shift
+            delta_sigma, mu_dmft, freq_dict = _sigma_from_dmft(n_orb, orbital_order_to, with_sigma, **specs)
+            mu = mu_dmft + mu_shift
 
-        if add_tb_mu:
-            print('Adding tb_mu to DMFT μ; assuming DMFT was run with subtracted dft μ.')
-            mu = mu + tb_mu + mu_shift
+        if add_mu_tb:
+            print('Adding mu_tb to DMFT μ; assuming DMFT was run with subtracted dft μ.')
+            mu += mu_tb
 
         print('μ={:2.4f} eV set for calculating A(k,ω)'.format(mu))
 
         # initial checks
-        if not proj_knu.any() is None and e_vecs.any() is None:
+        if isinstance(proj_nuk, np.ndarray) and not isinstance(e_vecs, np.ndarray):
             raise ValueError('Projection weights can only be applied if band_basis=True')
 
         assert n_orb == delta_sigma.shape[0] and n_orb == delta_sigma.shape[
             1], f'Number of orbitals n_orb={n_orb} and shape of sigma: {delta_sigma.shape} does not match'
-        if not proj_knu.any() is None:
-            assert n_orb == proj_knu.shape[-1], f'Number of orbitals n_orb={n_orb} does not match shape of proj_knu: {proj_knu.shape[1]}'
+        if isinstance(proj_nuk, np.ndarray):
+            assert n_orb == proj_nuk.shape[-1], f'Number of orbitals n_orb={n_orb} does not match shape of proj_nuk: {proj_nuk.shape[1]}'
             if not fermi_slice:
-                assert proj_knu.shape[0] == e_vecs.shape[
-                    2], f'Number of kpoints in proj_knu : {proj_knu.shape[0]} does not match number of kpoints in e_vecs: {e_vecs.shape[2]}'
+                assert proj_nuk.shape[0] == e_vecs.shape[
+                    2], f'Number of kpoints in proj_nuk : {proj_nuk.shape[0]} does not match number of kpoints in e_vecs: {e_vecs.shape[2]}'
             else:
-                assert proj_knu.shape == tuple([e_vecs.shape[2], e_vecs.shape[3], n_orb]
-                                               ), f'shape of projectors {proj_knu.shape} does not match expected shape of [{e_vecs.shape[2]},{e_vecs.shape[3]},{n_orb}]'
+                assert proj_nuk.shape == tuple([e_vecs.shape[2], e_vecs.shape[3], n_orb]
+                                               ), f'shape of projectors {proj_nuk.shape} does not match expected shape of [{e_vecs.shape[2]},{e_vecs.shape[3]},{n_orb}]'
 
         # calculate alatt
         if not fermi_slice:
-            alatt_k_w = _calc_alatt(n_orb, mu, eta, e_mat, delta_sigma, qp_bands, e_vecs=e_vecs, trace=trace, proj_knu=proj_knu, **freq_dict)
+            alatt_k_w = _calc_alatt(n_orb, mu, eta, e_mat, delta_sigma, qp_bands, e_vecs=e_vecs, trace=trace, proj_nuk=proj_nuk, **freq_dict)
         else:
-            alatt_k_w = _calc_kslice(n_orb, mu, eta, e_mat, delta_sigma, qp_bands, e_vecs=e_vecs, proj_knu=proj_knu, **freq_dict)
+            alatt_k_w = _calc_kslice(n_orb, mu, eta, e_mat, delta_sigma, qp_bands, e_vecs=e_vecs, proj_nuk=proj_nuk, **freq_dict)
     else:
         freq_dict = {}
         freq_dict['w_mesh'] = None
         freq_dict['window'] = None
         alatt_k_w = None
 
-    tb_data = {'k_mesh': k_1d,
-               'special_k': special_k,
-               'k_points': k_vec,
-               'k_points_labels': k_points_labels,
-               'e_mat': e_mat,
-               'e_vecs': e_vecs,
-               'tb': tb,
-               'efermi': tb_mu}
+    tb_data = {'k_mesh': k_1d, 'special_k': special_k, 'k_points': k_vec,
+               'k_points_labels': k_points_labels, 'e_mat': e_mat,
+               'e_vecs': e_vecs, 'tb': tb, 'mu_tb': mu_tb}
 
     return tb_data, alatt_k_w, freq_dict
