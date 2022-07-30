@@ -24,9 +24,19 @@ endforeach()
 
 # all other tests
 set(all_tests 
-    test_convergence)
+    test_convergence
+    test_plot_correlated_bands)
 
-foreach(test ${all_tests})
+  # copy input files for PCB test from documentation tutorial
+  set (test_dir ${CMAKE_CURRENT_BINARY_DIR})
+  foreach(file svo.wout svo_example.h5 svo_hr.dat)
+    FILE(COPY ../../doc/tutorials/correlated_bandstructure/${file} DESTINATION ${test_dir})
+  endforeach()
+
+  # copy reference data for PCB test
+  FILE(COPY test_pcb_ref.h5 DESTINATION ${test_dir})
+
+  foreach(test ${all_tests})
   get_filename_component(test_name ${test} NAME_WE)
   get_filename_component(test_dir ${test} DIRECTORY)
   add_test(NAME ${test_name} COMMAND ${TRIQS_PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${test_dir}/${test_name}.py WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${test_dir})
