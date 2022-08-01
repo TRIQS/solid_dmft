@@ -57,9 +57,9 @@ class test_convergence(unittest.TestCase):
                     'Z': np.array([0, 0, 0.5]), 'M': [0.5, 0.5, 0.], 'R': [0.5, 0.5, 0.5],
                     'X': [0.,  0.5, 0.], 'n_k': 50}
 
-        self.sigma_dict['proj_on_orb'] = [0, 1]
         tb_data, alatt_k_w, freq_dict = pcb.get_dmft_bands(with_sigma='calc', add_mu_tb=True,
                                                            orbital_order_to=self.orbital_order_to,
+                                                           proj_on_orb = [0,1],
                                                            **self.w90_dict, **tb_bands, **self.sigma_dict)
 
         with HDFArchive('test_pcb_ref.h5', 'r') as ar:
