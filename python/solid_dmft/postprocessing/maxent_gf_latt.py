@@ -137,7 +137,7 @@ def _generate_lattice_gf(sum_k, sum_spins):
 
 
 def _run_maxent(gf_lattice_iw, sum_k, error, omega_min, omega_max,
-                n_points_maxent, n_points_alpha):
+                n_points_maxent, n_points_alpha, analyzer='LineFitAnalyzer'):
     """
     Runs maxent to get the spectral function from the block GF.
     """
@@ -169,6 +169,23 @@ def _run_maxent(gf_lattice_iw, sum_k, error, omega_min, omega_max,
         solver.omega = omega_mesh
         solver.alpha_mesh = LogAlphaMesh(alpha_min=1e-6, alpha_max=1e2, n_points=n_points_alpha)
         results[block] = solver.run()
+
+        n_orb = gf.target_shape[0]
+        opt_alpha = np.zeros((n_orb, n_orb, 2), dtype=int)
+        opt_alpha[:,:,:] = -1 # set results to -1 to distinguish them from 0
+        for i_orb in range(n_orb):
+            for j_orb in range(n_orb):
+                for l_com in range(2):  # loop over complex numbers
+                    if results[block].analyzer_results[i_orb][j_orb][l_com] == {}:
+                        continue
+                    opt_alpha[i_orb, j_orb, l_com] = results[block].analyzer_results[i_orb][j_orb][l_com][analyzer]['alpha_index']
+
+        mpi.report(f'Optimal alphas , block {block}:')
+        mpi.report('--- Real part ---', opt_alpha[:, :, 0])
+        if np.any(opt_alpha[:, :, 1] != -1):
+            mpi.report('--- Imag part ---', opt_alpha[:, :, 1])
+        if np.any(opt_alpha[:,:,0] == -1):
+            mpi.report('(a -1 indicates that maxent did not run for this block due to symmetry)')
 
     return results, omega_mesh
 
