@@ -11,7 +11,6 @@ if(NOT DEFINED SPHINXBUILD_EXECUTABLE)
   find_package(Sphinx)
 endif()
 
-
 # Sphinx has internal caching, always run it
 add_custom_target(${PROJECT_NAME}_docs_sphinx ALL)
 add_custom_command(
@@ -19,10 +18,20 @@ add_custom_command(
   COMMAND bash generate_doc_from_comments.sh
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/input_output/DMFT_input
 )
+
+# --------------------------------------------------------
+# Clone the triqs tutorials with the output included
+# --------------------------------------------------------
+add_custom_command(
+  TARGET ${PROJECT_NAME}_docs_sphinx
+  COMMAND ${GIT_EXECUTABLE} clone --depth 1 --branch unstable_executed https://github.com/triqs/tutorials/AbinitioDMFT ${CMAKE_CURRENT_SOURCE_DIR}/userguide/python/tutorials/AbinitioDMFT || true
+)
+
 add_custom_command(
   TARGET ${PROJECT_NAME}_docs_sphinx
   COMMAND PYTHONPATH=${PROJECT_BINARY_DIR}/python:${PROJECT_BINARY_DIR}/python/solid_dmft:$ENV{PYTHONPATH} ${SPHINXBUILD_EXECUTABLE} -c . -b html ${CMAKE_CURRENT_SOURCE_DIR} html
 )
+  
 
 # ---------------------------------
 # Install
