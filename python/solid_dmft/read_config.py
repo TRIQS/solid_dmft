@@ -396,7 +396,13 @@ BOOL_PARSER = lambda b: ConfigParser()._convert_to_boolean(b)
 #              is True, the parameter becomes an optional parameter
 PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace(' ', '').split(','), 'used': True},
 
-                                 'h_int_type': {'valid for': lambda x, _: all(hint in ('density_density', 'kanamori', 'full_slater', 'crpa', 'crpa_density_density','dynamic') for hint in x),
+                                 'h_int_type': {'valid for': lambda x, _: all(hint in ('density_density',
+                                                                                       'kanamori',
+                                                                                       'full_slater',
+                                                                                       'crpa',
+                                                                                       'crpa_density_density',
+                                                                                       'dynamic',
+                                                                                       'ntot') for hint in x),
                                                 'converter': lambda s: list(map(str, s.replace(" ", "").split(','))),
                                                 'used': True},
 
