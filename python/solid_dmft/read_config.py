@@ -396,8 +396,8 @@ BOOL_PARSER = lambda b: ConfigParser()._convert_to_boolean(b)
 #              is True, the parameter becomes an optional parameter
 PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace(' ', '').split(','), 'used': True},
 
-                                 'h_int_type': {'valid for': lambda x, _: x in ('density_density', 'kanamori', 'full_slater',
-                                                                                'crpa', 'crpa_density_density','dynamic'),
+                                 'h_int_type': {'valid for': lambda x, _: all(hint in ('density_density', 'kanamori', 'full_slater', 'crpa', 'crpa_density_density','dynamic') for hint in x),
+                                                'converter': lambda s: list(map(str, s.replace(" ", "").split(','))),
                                                 'used': True},
 
                                  'U': {'converter': lambda s: list(map(float, s.split(','))), 'used': True},
@@ -405,8 +405,8 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                  'J': {'converter': lambda s: list(map(float, s.split(','))), 'used': True},
 
                                  'ratio_F4_F2': {'converter': lambda s: list(map(float, s.split(','))),
-                                                 'used': lambda params: params['general']['h_int_type'] in ['density_density', 'full_slater'],
-                                                 'default': ['none']},
+                                                 'default': ['none'],
+                                                 'used': True},
 
                                  'beta': {'converter': float, 'valid for': lambda x, _: x > 0,
                                           'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint', 'inchworm', 'hubbardI','ctseg']},
