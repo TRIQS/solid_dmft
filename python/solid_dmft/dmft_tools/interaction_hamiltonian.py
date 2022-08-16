@@ -49,8 +49,11 @@ def _extract_U_J_list(param_name, n_inequiv_shells, general_params):
     applied to each shell.
     """
 
-    formatted_param = ['none' if p == 'none' else '{:.2f}'.format(p)
-                       for p in general_params[param_name]]
+    if not isinstance(param_name, str):
+        formatted_param = ['none' if p == 'none' else '{:.2f}'.format(p)
+                           for p in general_params[param_name]]
+    else:
+        formatted_param = general_params[param_name]
 
     if len(general_params[param_name]) == 1:
         mpi.report('Assuming {} = '.format(param_name)
@@ -99,9 +102,9 @@ def _load_crpa_interaction_matrix(sum_k, filename='UIJKL'):
         elif not np.allclose(u_matrix_four_indices_per_shell[icrsh], u_matrix_temp, atol=1e-6, rtol=0):
             # TODO: for some reason, some entries in the matrices differ by a sign. Check that
             # mpi.report(np.allclose(np.abs(u_matrix_four_indices_per_shell[icrsh]), np.abs(u_matrix_temp),
-                              # atol=1e-6, rtol=0))
+            # atol=1e-6, rtol=0))
             mpi.report('Warning: cRPA matrix for impurity {} '.format(icrsh)
-                  + 'differs for shells {} and {}'.format(sum_k.inequiv_to_corr[icrsh], ish))
+                       + 'differs for shells {} and {}'.format(sum_k.inequiv_to_corr[icrsh], ish))
 
         first_index_shell += n_orb
 
@@ -223,7 +226,7 @@ def _construct_kanamori_soc(U_int, J_hund, orb_names, map_operator_structure, H_
     """
 
     if H_dump:
-        H_dump_file = open(H_dump,'w')
+        H_dump_file = open(H_dump, 'w')
         H_dump_file.write("Kanamori Hamiltonian:" + '\n')
 
     H = Operator()
@@ -236,14 +239,14 @@ def _construct_kanamori_soc(U_int, J_hund, orb_names, map_operator_structure, H_
     if H_dump:
         H_dump_file.write("Density-density terms:" + '\n')
     for a1, a2 in product(orb_names, orb_names):
-        if a1 == a2: # same spin and orbital
+        if a1 == a2:  # same spin and orbital
             continue
 
-        if a1 // 2 == a2 // 2: # same orbital (, different spins)
+        if a1 // 2 == a2 // 2:  # same orbital (, different spins)
             U_val = U_int
-        elif a1 % 2 != a2 % 2: # different spins (, different orbitals)
+        elif a1 % 2 != a2 % 2:  # different spins (, different orbitals)
             U_val = U_int - 2*J_hund
-        else: # same spins (, different orbitals)
+        else:  # same spins (, different orbitals)
             U_val = U_int - 3*J_hund
 
         H_term = 0.5 * U_val * n(*mkind(s, a1)) * n(*mkind(s, a2))
@@ -251,8 +254,8 @@ def _construct_kanamori_soc(U_int, J_hund, orb_names, map_operator_structure, H_
 
         # Dump terms of H
         if H_dump and not H_term.is_zero():
-            H_dump_file.write('%s'%(mkind(s, a1), ) + '\t')
-            H_dump_file.write('%s'%(mkind(s, a2), ) + '\t')
+            H_dump_file.write('%s' % (mkind(s, a1), ) + '\t')
+            H_dump_file.write('%s' % (mkind(s, a2), ) + '\t')
             H_dump_file.write(str(U_val) + '\n')
 
     # spin-flip terms:
@@ -262,7 +265,7 @@ def _construct_kanamori_soc(U_int, J_hund, orb_names, map_operator_structure, H_
         if a1 == a2 or a1 == a3 or a1 == a4 or a2 == a3 or a2 == a4 or a3 == a4:
             continue
 
-        if not (a1//2 == a2//2 and a3//2 == a4//2 and a1//2 != a3//2 and a1%2 != a3%2):
+        if not (a1//2 == a2//2 and a3//2 == a4//2 and a1//2 != a3//2 and a1 % 2 != a3 % 2):
             continue
 
         H_term = -0.5 * J_hund * c_dag(*mkind(s, a1)) * c(*mkind(s, a2)) * c_dag(*mkind(s, a3)) * c(*mkind(s, a4))
@@ -270,10 +273,10 @@ def _construct_kanamori_soc(U_int, J_hund, orb_names, map_operator_structure, H_
 
         # Dump terms of H
         if H_dump and not H_term.is_zero():
-            H_dump_file.write('%s'%(mkind(s, a1), ) + '\t')
-            H_dump_file.write('%s'%(mkind(s, a2), ) + '\t')
-            H_dump_file.write('%s'%(mkind(s, a3), ) + '\t')
-            H_dump_file.write('%s'%(mkind(s, a4), ) + '\t')
+            H_dump_file.write('%s' % (mkind(s, a1), ) + '\t')
+            H_dump_file.write('%s' % (mkind(s, a2), ) + '\t')
+            H_dump_file.write('%s' % (mkind(s, a3), ) + '\t')
+            H_dump_file.write('%s' % (mkind(s, a4), ) + '\t')
             H_dump_file.write(str(-J_hund) + '\n')
 
     # pair-hopping terms:
@@ -283,7 +286,7 @@ def _construct_kanamori_soc(U_int, J_hund, orb_names, map_operator_structure, H_
         if a1 == a2 or a1 == a3 or a1 == a4 or a2 == a3 or a2 == a4 or a3 == a4:
             continue
 
-        if not (a1//2 == a2//2 and a3//2 == a4//2 and a1//2 != a3//2 and a1%2 != a3%2):
+        if not (a1//2 == a2//2 and a3//2 == a4//2 and a1//2 != a3//2 and a1 % 2 != a3 % 2):
             continue
 
         H_term = 0.5 * J_hund * c_dag(*mkind(s, a1)) * c_dag(*mkind(s, a2)) * c(*mkind(s, a4)) * c(*mkind(s, a3))
