@@ -25,7 +25,7 @@ def are_iterables_equal(obs1, obs2):
 
     if isinstance(obs1, dict):
         if sorted(obs1.keys()) != sorted(obs2.keys()):
-            print(set(obs1.items()) ^ set(obs2.items()))
+            print(set(obs1.keys()) ^ set(obs2.keys()))
             return False
 
         for key, value in obs2.items():
