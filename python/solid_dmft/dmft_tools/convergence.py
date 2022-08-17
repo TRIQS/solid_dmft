@@ -50,7 +50,7 @@ def _generate_header(general_params, sum_k):
 
     headers = {}
     for iineq in range(sum_k.n_inequiv_shells):
-        number_spaces = max(13*n_orbitals[iineq]['up'], 21)
+        number_spaces = max(13*n_orbitals[iineq]['up']-1, 21)
         header_basic_mask = '{{:>3}} | {{:>11}} | {{:>{0}}} | {{:>11}} | {{:>11}} | {{:>11}} | {{:>11}} '.format(number_spaces)
 
         file_name = 'conv_imp{}.dat'.format(iineq)
