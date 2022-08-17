@@ -96,15 +96,20 @@ def _generate_header(general_params, sum_k):
     Generates the headers that are used in write_header_to_file.
     Returns a dict with {file_name: header_string}
     """
-    n_orbitals = [sum_k.corr_shells[sum_k.inequiv_to_corr[iineq]]['dim']
-                  for iineq in range(sum_k.n_inequiv_shells)]
+    n_orbitals = [{'up': 0, 'down': 0}] * sum_k.n_inequiv_shells
+    for icrsh in range(sum_k.n_inequiv_shells):
+        for block, n_orb in sum_k.gf_struct_solver[icrsh].items():
+            if 'down' in block:
+                n_orbitals[icrsh]['down'] += sum_k.gf_struct_solver[icrsh][block]
+            else:
+                n_orbitals[icrsh]['up'] += sum_k.gf_struct_solver[icrsh][block]
 
     header_energy_mask = ' | {:>10} | {:>10}   {:>10}   {:>10}   {:>10}'
     header_energy = header_energy_mask.format('E_tot', 'E_DFT', 'E_bandcorr', 'E_int_imp', 'E_DC')
 
     headers = {}
     for iineq in range(sum_k.n_inequiv_shells):
-        number_spaces = max(10*n_orbitals[iineq] + 3*(n_orbitals[iineq]-1), 21)
+        number_spaces = max(10*n_orbitals[iineq]['up'] + 3*(n_orbitals[iineq]['up']-1), 21)
         header_basic_mask = '{{:>3}} | {{:>10}} | {{:>{0}}} | {{:>{0}}} | {{:>17}}'.format(number_spaces)
 
         # If magnetic calculation is done create two obs files per imp
