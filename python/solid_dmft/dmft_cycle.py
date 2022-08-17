@@ -143,6 +143,11 @@ def _determine_block_structure(sum_k, general_params, advanced_params):
         if advanced_params['mapped_solver_struct_degeneracies'] != 'none':
             sum_k.block_structure.deg_shells = [advanced_params['mapped_solver_struct_degeneracies']] * sum_k.n_inequiv_shells
 
+    if advanced_params['pick_solver_struct'] != 'none':
+        mpi.report('selecting subset of orbital space for gf_struct_solver from input:')
+        mpi.report(advanced_params['pick_solver_struct'])
+        sum_k.block_structure.pick_gf_struct_solver([advanced_params['pick_solver_struct']])
+
     return sum_k, original_dens_mat, solver_struct_ftps
 
 

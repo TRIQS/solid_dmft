@@ -107,6 +107,7 @@ def test_config_file_1():
                                             'advanced': {'dc_fixed_value': 'none', 'dc_fixed_occ': 'none',
                                                          'dc_nominal': False,
                                                          'dc_factor': 'none', 'dc_J': [2.0], 'dc_U': [2.0],
+                                                         'pick_solver_struct': 'none',
                                                          'map_solver_struct': 'none'},
                                             'solver': {'move_double': True, 'measure_G_l': False,
                                                        'move_shift': False, 'store_solver': False,
@@ -202,7 +203,6 @@ def test_config_file_2():
     invalid_params = _checks_validity_criterion(parameters)
     assert invalid_params == {'dft': [], 'general': [], 'advanced': [], 'solver': []}
 
-    print(parameters)
     assert are_iterables_equal(parameters, {'dft': {},
                                             'general': {'afm_order': True, 'magnetic': True,
                                                         'measure_chi': 'none',
@@ -230,6 +230,7 @@ def test_config_file_2():
                                                          'dc_nominal': False,
                                                          'dc_factor': 'none', 'dc_J': [1.0], 'dc_U': [5.5],
                                                          'map_solver_struct': {('ud_0', 0): ('up_0', 0)},
+                                                         'pick_solver_struct': 'none',
                                                          'mapped_solver_struct_degeneracies': 'none', },
                                             'solver': {'imag_threshold': 1e-05, 'n_warmup_cycles': 10000,
                                                        'length_cycle': 140, 'measure_G_l': True,

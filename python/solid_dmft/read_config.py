@@ -368,6 +368,9 @@ map_solver_struct : dict, optional, default=no additional mapping
 mapped_solver_struct_degeneracies : list, optional, default=none
             Degeneracies applied when using map_solver_struct, same for all inmpurities.
             If not given and map_solver_struct is used, no symmetrization will happen.
+pick_solver_struct : list of dict, optional, default={}
+            input a solver dictionary to reduce dimensionality of solver block structure as in,
+            e.g., SO=1 calculations
 
 ---XXX---end
 
@@ -793,6 +796,9 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                             'valid for': lambda x, _: x=='none' or isinstance(x, list),
                                             'used': lambda params: params['advanced']['map_solver_struct'] != 'none',
                                             'default': 'none'},
+                                  'pick_solver_struct': {'converter': eval,
+                                                        'valid for': lambda x, _: x =='none' or isinstance(x, dict) or isinstance(x, list),
+                                                        'used': True, 'default': 'none'},
                                  }
                     }
 
