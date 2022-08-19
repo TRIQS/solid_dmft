@@ -30,6 +30,7 @@ import numpy as np
 
 # triqs
 from triqs.gf import MeshImFreq, MeshImTime, MeshReFreq, BlockGf
+from solid_dmft.dmft_tools.solver import n_orb_solver
 
 def _generate_header(general_params, sum_k):
     """
@@ -37,20 +38,14 @@ def _generate_header(general_params, sum_k):
     Returns a dict with {file_name: header_string}
     """
 
-    n_orbitals = [{'up': 0, 'down': 0}] * sum_k.n_inequiv_shells
-    for icrsh in range(sum_k.n_inequiv_shells):
-        for block, n_orb in sum_k.gf_struct_solver[icrsh].items():
-            if 'down' in block:
-                n_orbitals[icrsh]['down'] += sum_k.gf_struct_solver[icrsh][block]
-            else:
-                n_orbitals[icrsh]['up'] += sum_k.gf_struct_solver[icrsh][block]
+    n_orb = n_orb_solver(sum_k)
 
     header_energy_mask = '| {:>11} '
     header_energy = header_energy_mask.format('δE_tot')
 
     headers = {}
     for iineq in range(sum_k.n_inequiv_shells):
-        number_spaces = max(13*n_orbitals[iineq]['up']-1, 21)
+        number_spaces = max(13*n_orb[iineq]['up']-1, 21)
         header_basic_mask = '{{:>3}} | {{:>11}} | {{:>{0}}} | {{:>11}} | {{:>11}} | {{:>11}} | {{:>11}} '.format(number_spaces)
 
         file_name = 'conv_imp{}.dat'.format(iineq)
@@ -81,23 +76,17 @@ def write_conv(conv_obs, sum_k, general_params):
 
     """
 
-    n_orbitals = [{'up': 0, 'down': 0}] * sum_k.n_inequiv_shells
-    for icrsh in range(sum_k.n_inequiv_shells):
-        for block, n_orb in sum_k.gf_struct_solver[icrsh].items():
-            if 'down' in block:
-                n_orbitals[icrsh]['down'] += sum_k.gf_struct_solver[icrsh][block]
-            else:
-                n_orbitals[icrsh]['up'] += sum_k.gf_struct_solver[icrsh][block]
+    n_orb = n_orb_solver(sum_k)
 
     for icrsh in range(sum_k.n_inequiv_shells):
         line = '{:3d} | '.format(conv_obs['iteration'][-1])
         line += '{:10.5e} | '.format(conv_obs['d_mu'][-1])
 
         # Adds spaces for header to fit in properly
-        if n_orbitals[icrsh]['up'] == 1:
+        if n_orb[icrsh]['up'] == 1:
             line += ' '*11
         # Adds up the spin channels
-        for iorb in range(n_orbitals[icrsh]['up']):
+        for iorb in range(n_orb[icrsh]['up']):
             line += '{:10.5e}   '.format(conv_obs['d_orb_occ'][icrsh][-1][iorb])
         line = line[:-3] + ' | '
 

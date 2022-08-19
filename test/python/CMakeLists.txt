@@ -14,7 +14,7 @@ foreach(test ${all_pytests})
   get_filename_component(test_dir ${test} DIRECTORY)
   
   add_test(NAME ${test_name} 
-           COMMAND ${TRIQS_PYTHON_EXECUTABLE} -m pytest ${CMAKE_CURRENT_SOURCE_DIR}/${test_dir}/${test_name}.py 
+           COMMAND ${TRIQS_PYTHON_EXECUTABLE} -m pytest -vv ${CMAKE_CURRENT_SOURCE_DIR}/${test_dir}/${test_name}.py 
            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${test_dir})
   
   set_property(TEST ${test_name} APPEND PROPERTY ENVIRONMENT PYTHONPATH=${PROJECT_BINARY_DIR}/python:$ENV{PYTHONPATH})
