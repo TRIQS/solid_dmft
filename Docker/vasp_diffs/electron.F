@@ -6,7 +6,7 @@
 656a660,661
 >       flush(17)
 >       print *, ' '
-697,704c702,718
+697,704c702,720
 <          IF (IO%LORBIT==14) CALL SPHPRO_FAST( &
 <               GRID,LATT_CUR, P,T_INFO,W, WDES, 71,IO%IU6,&
 <               INFO%LOVERL,LMDIM,CQIJ, LDIMP, LDIMP,LMDIMP,INNER_STEP, IO%LORBIT,PAR, &
@@ -26,10 +26,12 @@
 >                  EFERMI, KPOINTS%EMIN, KPOINTS%EMAX)
 >             CALL LPRJ_PROALL(W,WDES,P,CQIJ,LATT_CUR,LPRJ_functions,LPRJ_COVL,T_INFO,INFO,IO)
 >             CALL LPRJ_WRITE(LPRJ_functions,LPRJ_COVL,IO%IU6, IO%IU0, W, EFERMI)
+>             ! CALL LPRJ_LDApU(IO, W)   ! write a LDA+U GAMMA file
 >             CALL LPRJ_DEALLOC
 > 
 >             IF (WANNIER90()) THEN
 >                 CALL KPAR_SYNC_ALL(WDES,W)
 >                 CALL MLWF_MAIN(WDES,W,P,KPOINTS,CQIJ,T_INFO,LATT_CUR,INFO,IO,MLWF_GLOBAL)
+>                 CALL WRITE_EIGENVAL(WDES, W, IO%IU6)
 >             ENDIF
 >          ENDIF
