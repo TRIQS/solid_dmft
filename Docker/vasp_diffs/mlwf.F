@@ -21,7 +21,3 @@
 <    ! or unitary matrix contrained optimization (umco)
 <    ELSE
 <       CALL MLWF_TRAFO_RUN(P_MLWF,W,P,CQIJ,LATT_CUR,T_INFO,INFO,IO)
-1125c1132
-<       MLWF%LPRJ_functions(IS)%spin_qaxis = proj_s_qaxisx(3,IS)
----
->       MLWF%LPRJ_functions(IS)%spin_qaxis = proj_s_qaxisx(:,IS)
