@@ -1,19 +1,33 @@
 .. _issues:
 
-*****************
-How to contribute
-*****************
+********************
+Support & contribute
+********************
+
+Seeking help
+============
+
+If you have any questions please ask them on the solid_dmft github discussion page:
+`<https://github.com/flatironinstitute/solid_dmft/discussions>`_. However, note
+that solid_dmft is targeted at experienced users of DMFT, and we can only provide
+technial support for the code itself not for theory questions about the utilized methods.
+
+Also make sure to ask only questions relevant for solid_dmft. For questions
+regarding other parts of TRIQS use the discussions page of the respective TRIQS
+application.
+
+Take also a look at the :ref:`tutorials` section of the documentation for examples, and
+the official `TRIQS tutorial page <https://github.com/TRIQS/tutorials>`_ for even more
+tutorials.
 
 
 Improving solid_dmft
 ====================
 
-solid_dmft is targeted at experienced users of DMFT. If you have suggestions or
-questions, please use github discussion
-`<https://github.com/flatironinstitute/solid_dmft/discussions>`_.
-
-We encourage pull requests with new features or helpful postprocessing scripts.
-
+Please post suggestions for new features on the `github discussion page 
+<https://github.com/flatironinstitute/solid_dmft/discussions>`_ or create 
+directly a pull request with new features or helpful postprocessing scripts
+via github.
 
 Reporting issues
 ================
