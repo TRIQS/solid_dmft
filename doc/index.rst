@@ -19,11 +19,12 @@ solid_dmft
 
 This program allows to perform DFT+DMFT ''one-shot'' and charge self-consistent
 (CSC) calculations from h5 archives or VASP/Quantum Espresso input files for
-multiband systems using the TRIQS software library, and the DFT code interface 
-`TRIQS/DFTTools <https://triqs.github.io/dft_tools>`_. Works with triqs >3.x.x. 
-solid_dmft takes advantage of various impurity solvers available in triqs: cthyb, 
-HubbardI, ForkTPS, ctint, and ctseg. Postprocessing scripts are available to 
-perform analytic continuation and calculate spectral functions. 
+multiband systems using the `TRIQS software library <https://triqs.github.io>`_, and the DFT code interface
+`TRIQS/DFTTools <https://triqs.github.io/dft_tools>`_. Works with triqs >3.x.x.
+solid_dmft takes advantage of various
+`impurity solvers available <https://triqs.github.io/triqs/latest/applications.html#impurity-solvers>`_
+in triqs: cthyb, HubbardI, ForkTPS, ctint, and ctseg. Postprocessing scripts are available to
+perform analytic continuation and calculate spectral functions.
 
 For installation use the same branch / tag as your triqs installation. More
 information under :ref:`installation`. 
