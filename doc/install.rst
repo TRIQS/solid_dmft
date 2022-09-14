@@ -31,33 +31,32 @@ However, please make sure that you have a valid TRIQS and TRIQS/DFTTools install
 Manual installation via CMake
 -----------------------------
 
-#. clone the ``flatironinstitute/solid_dmft`` repository from GitHub::
+We provide hereafter the build instructions in the form of a documented bash script. Please change the variable INSTALL_PREFIX to point to your TRIQS installation directory::
+    
+    INSTALL_PREFIX=/path/to/triqs
+    # source the triqsvars.sh file from your TRIQS installation to load the TRIQS environment
+    source $(INSTALL_PREFIX)/share/triqs/triqsvars.sh
 
-     $ git clone https://github.com/flatironinstitute/solid_dmft solid_dmft.src
+    # clone the flatironinstitute/solid_dmft repository from GitHub
+    git clone https://github.com/flatironinstitute/solid_dmft solid_dmft.src
 
-#. checkout the branch of solid_dmft matching your triqs version. For example if you use the `3.1.x` branch of triqs, dfttools. and cthyb:
+    # checkout the branch of solid_dmft matching your triqs version. 
+    # For example if you use the 3.1.x branch of triqs, dfttools. and cthyb
+    git checkout 3.1.x
 
-    $ git checkout 3.1.x
+    # Create and move to a new directory where you will compile the code
+    mkdir solid_dmft.build && cd solid_dmft.build
 
-#. Create and move to a new directory where you will compile the code::
+    # In the build directory call cmake, including any additional custom CMake options, see below
+    cmake ../solid_dmft.src
 
-     $ mkdir solid_dmft.build && cd solid_dmft.build
+    # Compile the code, run the tests, and install the application
+    make test
+    make install
 
-#. Ensure that your shell contains the TRIQS environment variables by sourcing the ``triqsvars.sh`` file from your TRIQS installation::
+This installs solid_dmft into your TRIQS installation folder.
 
-     $ source path_to_triqs/share/triqs/triqsvars.sh
-
-#. In the build directory call cmake, including any additional custom CMake options, see below::
-
-     $ cmake ../solid_dmft.src
-
-#. Compile the code, run the tests and install the application::
-
-     $ make test
-     $ make install
-
-
-to build ``solid_dmft`` with documentation you should run:: 
+To build ``solid_dmft`` with documentation you should run:: 
 
      $ cmake path/to/solid_dmft.src -DBuild_Documentation=ON 
      $ make 
@@ -65,6 +64,14 @@ to build ``solid_dmft`` with documentation you should run::
 
 The last line will automatically search for changes in your src dir, rebuild the documentation, 
 and serve it locally as under `127.0.0.1:8000`. 
+
+Docker files & images
+---------------------
+
+We `provide docker files <https://github.com/TRIQS/solid_dmft/tree/3.1.x/Docker>`_ to build solid_dmft inside a docker container with all dependencies and instructions on how to integrate the connected DFT codes as well. Additionally, we host a most recent unstable version of the docker image used for the github CI `on dockerhub <https://hub.docker.com/r/materialstheory/solid_dmft_ci>`_. To use this version, which includes the cthyb solver, the hubbardI solver, dfttools, and the maxent package, pull the following image::
+
+    $ docker pull materialstheory/solid_dmft_ci
+
 
 Version compatibility
 ---------------------

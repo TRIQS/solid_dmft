@@ -9,7 +9,13 @@
 
 This program allows to perform DFT+DMFT one-shot and charge self-consistent (CSC) calculations from h5 archives or VASP/Quantum Espresso input files for multiband systems using the [TRIQS](https://triqs.github.io/triqs/latest/) software library, and the DFT code interface [TRIQS/DFTTools](https://triqs.github.io/dft_tools/latest/). solid_dmft takes advantage of various impurity solvers available in [TRIQS](https://triqs.github.io/triqs/unstable/applications.html#impurity-solvers). Postprocessing scripts are available to perform analytic continuation and calculate spectral functions.
 
-To learn how to use solid_dmft, take a look at the [online documentation](https://triqs.github.io/solid_dmft/).
+### Documentation & tutorials
+
+To learn how to use solid_dmft, take a look at the [online documentation](https://triqs.github.io/solid_dmft/). There you can find:
+* [input / output documentation](https://triqs.github.io/solid_dmft/documentation.html#input-output)
+* [reference manual of functions](https://triqs.github.io/solid_dmft/documentation.html#module-reference-manual)
+* [code structure](https://triqs.github.io/solid_dmft/documentation.html#code-structure)
+* [tutorials](https://triqs.github.io/solid_dmft/tutorials.html)
 
 ### Installation
 
@@ -21,7 +27,7 @@ However, please make sure that you have a valid TRIQS and TRIQS/DFTTools install
 
 A more thorough installation can be performed manually via `cmake`, which will also check if you have a working and matching TRIQS installation.
 
-Please check our [online documentation](https://triqs.github.io/solid_dmft/install.html) for more detailed installation instructions.
+Please check the [installation page](https://triqs.github.io/solid_dmft/install.html) on the online documentation for more detailed instructions.
 
 ---
 
