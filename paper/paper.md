@@ -60,7 +60,7 @@ TRIQS/DFTTools [@dfttools:2016] converts the input into a standardized HDF5 arch
 The input for the DMFT calculation can be provided either as a Hamiltonian in reciprocal $\mathbf{k}$-space in a localized basis set or in terms of the overlap between the localized basis set and the Kohn-Sham wavefunctions (so-called projector functions) and their respective eigenvalues.
 
 The code follows the same modular philosophy as the TRIQS software package and relies on TRIQS functionalities to perform basic operations on Green functions.
-Each part of the simulation is split into separate stand-alone functions to limit statefulness to a minimum and allows easily extending the functionalities.
+Each part of the simulation is split into separate stand-alone functions to limit statefulness to a minimum and can easily be extended in functionality.
 The modularity of the program also allows users to run, for example, the DMFT loop via a call of a single pure function with well-defined input and output, i.e., without running solid\_dmft as a monolithic code.
 An abstracted `solver` class implements the various impurity solvers available in TRIQS.
 solid\_dmft allows one to seamlessly switch between impurity solvers with the change of a simple input flag and by adjusting the solver parameters.
@@ -77,7 +77,7 @@ Furthermore, we utilize a continuous-integration workflow on GitHub to test ever
 
 As of now, only few ready-to-use DFT+DMFT codes are available, all of them released rather recently.
 Most of these codes adopt a black-box approach, where the complexity of the DMFT part is abstracted away from the final user (as in EDMFT [@Haule:2010], Amulet [@amulet] or the DMFT implementation in Abinit [@Aldo:2020]) and therefore reduces the number of free parameters to tune. However, this approach may limit the flexibility of the implementation.
-solid\_dmft is designed as a more modular, and open source program, similar to other software packages like DFTwDMFT [@Singh:2021] and DCORE [@Shinaoka:2021], and acts as a flagship implementation of DFT+DMFT based on the TRIQS ecosystem.
+solid\_dmft is designed as a more modular, open source program, similar to other software packages like DFTwDMFT [@Singh:2021] and DCORE [@Shinaoka:2021], and acts as a flagship implementation of DFT+DMFT based on the TRIQS ecosystem.
 The benefits of this approach are twofold: on the one hand, TRIQS developers are able to benchmark their applications in a well-tested framework.
 On the other hand, users can benefit from a standardized input-output structure compatible with the TRIQS framework, fundamentally increasing robustness and reproducibility.
 solid_dmft is developed in the spirit of a community code and supports external contributions that advance the capabilities of the software.
