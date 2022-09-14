@@ -70,7 +70,7 @@ ulimit -s unlimited
 and is written in the OUTCAR as two sets of bare interaction, where for one of them
 it says: low cutoff result for V_ijkl. Here ENCUT was used and for the one above 1.1*ENCUT or VCUTOFF was used.
 * usually a converged ENCUT gives also a reasonably high VCUTOFF, so that explicitly setting VCUTOFF is not necessary. Moreover, the effect of the VCUTOFF convergence is included by subtracting the constant shift between LOW and HIGH VCUTOFF test output in the OUTCAR
-* One can see in the convergence plot "examples/LaTiO3/VCUTOFF_convergence.png" the effect of ENCUT and VCUTOFF:
+* One can see in the convergence plot "debugging_examples/LaTiO3/VCUTOFF_convergence.png" the effect of ENCUT and VCUTOFF:
 
 ![vcutoff_test](VCUTOFF_convergence.png)
 
