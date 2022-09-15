@@ -33,7 +33,7 @@ from h5 import HDFArchive
 
 from . import legendre_filter
 
-def n_orb_solver(sum_k):
+def get_n_orbitals(sum_k):
     """
     determines the number of orbitals within the
     solver block structure.

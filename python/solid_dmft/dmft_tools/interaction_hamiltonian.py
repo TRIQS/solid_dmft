@@ -469,8 +469,8 @@ def construct(sum_k, general_params, advanced_params):
     for param_name in ('dc_U', 'dc_J'):
         advanced_params = _extract_U_J_list(param_name, sum_k.n_inequiv_shells, advanced_params)
 
-    # Extracts ratio_F4_F2 if every correlated shell is a d-shell
-    if 'density_density' or 'full_slater' in general_params['h_int_type']:
+    # Extracts ratio_F4_F2 if any shell uses a solver supporting it
+    if 'density_density' in general_params['h_int_type'] or 'full_slater' in general_params['h_int_type']:
         general_params = _extract_U_J_list('ratio_F4_F2', sum_k.n_inequiv_shells, general_params)
 
     # Constructs the interaction Hamiltonian. Needs to come after setting sum_k.rot_mat
@@ -482,6 +482,7 @@ def construct(sum_k, general_params, advanced_params):
         # Kanamori
         if general_params['h_int_type'][icrsh] == 'kanamori':
             h_int[icrsh] = _construct_kanamori(sum_k, general_params, icrsh)
+            continue
 
         # for density density or full slater get full four-index U matrix
         if general_params['h_int_type'][icrsh] in ('density_density', 'full_slater'):
@@ -508,6 +509,7 @@ def construct(sum_k, general_params, advanced_params):
 
             # construct slater from U tensor
             h_int[icrsh] = _construct_slater(sum_k, general_params, Umat_full_rotated, icrsh)
+            continue
 
         # simple total impurity occupation interation: U/2 (Ntot^2 - Ntot)
         if general_params['h_int_type'][icrsh] == 'ntot':
@@ -515,6 +517,7 @@ def construct(sum_k, general_params, advanced_params):
             for block, n_orb in sum_k.gf_struct_solver[icrsh].items():
                 n_tot_op += sum(n(block, orb) for orb in range(n_orb))
             h_int[icrsh] = general_params['U'][icrsh]/2.0 * (n_tot_op*n_tot_op - n_tot_op)
+            continue
 
         # read from file options
         if general_params['h_int_type'][icrsh] in ('crpa', 'crpa_density_density'):
@@ -528,11 +531,13 @@ def construct(sum_k, general_params, advanced_params):
             Umat_full_rotated = _rotate_four_index_matrix(sum_k, general_params, Umat_full, icrsh)
 
             h_int[icrsh] = _construct_density_density(sum_k, general_params, Umat_full_rotated, icrsh)
+            continue
 
         # dynamic interaction from file
         if general_params['h_int_type'][icrsh] == 'dynamic':
             h_int[icrsh] = _construct_dynamic(sum_k, general_params, icrsh)
+            continue
 
-    assert h_int[icrsh] is not None, NotImplementedError('Error when constructing the interaction Hamiltonian.')
+        raise NotImplementedError('Error when constructing the interaction Hamiltonian.')
 
     return h_int

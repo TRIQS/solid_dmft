@@ -141,7 +141,6 @@ def _determine_block_structure(sum_k, general_params, advanced_params):
 
     # Applies the manual mapping to each inequivalent shell
     if advanced_params['map_solver_struct'] != 'none':
-        # TODO: prints for debug only, remove
         sum_k.block_structure.map_gf_struct_solver([advanced_params['map_solver_struct']] * sum_k.n_inequiv_shells)
         if advanced_params['mapped_solver_struct_degeneracies'] != 'none':
             sum_k.block_structure.deg_shells = [advanced_params['mapped_solver_struct_degeneracies']] * sum_k.n_inequiv_shells

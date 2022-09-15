@@ -30,7 +30,7 @@ import numpy as np
 
 # triqs
 from triqs.gf import MeshImFreq, MeshImTime, MeshReFreq, BlockGf
-from solid_dmft.dmft_tools.solver import n_orb_solver
+from solid_dmft.dmft_tools import solver
 
 def _generate_header(general_params, sum_k):
     """
@@ -38,7 +38,7 @@ def _generate_header(general_params, sum_k):
     Returns a dict with {file_name: header_string}
     """
 
-    n_orb = n_orb_solver(sum_k)
+    n_orb = solver.get_n_orbitals(sum_k)
 
     header_energy_mask = '| {:>11} '
     header_energy = header_energy_mask.format('δE_tot')
@@ -76,7 +76,7 @@ def write_conv(conv_obs, sum_k, general_params):
 
     """
 
-    n_orb = n_orb_solver(sum_k)
+    n_orb = solver.get_n_orbitals(sum_k)
 
     for icrsh in range(sum_k.n_inequiv_shells):
         line = '{:3d} | '.format(conv_obs['iteration'][-1])
