@@ -15,6 +15,7 @@ def test_load_crpa_interaction_matrix():
     sum_k.corr_shells = [{'dim': 5}, {'dim': 5}, {'dim': 5}, {'dim': 5}]
     sum_k.corr_to_inequiv = [0, 1, 1, 0]
     sum_k.inequiv_to_corr = [0, 1]
+    sum_k.gf_struct_solver = [{'down_0' : 5, 'up_0' : 5},{'down_0' : 5, 'up_0' : 5}]
 
     crpa_matrix = _load_crpa_interaction_matrix(sum_k, 'UIJKL')
 

@@ -36,6 +36,7 @@ from itertools import product
 from h5 import HDFArchive
 import triqs.utility.mpi as mpi
 from triqs.operators import util, n, c, c_dag, Operator
+from solid_dmft.dmft_tools import solver
 try:
     import forktps as ftps
 except ImportError:
@@ -88,8 +89,8 @@ def _load_crpa_interaction_matrix(sum_k, filename='UIJKL'):
     u_matrix_four_indices_per_shell = [None] * sum_k.n_inequiv_shells
     first_index_shell = 0
     for ish in range(sum_k.n_corr_shells):
-        n_orb = sum_k.corr_shells[ish]['dim']
         icrsh = sum_k.corr_to_inequiv[ish]
+        n_orb = solver.get_n_orbitals(sum_k)[icrsh]['up']
         u_matrix_temp = u_matrix_four_indices[first_index_shell:first_index_shell+n_orb,
                                               first_index_shell:first_index_shell+n_orb,
                                               first_index_shell:first_index_shell+n_orb,
@@ -179,14 +180,11 @@ def _construct_kanamori(sum_k, general_params, icrsh):
     from the parameters U and J.
     """
 
-    # ish points to the shell representative of the current group
-    ish = sum_k.inequiv_to_corr[icrsh]
-    orb_names = list(range(sum_k.corr_shells[ish]['dim']))
-    if sum_k.SO == 0:
-        n_orb = sum_k.corr_shells[ish]['dim']
-    else:
-        assert sum_k.corr_shells[ish]['dim'] % 2 == 0
-        n_orb = sum_k.corr_shells[ish]['dim'] // 2
+    n_orb = solver.get_n_orbitals(sum_k)[icrsh]['up']
+    orb_names = list(range(n_orb))
+    if sum_k.SO == 1:
+        assert n_orb % 2 == 0
+        n_orb = n_orb // 2
 
     if n_orb not in (2, 3):
         mpi.report('warning: are you sure you want to use the kanamori hamiltonian '
@@ -313,12 +311,9 @@ def _construct_dynamic(sum_k, general_params, icrsh):
             U_onsite = archive['dynamic_U']['U_scr']
     U_onsite = mpi.bcast(U_onsite)
 
-    # ish points to the shell representative of the current group
-    ish = sum_k.inequiv_to_corr[icrsh]
-    orb_names = range(sum_k.corr_shells[ish]['dim'])
-    if sum_k.SO == 0:
-        n_orb = sum_k.corr_shells[ish]['dim']
-    else:
+    n_orb = solver.get_n_orbitals(sum_k)[icrsh]['up']
+    orb_names = list(range(n_orb))
+    if sum_k.SO == 1:
         raise ValueError('dynamic U not implemented for SO!=0')
     if n_orb > 1:
         raise ValueError('dynamic U not implemented for more than one orbital')
@@ -339,11 +334,11 @@ def _generate_four_index_u_matrix(sum_k, general_params, icrsh):
 
     # ish points to the shell representative of the current group
     ish = sum_k.inequiv_to_corr[icrsh]
-    if sum_k.SO == 0:
-        n_orb = sum_k.corr_shells[ish]['dim']
-    else:
-        assert sum_k.corr_shells[ish]['dim'] % 2 == 0
-        n_orb = sum_k.corr_shells[ish]['dim'] // 2
+    n_orb = solver.get_n_orbitals(sum_k)[icrsh]['up']
+    orb_names = list(range(n_orb))
+    if sum_k.SO == 1:
+        assert n_orb % 2 == 0
+        n_orb = n_orb // 2
 
     if sum_k.corr_shells[ish]['l'] != 2:
         slater_integrals = util.U_J_to_radial_integrals(l=sum_k.corr_shells[ish]['l'],
@@ -408,9 +403,8 @@ def _construct_density_density(sum_k, general_params, Umat_full_rotated, icrsh):
     """
 
     # Constructs Hamiltonian from Umat_full_rotated
-    # ish points to the shell representative of the current group
-    ish = sum_k.inequiv_to_corr[icrsh]
-    orb_names = list(range(sum_k.corr_shells[ish]['dim']))
+    n_orb = solver.get_n_orbitals(sum_k)[icrsh]['up']
+    orb_names = list(range(n_orb))
 
     Umat, Upmat = util.reduce_4index_to_2index(Umat_full_rotated)
     h_int = util.h_int_density(sum_k.spin_block_names[sum_k.SO], orb_names,
@@ -426,9 +420,8 @@ def _construct_slater(sum_k, general_params, Umat_full_rotated, icrsh):
     matrix.
     """
 
-    # ish points to the shell representative of the current group
-    ish = sum_k.inequiv_to_corr[icrsh]
-    orb_names = list(range(sum_k.corr_shells[ish]['dim']))
+    n_orb = solver.get_n_orbitals(sum_k)[icrsh]['up']
+    orb_names = list(range(n_orb))
 
     h_int = util.h_int_slater(sum_k.spin_block_names[sum_k.SO], orb_names,
                               map_operator_structure=sum_k.sumk_to_solver[icrsh],
