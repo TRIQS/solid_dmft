@@ -45,7 +45,8 @@ def get_n_orbitals(sum_k):
     Returns
     -------
     n_orb : dict of int
-        number of orbitals for up / down as dict
+        number of orbitals for up / down as dict for SOC calculation
+        without up / down block up holds the number of orbitals
     """
     n_orbitals = [{'up': 0, 'down': 0} for i in range(sum_k.n_inequiv_shells)]
     for icrsh in range(sum_k.n_inequiv_shells):
