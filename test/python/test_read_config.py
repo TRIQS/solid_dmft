@@ -102,11 +102,12 @@ def test_config_file_1():
                                                         'g0_mix_type' : 'linear',
                                                         'dc_type': 0, 'load_sigma': False, 'n_iw': 1025,
                                                         'noise_level_initial_sigma': 0.,
-                                                        'h_int_type': 'density_density',
+                                                        'h_int_type': [u'density_density'],
                                                         'mu_gap_gb2_threshold': 'none'},
                                             'advanced': {'dc_fixed_value': 'none', 'dc_fixed_occ': 'none',
                                                          'dc_nominal': False,
                                                          'dc_factor': 'none', 'dc_J': [2.0], 'dc_U': [2.0],
+                                                         'pick_solver_struct': 'none',
                                                          'map_solver_struct': 'none'},
                                             'solver': {'move_double': True, 'measure_G_l': False,
                                                        'move_shift': False, 'store_solver': False,
@@ -202,7 +203,6 @@ def test_config_file_2():
     invalid_params = _checks_validity_criterion(parameters)
     assert invalid_params == {'dft': [], 'general': [], 'advanced': [], 'solver': []}
 
-    print(parameters)
     assert are_iterables_equal(parameters, {'dft': {},
                                             'general': {'afm_order': True, 'magnetic': True,
                                                         'measure_chi': 'none',
@@ -224,12 +224,13 @@ def test_config_file_2():
                                                         'magmom': [1.0, -1.0], 'dc_type': 0, 'n_tau': 10001,
                                                         'load_sigma': False, 'n_l': 35, 'n_iw': 1025,
                                                         'noise_level_initial_sigma': 0., 'n_iter_dmft': 6,
-                                                        'h_int_type': 'kanamori',
+                                                        'h_int_type': [u'kanamori'], 'ratio_F4_F2' : [u'none'],
                                                         'mu_gap_gb2_threshold': 'none'},
                                             'advanced': {'dc_fixed_value': 'none', 'dc_fixed_occ': 'none',
                                                          'dc_nominal': False,
                                                          'dc_factor': 'none', 'dc_J': [1.0], 'dc_U': [5.5],
                                                          'map_solver_struct': {('ud_0', 0): ('up_0', 0)},
+                                                         'pick_solver_struct': 'none',
                                                          'mapped_solver_struct_degeneracies': 'none', },
                                             'solver': {'imag_threshold': 1e-05, 'n_warmup_cycles': 10000,
                                                        'length_cycle': 140, 'measure_G_l': True,

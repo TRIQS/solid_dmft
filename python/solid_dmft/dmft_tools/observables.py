@@ -40,6 +40,7 @@ import triqs.utility.mpi as mpi
 from triqs.gf import Gf, MeshImTime
 from triqs.atom_diag import trace_rho_op
 from triqs.gf.descriptors import Fourier
+from solid_dmft.dmft_tools import solver
 
 def prep_observables(h5_archive, sum_k):
     """
@@ -96,15 +97,14 @@ def _generate_header(general_params, sum_k):
     Generates the headers that are used in write_header_to_file.
     Returns a dict with {file_name: header_string}
     """
-    n_orbitals = [sum_k.corr_shells[sum_k.inequiv_to_corr[iineq]]['dim']
-                  for iineq in range(sum_k.n_inequiv_shells)]
+    n_orb = solver.get_n_orbitals(sum_k)
 
     header_energy_mask = ' | {:>10} | {:>10}   {:>10}   {:>10}   {:>10}'
     header_energy = header_energy_mask.format('E_tot', 'E_DFT', 'E_bandcorr', 'E_int_imp', 'E_DC')
 
     headers = {}
     for iineq in range(sum_k.n_inequiv_shells):
-        number_spaces = max(10*n_orbitals[iineq] + 3*(n_orbitals[iineq]-1), 21)
+        number_spaces = max(10*n_orb[iineq]['up'] + 3*(n_orb[iineq]['up']-1), 21)
         header_basic_mask = '{{:>3}} | {{:>10}} | {{:>{0}}} | {{:>{0}}} | {{:>17}}'.format(number_spaces)
 
         # If magnetic calculation is done create two obs files per imp
@@ -423,8 +423,7 @@ def write_obs(observables, sum_k, general_params):
 
     """
 
-    n_orbitals = [sum_k.corr_shells[sum_k.inequiv_to_corr[iineq]]['dim']
-                  for iineq in range(sum_k.n_inequiv_shells)]
+    n_orb = solver.get_n_orbitals(sum_k)
 
     for icrsh in range(sum_k.n_inequiv_shells):
         if not general_params['csc'] and general_params['magnetic'] and sum_k.SO == 0:
@@ -432,13 +431,13 @@ def write_obs(observables, sum_k, general_params):
                 line = '{:3d} | '.format(observables['iteration'][-1])
                 line += '{:10.5f} | '.format(observables['mu'][-1])
 
-                if n_orbitals[icrsh] == 1:
+                if n_orb[icrsh][spin] == 1:
                     line += ' '*11
                 for item in observables['orb_gb2'][icrsh][spin][-1]:
                     line += '{:10.5f}   '.format(item)
                 line = line[:-3] + ' | '
 
-                if n_orbitals[icrsh] == 1:
+                if n_orb[icrsh][spin] == 1:
                     line += ' '*11
                 for item in observables['orb_occ'][icrsh][spin][-1]:
                     line += '{:10.5f}   '.format(item)
@@ -461,19 +460,19 @@ def write_obs(observables, sum_k, general_params):
             line += '{:10.5f} | '.format(observables['mu'][-1])
 
             # Adds spaces for header to fit in properly
-            if n_orbitals[icrsh] == 1:
+            if n_orb[icrsh]['up'] == 1:
                 line += ' '*11
             # Adds up the spin channels
-            for iorb in range(n_orbitals[icrsh]):
+            for iorb in range(n_orb[icrsh]['up']):
                 val = np.sum([observables['orb_gb2'][icrsh][spin][-1][iorb] for spin in sum_k.spin_block_names[sum_k.SO]])
                 line += '{:10.5f}   '.format(val)
             line = line[:-3] + ' | '
 
             # Adds spaces for header to fit in properly
-            if n_orbitals[icrsh] == 1:
+            if n_orb[icrsh]['up'] == 1:
                 line += ' '*11
             # Adds up the spin channels
-            for iorb in range(n_orbitals[icrsh]):
+            for iorb in range(n_orb[icrsh]['up']):
                 val = np.sum([observables['orb_occ'][icrsh][spin][-1][iorb] for spin in sum_k.spin_block_names[sum_k.SO]])
                 line += '{:10.5f}   '.format(val)
             line = line[:-3] + ' | '

@@ -203,6 +203,7 @@ def test_generate_header():
     sum_k = Dummy()
     sum_k.n_inequiv_shells = 1
     sum_k.inequiv_to_corr = [0]
+    sum_k.gf_struct_solver = [{'up_0': 3, 'down_0': 3}]
     sum_k.corr_shells = [{'dim': 3}]
     sum_k.SO = 0
 
@@ -220,6 +221,8 @@ def test_generate_header():
     sum_k = Dummy()
     sum_k.n_inequiv_shells = 2
     sum_k.inequiv_to_corr = [0, 2]
+    sum_k.gf_struct_solver = [{'up_0': 3, 'down_0': 3},
+                              {'up_0': 1, 'down_0': 1}]
     sum_k.corr_shells = [{'dim': 3}, {'dim': 3}, {'dim': 1}, {'dim': 1}]
     sum_k.SO = 0
 
@@ -241,6 +244,7 @@ def test_generate_header():
     sum_k = Dummy()
     sum_k.n_inequiv_shells = 2
     sum_k.inequiv_to_corr = [0, 1]
+    sum_k.gf_struct_solver = [{'up_0': 2, 'down_0': 2}, {'up_0': 1, 'down_0': 1}]
     sum_k.corr_shells = [{'dim': 2}, {'dim': 1}]
     sum_k.SO = 0
 

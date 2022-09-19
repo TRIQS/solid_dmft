@@ -362,12 +362,20 @@ dc_U :  float or comma seperated list of floats, optional, default= general_para
             U values for DC determination if only one value is given, the same U is assumed for all impurities
 dc_J :  float or comma seperated list of floats, optional, default= general_params['J']
             J values for DC determination if only one value is given, the same J is assumed for all impurities
-map_solver_struct : dict, optional, default=no additional mapping
+map_solver_struct : list of dict, optional, default=no additional mapping
             Additional manual mapping of the solver block structure, applied
-            after the block structure finder to all impurities.
+            after the block structure finder for each impurity.
+            Give exactly one dict per ineq impurity.
+            see also triqs.github.io/dft_tools/latest/_python_api/triqs_dft_tools.block_structure.BlockStructure.map_gf_struct_solver.html
 mapped_solver_struct_degeneracies : list, optional, default=none
-            Degeneracies applied when using map_solver_struct, same for all inmpurities.
+            Degeneracies applied when using map_solver_struct, for each impurity.
             If not given and map_solver_struct is used, no symmetrization will happen.
+pick_solver_struct : list of dict, optional, default=no additional picking
+            input a solver dictionary for each ineq impurity to reduce dimensionality of
+            solver block structure. Similar to to map_solver_struct, but with simpler syntax.
+            Not listed blocks / orbitals will be not treated in impurity solver.
+            Keeps degenerate shells.
+
 
 ---XXX---end
 
@@ -396,8 +404,14 @@ BOOL_PARSER = lambda b: ConfigParser()._convert_to_boolean(b)
 #              is True, the parameter becomes an optional parameter
 PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace(' ', '').split(','), 'used': True},
 
-                                 'h_int_type': {'valid for': lambda x, _: x in ('density_density', 'kanamori', 'full_slater',
-                                                                                'crpa', 'crpa_density_density','dynamic'),
+                                 'h_int_type': {'valid for': lambda x, _: all(hint in ('density_density',
+                                                                                       'kanamori',
+                                                                                       'full_slater',
+                                                                                       'crpa',
+                                                                                       'crpa_density_density',
+                                                                                       'dynamic',
+                                                                                       'ntot') for hint in x),
+                                                'converter': lambda s: list(map(str, s.replace(" ", "").split(','))),
                                                 'used': True},
 
                                  'U': {'converter': lambda s: list(map(float, s.split(','))), 'used': True},
@@ -405,8 +419,10 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                  'J': {'converter': lambda s: list(map(float, s.split(','))), 'used': True},
 
                                  'ratio_F4_F2': {'converter': lambda s: list(map(float, s.split(','))),
-                                                 'used': lambda params: params['general']['h_int_type'] in ['density_density', 'full_slater'],
-                                                 'default': ['none']},
+                                                 'default': ['none'],
+                                                 'valid for': lambda x, params: all(r == 'none' or hint in ('density_density','full_slater')
+                                                                                    for r, hint in zip(x, params['general']['h_int_type'])),
+                                                 'used': True},
 
                                  'beta': {'converter': float, 'valid for': lambda x, _: x > 0,
                                           'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint', 'inchworm', 'hubbardI','ctseg']},
@@ -780,13 +796,16 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                            'used': True, 'default': lambda params: params['general']['J']},
 
                                   'map_solver_struct': {'converter': eval,
-                                                        'valid for': lambda x, _: x=='none' or isinstance(x, dict),
+                                                        'valid for': lambda x, _: x =='none' or isinstance(x, dict) or isinstance(x, list),
                                                         'used': True, 'default': 'none'},
 
                                   'mapped_solver_struct_degeneracies': {'converter': eval,
                                             'valid for': lambda x, _: x=='none' or isinstance(x, list),
                                             'used': lambda params: params['advanced']['map_solver_struct'] != 'none',
                                             'default': 'none'},
+                                  'pick_solver_struct': {'converter': eval,
+                                                        'valid for': lambda x, _: x =='none' or isinstance(x, dict) or isinstance(x, list),
+                                                        'used': True, 'default': 'none'},
                                  }
                     }
 
@@ -1124,6 +1143,14 @@ def read_config(config_file):
             raise ValueError('You shall not use Sigma and G0 mixing together!')
 
     # Workarounds for some parameters
+
+    # make sure that pick_solver_struct and map_solver_struct are a list of dict
+    if isinstance(parameters['advanced']['pick_solver_struct'], dict):
+        parameters['advanced']['pick_solver_struct'] = [parameters['advanced']['pick_solver_struct']]
+
+    if isinstance(parameters['advanced']['map_solver_struct'], dict):
+        parameters['advanced']['map_solver_struct'] = [parameters['advanced']['map_solver_struct']]
+
     if parameters['general']['solver_type'] in ['cthyb', 'ctint', 'ctseg']:
         parameters['solver']['n_cycles'] = parameters['solver']['n_cycles_tot'] // mpi.size
         del parameters['solver']['n_cycles_tot']
