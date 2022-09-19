@@ -95,24 +95,6 @@ def _determine_block_structure(sum_k, general_params, advanced_params):
 
     original_dens_mat = deepcopy(dens_mat)
 
-    # if we want to do a magnetic calculation we need to lift up/down degeneracy
-    if not general_params['csc'] and general_params['magnetic'] and sum_k.SO == 0:
-        mpi.report('magnetic calculation: removing the spin degeneracy from the block structure')
-        for i, elem in enumerate(dens_mat):
-            for key, value in elem.items():
-                if key == 'up':
-                    for a in range(len(value[:, 0])):
-                        for b in range(len(value[0, :])):
-                            if a == b:
-                                dens_mat[i][key][a, b] = value[a, b]*1.1
-                elif key == 'down':
-                    for a in range(len(value[:, 0])):
-                        for b in range(len(value[0, :])):
-                            if a == b:
-                                dens_mat[i][key][a, b] = value[a, b]*0.9
-                else:
-                    mpi.report('warning spin channels not found! Doing a PM calculation')
-
     # for certain systems it is needed to keep off diag elements
     # this enforces to use the full corr subspace matrix
     solver_struct_ftps = None
@@ -150,6 +132,26 @@ def _determine_block_structure(sum_k, general_params, advanced_params):
         sum_k.block_structure.map_gf_struct_solver([advanced_params['map_solver_struct']] * sum_k.n_inequiv_shells)
         if advanced_params['mapped_solver_struct_degeneracies'] != 'none':
             sum_k.block_structure.deg_shells = [advanced_params['mapped_solver_struct_degeneracies']] * sum_k.n_inequiv_shells
+
+    # if we want to do a magnetic calculation we need to lift up/down degeneracy
+    if general_params['magnetic'] and sum_k.SO == 0:
+        mpi.report('magnetic calculation: removing the spin degeneracy from the block structure')
+
+        for icrsh, deg_shells_site in enumerate(sum_k.block_structure.deg_shells):
+            deg_shell_mag = []
+            # find degenerate orbitals that do not simply connect different spin channels
+            for deg_orbs in deg_shells_site:
+                for spin in ['up', 'down']:
+                    # create a list of all up / down orbitals
+                    deg = [orb for orb in deg_orbs if spin in orb]
+                    # if longer than one than we have two deg orbitals also in a magnetic calculation
+                    if len(deg) > 1:
+                        deg_shell_mag.append(deg)
+            sum_k.block_structure.deg_shells[icrsh] = deg_shell_mag
+
+    # for SOC we remove all degeneracies
+    elif general_params['magnetic'] and sum_k.SO == 1:
+        sum_k.block_structure.deg_shells = [[] for icrsh in range(len(sum_k.block_structure.deg_shells))]
 
     return sum_k, original_dens_mat, solver_struct_ftps
 
