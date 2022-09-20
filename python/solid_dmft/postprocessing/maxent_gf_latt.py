@@ -261,11 +261,11 @@ def main(external_path, iteration=None, sum_spins=False, maxent_error=.02,
     start_time = time.time()
 
     # Sets up the SumkDFT object
-    sum_k = SumkDFT(external_path, mesh=sigma_iw.mesh, use_dft_blocks=False)
     h5_content = None
     if mpi.is_master_node():
         h5_content = _read_h5(external_path, iteration)
     sigma_iw, chemical_potential, dc_potential, block_structure = mpi.bcast(h5_content)
+    sum_k = SumkDFT(external_path, mesh=sigma_iw[0].mesh, use_dft_blocks=False)
     sum_k.block_structure = block_structure
     sum_k.put_Sigma(sigma_iw)
     sum_k.set_mu(chemical_potential)
