@@ -4,7 +4,7 @@
 
 ## Version 3.1.2
 
-solid_dmft version 3.1.1 is a patch-release that improves / fixes the following issues:
+solid_dmft version 3.1.2 is a patch-release that improves / fixes the following issues:
 
 * fix deg shells in magnetic calculations
 * fix bug in max_G_diff function ignoring norm_temp
