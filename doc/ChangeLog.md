@@ -2,6 +2,31 @@
 
 # Changelog
 
+## Version 3.1.2
+
+solid_dmft version 3.1.1 is a patch-release that improves / fixes the following issues:
+
+* fix deg shells in magnetic calculations
+* fix bug in max_G_diff function ignoring norm_temp
+* fix load Sigma with new gf_struct in triqs 3.1.x
+* Made the way mesh is stored in maxent_gf_latt consistent with maxent_gf_imp
+* adapt vasp patch files for ver6.3.2
+* update README.md for Joss publication
+* print optimal alpha in other maxent scripts
+* update postprocessing routines for plotting spectral functions
+* add new test for pcb get_dmft_bands function
+* DOC: extend install instructions & improve readme for #21 #22
+* DOC: update support & contribute section, bump ver to 3.1.1
+* add proj_on_orb functionality to Akw
+* Added observables documentation for DMFT output
+* Added input documentation
+* Added ETH logo to website, small fixes to documentation
+* rename examples to debbuging_examples
+* pip package build files
+
+Contributors: Sophie Beck, Alberto Carta, Alexander Hampel, Max Merkel
+
+
 ## Version 3.1.1
 
 solid_dmft version 3.1.1 is a patch-release that improves / fixes the following issues:
