@@ -1,4 +1,0 @@
-First run Vasp with `INCAR_dft` to obtain converged CHGCAR and WAVECAR.
-Then start uni-dmft with `INCAR`.
-
-Note: for proper sampling, the number of QMC steps in this example should be increased.

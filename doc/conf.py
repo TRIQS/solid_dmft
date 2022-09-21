@@ -7,7 +7,7 @@ sys.path.insert(0, "@CMAKE_CURRENT_SOURCE_DIR@/sphinxext")
 sys.path.insert(0, "@CMAKE_CURRENT_SOURCE_DIR@/sphinxext/numpydoc")
 
 # exclude these folders from scanning by sphinx
-exclude_patterns = ['_templates', 'examples']
+exclude_patterns = ['_templates', 'debugging_examples']
 
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.mathjax',
@@ -55,7 +55,7 @@ rst_epilog = """
 version = version,
 )
 
-copyright = 'Copyright (C) 2018-2020, ETH Zurich Copyright (C) 2021, The Simons Foundation authors: A. Hampel, M. Merkel, and S. Beck'
+copyright = 'Copyright (C) 2018-2020, ETH Zurich Copyright (C) 2021-2022, The Simons Foundation authors: A. Hampel, M. Merkel, A. Carta, and S. Beck'
 
 mathjax_path = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=default"
 templates_path = ['@CMAKE_CURRENT_SOURCE_DIR@/_templates']

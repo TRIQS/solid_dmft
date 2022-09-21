@@ -1,6 +1,6 @@
 compile_commands.json
 /doc/html
-/doc/_autosummary
+/doc/_ref
 doc/cpp2rst_generated
 
 .vscode
@@ -11,3 +11,11 @@ ipynb_checkpoints
 
 POTCAR
 vasp.6.3.0.tgz
+
+doc/input_output/DMFT_input/advanced.rst
+doc/input_output/DMFT_input/dft.rst
+doc/input_output/DMFT_input/general.rst
+doc/input_output/DMFT_input/input.rst
+doc/input_output/DMFT_input/matches_comments.txt
+doc/input_output/DMFT_input/python_comments.txt
+doc/input_output/DMFT_input/solver.rst

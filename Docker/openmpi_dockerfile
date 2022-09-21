@@ -119,6 +119,12 @@ RUN cd /source && wget --quiet https://gitlab.com/QEF/q-e/-/archive/qe-7.0/q-e-q
 #ADD csc_vasp.tar.gz /vasp/
 #COPY openmpi_vasp.makefile /vasp/makefile.include
 
+# patch for Vasp CSC
+#COPY vasp_diffs /vasp/vasp_diffs
+#RUN cd /vasp/src \
+    #&& for name in electron.F fileio.F locproj.F mlwf.F .objects; \
+       #do patch $name -p1 -i ../vasp_diffs/$name; done
+
 #RUN  cd /vasp/ \
      #&& make std \
      #&& rm -rf src/ build/ arch/

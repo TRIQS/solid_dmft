@@ -137,7 +137,7 @@ def _generate_lattice_gf(sum_k, sum_spins):
 
 
 def _run_maxent(gf_lattice_iw, sum_k, error, omega_min, omega_max,
-                n_points_maxent, n_points_alpha):
+                n_points_maxent, n_points_alpha, analyzer='LineFitAnalyzer'):
     """
     Runs maxent to get the spectral function from the block GF.
     """
@@ -152,6 +152,9 @@ def _run_maxent(gf_lattice_iw, sum_k, error, omega_min, omega_max,
         omega_max = max(20, hopping_max - sum_k.chemical_potential)
         mpi.report('Set omega range to {:.3f}...{:.3f} eV'.format(omega_min, omega_max))
 
+    omega_mesh = HyperbolicOmegaMesh(omega_min=omega_min, omega_max=omega_max,
+                                     n_points=n_points_maxent)
+
     # Prints information on the blocks found
     mpi.report('Found blocks {}'.format(list(gf_lattice_iw.indices)))
 
@@ -163,29 +166,44 @@ def _run_maxent(gf_lattice_iw, sum_k, error, omega_min, omega_max,
         solver = TauMaxEnt()
         solver.set_G_iw(gf)
         solver.set_error(error)
-        solver.omega = HyperbolicOmegaMesh(omega_min=omega_min, omega_max=omega_max,
-                                           n_points=n_points_maxent)
+        solver.omega = omega_mesh
         solver.alpha_mesh = LogAlphaMesh(alpha_min=1e-6, alpha_max=1e2, n_points=n_points_alpha)
         results[block] = solver.run()
 
-    return results
+        n_orb = gf.target_shape[0]
+        opt_alpha = np.zeros((n_orb, n_orb, 2), dtype=int)
+        opt_alpha[:,:,:] = -1 # set results to -1 to distinguish them from 0
+        for i_orb in range(n_orb):
+            for j_orb in range(n_orb):
+                for l_com in range(2):  # loop over complex numbers
+                    if results[block].analyzer_results[i_orb][j_orb][l_com] == {}:
+                        continue
+                    opt_alpha[i_orb, j_orb, l_com] = results[block].analyzer_results[i_orb][j_orb][l_com][analyzer]['alpha_index']
+
+        mpi.report(f'Optimal alphas , block {block}:')
+        mpi.report('--- Real part ---', opt_alpha[:, :, 0])
+        if np.any(opt_alpha[:, :, 1] != -1):
+            mpi.report('--- Imag part ---', opt_alpha[:, :, 1])
+        if np.any(opt_alpha[:,:,0] == -1):
+            mpi.report('(a -1 indicates that maxent did not run for this block due to symmetry)')
+
+    return results, omega_mesh
 
 
-def _unpack_maxent_results(results):
+def _unpack_maxent_results(results, omega_mesh):
     """
     Converts maxent result to dict with mesh and spectral function from each
     analyzer.
     """
-    mesh = {key: np.array(r.omega) for key, r in results.items()}
     data_linefit = {}
     data_chi2 = {}
     for key, result in results.items():
         data_linefit[key] = result.get_A_out('LineFitAnalyzer')
         data_chi2[key] = result.get_A_out('Chi2CurvatureAnalyzer')
 
-    data_per_impurity = {'mesh': mesh, 'Alatt_w_line_fit': data_linefit,
-                         'Alatt_w_chi2_curvature': data_chi2}
-    return data_per_impurity
+    data = {'mesh': np.array(omega_mesh), 'Alatt_w_line_fit': data_linefit,
+            'Alatt_w_chi2_curvature': data_chi2}
+    return data
 
 
 def _write_spectral_function_to_h5(unpacked_results, external_path, iteration):
@@ -260,9 +278,10 @@ def main(external_path, iteration=None, sum_spins=False, maxent_error=.02,
     # Runs MaxEnt
     unpacked_results = None
     if mpi.is_master_node():
-        maxent_results = _run_maxent(gf_lattice_iw, sum_k, maxent_error, omega_min,
-                                     omega_max, n_points_maxent, n_points_alpha)
-        unpacked_results = _unpack_maxent_results(maxent_results)
+        maxent_results, omega_mesh = _run_maxent(gf_lattice_iw, sum_k, maxent_error,
+                                                 omega_min, omega_max, n_points_maxent,
+                                                 n_points_alpha)
+        unpacked_results = _unpack_maxent_results(maxent_results, omega_mesh)
         _write_spectral_function_to_h5(unpacked_results, external_path, iteration)
     unpacked_results = mpi.bcast(unpacked_results)
 

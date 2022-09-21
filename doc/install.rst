@@ -72,7 +72,6 @@ We `provide docker files <https://github.com/TRIQS/solid_dmft/tree/3.1.x/Docker>
 
     $ docker pull materialstheory/solid_dmft_ci
 
-
 Version compatibility
 ---------------------
 

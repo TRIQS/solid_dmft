@@ -1,0 +1,32 @@
+SYSTEM = SrVO3
+ENCUT = 400
+NWRITE = 2
+PREC = Normal
+ISPIN = 1   ! no spin=1
+ICHARG=2 ! 5 for fcsc calculations (communication with python)
+
+EDIFF = 1.E-08
+ISYM=-1
+
+!! DOS energy window
+NEDOS = 1001
+!! Smearing procedure
+ISMEAR = -5 ! -4 (-5) Tetrahedron (with Bloechl), 0 Gaussian, 1,... Methfessel-Paxton
+SIGMA=0.01
+!! real/reci projection scheme
+LREAL = .FALSE. ! my master's voice told me to
+!! Algo=Fast/Normal
+ALGO = Normal
+!! subspace rotation - TRUE (=default) means slower and more stable for metals, small gaps
+! LDIAG = .TRUE.
+NCORE = 1
+
+LMAXMIX=6
+LORBIT=14
+EMIN = 3.9
+EMAX = 7.1
+LOCPROJ = 2 : d : Pr
+
+!! write WAVECAR, CHGCAR
+LWAVE = .TRUE.
+LCHARG = .TRUE.
