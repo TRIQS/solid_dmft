@@ -1,5 +1,5 @@
 ---
-title: 'solid\_dmft: gray-boxing DFT+DMFT materials simulations with TRIQS'
+title: 'solid_dmft: gray-boxing DFT+DMFT materials simulations with TRIQS'
 tags:
   - Python
   - electronic structure theory
@@ -38,7 +38,7 @@ In these systems, an effective single-particle description may not capture the m
 Although density functional theory (DFT) plus dynamical mean-field theory (DMFT) has proven successful in describing strongly correlated electron systems for over two decades, only very recently ready-to-use software packages have begun to become available, with most scientific research carried out by in-house codes developed and used in individual research groups.
 Given the complexity of the method, there is also the question of whether users should implement the formalism themselves for each problem or whether black-box software, analogous to popular DFT packages, would be beneficial to the community.
 
-The goal of solid\_dmft is to find a middle ground, i.e., a *gray-box* tool as a ready-to-use implementation. Such a gray-box approach is widely used in other areas of materials simulation [@sun_pyscf_2018; @larsen_atomic_2017].
+The goal of solid_dmft is to find a middle ground, i.e., a *gray-box* tool as a ready-to-use implementation. Such a gray-box approach is widely used in other areas of materials simulation [@sun_pyscf_2018; @larsen_atomic_2017].
 This means that while the code contains all the functionality needed for many standard DMFT calculations, it is highly modular, based on open-source and community-developed software, and therefore can be easily adapted to specific applications and needs.
 Hence, this project is targeted towards researchers aiming to apply DMFT methods on top of DFT simulations to describe the physics of strongly correlated electron systems.
 While our approach allows one to fully perform these computations using standardized input flags without need for coding, the end user can easily extend the functionality by modifying relevant modules in the code.
@@ -50,25 +50,25 @@ The goal of this package is to increase reproducibility of DFT+DMFT calculations
 
 solid_dmft uses the state-of-the-art implementations provided by the TRIQS ecosystem.
 This allows the user to easily run ab-initio calculations for strongly correlated materials, as well as implement and test new features of TRIQS and benchmark new TRIQS solvers against existing ones.
-solid\_dmft either manages the DFT run itself in the charge-self-consistent mode or simply postprocesses the DFT output for one-shot calculations. In both cases, solid\_dmft then creates the downfolded Hamiltonian, solves the resulting Hubbard-like Hamiltonian via DMFT, calculates physical observables from the DMFT data, and in case of charge self-consistency feeds back the corrected charge to DFT.
+solid_dmft either manages the DFT run itself in the charge-self-consistent mode or simply postprocesses the DFT output for one-shot calculations. In both cases, solid_dmft then creates the downfolded Hamiltonian, solves the resulting Hubbard-like Hamiltonian via DMFT, calculates physical observables from the DMFT data, and in case of charge self-consistency feeds back the corrected charge to DFT.
 The full DFT+DMFT cycle is presented in \autoref{fig:downfolding}.
 
 ![Fully charge-self-consistent DFT+DMFT cycle. Starting from a DFT calculation (top left), a downfolded Hamiltonian and projector functions are created via optimized projections on a local basis set (top right). By adding a specified interaction Hamiltonian $H_\text{int}$, a full interacting electron problem is created, to be solved via the DMFT equations in TRIQS (bottom). After convergence in DMFT is reached, physical observables are calculated (bottom left). For fully charge-self-consistent calculations, the DFT cycle is restarted with a DMFT-corrected charge density.\label{fig:downfolding}](downfolding.png){ width=100% }
 
 The code is designed to run starting from DFT output or a tight-binding model, which provide the low-energy (downfolded) description of a periodic system.
-TRIQS/DFTTools [@dfttools:2016] converts the input into a standardized HDF5 archive to be used by solid\_dmft.
+TRIQS/DFTTools [@dfttools:2016] converts the input into a standardized HDF5 archive to be used by solid_dmft.
 The input for the DMFT calculation can be provided either as a Hamiltonian in reciprocal ($\mathbf{k}$-)space in a localized basis set or in terms of the overlap between the localized basis set and the Kohn-Sham wavefunctions (so-called projector functions) and their respective eigenvalues.
 
 The code follows the same modular philosophy as the TRIQS software package and relies on TRIQS functionalities to perform basic operations on Green functions.
 Each part of the simulation is split into separate stand-alone functions to keep statefulness to a minimum and can easily be extended in functionality.
-The modularity of the program also allows users to run, for example, the DMFT loop via a call of a single pure function with well-defined input and output, i.e., without running solid\_dmft as a monolithic code.
+The modularity of the program also allows users to run, for example, the DMFT loop via a call of a single pure function with well-defined input and output, i.e., without running solid_dmft as a monolithic code.
 An abstracted `solver` class implements the various impurity solvers available in TRIQS.
-solid\_dmft allows one to seamlessly switch between impurity solvers with the change of a simple input flag and by adjusting the solver parameters.
+solid_dmft allows one to seamlessly switch between impurity solvers with the change of a simple input flag and by adjusting the solver parameters.
 Fully charge-self-consistent interfaces are implemented for Quantum ESPRESSO [@Giannozzi_et_al:2009] and the Vienna ab-initio simulation package (VASP) [@kresse_ab_1993; @kresse_efficient_1996].
-solid\_dmft also allows users to perform inhomogeneous DMFT calculations, i.e., the treatment of multiple correlated and uncorrelated shells (impurity problems).
+solid_dmft also allows users to perform inhomogeneous DMFT calculations, i.e., the treatment of multiple correlated and uncorrelated shells (impurity problems).
 Postprocessing scripts are available to perform analytic continuation of imaginary Green functions or self-energies, and to calculate spectral functions.
 
-As of now, solid\_dmft has been successfully used in various peer-reviewed research studies [@Hampel:2019; @Hampel:2020; @Hampel:2021; @merkel_charge_2021; @Beck:2022; @zhang_training_2022].
+As of now, solid_dmft has been successfully used in various peer-reviewed research studies [@Hampel:2019; @Hampel:2020; @Hampel:2021; @merkel_charge_2021; @Beck:2022; @zhang_training_2022].
 We provide releases matching those of the TRIQS library, as well as up-to-date documentation with automatic reference manual and tutorials.
 Examples and benchmark calculations can be found in the tutorials section of the documentation.
 Furthermore, we utilize a continuous-integration workflow on GitHub to test every pull request and commit.
@@ -77,7 +77,7 @@ Furthermore, we utilize a continuous-integration workflow on GitHub to test ever
 
 As of now, only a few ready-to-use DFT+DMFT codes are available, all of them released rather recently.
 Most of these codes adopt a black-box approach, where the complexity of the DMFT part is abstracted away from the end user (as in EDMFT [@Haule:2010], Amulet [@amulet] or the DMFT implementation in Abinit [@Aldo:2020]) and therefore reduces the number of free parameters to tune. However, this approach may limit the flexibility of the implementation.
-solid\_dmft is designed as a more modular, open-source program, similar to other software packages like DFTwDMFT [@Singh:2021] and DCORE [@Shinaoka:2021], and acts as a flagship implementation of DFT+DMFT based on the TRIQS ecosystem.
+solid_dmft is designed as a more modular, open-source program, similar to other software packages like DFTwDMFT [@Singh:2021] and DCORE [@Shinaoka:2021], and acts as a flagship implementation of DFT+DMFT based on the TRIQS ecosystem.
 The benefits of this approach are twofold: on the one hand, TRIQS developers are able to benchmark their applications in a well-tested framework.
 On the other hand, users can benefit from a standardized input-output structure compatible with the TRIQS framework, fundamentally increasing robustness and reproducibility.
 solid_dmft is developed in the spirit of a community code and supports external contributions that advance the capabilities of the software.
