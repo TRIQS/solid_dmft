@@ -589,14 +589,14 @@ def plot_kslice(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb, tb_dict, tb=True,
                     color = eval('cm.'+plot_dict['colorscheme_kslice'])(total_proj)
                 for (qx, qy) in used_quarters:
                     ax.plot(2*qx * FS_kx_ky[sheet][k_on_sheet:k_on_sheet+2, 0], 2*qy * FS_kx_ky[sheet][k_on_sheet:k_on_sheet+2, 1], '-',
-                            solid_capstyle='round', c=color, zorder=1.)
+                            solid_capstyle='round', c=color, zorder=1., label=plot_dict['label'] if 'label' in plot_dict else '')
 
     setup_plot_kslice(ax)
 
     return ax
 
 
-def get_dmft_bands(n_orb, w90_path, w90_seed, mu_tb, add_spin=False, add_lambda=None,
+def get_dmft_bands(n_orb, w90_path, w90_seed, mu_tb, add_spin=False, add_lambda=None, add_local=None,
                    with_sigma=None, fermi_slice=False, qp_bands=False, orbital_order_to=None,
                    add_mu_tb=False, band_basis=False, proj_on_orb=None, trace=True, eta=0.0,
                    mu_shift=0.0, proj_nuk=None, **specs):
@@ -617,6 +617,8 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, mu_tb, add_spin=False, add_lambda=
         Extend w90 Hamiltonian by spin indices
     add_lambda : float, default=None
         Add SOC term with strength add_lambda (works only for t2g shells)
+    add_local : numpy array, default=None
+        Add local term of dimension (n_orb x n_orb)
     with_sigma : str, or BlockGf, default=None
         Add self-energy to spectral function? Can be either directly take
         a triqs BlockGf object or can be either 'calc' or 'model'
@@ -691,6 +693,10 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, mu_tb, add_spin=False, add_lambda=
     n_orb_rescale = 2 * n_orb if add_spin else n_orb
     change_of_basis = change_basis(n_orb, orbital_order_to, specs['orbital_order_w90'])
     H_add_loc = np.zeros((n_orb_rescale, n_orb_rescale), dtype=complex)
+    if not isinstance(add_local, type(None)):
+        assert np.shape(add_local) == (n_orb_rescale, n_orb_rescale), 'add_local must have dimension (n_orb, n_orb), but has '\
+                f'dimension {np.shape(add_local)}'
+        H_add_loc += add_local
     if add_spin and add_lambda:
         H_add_loc += lambda_matrix_w90_t2g(add_lambda)
     eta = eta * 1j
