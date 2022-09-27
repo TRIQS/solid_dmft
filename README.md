@@ -17,6 +17,8 @@ To learn how to use solid_dmft, take a look at the [online documentation](https:
 * [code structure](https://triqs.github.io/solid_dmft/documentation.html#code-structure)
 * [tutorials](https://triqs.github.io/solid_dmft/tutorials.html)
 
+Check also the [solid_dmft publication](https://doi.org/10.21105/joss.04623) in the JOSS journal for more information and further references.
+
 ### Installation
 
 You can install the latest solid_dmft release simply via pip (PyPi):
@@ -40,5 +42,5 @@ Developed by the Materials Theory Group, ETH Zurich
 and the Center for Computational Quantum Physics, Flatiron Institute.
 
 If you are using this code for your research, please cite it with this
-[bib file](cite_solid_dmft.bib).
+[bib file](https://github.com/TRIQS/solid_dmft/blob/unstable/cite_solid_dmft.bib).
 

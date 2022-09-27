@@ -31,6 +31,8 @@ information under :ref:`installation`.
 
 Learn how to use solid_dmft in the :ref:`documentation` and the :ref:`tutorials`.
 
+For more technical information about the implementation check also the `solid_dmft publication <https://doi.org/10.21105/joss.04623>`_ in the JOSS journal. If you are using this code for your research, please cite the paper using this `bib file <https://github.com/TRIQS/solid_dmft/blob/unstable/cite_solid_dmft.bib>`_.
+
 Workflow of DFT+DMFT calculations with solid_dmft
 =================================================
 
