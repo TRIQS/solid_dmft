@@ -1,4 +1,4 @@
-FROM ubuntu:impish
+FROM ubuntu:jammy
 
 ##################################################
 # Essential packages and libraries               #
@@ -122,7 +122,7 @@ ENV CPATH=/triqs/include:${CPATH}
 ENV PATH=/triqs/bin:${PATH}
 ENV LIBRARY_PATH=/triqs/lib:${LIBRARY_PATH}
 ENV LD_LIBRARY_PATH=/triqs/lib:${LD_LIBRARY_PATH}
-ENV PYTHONPATH=/triqs/lib/python3.9/site-packages:${PYTHONPATH}
+ENV PYTHONPATH=/triqs/lib/python3.10/site-packages:${PYTHONPATH}
 ENV CMAKE_PREFIX_PATH=/triqs/share/cmake:${CMAKE_PREFIX_PATH}
 ENV TRIQS_ROOT=/triqs
 
