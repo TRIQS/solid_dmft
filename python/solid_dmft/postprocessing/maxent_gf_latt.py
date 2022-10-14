@@ -171,7 +171,7 @@ def _run_maxent(gf_lattice_iw, sum_k, error, omega_min, omega_max,
         results[block] = solver.run()
 
         opt_alpha = results[block].analyzer_results[analyzer]['alpha_index']
-        mpi.report(f'Optimal alphas, block "{block}" from {analyzer}: {opt_alpha}')
+        mpi.report(f'Optimal alpha, block "{block}" from {analyzer}: {opt_alpha}')
 
     return results, omega_mesh
 

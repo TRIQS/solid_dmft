@@ -16,4 +16,5 @@ if mpi.is_master_node():
     with HDFArchive('svo_hubbardI_basic/out/inp.h5', 'r')['DMFT_results']['last_iter'] as out, \
             HDFArchive('svo_hubbardI_basic/ref.h5', 'r')['DMFT_results']['last_iter'] as ref:
         for key in ['Aimp_maxent_0', 'Alatt_maxent']:
-            are_iterables_equal(out[key], ref[key])
+            print(key)
+            assert are_iterables_equal(out[key], ref[key])
