@@ -5,8 +5,7 @@ from helper import are_iterables_equal
 
 from solid_dmft.postprocessing import maxent_gf_imp, maxent_gf_latt
 
-if mpi.is_master_node():
-    maxent_gf_imp.main('svo_hubbardI_basic/out/inp.h5', sum_spins=True, n_points_maxent=100, n_points_alpha=25)
+maxent_gf_imp.main('svo_hubbardI_basic/out/inp.h5', sum_spins=True, n_points_maxent=100, n_points_alpha=25)
 mpi.barrier()
 
 maxent_gf_latt.main('svo_hubbardI_basic/out/inp.h5', sum_spins=True, n_points_maxent=100, n_points_alpha=25,
