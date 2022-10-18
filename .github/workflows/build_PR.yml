@@ -27,7 +27,7 @@ jobs:
       - name: Test solid_dmft
         run: |
           cd solid_dmft.build
-          ctest --output-on-failure -V -R svo_hubbardI_basic
+          ctest --output-on-failure
 
 
 

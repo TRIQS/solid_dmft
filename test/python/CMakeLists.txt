@@ -74,9 +74,8 @@ endforeach()
 
 # ------------------------------#
 
-# MaxEnt test in svo_hubbardI_basic
+# MaxEnt test on svo_hubbardI_basic
 set (test svo_hubbardI_basic)
-#set (test_dir ${CMAKE_CURRENT_BINARY_DIR})
 
 foreach(file test_maxent.py helper.py)
     FILE(COPY ${file} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
