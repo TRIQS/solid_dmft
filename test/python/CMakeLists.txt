@@ -72,3 +72,18 @@ foreach(test ${integration_tests})
   set_property(TEST ${test} APPEND PROPERTY ENVIRONMENT PYTHONPATH=${PROJECT_BINARY_DIR}/python:$ENV{PYTHONPATH})
 endforeach()
 
+# ------------------------------#
+
+# MaxEnt test on svo_hubbardI_basic
+set (test svo_hubbardI_basic)
+
+foreach(file test_maxent.py helper.py)
+    FILE(COPY ${file} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+endforeach()
+
+add_test(NAME maxent_${test}
+         COMMAND ${MPIEXEC_EXECUTABLE} ${MPIEXEC_PREFLAGS} ${TRIQS_PYTHON_EXECUTABLE} test_maxent.py
+         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        )
+
+set_property(TEST maxent_${test} APPEND PROPERTY ENVIRONMENT PYTHONPATH=${PROJECT_BINARY_DIR}/python:$ENV{PYTHONPATH})

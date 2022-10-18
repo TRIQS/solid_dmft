@@ -219,27 +219,25 @@ def main(external_path, iteration=None, sum_spins=False, maxent_error=0.02,
         in a dict for each impurity
     """
 
-    start_time = time.time()
-
-    gf_imp_tau = None
+    # Not mpi parallelized
+    unpacked_results = None
     if mpi.is_master_node():
+        start_time = time.time()
+
         gf_imp_tau = _read_h5(external_path, iteration)
         for i, gf in enumerate(gf_imp_tau):
             gf_imp_tau[i] = _sum_greens_functions(gf, sum_spins)
-    gf_imp_tau = mpi.bcast(gf_imp_tau)
 
-    maxent_results, omega_mesh = _run_maxent(gf_imp_tau, maxent_error, n_points_maxent,
-                                             n_points_alpha, omega_min, omega_max)
+        maxent_results, omega_mesh = _run_maxent(gf_imp_tau, maxent_error, n_points_maxent,
+                                                 n_points_alpha, omega_min, omega_max)
 
-    unpacked_results = None
-    if mpi.is_master_node():
         unpacked_results = _unpack_maxent_results(maxent_results, omega_mesh)
         _write_spectral_function_to_h5(unpacked_results, external_path, iteration)
-    unpacked_results = mpi.bcast(unpacked_results)
 
-    total_time = time.time() - start_time
-    mpi.report('-'*80, 'DONE')
-    mpi.report(f'Total run time: {total_time:.0f} s.')
+        total_time = time.time() - start_time
+        mpi.report('-'*80, 'DONE')
+        mpi.report(f'Total run time: {total_time:.0f} s.')
+    unpacked_results = mpi.bcast(unpacked_results)
 
     return unpacked_results
 
