@@ -1,7 +1,6 @@
 # Setting docker up
-Install docker as described in the [General Wiki](../../materials_theory_intro/wikis/IT%20overview#installation-of-docker).
 
-There are Dockerfiles for images based on Ubuntu 20 ("focal") with OpenMPI (for non-Cray clusters) or MPICH (for Cray clusters like Daint), IntelMKL, VASP, wannier90 2.1, triqs 3.x.x, and Triqs MaxEnt included.
+There are Dockerfiles for images based on Ubuntu 22 ("impish") with OpenMPI (for non-Cray clusters) or MPICH (for Cray clusters like Daint), IntelMKL, VASP, wannier90 3.1, triqs 3.x.x, and Triqs MaxEnt included.
 
 ## Building the docker image
 The Dockerfile is built with this command, where `<version name>` could be `3.0.0`:
@@ -9,45 +8,22 @@ The Dockerfile is built with this command, where `<version name>` could be `3.0.
 docker build -t triqs_mpich:<version name> -f mpich_dockerfile ./
 docker build -t triqs_openmpi:<version name> -f openmpi_dockerfile ./
 ```
-Note that you need a working, modified vasp version as archive (csc_vasp.tar.gz) in this directory to make the CSC calculation work.
+Note that you need a vasp version as archive (`vasp.6.3.0.tgz`) in this directory to make the vasp CSC calculation work. Otherwise, you can just remove the lines in the docker file referring to the vasp installation.
 
-## Pulling a docker image
-Alternatively, you can pull an already-compiled image from our [gitlab directly](../../../container_registry/).
-First [log in with a personal access token](https://gitlab.ethz.ch/help/user/packages/container_registry/index#authenticating-to-the-gitlab-container-registry).
-This token you can save into a file and then log in into the registry with
-```
-cat <path to token> | docker login registry.ethz.ch -u <username gitlab> --password-stdin
-```
-and then run
-```
-docker pull registry.ethz.ch/d-matl-theory/uni-dmft/<image name>:<version name>
-```
-Just make sure that the version is the one that you want to have, it might not yet contain recent changes or bug fixes. Alternatively, there is the [official triqs docker image](https://hub.docker.com/r/flatironinstitute/triqs/), which however is not optimized for use on Daint.
+## Running docker images with sarus in HPC clusters
 
-## Getting docker images onto CSCS daint
-First, you load the desired docker images with [sarus on daint](https://user.cscs.ch/tools/containers/sarus/).
-Then there are two ways of getting the image on daint:
-
-(1) For gitlab images (don't forget that you need the personal access token) or other, public image this can be done via:
-```
-sarus pull registry.ethz.ch/d-matl-theory/uni-dmft/<image name>:<version name>
-sarus pull materialstheory/triqs
-```
-Pulling from the gitlab didn't work on daint when I tried, which leaves you with the second option.
-
-(2) If you wish to use your locally saved docker image, you first have to save it
+To use your locally saved docker image, you first save it
 ```
 docker save --output=docker-triqs.tar <image name>:<version name>
 ```
-and then upload the tar to daint and then load it via:
+and then upload the tar to the HPC cluster and then load it into [sarus](https://user.cscs.ch/tools/containers/sarus/) via
 ```
 sarus load docker-triqs.tar <image name>:<version name>
 ```
-then you can run it as shown in the example files.
+then you can run it within sarus.
 
-# Running a docker container
+# Running a docker container locally
 
-## Running locally
 You can start a docker container with either of these commands
 ```
 docker run --rm -it -u $(id -u) -v ~$PWD:/work <image name>:<version name> bash
@@ -59,12 +35,12 @@ where the second command adds some important flags.
 This is hard coded in Docker to 64m and is often not sufficient and will produce SIBUS 7 errors when starting programs with mpirun! (see also https://github.com/moby/moby/issues/2606).
 - The '-v' flags mounts a host directory as the docker directory given after the colon.
 This way docker can permanently save data; otherwise, it will restart with clean directories each time.
-Make sure you mount all the directories you need (where you save your data, where your uni-dmft directory is, ...)!
+Make sure you mount the directory where you save your data.
 - All the flags are explained in 'docker run --help'.
 
-Inside the docker, you can normally execute program. To run uni-dmft, for example, use
+Inside the docker, you can normally execute program. To run solid_dmft, for example, use
 ```
-mpirun -n 4 python <path to uni-dmft>/run_dmft.py
+mpirun -n 4 solid_dmft
 ```
 To start a jupyter-lab server from the current path, use
 ```
@@ -72,8 +48,5 @@ jupyter.sh
 ```
 All these commands you can execute directly by just adding them to the `docker run ... bash` command with the `-c` flag, e.g.
 ```
-docker run --rm -it --shm-size=4g -e USER_ID=`id -u` -e GROUP_ID=`id -g` -p 8378:8378 -v $PWD:/work <image name>:<version name> bash -c 'cd /work && mpirun -n 4 python <path to uni-dmft>/run_dmft.py'
+docker run --rm -it --shm-size=4g -e USER_ID=`id -u` -e GROUP_ID=`id -g` -p 8378:8378 -v $PWD:/work <image name>:<version name> bash -c 'cd /work && mpirun -n 4 solid_dmft
 ```
-
-## Running on daint
-The job scripts are described in the [README.md in the main folder](../README.md). In some directories one can also find example job files to run everything on daint.
