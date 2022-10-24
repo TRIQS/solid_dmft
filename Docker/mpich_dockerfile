@@ -201,6 +201,8 @@ RUN cd / && rm -rf source
 
 # make sure openmp does not start
 ENV OMP_NUM_THREADS=1
+# allow safe forking to start DFT in CSC calculations
+ENV RDMAV_FORK_SAFE=1
 
 # expose port for jupyter
 EXPOSE 8378
