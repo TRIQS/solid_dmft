@@ -30,6 +30,7 @@ dependencies = [
 [project.urls]
 "Homepage" = "https://triqs.github.io/solid_dmft"
 "Bug Tracker" = "https://github.com/triqs/solid_dmft/issues"
+"Paper" = "https://doi.org/10.21105/joss.04623"
 
 [project.scripts]
 solid_dmft = "solid_dmft.main:main"
