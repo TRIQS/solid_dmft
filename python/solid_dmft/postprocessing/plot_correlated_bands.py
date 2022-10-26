@@ -106,15 +106,13 @@ def print_matrix(matrix, n_orb, text):
         print((' '*4 + fmt).format(*row))
 
 
-def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, block, orbital_order_dmft, eta=0.0, **specs):
-
-    block_spin = spin + '_' + str(block) if with_sigma == 'calc' else spin
+def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, orbital_order_dmft, eta=0.0, **specs):
 
     if with_sigma == 'calc':
         print('Setting Sigma from {}'.format(specs['dmft_path']))
 
         sigma_imp_list = []
-        dc_list = []
+        dc_imp_list = []
         with HDFArchive(specs['dmft_path'], 'r') as ar:
             for icrsh in range(ar['dft_input']['n_inequiv_shells']):
                 try:
@@ -128,9 +126,9 @@ def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, block, orbital_orde
                             sigma = ar['DMFT_results'][specs['it']][f'Sigma_Refreq_{icrsh}']
                         except KeyError:
                             raise KeyError('Provide either "Sigma_freq_0" in real frequency, "Sigma_Refreq_0" or "Sigma_maxent_0".')
-                dc = ar['DMFT_results'][specs['it']]['DC_pot'][icrsh][spin]
+                dc_imp_list.append(ar['DMFT_results'][specs['it']]['DC_pot'][icrsh])
 
-                sigma_imp_list.append(sigma - dc)
+                sigma_imp_list.append(sigma)
 
             mu_dmft = ar['DMFT_results'][specs['it']]['chemical_potential_post']
 
@@ -139,8 +137,20 @@ def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, block, orbital_orde
             sum_k.deg_shells = ar['DMFT_input/deg_shells']
             sum_k.set_mu = mu_dmft
 
+            # first go to sumk block structure
             sigma_sumk = sum_k.transform_to_sumk_blocks(sigma_imp_list)
 
+            # subtract now dc and rotate with rot_mat
+            for icrsh in range(sum_k.n_corr_shells):
+                for bname, gf in sigma_sumk[icrsh]:
+                    sigma_sumk[icrsh][bname] -= dc_imp_list[icrsh][bname]
+                    if sum_k.use_rotations:
+                        gf << sum_k.rotloc(icrsh,
+                                           sigma_sumk[icrsh][bname],
+                                           direction='toGlobal')
+
+            # now upfold with proj_mat to band basis, this only works for the
+            # case where proj_mat is equal for all k points (wannier mode)
             sigma = Gf(mesh=sigma.mesh, target_shape=[n_orb, n_orb])
             for icrsh in range(ar['dft_input']['n_corr_shells']):
                 sigma += sum_k.upfold(ik=0, ish=icrsh, bname=spin, gf_to_upfold=sigma_sumk[icrsh][spin], gf_inp=sigma)
@@ -179,7 +189,7 @@ def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, block, orbital_orde
     if specs['linearize']:
         print('Linearizing Sigma at zero frequency:')
         eta = eta * 1j
-        iw0 = np.where(np.sign(w_mesh_dmft) == True)[0][0]-1
+        iw0 = np.where(np.sign(w_mesh_dmft) is True)[0][0]-1
         if SOC:
             sigma_interpolated += np.expand_dims(sigma_mat[iw0, :, :], axis=-1)
         # linearize diagonal elements of sigma
@@ -554,7 +564,7 @@ def plot_bands(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb, tb=True, alatt=Fal
         for band in range(n_orb):
             if not proj_on_orb[0] is not None:
                 color = eval('cm.'+plot_dict['colorscheme_bands'])(1.0)
-                ax.plot(tb_data['k_mesh'], eps_nuk[band, band].real - tb_data['mu_tb'], c=color, label=r'tight-binding', zorder=1.)
+                ax.plot(tb_data['k_mesh'], eps_nuk[band, band].real - tb_data['mu_tb'], c=color, label=r'tight-binding', zorder=1., lw=1)
             else:
                 color = eval('cm.'+plot_dict['colorscheme_bands'])(total_proj[band])
                 ax.scatter(tb_data['k_mesh'], eps_nuk[band, band].real - tb_data['mu_tb'], c=color, s=1, label=r'tight-binding', zorder=1.)
