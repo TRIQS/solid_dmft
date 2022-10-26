@@ -740,18 +740,23 @@ class SolverStructure:
             self.G_freq << make_hermitian(self.triqs_solver.G_iw)
             self.G_freq_unsym << self.G_freq
             self.sum_k.symm_deg_gf(self.G_freq, ish=self.icrsh)
-            # obtain Sigma via dyson from symmetrized G_freq
-            self.Sigma_freq << inverse(self.G0_freq) - inverse(self.G_freq)
             # set G_time
             self.G_time << self.triqs_solver.G_tau
             self.sum_k.symm_deg_gf(self.G_time, ish=self.icrsh)
 
-            if not self.solver_params['perform_tail_fit'] and self.general_params['legendre_fit']:
+            if self.general_params['legendre_fit']:
                 self.G_time_orig << self.triqs_solver.G_tau
                 # run the filter
                 self.G_l << legendre_filter.apply(self.G_time, self.general_params['n_l'])
                 # get G_time, G_freq, Sigma_freq from G_l
                 set_Gs_from_G_l()
+            elif self.solver_params['perform_tail_fit'] and not self.general_params['legendre_fit']:
+                # if tailfit has been used replace Sigma with the tail fitted Sigma from cthyb
+                self.Sigma_freq << self.triqs_solver.Sigma_iw
+                self.sum_k.symm_deg_gf(self.Sigma_freq, ish=self.icrsh)
+            else:
+                # obtain Sigma via dyson from symmetrized G_freq
+                self.Sigma_freq << inverse(self.G0_freq) - inverse(self.G_freq)
 
         # if density matrix is measured, get this too
         if self.solver_params['measure_density_matrix']:
