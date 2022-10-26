@@ -287,7 +287,7 @@ class SolverStructure:
                 mpi.report('\n Using the delta interface for cthyb passing Delta(tau) and Hloc0 directly.')
                  # prepare solver input
                 sumk_eal = self.sum_k.eff_atomic_levels()[self.icrsh]
-                solver_eal = self.sum_k.block_structure.convert_matrix(sumk_eal, space_from='sumk')
+                solver_eal = self.sum_k.block_structure.convert_matrix(sumk_eal, space_from='sumk', ish_from=self.sum_k.inequiv_to_corr[self.icrsh])
                 # fill Delta_time from Delta_freq sum_k to solver
                 for name, g0 in self.G0_freq:
                     self.Delta_freq[name] << iOmega_n - inverse(g0) - solver_eal[name]
@@ -379,7 +379,7 @@ class SolverStructure:
             for name, g0 in self.G0_freq:
                 spin = name.split('_')[0] if not self.sum_k.corr_shells[self.icrsh]['SO'] else name
                 ftps_name = self.convert_ftps[spin]
-                solver_eal = self.sum_k.block_structure.convert_matrix(sumk_eal, space_from='sumk')[name]
+                solver_eal = self.sum_k.block_structure.convert_matrix(sumk_eal, space_from='sumk', ish_from=self.sum_k.inequiv_to_corr[self.icrsh])[name]
                 self.Delta_freq[name] << Omega + 1j * self.general_params['eta'] - inverse(g0) - solver_eal
                 # solver Delta is symmetrized by just using 'up_0' channel
                 self.Delta_freq_solver[ftps_name] << Omega + 1j * self.general_params['eta'] - inverse(g0) - solver_eal
@@ -441,7 +441,7 @@ class SolverStructure:
             # fill Hloc FTPS object
             # get hloc_dft from effective atomic levels
             for name, gf in self.Delta_freq:
-                solver_eal = self.sum_k.block_structure.convert_matrix(sumk_eal, space_from='sumk')[name]
+                solver_eal = self.sum_k.block_structure.convert_matrix(sumk_eal, space_from='sumk', ish_from=self.sum_k.inequiv_to_corr[self.icrsh])[name]
                 if not self.sum_k.corr_shells[self.icrsh]['SO']:
                     name = self.convert_ftps[name.split('_')[0]]
                     solver_eal = solver_eal.real
