@@ -106,7 +106,10 @@ def print_matrix(matrix, n_orb, text):
         print((' '*4 + fmt).format(*row))
 
 
-def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, orbital_order_dmft, eta=0.0, **specs):
+def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, orbital_order_dmft=None, eta=0.0, **specs):
+
+    if orbital_order_dmft is None:
+        orbital_order_dmft = orbital_order
 
     if with_sigma == 'calc':
         print('Setting Sigma from {}'.format(specs['dmft_path']))
@@ -136,6 +139,8 @@ def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, orbital_order_dmft,
             sum_k.block_structure = ar['DMFT_input/block_structure']
             sum_k.deg_shells = ar['DMFT_input/deg_shells']
             sum_k.set_mu = mu_dmft
+
+            assert np.allclose(sum_k.proj_mat[0], sum_k.proj_mat[-1]), 'upfolding works only when proj_mat is the same for all kpoints (wannier mode)'
 
             # first go to sumk block structure
             sigma_sumk = sum_k.transform_to_sumk_blocks(sigma_imp_list)
@@ -693,11 +698,20 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, mu_tb, add_spin=False, add_lambda=
         frequency mesh information on which alatt_k_w is evaluated
     '''
 
+    # set default ordering
+    if 'orbital_order_w90' in specs:
+        orbital_order_w90 = specs['orbital_order_w90']
+    else:
+        orbital_order_w90 = list(range(n_orb))
+
+    if orbital_order_to is None:
+        orbital_order_to = orbital_order_w90
+
     # checks
     assert len(set(orbital_order_to)) == len(orbital_order_to), 'Please provide a unique identifier for each orbital.'
 
-    assert set(specs['orbital_order_w90']) == set(orbital_order_to), f'Identifiers of orbital_order_to and orbital_order_w90'\
-        f'do not match! orbital_order_to is {orbital_order_to}, but orbital_order_w90 is {specs["orbital_order_w90"]}.'
+    assert set(orbital_order_w90) == set(orbital_order_to), f'Identifiers of orbital_order_to and orbital_order_w90'\
+        f'do not match! orbital_order_to is {orbital_order_to}, but orbital_order_w90 is {orbital_order_w90}.'
 
     assert with_sigma or eta != 0.0, 'if no Sigma is provided eta has to be different from 0.0'
 
@@ -721,12 +735,9 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, mu_tb, add_spin=False, add_lambda=
     if isinstance(proj_nuk, np.ndarray) and not band_basis:
         band_basis = True
 
-    if not orbital_order_to:
-        orbital_order_to = specs['orbital_order_w90']
-
     # set up Wannier Hamiltonian
     n_orb_rescale = 2 * n_orb if add_spin else n_orb
-    change_of_basis = change_basis(n_orb, orbital_order_to, specs['orbital_order_w90'])
+    change_of_basis = change_basis(n_orb, orbital_order_to, orbital_order_w90)
     H_add_loc = np.zeros((n_orb_rescale, n_orb_rescale), dtype=complex)
     if not isinstance(add_local, type(None)):
         assert np.shape(add_local) == (n_orb_rescale, n_orb_rescale), 'add_local must have dimension (n_orb, n_orb), but has '\
