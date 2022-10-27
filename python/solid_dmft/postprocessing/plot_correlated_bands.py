@@ -158,7 +158,9 @@ def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, orbital_order_dmft=
             # case where proj_mat is equal for all k points (wannier mode)
             sigma = Gf(mesh=sigma.mesh, target_shape=[n_orb, n_orb])
             for icrsh in range(ar['dft_input']['n_corr_shells']):
-                sigma += sum_k.upfold(ik=0, ish=icrsh, bname=spin, gf_to_upfold=sigma_sumk[icrsh][spin], gf_inp=sigma)
+                sigma += sum_k.upfold(ik=0, ish=sum_k.inequiv_to_corr[icrsh],
+                                      bname=spin, gf_to_upfold=sigma_sumk[icrsh][spin],
+                                      gf_inp=sigma)
 
         # already subtracted
         dc = 0.0
