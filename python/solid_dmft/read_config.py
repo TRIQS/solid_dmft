@@ -596,7 +596,10 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                                           'valid for': lambda x, _: x == 'none' or x > 0 or np.isclose(x, 0),
                                                           'used': lambda params: (params['general']['solver_type'] in ['cthyb', 'ctint','ctseg']
                                                                                   and params['general']['mu_gap_gb2_threshold'] != 'none'),
-                                                          'default': 'none'}
+                                                          'default': 'none'},
+
+                                 'basis' : {'valid for': lambda x, _: x in ('triqs', 'wien2k', 'wannier90', 'qe', 'vasp'),
+                                            'used': True, 'default' : 'triqs'}
 
                                 },
                      'dft': {'dft_code': {'used': lambda params: params['general']['csc'],

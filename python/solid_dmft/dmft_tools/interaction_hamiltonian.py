@@ -362,7 +362,11 @@ def _generate_four_index_u_matrix(sum_k, general_params, icrsh):
     # this is consistent with the order of orbitals in the VASP interface
     # but not necessarily with wannier90! This is also true for the f-shell.
     Umat_full = util.U_matrix(l=sum_k.corr_shells[ish]['l'],
-                              radial_integrals=slater_integrals, basis='cubic')
+                              radial_integrals=slater_integrals, basis='spherical')
+    Umat_full = util.transform_U_matrix(Umat_full,
+                                        util.spherical_to_cubic(l=sum_k.corr_shells[ish]['l'],
+                                                                convention=general_params['basis'])
+                                        )
 
     if n_orb == 2:
         Umat_full = util.eg_submatrix(Umat_full)
