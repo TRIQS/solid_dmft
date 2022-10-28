@@ -139,20 +139,14 @@ def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, orbital_order_dmft=
             sum_k.block_structure = ar['DMFT_input/block_structure']
             sum_k.deg_shells = ar['DMFT_input/deg_shells']
             sum_k.set_mu = mu_dmft
+            # set Sigma and DC into sum_k
+            sum_k.dc_imp = dc_imp_list
+            sum_k.put_Sigma(sigma_imp_list)
+
+            # use add_dc function to rotate to sumk block structure and subtract the DC
+            sigma_sumk = sum_k.add_dc()
 
             assert np.allclose(sum_k.proj_mat[0], sum_k.proj_mat[-1]), 'upfolding works only when proj_mat is the same for all kpoints (wannier mode)'
-
-            # first go to sumk block structure
-            sigma_sumk = sum_k.transform_to_sumk_blocks(sigma_imp_list)
-
-            # subtract now dc and rotate with rot_mat
-            for icrsh in range(sum_k.n_corr_shells):
-                for bname, gf in sigma_sumk[icrsh]:
-                    sigma_sumk[icrsh][bname] -= dc_imp_list[icrsh][bname]
-                    if sum_k.use_rotations:
-                        gf << sum_k.rotloc(icrsh,
-                                           sigma_sumk[icrsh][bname],
-                                           direction='toGlobal')
 
             # now upfold with proj_mat to band basis, this only works for the
             # case where proj_mat is equal for all k points (wannier mode)
