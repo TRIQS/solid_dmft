@@ -45,8 +45,9 @@ import itertools
 import skimage.measure
 
 from h5 import HDFArchive
-from triqs.gf import BlockGf, MeshReFreq
+from triqs.gf import BlockGf, MeshReFreq, Gf
 from triqs.lattice.utils import TB_from_wannier90, k_space_path
+from triqs_dft_tools.sumk_dft import SumkDFT
 
 
 def _linefit(x, y, interval, spacing=50, addspace=0.0):
@@ -105,22 +106,58 @@ def print_matrix(matrix, n_orb, text):
         print((' '*4 + fmt).format(*row))
 
 
-def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, block, orbital_order_dmft, eta=0.0, **specs):
+def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, orbital_order_dmft=None, eta=0.0, **specs):
+
+    if orbital_order_dmft is None:
+        orbital_order_dmft = orbital_order
 
     if with_sigma == 'calc':
         print('Setting Sigma from {}'.format(specs['dmft_path']))
 
+        sigma_imp_list = []
+        dc_imp_list = []
         with HDFArchive(specs['dmft_path'], 'r') as ar:
-            try:
-                sigma = ar['DMFT_results'][specs['it']]['Sigma_freq_0']
-                assert isinstance(sigma.mesh, MeshReFreq), 'Imported Greens function must be real frequency'
-            except(KeyError, AssertionError):
+            for icrsh in range(ar['dft_input']['n_inequiv_shells']):
                 try:
-                    sigma = ar['DMFT_results'][specs['it']]['Sigma_maxent_0']
-                except KeyError:
-                    raise KeyError('Provide either "Sigma_freq_0" in real frequency or "Sigma_maxent_0".')
-            dc = ar['DMFT_results'][specs['it']]['DC_pot'][0][spin][0, 0]
+                    sigma = ar['DMFT_results'][specs['it']][f'Sigma_freq_{icrsh}']
+                    assert isinstance(sigma.mesh, MeshReFreq), 'Imported Greens function must be real frequency'
+                except(KeyError, AssertionError):
+                    try:
+                        sigma = ar['DMFT_results'][specs['it']][f'Sigma_maxent_{icrsh}']
+                    except KeyError:
+                        try:
+                            sigma = ar['DMFT_results'][specs['it']][f'Sigma_Refreq_{icrsh}']
+                        except KeyError:
+                            raise KeyError('Provide either "Sigma_freq_0" in real frequency, "Sigma_Refreq_0" or "Sigma_maxent_0".')
+                dc_imp_list.append(ar['DMFT_results'][specs['it']]['DC_pot'][icrsh])
+
+                sigma_imp_list.append(sigma)
+
             mu_dmft = ar['DMFT_results'][specs['it']]['chemical_potential_post']
+
+            sum_k = SumkDFT(specs['dmft_path'], mesh=sigma.mesh)
+            sum_k.block_structure = ar['DMFT_input/block_structure']
+            sum_k.deg_shells = ar['DMFT_input/deg_shells']
+            sum_k.set_mu = mu_dmft
+            # set Sigma and DC into sum_k
+            sum_k.dc_imp = dc_imp_list
+            sum_k.put_Sigma(sigma_imp_list)
+
+            # use add_dc function to rotate to sumk block structure and subtract the DC
+            sigma_sumk = sum_k.add_dc()
+
+            assert np.allclose(sum_k.proj_mat[0], sum_k.proj_mat[-1]), 'upfolding works only when proj_mat is the same for all kpoints (wannier mode)'
+
+            # now upfold with proj_mat to band basis, this only works for the
+            # case where proj_mat is equal for all k points (wannier mode)
+            sigma = Gf(mesh=sigma.mesh, target_shape=[n_orb, n_orb])
+            for icrsh in range(ar['dft_input']['n_corr_shells']):
+                sigma += sum_k.upfold(ik=0, ish=sum_k.inequiv_to_corr[icrsh],
+                                      bname=spin, gf_to_upfold=sigma_sumk[icrsh][spin],
+                                      gf_inp=sigma)
+
+        # already subtracted
+        dc = 0.0
 
     else:
         print('Setting Sigma from memory')
@@ -129,16 +166,15 @@ def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, block, orbital_orde
         dc = specs['dc'][0][spin][0, 0]
         mu_dmft = specs['mu_dmft']
 
-    block_spin = spin + '_' + str(block) if with_sigma == 'calc' else spin
     SOC = (spin == 'ud')
     w_mesh_dmft = np.linspace(sigma.mesh.omega_min, sigma.mesh.omega_max, len(sigma.mesh))
-    assert sigma[block_spin].target_shape[0] == n_orb, f'Number of Wannier orbitals: {n_orb} and self-energy target_shape {sigma[block_spin].target_shape} does not match'
+    assert sigma.target_shape[0] == n_orb, f'Number of Wannier orbitals: {n_orb} and self-energy target_shape {sigma.target_shape} does not match'
 
-    sigma_mat = {block_spin: sigma[block_spin].data.real - np.eye(n_orb) * dc + 1j * sigma[block_spin].data.imag}
+    sigma_mat = sigma.data.real - np.eye(n_orb) * dc + 1j * sigma.data.imag
 
     # rotate sigma from orbital_order_dmft to orbital_order
     change_of_basis = change_basis(n_orb, orbital_order, orbital_order_dmft)
-    sigma_mat[block_spin] = np.einsum('ij, kjl -> kil', np.linalg.inv(change_of_basis), np.einsum('ijk, kl -> ijl', sigma_mat[block_spin], change_of_basis))
+    sigma_mat = np.einsum('ij, kjl -> kil', np.linalg.inv(change_of_basis), np.einsum('ijk, kl -> ijl', sigma_mat, change_of_basis))
 
     # set up mesh
     if 'w_mesh' in specs:
@@ -154,12 +190,12 @@ def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, block, orbital_orde
     if specs['linearize']:
         print('Linearizing Sigma at zero frequency:')
         eta = eta * 1j
-        iw0 = np.where(np.sign(w_mesh_dmft) == True)[0][0]-1
+        iw0 = np.where(np.sign(w_mesh_dmft) is True)[0][0]-1
         if SOC:
-            sigma_interpolated += np.expand_dims(sigma_mat[block_spin][iw0, :, :], axis=-1)
+            sigma_interpolated += np.expand_dims(sigma_mat[iw0, :, :], axis=-1)
         # linearize diagonal elements of sigma
         for ct in range(n_orb):
-            _, _, fit_params = _linefit(w_mesh_dmft, sigma_mat[block_spin][:, ct, ct], specs['linearize']['window'])
+            _, _, fit_params = _linefit(w_mesh_dmft, sigma_mat[:, ct, ct], specs['linearize']['window'])
             zeroth_order, first_order = fit_params[::-1].real
             print('Zeroth and first order fit parameters: [{0:.4f}, {1:.4f}]'.format(zeroth_order, first_order))
             sigma_interpolated[ct, ct] = zeroth_order + freq_dict['w_mesh'] * first_order
@@ -168,7 +204,7 @@ def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, block, orbital_orde
         # eta is added on the level of the spectral function!
         eta = 0 * 1j
         # interpolate sigma
-        def interpolate_sigma(w_mesh, w_mesh_dmft, orb1, orb2): return np.interp(w_mesh, w_mesh_dmft, sigma_mat[block_spin][:, orb1, orb2])
+        def interpolate_sigma(w_mesh, w_mesh_dmft, orb1, orb2): return np.interp(w_mesh, w_mesh_dmft, sigma_mat[:, orb1, orb2])
 
         for ct1, ct2 in itertools.product(range(n_orb), range(n_orb)):
             if ct1 != ct2 and not SOC:
@@ -529,7 +565,7 @@ def plot_bands(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb, tb=True, alatt=Fal
         for band in range(n_orb):
             if not proj_on_orb[0] is not None:
                 color = eval('cm.'+plot_dict['colorscheme_bands'])(1.0)
-                ax.plot(tb_data['k_mesh'], eps_nuk[band, band].real - tb_data['mu_tb'], c=color, label=r'tight-binding', zorder=1.)
+                ax.plot(tb_data['k_mesh'], eps_nuk[band, band].real - tb_data['mu_tb'], c=color, label=r'tight-binding', zorder=1., lw=1)
             else:
                 color = eval('cm.'+plot_dict['colorscheme_bands'])(total_proj[band])
                 ax.scatter(tb_data['k_mesh'], eps_nuk[band, band].real - tb_data['mu_tb'], c=color, s=1, label=r'tight-binding', zorder=1.)
@@ -658,11 +694,20 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, mu_tb, add_spin=False, add_lambda=
         frequency mesh information on which alatt_k_w is evaluated
     '''
 
+    # set default ordering
+    if 'orbital_order_w90' in specs:
+        orbital_order_w90 = specs['orbital_order_w90']
+    else:
+        orbital_order_w90 = list(range(n_orb))
+
+    if orbital_order_to is None:
+        orbital_order_to = orbital_order_w90
+
     # checks
     assert len(set(orbital_order_to)) == len(orbital_order_to), 'Please provide a unique identifier for each orbital.'
 
-    assert set(specs['orbital_order_w90']) == set(orbital_order_to), f'Identifiers of orbital_order_to and orbital_order_w90'\
-        f'do not match! orbital_order_to is {orbital_order_to}, but orbital_order_w90 is {specs["orbital_order_w90"]}.'
+    assert set(orbital_order_w90) == set(orbital_order_to), f'Identifiers of orbital_order_to and orbital_order_w90'\
+        f'do not match! orbital_order_to is {orbital_order_to}, but orbital_order_w90 is {orbital_order_w90}.'
 
     assert with_sigma or eta != 0.0, 'if no Sigma is provided eta has to be different from 0.0'
 
@@ -686,12 +731,9 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, mu_tb, add_spin=False, add_lambda=
     if isinstance(proj_nuk, np.ndarray) and not band_basis:
         band_basis = True
 
-    if not orbital_order_to:
-        orbital_order_to = specs['orbital_order_w90']
-
     # set up Wannier Hamiltonian
     n_orb_rescale = 2 * n_orb if add_spin else n_orb
-    change_of_basis = change_basis(n_orb, orbital_order_to, specs['orbital_order_w90'])
+    change_of_basis = change_basis(n_orb, orbital_order_to, orbital_order_w90)
     H_add_loc = np.zeros((n_orb_rescale, n_orb_rescale), dtype=complex)
     if not isinstance(add_local, type(None)):
         assert np.shape(add_local) == (n_orb_rescale, n_orb_rescale), 'add_local must have dimension (n_orb, n_orb), but has '\
@@ -792,6 +834,7 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, mu_tb, add_spin=False, add_lambda=
         else:
             alatt_k_w = _calc_kslice(n_orb, mu, eta, e_mat, delta_sigma, qp_bands, e_vecs=e_vecs,
                                      proj_nuk=proj_nuk, **freq_dict)
+        freq_dict['sigma'] = delta_sigma
     else:
         freq_dict = {}
         freq_dict['w_mesh'] = None
