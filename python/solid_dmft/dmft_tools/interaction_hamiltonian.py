@@ -358,9 +358,11 @@ def _generate_four_index_u_matrix(sum_k, general_params, icrsh):
 
     # Constructs U matrix
     # construct full spherical symmetric U matrix and transform to cubic basis
-    # the order for the cubic orbitals is as follows ("xy","yz","z^2","xz","x^2-y^2")
+    # the order for the cubic orbitals is given by the convention. The TRIQS
+    # convention is as follows ("xy","yz","z^2","xz","x^2-y^2")
     # this is consistent with the order of orbitals in the VASP interface
-    # but not necessarily with wannier90! This is also true for the f-shell.
+    # but not necessarily with wannier90, qe, and wien2k! 
+    # This is also true for the f-shell.
     Umat_full = util.U_matrix(l=sum_k.corr_shells[ish]['l'],
                               radial_integrals=slater_integrals, basis='spherical')
     Umat_full = util.transform_U_matrix(Umat_full,
