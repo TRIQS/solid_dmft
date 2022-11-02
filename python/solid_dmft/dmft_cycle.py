@@ -42,6 +42,7 @@ from triqs.gf.tools import inverse
 from triqs_dft_tools.sumk_dft import SumkDFT
 
 # own modules
+from solid_dmft.version import solid_dmft_hash
 from solid_dmft.dmft_tools.observables import (calc_dft_kin_en, add_dmft_observables, calc_bandcorr_man, write_obs,
                                          add_dft_values_as_zeroth_iteration, write_header_to_file, prep_observables)
 from solid_dmft.dmft_tools.solver import SolverStructure
@@ -302,6 +303,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
             archive['DMFT_input'].create_group('solver')
             archive['DMFT_input'].create_group('version')
             archive['DMFT_input']['version']['triqs_hash'] = triqs_hash
+            archive['DMFT_input']['version']['solid_dmft_hash'] = solid_dmft_hash
         if 'iteration_count' in archive['DMFT_results']:
             iteration_offset = archive['DMFT_results/iteration_count']
             print('previous iteration count of {} '.format(iteration_offset)
