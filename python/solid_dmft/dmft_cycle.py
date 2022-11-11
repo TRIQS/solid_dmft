@@ -521,6 +521,14 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
     # The infamous DMFT self consistency cycle
     is_converged = False
     for it in range(iteration_offset + 1, iteration_offset + n_iter + 1):
+
+        # remove h_field when number of iterations is reached
+        if sum_k.h_field != 0.0 and general_params['h_field_it'] != 0 and it > general_params['h_field_it']:
+            mpi.report('\nRemoving magnetic field now.\n')
+            sum_k.h_field = 0.0
+            # enforce recomputation of eff_atomic_levels
+            delattr(sum_k, 'Hsumk')
+
         mpi.report('#'*80)
         mpi.report('Running iteration: {} / {}'.format(it, iteration_offset + n_iter))
         (sum_k, solvers,

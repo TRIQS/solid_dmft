@@ -131,6 +131,8 @@ enforce_off_diag : bool, optional, default=False
             enforce off diagonal elements in block structure finder
 h_field : float, optional, default=0.0
             magnetic field
+h_field_it : int, optional, default=0
+            number of iterations the magnetic field is kept on
 energy_shift_orbitals : list of floats, optional, default= 'none'
             orbitals will be shifted by this energy
             The entries can be python code, to be combined with configparser's interpolation
@@ -498,6 +500,8 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                             'default': []},
 
                                  'h_field': {'converter': float, 'used': True, 'default': 0.0},
+
+                                 'h_field_it': {'converter': int, 'used': True, 'default': 0},
 
                                  'energy_shift_orbitals': {'converter': lambda s: [float(eval(x)) for x in s.split(',')],
                                                            'used': lambda params: not params['general']['csc'], 'default': 'none'},
