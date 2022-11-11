@@ -2,6 +2,7 @@
 
 import numpy as np
 import collections
+from itertools import product
 
 '''
 python functions for reading Uijkl from a VASP cRPA run and the evaluating the matrix
@@ -43,6 +44,50 @@ def read_uijkl(path_to_uijkl, n_sites, n_orb):
         uijkl[i, j, k, l] = data[line, 4]+1j*data[line, 5]
 
     return uijkl
+
+
+def construct_U_kan(n_orb, U, J, Up=None, Jc=None):
+    '''
+    construct Kanamori Uijkl tensor for given U, J, Up, and Jc
+
+    Parameters
+    ----------
+    n_orb : int
+        number of orbitals
+    U : float
+        U value for elements Uiiii
+    J : float
+        Hunds coupling J for tensor elements Uijji
+    Up : float, optional, default=U-2J
+        inter orbital exchange term Uijij
+    Jc : float, optional, default=J
+        Uiijj term, is the same as J for real valued wave functions
+
+    Returns
+    -------
+    uijkl : numpy array
+        uijkl Coulomb tensor
+
+    '''
+
+    orb_range = range(0, n_orb)
+    U_kan = np.zeros((n_orb, n_orb, n_orb, n_orb))
+
+    if not Up:
+        Up = U-2*J
+    if not Jc:
+        Jc = J
+
+    for i, j, k, l in product(orb_range, orb_range, orb_range, orb_range):
+        if i == j == k == l:  # Uiiii
+            U_kan[i, j, k, l] = U
+        elif i == k and j == l:  # Uijij
+            U_kan[i, j, k, l] = Up
+        elif i == l and j == k:  # Uijji
+            U_kan[i, j, k, l] = J
+        elif i == j and k == l:  # Uiijj
+            U_kan[i, j, k, l] = Jc
+    return U_kan
 
 
 def red_to_2ind(uijkl, n_sites, n_orb, out=False):
@@ -160,6 +205,105 @@ def calc_kan_params(uijkl, n_sites, n_orb, out=False):
         print('J= ', "{:.4f}".format(J))
 
     return int_params
+
+
+def fit_kanamori(uijkl, n_orb, switch_jk=False, fit_2=True, fit_3=False, fit_4=True):
+    '''
+    Fit Kanamori Hamiltonian with scipy to 2,3, and / or 4 parameters
+
+    Parameters
+    -----------
+    uijkl: np.array (n_orb x n_orb x n_orb x n_orb)
+            input four index tensor
+    n_orb: int
+            number of orbitals
+    switch_jk: bool, default=False
+            flip two inner indices in input U tensor (for Vasp)
+    fit_2: bool, default=True
+            fit two parameter form
+    fit_3: bool, default=False
+            fit three parameter form (U,Up,J=Jc)
+    fit_4: bool, default=True
+            fit four parameter form
+
+    Returns
+    -------
+    Uijkl_fit: np.array (n_orb x n_orb x n_orb x n_orb)
+            fitted Uijkl tensor
+    '''
+    from scipy.optimize import minimize
+
+    def minimizer_2params(parameters):
+        U, J = parameters
+
+        Uijkl_fit = construct_U_kan(n_orb, U, J)
+
+        return np.sum((uijkl - Uijkl_fit)**2)
+
+    def minimizer_3params(parameters):
+        U, J, Up = parameters
+
+        Uijkl_fit = construct_U_kan(n_orb, U, J, Up)
+
+        return np.sum((uijkl - Uijkl_fit)**2)
+
+    def minimizer_4params(parameters):
+        U, J, Up, Jc = parameters
+
+        Uijkl_fit = construct_U_kan(n_orb, U, J, Up, Jc)
+
+        return np.sum((uijkl - Uijkl_fit)**2)
+
+    # check if J = JC (Hunds exchange and pair hopping have same amplitude)
+    # true for real values wave functions
+    if np.max(uijkl.imag) > 0.0:
+        print(f"Largest imaginary part of Uijkl: {np.max(uijkl.imag)}. Kanamori Hint assumed to be real valued. Neglecting imag part")
+        uijkl = uijkl.real
+
+    if switch_jk:
+        uijkl = np.moveaxis(uijkl, 1, 2)
+
+    # fit U, J
+    if fit_2:
+        initial_guess = (4, 1)
+        result = minimize(minimizer_2params, initial_guess)
+        U, J = result.x
+        Uijkl_fit = construct_U_kan(n_orb, U, J)
+        print('Result 2 parameter fit: \nU = {:.4f} eV, J = {:.4f} eV'.format(U, J))
+        print(f'optimize error {result.fun:.3e}')
+        max_ind = np.unravel_index(np.argmax(np.abs(Uijkl_fit-uijkl), axis=None), Uijkl_fit.shape)
+        print(f'U max diff: U{max_ind}= {np.abs(Uijkl_fit-uijkl)[max_ind]:.4e}')
+
+        print('\n-------------------------\n')
+
+    # fit U, J, Up
+    if fit_3:
+        initial_guess = (4, 1, 2)
+        result = minimize(minimizer_3params, initial_guess)
+        U, J, Up = result.x
+        Uijkl_fit = construct_U_kan(n_orb, U, J, Up)
+        print('Result 3 parameter fit: \nU = {:.4f} eV, U\' = {:.4f} eV J = {:.4f} eV'.format(U, Up, J))
+        print(f'optimize error {result.fun:.3e}')
+        max_ind = np.unravel_index(np.argmax(np.abs(Uijkl_fit-uijkl), axis=None), Uijkl_fit.shape)
+        print(f'U max diff: U{max_ind}= {np.abs(Uijkl_fit-uijkl)[max_ind]:.4e}')
+        print(f'U=U\'-2J deviation: {U-Up-2*J:.4f}')
+
+        print('\n-------------------------\n')
+
+    if fit_4:
+        # fit U, J, Up, Jc
+        initial_guess = (4, 1, 2, 1)
+        result = minimize(minimizer_4params, initial_guess)
+        U, J, Up, Jc = result.x
+        Uijkl_fit = construct_U_kan(n_orb, U, Up, J, Jc)
+        print('Result 4 parameter fit: \nU = {:.4f} eV, U\' = {:.4f} eV, J = {:.4f} eV, Jc = {:.4f} eV'.format(U, Up, J, Jc))
+        print(f'optimize error {result.fun:.3e}')
+        print(f'U max diff: U{max_ind}= {np.abs(Uijkl_fit-uijkl)[max_ind]:.4e}')
+        max_ind = np.unravel_index(np.argmax(np.abs(Uijkl_fit-uijkl), axis=None), Uijkl_fit.shape)
+        print(f'U=U\'-2J deviation: {U-Up-2*J:.4f}')
+        print(f'J=Jc deviation: {J-Jc:.4f}')
+
+    return Uijkl_fit
 
 
 def calc_u_avg_fulld(uijkl, n_sites, n_orb, out=False):
