@@ -326,21 +326,19 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
                   for iineq in range(sum_k.n_inequiv_shells)]
     sum_k.put_Sigma(zero_Sigma)
 
-    # Sets the chemical potential of the DFT calculation
-    # Either directly from general parameters, if given, ...
+    # Sets the chemical potential of the DFT calculation as starting guess
     if general_params['dft_mu'] != 'none':
         dft_mu = general_params['dft_mu']
         # Initializes chemical potential with dft_mu if this is the first iteration
         if iteration_offset == 0:
             sum_k.chemical_potential = dft_mu
             mpi.report('\n chemical potential set to {:.3f} eV\n'.format(sum_k.chemical_potential))
-    # ... or with sum_k.calc_mu
+
+    if general_params['solver_type'] in ['ftps']:
+        dft_mu = sum_k.calc_mu(precision=general_params['prec_mu'],
+                               broadening=general_params['eta'])
     else:
-        if general_params['solver_type'] in ['ftps']:
-            dft_mu = sum_k.calc_mu(precision=general_params['prec_mu'],
-                                   broadening=general_params['eta'])
-        else:
-            dft_mu = sum_k.calc_mu(precision=general_params['prec_mu'])
+        dft_mu = sum_k.calc_mu(precision=general_params['prec_mu'])
 
     # calculate E_kin_dft for one shot calculations
     if not general_params['csc'] and general_params['calc_energies']:
