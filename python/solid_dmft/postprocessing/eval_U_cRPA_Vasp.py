@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!@TRIQS_PYTHON_EXECUTABLE@
 
 import numpy as np
 import collections
@@ -11,7 +11,8 @@ Copyright (C) 2020, A. Hampel and M. Merkel from Materials Theory Group
 at ETH Zurich
 '''
 
-def read_uijkl(path_to_uijkl,n_sites,n_orb):
+
+def read_uijkl(path_to_uijkl, n_sites, n_orb):
     '''
     reads the VASP UIJKL files or the vijkl file if wanted
 
@@ -31,20 +32,20 @@ def read_uijkl(path_to_uijkl,n_sites,n_orb):
 
     '''
     dim = n_sites*n_orb
-    uijkl = np.zeros((dim,dim,dim,dim))
-    data =np.loadtxt(path_to_uijkl)
+    uijkl = np.zeros((dim, dim, dim, dim), dtype=complex)
+    data = np.loadtxt(path_to_uijkl)
 
-    for line in range(0,len(data[:,0])):
-        i = int(data[line,0])-1
-        j = int(data[line,1])-1
-        k = int(data[line,2])-1
-        l = int(data[line,3])-1
-        uijkl[i,j,k,l] = data[line,4]
+    for line in range(0, len(data[:, 0])):
+        i = int(data[line, 0])-1
+        j = int(data[line, 1])-1
+        k = int(data[line, 2])-1
+        l = int(data[line, 3])-1
+        uijkl[i, j, k, l] = data[line, 4]+1j*data[line, 5]
 
     return uijkl
 
 
-def red_to_2ind(uijkl,n_sites,n_orb,out=False):
+def red_to_2ind(uijkl, n_sites, n_orb, out=False):
     '''
     reduces the 4index coulomb matrix to a 2index matrix and
     follows the procedure given in PRB96 seth,peil,georges:
@@ -83,26 +84,26 @@ def red_to_2ind(uijkl,n_sites,n_orb,out=False):
     Uiijj = np.zeros((dim, dim))
     Uijji = np.zeros((dim, dim))
 
-    for i in range(0,dim):
-        for j in range(0,dim):
+    for i in range(0, dim):
+        for j in range(0, dim):
             # the indices in VASP are switched: U_ijkl ---VASP--> U_ikjl
-            Uij_anti[i,j] = uijkl[i,i,j,j]
-            Uij_par[i,j] = uijkl[i,i,j,j]-uijkl[i,j,j,i]
-            Uiijj[i,j] =  uijkl[i,j,i,j]
-            Uijji[i,j] = uijkl[i,j,j,i]
+            Uij_anti[i, j] = uijkl[i, i, j, j]
+            Uij_par[i, j] = uijkl[i, i, j, j]-uijkl[i, j, j, i]
+            Uiijj[i, j] = uijkl[i, j, i, j]
+            Uijji[i, j] = uijkl[i, j, j, i]
 
-    np.set_printoptions(precision=3,suppress=True)
+    np.set_printoptions(precision=3, suppress=True)
 
     if out:
-        print( 'reduced U anti-parallel = U_mm\'\^oo\' = U_mm\'mm\' matrix : \n', Uij_anti)
+        print('reduced U anti-parallel = U_mm\'\^oo\' = U_mm\'mm\' matrix : \n', Uij_anti)
         print('reduced U parallel = U_mm\'\^oo = U_mm\'mm\' - U_mm\'m\'m matrix : \n', Uij_par)
-        print( 'reduced Uijji : \n', Uijji)
-        print( 'reduced Uiijj : \n', Uiijj)
+        print('reduced Uijji : \n', Uijji)
+        print('reduced Uiijj : \n', Uiijj)
 
-    return Uij_anti,Uiijj,Uijji,Uij_par
+    return Uij_anti, Uiijj, Uijji, Uij_par
 
 
-def calc_kan_params(uijkl,n_sites,n_orb,out=False):
+def calc_kan_params(uijkl, n_sites, n_orb, out=False):
     '''
     calculates the kanamori interaction parameters from a
     given Uijkl matrix. Follows the procedure given in
@@ -127,31 +128,30 @@ def calc_kan_params(uijkl,n_sites,n_orb,out=False):
     '''
 
     int_params = collections.OrderedDict()
-    dim = n_sites*n_orb
 
     # calculate intra-orbital U
     U = 0.0
-    for i in range(0,n_orb):
-        U += uijkl[i,i,i,i]
+    for i in range(0, n_orb):
+        U += uijkl[i, i, i, i]
     U = U/(n_orb)
     int_params['U'] = U
 
     # calculate the U'
     Uprime = 0.0
-    for i in range(0,n_orb):
-        for j in range(0,n_orb):
+    for i in range(0, n_orb):
+        for j in range(0, n_orb):
             if i != j:
-                Uprime +=  uijkl[i,i,j,j]
-    Uprime = Uprime/ (n_orb*(n_orb-1))
+                Uprime += uijkl[i, i, j, j]
+    Uprime = Uprime / (n_orb*(n_orb-1))
     int_params['Uprime'] = Uprime
 
     # calculate J
     J = 0.0
-    for i in range(0,n_orb):
-        for j in range(0,n_orb):
+    for i in range(0, n_orb):
+        for j in range(0, n_orb):
             if i != j:
-                J +=  uijkl[i,j,i,j]
-    J = J/ (n_orb*(n_orb-1))
+                J += uijkl[i, j, i, j]
+    J = J / (n_orb*(n_orb-1))
     int_params['J'] = J
 
     if out:
@@ -161,7 +161,8 @@ def calc_kan_params(uijkl,n_sites,n_orb,out=False):
 
     return int_params
 
-def calc_u_avg_fulld(uijkl,n_sites,n_orb,out=False):
+
+def calc_u_avg_fulld(uijkl, n_sites, n_orb, out=False):
     '''
     calculates the coulomb integrals from a
     given Uijkl matrix for full d shells. Follows the procedure given
@@ -191,8 +192,7 @@ def calc_u_avg_fulld(uijkl,n_sites,n_orb,out=False):
     '''
 
     int_params = collections.OrderedDict()
-    dim = n_sites*n_orb
-    Uij_anti,Uiijj,Uijji,Uij_par = red_to_2ind(uijkl,n_sites,n_orb,out=out)
+    Uij_anti, Uiijj, Uijji, Uij_par = red_to_2ind(uijkl, n_sites, n_orb, out=out)
     # U_antipar = U_mm'^oo' = U_mm'mm' (Coulomb Int)
     # U_par = U_mm'^oo = U_mm'mm' - U_mm'm'm (for intersite interaction)
     # here we assume cubic harmonics (real harmonics) as basis functions in the order
@@ -201,10 +201,10 @@ def calc_u_avg_fulld(uijkl,n_sites,n_orb,out=False):
 
     # calculate J
     J_cubic = 0.0
-    for i in range(0,n_orb):
-        for j in range(0,n_orb):
+    for i in range(0, n_orb):
+        for j in range(0, n_orb):
             if i != j:
-                J_cubic +=  Uijji[i,j]
+                J_cubic += Uijji[i, j]
     J_cubic = J_cubic/(20.0)
     # 20 for 2l(2l+1)
     int_params['J_cubic'] = J_cubic
@@ -216,13 +216,13 @@ def calc_u_avg_fulld(uijkl,n_sites,n_orb,out=False):
 
     # calculate intra-orbital U
     U_0 = 0.0
-    for i in range(0,n_orb):
-            U_0 += Uij_anti[i,i]
-    U_0 = U_0 /float(n_orb)
+    for i in range(0, n_orb):
+        U_0 += Uij_anti[i, i]
+    U_0 = U_0 / float(n_orb)
     int_params['U_0'] = U_0
 
     # now conversion from cubic to spherical
-    U = U_0 - ( 8.0*J_cubic/5.0 )
+    U = U_0 - (8.0*J_cubic/5.0)
 
     int_params['U'] = U
 
@@ -233,6 +233,7 @@ def calc_u_avg_fulld(uijkl,n_sites,n_orb,out=False):
         print('spherical J=(F2+f4)/14 = ', "{:.4f}".format(J))
 
     return int_params
+
 
 def calculate_interaction_from_averaging(uijkl, n_sites, n_orb, out=False):
     '''
@@ -263,8 +264,7 @@ def calculate_interaction_from_averaging(uijkl, n_sites, n_orb, out=False):
 
     l = 2
 
-    dim = n_sites*n_orb
-    Uij_anti,Uiijj,Uijji,Uij_par = red_to_2ind(uijkl,n_sites,n_orb,out=out)
+    Uij_anti, Uiijj, Uijji, Uij_par = red_to_2ind(uijkl, n_sites, n_orb, out=out)
 
     # Calculates Slater-averaged parameters directly
     U = [None] * n_sites
@@ -284,7 +284,8 @@ def calculate_interaction_from_averaging(uijkl, n_sites, n_orb, out=False):
 
     return U, J
 
-def fit_slater_fulld(uijkl,n_sites,U_init,J_init,fixed_F4_F2= True):
+
+def fit_slater_fulld(uijkl, n_sites, U_init, J_init, fixed_F4_F2=True):
     '''
     finds best Slater parameters U, J for given Uijkl tensor
     using the triqs U_matrix operator routine
@@ -294,8 +295,9 @@ def fit_slater_fulld(uijkl,n_sites,U_init,J_init,fixed_F4_F2= True):
     from triqs.operators.util.U_matrix import U_matrix, reduce_4index_to_2index
     from scipy.optimize import minimize
     # transform U matrix orbital basis ijkl to nmop, note the last two indices need to be switched in the T matrices
+
     def transformU(U_matrix, T):
-        return np.einsum("im,jn,ijkl,lo,kp->mnpo",np.conj(T),np.conj(T),U_matrix,T,T)
+        return np.einsum("im,jn,ijkl,lo,kp->mnpo", np.conj(T), np.conj(T), U_matrix, T, T)
 
     def minimizer(parameters):
         U_int, J_hund = parameters
@@ -303,21 +305,21 @@ def fit_slater_fulld(uijkl,n_sites,U_init,J_init,fixed_F4_F2= True):
         Umat_full = transformU(Umat_full, rot_def_to_w90)
 
         Umat, Upmat = reduce_4index_to_2index(Umat_full)
-        u_iijj_crpa = Uiijj[:5,:5]
+        u_iijj_crpa = Uiijj[:5, :5]
         u_iijj_slater = Upmat - Umat
-        u_ijij_crpa = Uij_anti[:5,:5]
+        u_ijij_crpa = Uij_anti[:5, :5]
         u_ijij_slater = Upmat
         return np.sum((u_iijj_crpa - u_iijj_slater)**2 + (u_ijij_crpa - u_ijij_slater)**2)
 
     def minimizer_radial(parameters):
         F0, F2, F4 = parameters
-        Umat_full = U_matrix(l=2, radial_integrals=[F0,F2,F4], basis='cubic')
+        Umat_full = U_matrix(l=2, radial_integrals=[F0, F2, F4], basis='cubic')
         Umat_full = transformU(Umat_full, rot_def_to_w90)
 
         Umat, Upmat = reduce_4index_to_2index(Umat_full)
-        u_iijj_crpa = Uiijj[:5,:5]
+        u_iijj_crpa = Uiijj[:5, :5]
         u_iijj_slater = Upmat - Umat
-        u_ijij_crpa = Uij_anti[:5,:5]
+        u_ijij_crpa = Uij_anti[:5, :5]
         u_ijij_slater = Upmat
         return np.sum((u_iijj_crpa - u_iijj_slater)**2 + (u_ijij_crpa - u_ijij_slater)**2)
 
@@ -330,10 +332,10 @@ def fit_slater_fulld(uijkl,n_sites,U_init,J_init,fixed_F4_F2= True):
                                [0, 1, 0, 0, 0],
                                [0, 0, 0, 1, 0]])
 
-    Uij_anti,Uiijj,Uijji,Uij_par = red_to_2ind(uijkl,n_sites,n_orb=5,out=False)
+    Uij_anti, Uiijj, Uijji, Uij_par = red_to_2ind(uijkl, n_sites, n_orb=5, out=False)
 
     if fixed_F4_F2:
-        result = minimize(minimizer, (U_init,J_init))
+        result = minimize(minimizer, (U_init, J_init))
 
         U_int, J_hund = result.x
         print('Final results from fit: U = {:.3f} eV, J = {:.3f} eV'.format(U_int, J_hund))
@@ -356,7 +358,6 @@ def fit_slater_fulld(uijkl,n_sites,U_init,J_init,fixed_F4_F2= True):
         print('optimize error', result.fun)
         U_int = F0
         J_hund = (F2+F4)/14
-
 
     return U_int, J_hund
 
