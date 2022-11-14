@@ -821,9 +821,9 @@ class SolverStructure:
         self.Sigma_freq << self.triqs_solver.Sigma_iw
         self.G0_freq << self.triqs_solver.G0_iw
         self.G0_Refreq << self.triqs_solver.G0_w
-        self.G_freq << self.triqs_solver.G_iw
+        self.G_freq_unsym << self.triqs_solver.G_iw
         self.sum_k.symm_deg_gf(self.G_freq, ish=self.icrsh)
-        self.G_freq_unsym << self.G_freq
+        self.G_freq << self.G_freq
         self.G_Refreq << self.triqs_solver.G_w
         self.Sigma_Refreq << self.triqs_solver.Sigma_w
 
