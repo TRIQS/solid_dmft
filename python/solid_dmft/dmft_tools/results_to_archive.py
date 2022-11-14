@@ -85,6 +85,9 @@ def _compile_information(sum_k, general_params, solver_params, solvers,
             if solver_params['measure_G_l']:
                 write_to_h5['Gimp_l_{}'.format(icrsh)] = solvers[icrsh].G_l
 
+        if general_params['solver_type'] == 'hartree':
+            write_to_h5['Sigma_Refreq_{}'.format(icrsh)] = solvers[icrsh].Sigma_Refreq
+
         if general_params['solver_type'] == 'ctseg':
             # if legendre was set, that we have both now!
             if (solver_params['measure_gl'] or general_params['legendre_fit']):

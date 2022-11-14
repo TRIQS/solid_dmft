@@ -53,6 +53,7 @@ endforeach()
 # integration tests
 set (integration_tests 
      svo_hubbardI_basic
+     svo_hartree
      lno_hubbardI_mag
      svo_cthyb_basic_gl
      svo_cthyb_basic_tf

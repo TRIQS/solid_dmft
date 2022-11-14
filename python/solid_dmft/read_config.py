@@ -106,6 +106,7 @@ solver_type : str
             * 'ctint'
             * 'ftps'
             * 'hubbardI'
+            * 'hartree'
             * 'ctseg'
 
 n_iw : int, optional, default=1025
@@ -330,6 +331,15 @@ improved_estimator  : bool, optional, default=False
               Sigma_iw will automatically be calculated via
               http://dx.doi.org/10.1103/PhysRevB.85.205106
 
+hartree parameters
+================
+with_fock : bool, optional, default=False
+        include Fock exchange terms in the self-energy
+force_real : bool, optional, default=False
+        force the self energy from Hartree fock to be real
+one_shot : bool, optional, default=False
+        True if the calcualtion is just one shot and not self consistent. Default is False
+
 [  dft  ]
 ---------
 dft_code : string
@@ -434,7 +444,7 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                                  'used': True},
 
                                  'beta': {'converter': float, 'valid for': lambda x, _: x > 0,
-                                          'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint', 'inchworm', 'hubbardI','ctseg']},
+                                          'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint', 'inchworm', 'hubbardI','ctseg','hartree']},
 
                                  'n_iter_dmft': {'converter': int, 'valid for': lambda x, _: x >= 0, 'used': True},
 
@@ -454,7 +464,7 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                  'cpa_x': {'converter': lambda s: list(map(float, s.split(','))),
                                            'used': lambda params: params['general']['dc'] and params['general']['dc_type'] == 4},
 
-                                 'solver_type': {'valid for': lambda x, _: x in ['cthyb', 'ctint', 'ftps', 'hubbardI','ctseg'],
+                                 'solver_type': {'valid for': lambda x, _: x in ['cthyb', 'ctint', 'ftps', 'hubbardI','ctseg', 'hartree'],
                                                  'used': True},
 
                                  'n_l': {'converter': int, 'valid for': lambda x, _: x > 0,
@@ -462,20 +472,20 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                          and (params['solver']['measure_G_l'] or params['solver']['legendre_fit'])},
 
                                  'n_iw': {'converter': int, 'valid for': lambda x, _: x > 0,
-                                          'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint', 'inchworm', 'hubbardI','ctseg'], 'default': 1025},
+                                          'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint', 'inchworm', 'hubbardI','ctseg','hartree'], 'default': 1025},
 
                                  'n_tau': {'converter': int, 'valid for': lambda x, _: x > 0,
-                                           'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint', 'inchworm', 'hubbardI','ctseg'], 'default': 10001},
+                                           'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint', 'inchworm', 'hubbardI','ctseg','hartree'], 'default': 10001},
 
                                  'n_w': {'converter': int, 'valid for': lambda x, _: x > 0,
-                                         'used': lambda params: params['general']['solver_type'] in ['ftps', 'hubbardI'], 'default': 5001},
+                                         'used': lambda params: params['general']['solver_type'] in ['ftps', 'hubbardI', 'hartree'], 'default': 5001},
 
                                  'w_range': {'converter': lambda s: tuple(map(float, s.split(','))),
                                              'valid for': lambda x, _: x[0] < x[1],
-                                             'used': lambda params: params['general']['solver_type'] in ['ftps', 'hubbardI'], 'default': (-10, 10)},
+                                             'used': lambda params: params['general']['solver_type'] in ['ftps', 'hubbardI', 'hartree'], 'default': (-10, 10)},
 
                                  'eta': {'converter': float, 'valid for': lambda x, _: x >= 0,
-                                         'used': lambda params: params['general']['solver_type'] in ['ftps', 'hubbardI']},
+                                         'used': lambda params: params['general']['solver_type'] in ['ftps', 'hubbardI', 'hartree']},
 
                                  'diag_delta': {'converter': BOOL_PARSER, 'used': True, 'default': False},
 
@@ -743,6 +753,18 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                                  'used': lambda params: params['general']['solver_type'] in ['ctseg'],
                                                  'default': False},
 
+                                #
+                                # extra hartree params
+                                #
+                                'with_fock': {'converter': BOOL_PARSER,
+                                                 'used': lambda params: params['general']['solver_type'] in ['hartree'],
+                                                 'default': False},
+                                'one_shot': {'converter': BOOL_PARSER,
+                                                 'used': lambda params: params['general']['solver_type'] in ['hartree'],
+                                                 'default': False},
+                                'force_real': {'converter': BOOL_PARSER,
+                                                 'used': lambda params: params['general']['solver_type'] in ['hartree'],
+                                                 'default': False},
 
                                 #
                                 # ftps parameters
