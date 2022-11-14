@@ -174,6 +174,16 @@ class SolverStructure:
             self.git_hash = triqs_hubbardI_hash
             self.version = version
 
+        elif self.general_params['solver_type'] == 'hartree':
+            from hartree_fock.version import hartree_fock_hash
+
+            # sets up necessary GF objects on ImFreq
+            self._init_ImFreq_objects()
+            self._init_ReFreq_hartree()
+            # sets up solver
+            self.triqs_solver = self._create_hartree_solver()
+            self.git_hash = hartree_fock_hash
+
         elif self.general_params['solver_type'] == 'ftps':
             from forktps.version import forktps_hash, version
 
@@ -309,6 +319,17 @@ class SolverStructure:
         self.Sigma_Refreq = self.G_Refreq.copy()
         self.G0_Refreq = self.G_Refreq.copy()
 
+    def _init_ReFreq_hartree(self):
+        r'''
+        Initialize all ReFreq objects
+        '''
+
+        # create all ReFreq instances
+        self.n_w = self.general_params['n_w']
+        self.Sigma_Refreq = self.sum_k.block_structure.create_gf(ish=self.icrsh, gf_function=Gf, space='solver',
+                                                             mesh=MeshReFreq(n_w=self.n_w, window=self.general_params['w_range'])
+                                                             )
+
     # ********************************************************************
     # solver-specific solve() command
     # ********************************************************************
@@ -405,6 +426,19 @@ class SolverStructure:
 
             # call postprocessing
             self._hubbardI_postprocessing()
+
+        elif self.general_params['solver_type'] == 'hartree':
+            # fill G0_freq from sum_k to solver
+            self.triqs_solver.G0_iw << self.G0_freq
+
+            # Solve the impurity problem for icrsh shell
+            # *************************************
+            # this is done on every node due to very slow bcast of the AtomDiag object as of now
+            self.triqs_solver.solve(h_int=self.h_int, with_fock=self.solver_params['with_fock'],
+                                    one_shot=self.solver_params['one_shot'])
+
+            # call postprocessing
+            self._hartree_postprocessing()
 
         elif self.general_params['solver_type'] == 'ftps':
             import forktps as ftps
@@ -636,6 +670,20 @@ class SolverStructure:
 
         return triqs_solver
 
+    def _create_hartree_solver(self):
+        r'''
+        Initialize hartree_fock solver instance
+        '''
+        from hartree_fock.impurity import ImpuritySolver as hartree_solver
+
+        gf_struct =  self.sum_k.gf_struct_solver_list[self.icrsh]
+        # Construct the triqs_solver instances
+        triqs_solver = hartree_solver(beta=self.general_params['beta'], gf_struct=gf_struct,
+                                       n_iw=self.general_params['n_iw'], force_real=self.solver_params['force_real'],
+                                       symmetries=[])
+
+        return triqs_solver
+
     def _create_inchworm_solver(self):
         r'''
         Initialize inchworm solver instance
@@ -852,6 +900,24 @@ class SolverStructure:
 
         if self.solver_params['measure_G_tau']:
             self.G_time << self.triqs_solver.G_tau
+
+        return
+
+    def _hartree_postprocessing(self):
+        r'''
+        Organize G_freq, G_time, Sigma_freq and G_l from hartree solver
+        '''
+
+        # get everything from solver
+        self.G0_freq << self.triqs_solver.G0_iw
+        self.G_freq_unsym << self.triqs_solver.G_iw
+        self.sum_k.symm_deg_gf(self.G_freq, ish=self.icrsh)
+        self.G_freq << self.G_freq
+        for bl, gf in self.Sigma_freq:
+            self.Sigma_freq[bl] << self.triqs_solver.Sigma_HF[bl]
+            self.Sigma_Refreq[bl] << self.triqs_solver.Sigma_HF[bl]
+        self.G_time << Fourier(self.G_freq)
+        self.interaction_energy = self.triqs_solver.interaction_energy()
 
         return
 

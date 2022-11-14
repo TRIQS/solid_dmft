@@ -93,7 +93,7 @@ def _determine_block_structure(sum_k, general_params, advanced_params):
     # for certain systems it is needed to keep off diag elements
     # this enforces to use the full corr subspace matrix
     solver_struct_ftps = None
-    if general_params['enforce_off_diag'] or general_params['solver_type'] in ['ftps']:
+    if general_params['enforce_off_diag'] or general_params['solver_type'] in ['ftps', 'hartree']:
         if general_params['solver_type'] in ['ftps']:
             # first round to determine real blockstructure
             mock_sumk = deepcopy(sum_k)
