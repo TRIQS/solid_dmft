@@ -322,8 +322,8 @@ class SolverStructure:
         # create all ReFreq instances
         self.n_w = self.general_params['n_w']
         self.Sigma_Refreq = self.sum_k.block_structure.create_gf(ish=self.icrsh, gf_function=Gf, space='solver',
-                                                             mesh=MeshReFreq(n_w=self.n_w, window=self.general_params['w_range'])
-                                                             )
+                                                                 mesh=MeshReFreq(n_w=self.n_w, window=self.general_params['w_range'])
+                                                                 )
 
     # ********************************************************************
     # solver-specific solve() command
@@ -665,17 +665,26 @@ class SolverStructure:
 
         return triqs_solver
 
+    def _make_spin_equal(self, Sigma):
+
+        # if not SOC than average up and down
+        if not self.general_params['magnetic'] and not self.sum_k.SO == 1:
+            Sigma['up_0'] = 0.5*(Sigma['up_0'] + Sigma['down_0'])
+            Sigma['down_0'] = Sigma['up_0']
+
+        return Sigma
+
     def _create_hartree_solver(self):
         r'''
         Initialize hartree_fock solver instance
         '''
         from hartree_fock.impurity import ImpuritySolver as hartree_solver
 
-        gf_struct =  self.sum_k.gf_struct_solver_list[self.icrsh]
+        gf_struct = self.sum_k.gf_struct_solver_list[self.icrsh]
         # Construct the triqs_solver instances
         triqs_solver = hartree_solver(beta=self.general_params['beta'], gf_struct=gf_struct,
-                                       n_iw=self.general_params['n_iw'], force_real=self.solver_params['force_real'],
-                                       symmetries=[])
+                                      n_iw=self.general_params['n_iw'], force_real=self.solver_params['force_real'],
+                                      symmetries=[self._make_spin_equal])
 
         return triqs_solver
 
