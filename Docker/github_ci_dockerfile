@@ -64,7 +64,7 @@ RUN pip3 install --no-cache-dir \
 
 ENV OMP_NUM_THREADS=1
 ENV MKL_NUM_THREADS=1
-ARG NCORES=8
+ARG NCORES=4
 
 # create source dirs
 RUN cd / && mkdir -p triqs && mkdir -p source
@@ -101,11 +101,17 @@ RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hubba
     && cmake ../hubbardI.src \ 
     && make -j$NCORES && ctest -j$NCORES && make install
 
+# Hartree-Fock solver
+RUN cd /source && git clone -b unstable --depth 1 git@github.com:TRIQS/hartree_fock.git hartree.src \
+    && mkdir -p hartree.build && cd hartree.build \
+    && cmake ../hartree.src \ 
+    && make -j$NCORES && ctest -j$NCORES && make install
+
 # maxent needed for doc build
 RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/maxent.git maxent.src \
     && mkdir -p maxent.build && cd maxent.build \
     && cmake ../maxent.src \ 
-    && make -j$NCORES && ctest -j$NCORES && make install
+    && make -j$NCORES && make install
 
 # remove source
 RUN cd / && rm -rf source
