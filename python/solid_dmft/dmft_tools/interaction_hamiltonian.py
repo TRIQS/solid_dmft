@@ -181,7 +181,6 @@ def _construct_kanamori(sum_k, general_params, icrsh):
     """
 
     n_orb = solver.get_n_orbitals(sum_k)[icrsh]['up']
-    orb_names = list(range(n_orb))
     if sum_k.SO == 1:
         assert n_orb % 2 == 0
         n_orb = n_orb // 2
@@ -203,22 +202,24 @@ def _construct_kanamori(sum_k, general_params, icrsh):
         Umat, Upmat = util.U_matrix_kanamori(n_orb=n_orb, U_int=general_params['U'][icrsh],
                                              J_hund=general_params['J'][icrsh])
 
-        h_int = util.h_int_kanamori(sum_k.spin_block_names[sum_k.SO], orb_names,
+        h_int = util.h_int_kanamori(sum_k.spin_block_names[sum_k.SO], n_orb,
                                     map_operator_structure=sum_k.sumk_to_solver[icrsh],
                                     U=Umat, Uprime=Upmat, J_hund=general_params['J'][icrsh],
                                     H_dump=os.path.join(general_params['jobname'], 'H.txt'))
     else:
         h_int = _construct_kanamori_soc(general_params['U'][icrsh], general_params['J'][icrsh],
-                                        orb_names, sum_k.sumk_to_solver[icrsh],
+                                        n_orb, sum_k.sumk_to_solver[icrsh],
                                         os.path.join(general_params['jobname'], 'H.txt'))
     return h_int
 
 
-def _construct_kanamori_soc(U_int, J_hund, orb_names, map_operator_structure, H_dump=None):
+def _construct_kanamori_soc(U_int, J_hund, n_orb, map_operator_structure, H_dump=None):
     r"""
     Adapted from triqs.operators.util.hamiltonians.h_int_kanamori. Assumes
     that spin_names == ['ud'] and that map_operator_structure is given.
     """
+
+    orb_names = list(range(n_orb))
 
     if H_dump:
         H_dump_file = open(H_dump, 'w')
@@ -312,14 +313,13 @@ def _construct_dynamic(sum_k, general_params, icrsh):
     U_onsite = mpi.bcast(U_onsite)
 
     n_orb = solver.get_n_orbitals(sum_k)[icrsh]['up']
-    orb_names = list(range(n_orb))
     if sum_k.SO == 1:
         raise ValueError('dynamic U not implemented for SO!=0')
     if n_orb > 1:
         raise ValueError('dynamic U not implemented for more than one orbital')
 
     mpi.report('onsite interaction value for imp {}: {:.3f}'.format(icrsh, U_onsite[icrsh]))
-    h_int = util.h_int_density(sum_k.spin_block_names[sum_k.SO], orb_names,
+    h_int = util.h_int_density(sum_k.spin_block_names[sum_k.SO], n_orb,
                                map_operator_structure=sum_k.sumk_to_solver[icrsh],
                                U=np.array([[0]]), Uprime=np.array([[U_onsite[icrsh]]]), H_dump=os.path.join(general_params['jobname'], 'H.txt'))
 
@@ -335,7 +335,6 @@ def _generate_four_index_u_matrix(sum_k, general_params, icrsh):
     # ish points to the shell representative of the current group
     ish = sum_k.inequiv_to_corr[icrsh]
     n_orb = solver.get_n_orbitals(sum_k)[icrsh]['up']
-    orb_names = list(range(n_orb))
     if sum_k.SO == 1:
         assert n_orb % 2 == 0
         n_orb = n_orb // 2
@@ -410,10 +409,9 @@ def _construct_density_density(sum_k, general_params, Umat_full_rotated, icrsh):
 
     # Constructs Hamiltonian from Umat_full_rotated
     n_orb = solver.get_n_orbitals(sum_k)[icrsh]['up']
-    orb_names = list(range(n_orb))
 
     Umat, Upmat = util.reduce_4index_to_2index(Umat_full_rotated)
-    h_int = util.h_int_density(sum_k.spin_block_names[sum_k.SO], orb_names,
+    h_int = util.h_int_density(sum_k.spin_block_names[sum_k.SO], n_orb,
                                map_operator_structure=sum_k.sumk_to_solver[icrsh],
                                U=Umat, Uprime=Upmat, H_dump=os.path.join(general_params['jobname'], 'H.txt'))
 
@@ -427,9 +425,8 @@ def _construct_slater(sum_k, general_params, Umat_full_rotated, icrsh):
     """
 
     n_orb = solver.get_n_orbitals(sum_k)[icrsh]['up']
-    orb_names = list(range(n_orb))
 
-    h_int = util.h_int_slater(sum_k.spin_block_names[sum_k.SO], orb_names,
+    h_int = util.h_int_slater(sum_k.spin_block_names[sum_k.SO], n_orb,
                               map_operator_structure=sum_k.sumk_to_solver[icrsh],
                               U_matrix=Umat_full_rotated,
                               H_dump=os.path.join(general_params['jobname'], 'H.txt'))
