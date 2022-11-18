@@ -396,7 +396,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
         solver_struct_ftps = mpi.bcast(solver_struct_ftps)
 
         # In a magnetic calculation, no shells are degenerate
-        if not general_params['csc'] and general_params['magnetic'] and sum_k.SO == 0:
+        if general_params['magnetic'] and sum_k.SO == 0:
             sum_k.deg_shells = [[] for _ in range(sum_k.n_inequiv_shells)]
         dm = None
     else:
@@ -448,7 +448,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
         density_shell_dft = G_loc_all_dft[iineq].total_density()
         mpi.report('total density for imp {} from DFT: {:10.6f}'.format(iineq, np.real(density_shell_dft)))
 
-    if not general_params['csc'] and general_params['magnetic']:
+    if general_params['magnetic']:
         sum_k.SP = 1
 
         if general_params['afm_order']:
@@ -658,8 +658,7 @@ def _dmft_step(sum_k, solvers, it, general_params,
         if general_params['measure_chi'] != 'none':
             solvers[icrsh].solver_params['measure_O_tau'] = (Op_list[icrsh], Op_list[icrsh])
 
-        if (not general_params['csc'] and general_params['magnetic']
-                and general_params['afm_order'] and general_params['afm_mapping'][icrsh][0]):
+        if (general_params['magnetic'] and general_params['afm_order'] and general_params['afm_mapping'][icrsh][0]):
             # If we do a AFM calculation we can use the init magnetic moments to
             # copy the self energy instead of solving it explicitly
             solvers = afm_mapping.apply(general_params, solver_params, icrsh, sum_k.gf_struct_solver[icrsh], solvers)

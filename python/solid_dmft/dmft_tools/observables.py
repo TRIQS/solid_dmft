@@ -108,7 +108,7 @@ def _generate_header(general_params, sum_k):
         header_basic_mask = '{{:>3}} | {{:>10}} | {{:>{0}}} | {{:>{0}}} | {{:>17}}'.format(number_spaces)
 
         # If magnetic calculation is done create two obs files per imp
-        if not general_params['csc'] and general_params['magnetic'] and sum_k.SO == 0:
+        if general_params['magnetic'] and sum_k.SO == 0:
             for spin in ('up', 'down'):
                 file_name = 'observables_imp{}_{}.dat'.format(iineq, spin)
                 headers[file_name] = header_basic_mask.format('it', 'mu', 'G(beta/2) per orbital',
@@ -426,7 +426,7 @@ def write_obs(observables, sum_k, general_params):
     n_orb = solver.get_n_orbitals(sum_k)
 
     for icrsh in range(sum_k.n_inequiv_shells):
-        if not general_params['csc'] and general_params['magnetic'] and sum_k.SO == 0:
+        if general_params['magnetic'] and sum_k.SO == 0:
             for spin in ('up', 'down'):
                 line = '{:3d} | '.format(observables['iteration'][-1])
                 line += '{:10.5f} | '.format(observables['mu'][-1])

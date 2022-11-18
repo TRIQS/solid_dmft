@@ -412,8 +412,7 @@ def determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
             for icrsh in range(sum_k.n_inequiv_shells):
                 dc_value = sum_k.dc_imp[sum_k.inequiv_to_corr[icrsh]][sum_k.spin_block_names[sum_k.SO][0]][0, 0]
 
-                if (not general_params['csc'] and general_params['magnetic']
-                        and general_params['magmom'] and sum_k.SO == 0):
+                if (general_params['magnetic'] and general_params['magmom'] and sum_k.SO == 0):
                     # if we are doing a magnetic calculation and initial magnetic moments
                     # are set, manipulate the initial sigma accordingly
                     fac = general_params['magmom'][icrsh]

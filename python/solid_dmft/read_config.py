@@ -493,7 +493,7 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                                   'used': True, 'default': 5},
 
                                  'magnetic': {'converter': BOOL_PARSER,
-                                              'used': lambda params: not params['general']['csc'], 'default': False},
+                                              'used': True, 'default': False},
 
                                  'magmom': {'converter': lambda s: list(map(float, s.split(','))),
                                             'used': lambda params: not params['general']['csc'] and params['general']['magnetic'],
