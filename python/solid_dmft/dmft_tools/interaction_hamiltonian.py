@@ -367,7 +367,7 @@ def _generate_four_index_u_matrix(sum_k, general_params, icrsh):
                               radial_integrals=slater_integrals, basis='spherical')
     Umat_full = util.transform_U_matrix(Umat_full,
                                         util.spherical_to_cubic(l=sum_k.corr_shells[ish]['l'],
-                                                                convention=general_params['basis'])
+                                                                convention=general_params['h_int_basis'])
                                         )
 
     if n_orb == 2:
