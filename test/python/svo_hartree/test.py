@@ -20,7 +20,7 @@ if mpi.is_master_node():
             HDFArchive('ref.h5', 'r')['DMFT_results']['last_iter'] as ref:
         for key in ['G0_freq_0', 'Gimp_freq_0', 'Gimp_time_0', 'Sigma_Refreq_0', 'Sigma_freq_0']:
             print(key)
-            assert_block_gfs_are_close(out[key],ref[key])
+            assert_block_gfs_are_close(out[key],ref[key],precision=1e-05)
 
         for key in ['chemical_potential_pre', 'chemical_potential_post']:
             print(key)
