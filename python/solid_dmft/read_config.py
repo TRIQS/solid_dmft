@@ -59,6 +59,13 @@ h_int_type : string
             * dynamic: use dynamic U from h5 archive
 
             Needs to be stored as Matsubara Gf under dynamic_U/U_iw in the input h5
+h_int_basis : string
+              cubic basis convention to compute the interaction U matrix
+              * 'triqs'
+              * 'vasp' (equivalent to 'triqs')
+              * 'wien2k'
+              * 'wannier90'
+              * 'qe' (equivalent to 'wannier90')
 U :  float or comma separated list of floats
             U values for impurities if only one value is given, the same U is assumed for all impurities
 J :  float or comma separated list of floats
@@ -600,7 +607,10 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                                           'valid for': lambda x, _: x == 'none' or x > 0 or np.isclose(x, 0),
                                                           'used': lambda params: (params['general']['solver_type'] in ['cthyb', 'ctint','ctseg']
                                                                                   and params['general']['mu_gap_gb2_threshold'] != 'none'),
-                                                          'default': 'none'}
+                                                          'default': 'none'},
+
+                                 'h_int_basis' : {'valid for': lambda x, _: x in ('triqs', 'wien2k', 'wannier90', 'qe', 'vasp'),
+                                            'used': True, 'default' : 'triqs'}
 
                                 },
                      'dft': {'dft_code': {'used': lambda params: params['general']['csc'],
