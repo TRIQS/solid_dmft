@@ -764,7 +764,7 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                                  'default': False},
                                 'force_real': {'converter': BOOL_PARSER,
                                                  'used': lambda params: params['general']['solver_type'] in ['hartree'],
-                                                 'default': False},
+                                                 'default': True},
 
                                 #
                                 # ftps parameters

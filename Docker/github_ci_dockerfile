@@ -102,7 +102,7 @@ RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hubba
     && make -j$NCORES && ctest -j$NCORES && make install
 
 # Hartree-Fock solver
-RUN cd /source && git clone -b unstable --depth 1 git@github.com:TRIQS/hartree_fock.git hartree.src \
+RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hartree_fock.git hartree.src \
     && mkdir -p hartree.build && cd hartree.build \
     && cmake ../hartree.src \ 
     && make -j$NCORES && ctest -j$NCORES && make install
