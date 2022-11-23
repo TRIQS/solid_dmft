@@ -326,13 +326,10 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
                   for iineq in range(sum_k.n_inequiv_shells)]
     sum_k.put_Sigma(zero_Sigma)
 
-    # Sets the chemical potential of the DFT calculation as starting guess
-    if general_params['dft_mu'] != 'none':
-        dft_mu = general_params['dft_mu']
-        # Initializes chemical potential with dft_mu if this is the first iteration
-        if iteration_offset == 0:
-            sum_k.chemical_potential = dft_mu
-            mpi.report('\n chemical potential set to {:.3f} eV\n'.format(sum_k.chemical_potential))
+    # Initializes chemical potential with mu_initial_guess if this is the first iteration
+    if general_params['mu_initial_guess'] != 'none' and iteration_offset == 0:
+            sum_k.chemical_potential = general_params['mu_initial_guess']
+            mpi.report('\ninitial chemical potential set to {:.3f} eV\n'.format(sum_k.chemical_potential))
 
     if general_params['solver_type'] in ['ftps']:
         dft_mu = sum_k.calc_mu(precision=general_params['prec_mu'],

@@ -188,7 +188,7 @@ fixed_mu_value : float, optional, default= 'none'
             If given, the chemical potential remains fixed in calculations
 mu_update_freq : int, optional, default= 1
             The chemical potential will be updated every # iteration
-dft_mu : float, optional, default= 'none'
+mu_initial_guess : float, optional, default= 'none'
             The chemical potential of the DFT calculation.
             If not given, mu will be calculated from the DFT bands
 mu_mix_const : float, optional, default= 1.0
@@ -575,7 +575,7 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                                     'used': lambda params: params['general']['fixed_mu_value'] == 'none',
                                                     'default': 1},
 
-                                 'dft_mu': {'converter': float, 'used': True, 'default': 'none'},
+                                 'mu_initial_guess': {'converter': float, 'used': True, 'default': 'none'},
 
                                  'mu_mix_const': {'converter': float,
                                                   'valid for': lambda x, _: x > 0 or np.isclose(x, 0),
