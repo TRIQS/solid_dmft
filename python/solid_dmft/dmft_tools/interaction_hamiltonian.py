@@ -503,8 +503,12 @@ def construct(sum_k, general_params, advanced_params):
             # Rotates the interaction matrix
             Umat_full_rotated = _rotate_four_index_matrix(sum_k, general_params, Umat_full, icrsh)
 
-            # construct slater from U tensor
-            h_int[icrsh] = _construct_slater(sum_k, general_params, Umat_full_rotated, icrsh)
+            # construct slater / density density from U tensor
+            if general_params['h_int_type'][icrsh] == 'full_slater':
+                h_int[icrsh] = _construct_slater(sum_k, general_params, Umat_full_rotated, icrsh)
+            else:
+                h_int[icrsh] = _construct_density_density(sum_k, general_params, Umat_full_rotated, icrsh)
+
             continue
 
         # simple total impurity occupation interation: U/2 (Ntot^2 - Ntot)
@@ -525,8 +529,12 @@ def construct(sum_k, general_params, advanced_params):
 
             # Rotates the interaction matrix
             Umat_full_rotated = _rotate_four_index_matrix(sum_k, general_params, Umat_full, icrsh)
-
-            h_int[icrsh] = _construct_density_density(sum_k, general_params, Umat_full_rotated, icrsh)
+    
+            # construct slater / density density from U tensor
+            if general_params['h_int_type'][icrsh] == 'crpa':
+                h_int[icrsh] = _construct_slater(sum_k, general_params, Umat_full_rotated, icrsh)
+            else:
+                h_int[icrsh] = _construct_density_density(sum_k, general_params, Umat_full_rotated, icrsh)
             continue
 
         # dynamic interaction from file
