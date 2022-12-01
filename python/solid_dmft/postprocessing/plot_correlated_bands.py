@@ -129,9 +129,10 @@ def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, orbital_order_dmft=
                             sigma = ar['DMFT_results'][specs['it']][f'Sigma_Refreq_{icrsh}']
                         except KeyError:
                             raise KeyError('Provide either "Sigma_freq_0" in real frequency, "Sigma_Refreq_0" or "Sigma_maxent_0".')
-                dc_imp_list.append(ar['DMFT_results'][specs['it']]['DC_pot'][icrsh])
-
                 sigma_imp_list.append(sigma)
+
+            for ish in range(ar['dft_input']['n_corr_shells']):
+                dc_imp_list.append(ar['DMFT_results'][specs['it']]['DC_pot'][ish])
 
             mu_dmft = ar['DMFT_results'][specs['it']]['chemical_potential_post']
 
@@ -151,9 +152,9 @@ def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, orbital_order_dmft=
             # now upfold with proj_mat to band basis, this only works for the
             # case where proj_mat is equal for all k points (wannier mode)
             sigma = Gf(mesh=sigma.mesh, target_shape=[n_orb, n_orb])
-            for icrsh in range(ar['dft_input']['n_corr_shells']):
-                sigma += sum_k.upfold(ik=0, ish=sum_k.inequiv_to_corr[icrsh],
-                                      bname=spin, gf_to_upfold=sigma_sumk[icrsh][spin],
+            for ish in range(ar['dft_input']['n_corr_shells']):
+                sigma += sum_k.upfold(ik=0, ish=ish,
+                                      bname=spin, gf_to_upfold=sigma_sumk[ish][spin],
                                       gf_inp=sigma)
 
         # already subtracted
