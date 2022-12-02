@@ -622,7 +622,8 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                 'length_cycle': {'converter': int, 'valid for': lambda x, _: x > 0,
                                                  'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint', 'ctseg']},
 
-                                'n_warmup_cycles': {'converter': int, 'valid for': lambda x, _: x > 0,
+                                'n_warmup_cycles': {'converter': lambda s: int(float(s)),
+                                                    'valid for': lambda x, _: x > 0,
                                                     'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint', 'ctseg']},
 
                                 'n_cycles_tot': {'converter': lambda s: int(float(s)),
