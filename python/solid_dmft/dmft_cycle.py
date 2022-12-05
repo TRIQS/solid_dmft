@@ -578,7 +578,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
     if mpi.is_master_node():
         del archive
 
-    return is_converged
+    return is_converged, sum_k
 
 
 def _dmft_step(sum_k, solvers, it, general_params,

@@ -333,6 +333,7 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
 
     iter_dmft = iteration_offset+1
     start_time_dft = timer()
+    sum_k = None
     while iter_dmft <= general_params['n_iter_dmft'] + iteration_offset:
         mpi.report('  solid_dmft: Running {}...'.format(dft_params['dft_code'].upper()))
         mpi.barrier()
@@ -345,17 +346,6 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
         elif dft_params['dft_code'] == 'qe':
             _run_qe(general_params, dft_params, iter_dmft, iteration_offset)
 
-        # check if we should do another DFT iteration or go on with DMFT
-        iter_dft += 1
-        if dft_params['dft_code'] == 'vasp' and ((iter_dft-1) % dft_params['n_iter'] != 0 or iter_dft < 0):
-            suppressed = iter_dft%dft_params['n_iter'] != 0 or iter_dft+1 < 0
-            _set_projections_suppressed(suppressed)
-            vasp.reactivate()
-            continue
-
-        end_time_dft = timer()
-        mpi.report('  solid_dmft: DFT cycle took {:10.4f} seconds'.format(end_time_dft-start_time_dft))
-
         if dft_params['dft_code'] == 'vasp':
             # Runs the converter
             if dft_params['projector_type'] == 'plo':
@@ -367,6 +357,32 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
                 mpi.barrier()
                 irred_indices = _read_irred_kpoints_from_vasp(general_params)
                 mpi.barrier()
+
+        # check if we should do another DFT iteration or go on with DMFT
+        iter_dft += 1
+        if dft_params['dft_code'] == 'vasp' and ((iter_dft-1) % dft_params['n_iter'] != 0 or iter_dft < 0):
+            if sum_k is not None:
+                # Reads in projectors
+                # TODO: also update rot_mats? I think for the PLO example it's fixed by the rotations.dat file
+                # New fermi weights are directly read in calc_density_correction
+                with HDFArchive(general_params['seedname']+'.h5', 'r') as archive:
+                    sum_k.proj_mat = archive['dft_input/proj_mat']
+                    #sum_k.rot_mat = archive['dft_input/rot_mat']
+                # Writes out GAMMA file
+                if irred_indices is None:
+                    deltaN, dens, E_bandcorr = sum_k.calc_density_correction(filename='GAMMA', dm_type='vasp')
+                else:
+                    deltaN, dens, E_bandcorr = sum_k.calc_density_correction(filename='GAMMA', dm_type='vasp',
+                                                                             kpts_to_write=irred_indices)
+                with HDFArchive(general_params['seedname']+'.h5', 'a') as archive:
+                    archive['DMFT_results'][f'deltaN_dftit_{iter_dft}'] = deltaN
+                    archive['DMFT_results'][f'dens_dftit_{iter_dft}'] = dens
+                    archive['DMFT_results'][f'E_bandcorr_dftit_{iter_dft}'] = E_bandcorr
+            vasp.reactivate()
+            continue
+
+        end_time_dft = timer()
+        mpi.report('  solid_dmft: DFT cycle took {:10.4f} seconds'.format(end_time_dft-start_time_dft))
 
         # Writes eigenvals to archive if requested
         dft_energy = None
@@ -407,8 +423,8 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
 
         ############################################################
         # run the dmft_cycle
-        is_converged = dmft_cycle(general_params, solver_params, advanced_params,
-                                  dft_params, iter_one_shot, irred_indices, dft_energy)
+        is_converged, sum_k = dmft_cycle(general_params, solver_params, advanced_params,
+                                         dft_params, iter_one_shot, irred_indices, dft_energy)
         ############################################################
 
         iter_dmft += iter_one_shot
@@ -428,7 +444,6 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
 
             start_time_dft = timer()
             if dft_params['dft_code'] == 'vasp':
-                _set_projections_suppressed(dft_params['n_iter'] > 1)
                 mpi.report('  solid_dmft: Reactivating VASP')
                 vasp.reactivate()
 
