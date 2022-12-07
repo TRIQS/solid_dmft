@@ -374,10 +374,13 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
                 else:
                     deltaN, dens, E_bandcorr = sum_k.calc_density_correction(filename='GAMMA', dm_type='vasp',
                                                                              kpts_to_write=irred_indices)
-                with HDFArchive(general_params['seedname']+'.h5', 'a') as archive:
-                    archive['DMFT_results'][f'deltaN_dftit_{iter_dft}'] = deltaN
-                    archive['DMFT_results'][f'dens_dftit_{iter_dft}'] = dens
-                    archive['DMFT_results'][f'E_bandcorr_dftit_{iter_dft}'] = E_bandcorr
+                mpi.barrier()
+                if mpi.is_master_node():
+                    with HDFArchive(general_params['seedname']+'.h5', 'a') as archive:
+                        archive['DMFT_results'][f'deltaN_dftit_{iter_dft}'] = deltaN
+                        archive['DMFT_results'][f'dens_dftit_{iter_dft}'] = dens
+                        archive['DMFT_results'][f'E_bandcorr_dftit_{iter_dft}'] = E_bandcorr
+                mpi.barrier()
             vasp.reactivate()
             continue
 
