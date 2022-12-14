@@ -235,13 +235,13 @@ def _set_mu_to_gap_middle_with_maxent(general_params, sum_k, gf_lattice_iw, arch
         return None
 
     # Runs MaxEnt using the Chi2Curvature analyzer
-    maxent_results = maxent_gf_latt._run_maxent(gf_lattice_iw, sum_k, .02, None, None, 200, 30)
-    mesh = np.array(maxent_results['total'].omega)
+    maxent_results, mesh = maxent_gf_latt._run_maxent(gf_lattice_iw, sum_k, .02, None, None, 200, 30)
+    mesh = np.array(mesh)
     spectral_function = maxent_results['total'].get_A_out('Chi2CurvatureAnalyzer')
 
     # Writes spectral function to archive
     if archive is not None:
-        unpacked_results = maxent_gf_latt._unpack_maxent_results(maxent_results)
+        unpacked_results = maxent_gf_latt._unpack_maxent_results(maxent_results, mesh)
         archive['DMFT_results/last_iter']['Alatt_w'] = unpacked_results
 
     # Checks if spectral function at Fermi energy below threshold
