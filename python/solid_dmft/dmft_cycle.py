@@ -169,17 +169,14 @@ def _calculate_rotation_matrix(general_params, sum_k, soc_make_real):
     elif general_params['set_rot'] == 'den':
         q_diag = sum_k.density_matrix(method='using_gf')
     elif general_params['set_rot'] == 'soc_real':
-        if isinstance(soc_make_real, list):
-            assert len(soc_make_real) == 3, 'soc_make_real only implemented for t2g subspace'
-            rot_mat_soc = np.kron(soc_make_real, np.ones((1,2))) * np.eye(6)
-        else:
-            raise TypeError('soc_make_real should be a list, but is {}'.format(type(soc_make_real)))
+        if len(soc_make_real) != 3:
+            raise ValueError('soc_make_real only implemented for t2g subspace')
+        rot_mat_soc = np.diag(np.repeat(soc_make_real, 2))
     else:
         raise ValueError('Parameter set_rot set to wrong value.')
 
     chnl = sum_k.spin_block_names[sum_k.SO][0]
 
-    rot_mat = []
     for icrsh in range(sum_k.n_corr_shells):
         ish = sum_k.corr_to_inequiv[icrsh]
         if general_params['set_rot'] == 'soc_real':
@@ -187,11 +184,10 @@ def _calculate_rotation_matrix(general_params, sum_k, soc_make_real):
         else:
             eigvec = np.array(np.linalg.eigh(np.real(q_diag[ish][chnl]))[1], dtype=complex)
         if sum_k.use_rotations:
-            rot_mat.append( np.dot(sum_k.rot_mat[icrsh], eigvec) )
+            sum_k.rot_mat[icrsh] = np.dot(sum_k.rot_mat[icrsh], eigvec)
         else:
-            rot_mat.append( eigvec )
+            sum_k.rot_mat[icrsh] = eigvec
 
-    sum_k.rot_mat = rot_mat
     # in case sum_k.use_rotations == False before:
     sum_k.use_rotations = True
     # sum_k.eff_atomic_levels() needs to be recomputed if rot_mat were changed
