@@ -365,9 +365,12 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
                 # Reads in projectors
                 # TODO: also update rot_mats? I think for the PLO example it's fixed by the rotations.dat file
                 # New fermi weights are directly read in calc_density_correction
-                with HDFArchive(general_params['seedname']+'.h5', 'r') as archive:
-                    sum_k.proj_mat = archive['dft_input/proj_mat']
-                    #sum_k.rot_mat = archive['dft_input/rot_mat']
+                if mpi.is_master_node():
+                    with HDFArchive(general_params['seedname']+'.h5', 'r') as archive:
+                        sum_k.proj_mat = archive['dft_input/proj_mat']
+                        #sum_k.rot_mat = archive['dft_input/rot_mat']
+                sum_k.proj_mat = mpi.bcast(sum_k.proj_mat)
+
                 # Writes out GAMMA file
                 if irred_indices is None:
                     deltaN, dens, E_bandcorr = sum_k.calc_density_correction(filename='GAMMA', dm_type='vasp')
