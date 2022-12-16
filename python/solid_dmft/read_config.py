@@ -335,7 +335,7 @@ hartree parameters
 ================
 with_fock : bool, optional, default=False
         include Fock exchange terms in the self-energy
-force_real : bool, optional, default=False
+force_real : bool, optional, default=True
         force the self energy from Hartree fock to be real
 one_shot : bool, optional, default=False
         True if the calcualtion is just one shot and not self consistent. Default is False
