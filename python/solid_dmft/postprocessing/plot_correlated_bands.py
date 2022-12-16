@@ -163,7 +163,7 @@ def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, orbital_order_dmft=
     else:
         print('Setting Sigma from memory')
 
-        sigma = with_sigma
+        sigma = with_sigma[spin]
         dc = specs['dc'][0][spin][0, 0]
         mu_dmft = specs['mu_dmft']
 
