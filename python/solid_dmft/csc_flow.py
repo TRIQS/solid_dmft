@@ -147,27 +147,58 @@ def read_dft_energy_vasp():
     print('DFT energy read from OSZICAR')
     return dft_energy
 
-def read_dft_energy_qe(seedname):
+def read_dft_energy_qe(seedname, n_iter):
     """
-    Reads DFT energy from quantum espresso's seedname.scf.out.
+    Reads DFT energy from quantum espresso's out files
+
+    1. At the first iteration, the DFT energy is read from the scf file.
+
+    2. After the first iteration the band energy computed in the mod_scf calculation is wrong,
+       and needs to be subtracted from the reported total energy. The correct band energy
+       is computed in the nscf calculation.
+
     """
-    RYDBERG = 13.605698066 # eV
+    dft_energy = 0.0
+    RYDBERG = 13.605693123 # eV
 
-    for mode in ['mod_scf', 'scf']:
-        try:
-            with open(f'{seedname}.{mode}.out', 'r') as file:
-                dft_output = file.readlines()
-            for line in dft_output:
-                if 'total energy' in line:
-                    dft_energy = float(line.split()[-2]) * RYDBERG
-            break
-        except FileNotFoundError:
-            if mode == 'scf':
-                print(f'{seedname}.{mode}.out not found, cannot read DFT energy.')
-        except ValueError:
-            pass
+    if n_iter == 1:
+        with open(f'{seedname}.scf.out', 'r') as file:
+            dft_output = file.readlines()
+        for line in dft_output:
+            if '!' in line:
+                print("\nReading total energy from the scf calculation \n")
+                dft_energy = float(line.split()[-2]) * RYDBERG
+                print(f"The DFT energy is: {dft_energy} eV")
+                break
+            if  line =="":
+                raise EOFError("Did not find scf total energy")
+    else:
+        with open(f'{seedname}.mod_scf.out', 'r') as file:
+            dft_output = file.readlines()
+        for line in dft_output:
+            #if 'eband, Ef (eV)' in line:
+            if "(sum(wg*et))" in line:
+                print("\nReading band energy from the mod_scf calculation \n")
+                #band_energy = float(line.split())
+                band_energy_modscf = float(line.split()[-2])*RYDBERG
+                print(f"The mod_scf band energy is: {band_energy_modscf} eV")
+            if 'total energy' in line:
+                print("\nReading total energy from the mod_scf calculation \n")
+                dft_energy = float(line.split()[-2]) * RYDBERG
+                print(f"The uncorrected DFT energy is: {dft_energy} eV")
+        dft_energy -= band_energy_modscf
+        print(f"The DFT energy without kinetic part is: {dft_energy} eV")
 
-    print(f'DFT energy read from {seedname}.{mode}.out')
+        with open(f'{seedname}.nscf.out', 'r') as file:
+            dft_output = file.readlines()
+        for line in dft_output:
+            if 'The nscf band energy' in line:
+                print("\nReading band energy from the nscf calculation\n")
+                band_energy_nscf = float(line.split()[-2]) * RYDBERG
+                dft_energy += band_energy_nscf
+                print(f"The nscf band energy is: {band_energy_nscf} eV")
+                print(f"The corrected DFT energy is: {dft_energy} eV")
+                break
     return dft_energy
 
 
@@ -349,7 +380,7 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
             if dft_params['dft_code'] == 'vasp':
                 dft_energy = read_dft_energy_vasp()
             elif dft_params['dft_code'] == 'qe':
-                dft_energy = read_dft_energy_qe(general_params['seedname'])
+                dft_energy = read_dft_energy_qe(general_params['seedname'], n_iter = iter_dmft)
         dft_energy = mpi.bcast(dft_energy)
 
         if mpi.is_master_node():
