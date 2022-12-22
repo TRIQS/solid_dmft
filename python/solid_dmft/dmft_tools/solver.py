@@ -325,7 +325,12 @@ class SolverStructure:
                     self.Delta_freq[name] << iOmega_n - inverse(g0) - solver_eal[name]
                     known_moments = make_zero_tail(self.Delta_freq[name], 1)
                     tail, err = fit_hermitian_tail(self.Delta_freq[name], known_moments)
-                    self.triqs_solver.Delta_tau[name] << make_gf_from_fourier(self.Delta_freq[name], self.triqs_solver.Delta_tau.mesh, tail).real
+                    # without SOC delta_tau needs to be real
+                    if not self.sum_k.SO == 1:
+                        self.triqs_solver.Delta_tau[name] << make_gf_from_fourier(self.Delta_freq[name], self.triqs_solver.Delta_tau.mesh, tail).real
+                    else:
+                        self.triqs_solver.Delta_tau[name] << make_gf_from_fourier(self.Delta_freq[name], self.triqs_solver.Delta_tau.mesh, tail)
+
 
                 # Make non-interacting operator for Hloc0
                 Hloc_0 = Operator()
@@ -342,6 +347,15 @@ class SolverStructure:
             else:
                 # fill G0_freq from sum_k to solver
                 self.triqs_solver.G0_iw << self.G0_freq
+
+            # update solver in h5 archive one last time for debugging if solve command crashes
+            if self.general_params['store_solver'] and mpi.is_master_node():
+                with HDFArchive(self.general_params['jobname']+'/'+self.general_params['seedname']+'.h5', 'a') as archive:
+                    if not 'it_-1' in archive['DMFT_input/solver']:
+                        archive['DMFT_input/solver'].create_group('it_-1')
+                    archive['DMFT_input/solver/it_-1'][f'S_{self.icrsh}'] = self.triqs_solver
+                    archive['DMFT_input/solver/it_-1'][f'solve_params_{self.icrsh}'] = self.solver_params
+                    archive['DMFT_input/solver/it_-1']['mpi_size'] = mpi.size
 
             # Solve the impurity problem for icrsh shell
             # *************************************
