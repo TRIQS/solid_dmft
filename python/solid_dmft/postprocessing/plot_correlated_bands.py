@@ -550,7 +550,7 @@ def plot_bands(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb, tb=True, alatt=Fal
             colorbar.set_label(r'$A(k, \omega)$')
 
     if tb:
-        if isinstance(proj_on_orb, np.ndarray):
+        if isinstance(proj_on_orb, np.ndarray) or isinstance(proj_on_orb, list):
             eps_nuk = tb_data['e_mat']
             evec_nuk = tb_data['e_vecs']
         else:
@@ -775,6 +775,12 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, mu_tb, add_spin=False, add_lambda=
     else:
         e_vecs = total_proj = orb_proj = None
 
+    # now we merge proj_nuk and orb_proj (has reverse shape)
+    if isinstance(proj_nuk, np.ndarray) and isinstance(orb_proj, np.ndarray):
+        proj_nuk = proj_nuk * orb_proj
+    elif not isinstance(proj_nuk, np.ndarray) and isinstance(orb_proj, np.ndarray):
+        proj_nuk = orb_proj
+
     # dmft output
     if with_sigma:
         sigma_types = ['calc', 'model']
@@ -809,12 +815,6 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, mu_tb, add_spin=False, add_lambda=
             else:
                 assert proj_nuk.shape == tuple([n_orb, e_vecs.shape[2], e_vecs.shape[3]]
                                                ), f'shape of projectors {proj_nuk.shape} does not match expected shape of [{n_orb},{e_vecs.shape[2]},{e_vecs.shape[3]}]'
-
-        # now we merge proj_nuk and orb_proj (has reverse shape)
-        if isinstance(proj_nuk, np.ndarray) and isinstance(orb_proj, np.ndarray):
-            proj_nuk = proj_nuk * orb_proj
-        elif not isinstance(proj_nuk, np.ndarray) and isinstance(orb_proj, np.ndarray):
-            proj_nuk = orb_proj
 
         # calculate alatt
         if not fermi_slice:
