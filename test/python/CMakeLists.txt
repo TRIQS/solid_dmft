@@ -25,7 +25,9 @@ endforeach()
 # all other tests
 set(all_tests 
     test_convergence
-    test_plot_correlated_bands)
+    test_plot_correlated_bands
+    test_respack_sfo
+    )
 
   # copy input files for PCB test from documentation tutorial
   set (test_dir ${CMAKE_CURRENT_BINARY_DIR})
@@ -35,6 +37,9 @@ set(all_tests
 
   # copy reference data for PCB test
   FILE(COPY test_pcb_ref.h5 DESTINATION ${test_dir})
+  
+  # copy reference data for respack test
+  FILE(COPY respack_sfo_data DESTINATION ${test_dir})
 
   foreach(test ${all_tests})
   get_filename_component(test_name ${test} NAME_WE)
