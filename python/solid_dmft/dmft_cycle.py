@@ -35,6 +35,7 @@ import numpy as np
 # triqs
 from triqs.operators.util.observables import S_op, N_op
 from triqs.version import git_hash as triqs_hash
+from triqs.version import version as triqs_version
 from h5 import HDFArchive
 import triqs.utility.mpi as mpi
 from triqs.gf import Gf, make_hermitian, MeshReFreq, MeshImFreq
@@ -43,6 +44,7 @@ from triqs_dft_tools.sumk_dft import SumkDFT
 
 # own modules
 from solid_dmft.version import solid_dmft_hash
+from solid_dmft.version import version as solid_dmft_version
 from solid_dmft.dmft_tools.observables import (calc_dft_kin_en, add_dmft_observables, calc_bandcorr_man, write_obs,
                                          add_dft_values_as_zeroth_iteration, write_header_to_file, prep_observables)
 from solid_dmft.dmft_tools.solver import SolverStructure
@@ -300,10 +302,13 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
             archive['DMFT_results'].create_group('last_iter')
         if 'DMFT_input' not in archive:
             archive.create_group('DMFT_input')
+            archive['DMFT_input']['program'] = 'solid_dmft'
             archive['DMFT_input'].create_group('solver')
             archive['DMFT_input'].create_group('version')
             archive['DMFT_input']['version']['triqs_hash'] = triqs_hash
+            archive['DMFT_input']['version']['triqs_version'] = triqs_version
             archive['DMFT_input']['version']['solid_dmft_hash'] = solid_dmft_hash
+            archive['DMFT_input']['version']['solid_dmft_version'] = solid_dmft_version
         if 'iteration_count' in archive['DMFT_results']:
             iteration_offset = archive['DMFT_results/iteration_count']
             print('previous iteration count of {} '.format(iteration_offset)
@@ -480,7 +485,9 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
     if mpi.is_master_node():
         if 'version' not in archive['DMFT_input']:
             archive['DMFT_input'].create_group('version')
+        archive['DMFT_input']['version']['solver_name'] = general_params['solver_type']
         archive['DMFT_input']['version']['solver_hash'] = solvers[0].git_hash
+        archive['DMFT_input']['version']['solver_version'] = solvers[0].version
 
     # Determines initial Sigma and DC
     sum_k, solvers = initial_sigma.determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
