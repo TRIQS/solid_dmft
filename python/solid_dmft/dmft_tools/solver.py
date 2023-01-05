@@ -117,16 +117,17 @@ class SolverStructure:
 
         # initialize solver object, options are cthyb
         if self.general_params['solver_type'] == 'cthyb':
-            from triqs_cthyb.version import triqs_cthyb_hash
+            from triqs_cthyb.version import triqs_cthyb_hash, version
 
             # sets up necessary GF objects on ImFreq
             self._init_ImFreq_objects()
             # sets up solver
             self.triqs_solver = self._create_cthyb_solver()
             self.git_hash = triqs_cthyb_hash
+            self.version = version
 
         elif self.general_params['solver_type'] == 'ctint':
-            from triqs_ctint.version import triqs_ctint_hash
+            from triqs_ctint.version import triqs_ctint_hash, version
 
             # sets up necessary GF objects on ImFreq
             self._init_ImFreq_objects()
@@ -135,9 +136,10 @@ class SolverStructure:
             self.solver_params['measure_histogram'] = self.solver_params.pop('measure_pert_order')
             self.solver_params['use_double_insertion'] = self.solver_params.pop('move_double')
             self.git_hash = triqs_ctint_hash
+            self.version = version
 
         elif self.general_params['solver_type'] == 'hubbardI':
-            from triqs_hubbardI.version import triqs_hubbardI_hash
+            from triqs_hubbardI.version import triqs_hubbardI_hash, version
 
             # sets up necessary GF objects on ImFreq
             self._init_ImFreq_objects()
@@ -145,9 +147,10 @@ class SolverStructure:
             # sets up solver
             self.triqs_solver = self._create_hubbardI_solver()
             self.git_hash = triqs_hubbardI_hash
+            self.version = version
 
         elif self.general_params['solver_type'] == 'ftps':
-            from forktps.version import forktps_hash
+            from forktps.version import forktps_hash, version
 
             # additional parameters
             self.bathfit_adjusted = self.iteration_offset != 0
@@ -166,6 +169,7 @@ class SolverStructure:
             # sets up solver
             self.triqs_solver, self.sector_params, self.dmrg_params, self.tevo_params, self.calc_me, self.calc_mapping = self._create_ftps_solver()
             self.git_hash = forktps_hash
+            self.version = version
 
         elif self.general_params['solver_type'] == 'inchworm':
 
@@ -173,16 +177,17 @@ class SolverStructure:
             self._init_ImFreq_objects()
             # sets up solver
             self.triqs_solver = self._create_inchworm_solver()
-            self.git_hash = inchworm_hash
+            # self.git_hash = inchworm_hash
 
         elif self.general_params['solver_type'] == 'ctseg':
-            from triqs_ctseg.version import triqs_ctseg_hash
+            from triqs_ctseg.version import triqs_ctseg_hash, version
 
             # sets up necessary GF objects on ImFreq
             self._init_ImFreq_objects()
             # sets up solver
             self.triqs_solver = self._create_ctseg_solver()
             self.git_hash = triqs_ctseg_hash
+            self.version = version
 
     # ********************************************************************
     # initialize Freq and Time objects
