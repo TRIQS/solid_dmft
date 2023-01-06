@@ -362,14 +362,15 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
         iter_dft += 1
         if dft_params['dft_code'] == 'vasp' and ((iter_dft-1) % dft_params['n_iter'] != 0 or iter_dft < 0):
             if sum_k is not None:
-                # Reads in projectors
-                # TODO: also update rot_mats? I think for the PLO example it's fixed by the rotations.dat file
+                # Reads in new projectors and hopping and updates chemical potential
                 # New fermi weights are directly read in calc_density_correction
                 if mpi.is_master_node():
                     with HDFArchive(general_params['seedname']+'.h5', 'r') as archive:
                         sum_k.proj_mat = archive['dft_input/proj_mat']
-                        #sum_k.rot_mat = archive['dft_input/rot_mat']
+                        sum_k.hopping = archive['dft_input/hopping']
                 sum_k.proj_mat = mpi.bcast(sum_k.proj_mat)
+                sum_k.hopping = mpi.bcast(sum_k.hopping)
+                sum_k.calc_mu(precision=general_params['prec_mu'])
 
                 # Writes out GAMMA file
                 if irred_indices is None:

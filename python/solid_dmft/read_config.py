@@ -342,7 +342,8 @@ dft_code : string
 n_cores : int
             number of cores for the DFT code (VASP)
 n_iter : int, optional, default= 6
-            number of dft iterations per cycle
+            number of DFT iterations per cycle. In between two DFT iterations, the charge-density correction
+            is recalculated using the newly generated projectors and hoppings from the previous DFT run
 dft_exec :  string, default= 'vasp_std'
             command for the DFT / VASP executable
 store_eigenvals : bool, optional, default= False
