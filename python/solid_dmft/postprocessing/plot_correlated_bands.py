@@ -558,7 +558,8 @@ def plot_bands(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb, tb=True, alatt=Fal
             colorbar.set_label(r'$A(k, \omega)$')
 
     if tb:
-        if isinstance(proj_on_orb, np.ndarray) or isinstance(proj_on_orb, list):
+        # if projection is requested, _get_tb_bands() ran already
+        if proj_on_orb[0] is not None:
             eps_nuk = tb_data['e_mat']
             evec_nuk = tb_data['e_vecs']
         else:
@@ -713,20 +714,17 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, mu_tb, add_spin=False, add_lambda=
     assert with_sigma or eta != 0.0, 'if no Sigma is provided eta has to be different from 0.0'
 
     # proj_on_orb
-    if not isinstance(proj_on_orb, type(None)):
-        assert isinstance(proj_on_orb, (int, type(None))) or all(isinstance(x, (int, type(None))) for x in proj_on_orb), 'proj_on_orb should be '\
-            f'an integer or list of integers, but is {type(specs["proj_on_orb"])}.'
+    assert isinstance(proj_on_orb, (int, type(None))) or all(isinstance(x, (int, type(None))) for x in proj_on_orb), 'proj_on_orb should be '\
+        f'an integer or list of integers, but is {type(specs["proj_on_orb"])}.'
 
-        if isinstance(proj_on_orb, (int, type(None))):
-            proj_on_orb = [proj_on_orb]
-        else:
-            proj_on_orb = proj_on_orb
-
-        # if projection is requested we have to use band_basis
-        if proj_on_orb[0] is not None:
-            band_basis = True
+    if isinstance(proj_on_orb, (int, type(None))):
+        proj_on_orb = [proj_on_orb]
     else:
-        proj_on_orb = [None]
+        proj_on_orb = proj_on_orb
+
+    # if projection is requested we have to use band_basis
+    if proj_on_orb[0] is not None:
+        band_basis = True
 
     # if proj_nuk is given we need to use the band_basis
     if isinstance(proj_nuk, np.ndarray) and not band_basis:
