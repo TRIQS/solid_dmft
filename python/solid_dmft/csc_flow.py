@@ -202,13 +202,10 @@ def read_dft_energy_qe(seedname, n_iter):
     return dft_energy
 
 
-def _set_projections_suppressed(suppressed):
+def _remove_projections_suppressed():
     if mpi.is_master_node():
-        if suppressed:
-            print('  solid_dmft: Writing suppress projectors file', flush=True)
-            open('./vasp.suppress_projs', 'w').close()
-        elif os.path.isfile('./vasp.suppress_projs'):
-            print('  solid_dmft: Removing suppress projectors file', flush=True)
+        if os.path.isfile('./vasp.suppress_projs'):
+            print('  solid_dmft: Removing legacy file vasp.suppress_projs', flush=True)
             os.remove('./vasp.suppress_projs')
     mpi.barrier()
 
@@ -317,8 +314,8 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
 
         vasp_process_id = vasp.start(dft_params['n_cores'], dft_params['dft_exec'],
                                      dft_params['mpi_env'])
-        # Removes projection suppression file if present
-        _set_projections_suppressed(False)
+        # Removes legacy file vasp.suppress_projs if present
+        _remove_projections_suppressed()
         mpi.report('  solid_dmft: Waiting for VASP to start (lock appears)...')
         while not vasp.is_lock_file_present():
             time.sleep(1)
