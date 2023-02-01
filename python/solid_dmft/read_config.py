@@ -88,8 +88,6 @@ dc_type : int
             * 1: held formula, needs to be used with slater-kanamori h_int_type=2
             * 2: AMF
             * 3: FLL for eg orbitals only with U,J for Kanamori
-prec_mu : float
-            general precision for determining the chemical potential at any time calc_mu is called
 dc_dmft : bool
            Whether to use DMFT or DFT occupations:
 
@@ -131,10 +129,11 @@ magnetic : bool, optional, default=False
             are we doing a magnetic calculations? If yes put magnetic to True.
             Not implemented for CSC calculations
 magmom : list of float seperated by comma, optional default=[]
-            initialize magnetic moments if magnetic is on. length must be #imps.
-            This will be used as factor for each imp in the initial self
-            energy, with up (or ud for spin-orbit coupling) (1+fac)*sigma, and
-            with down (1-fac)*sigma
+            Initialize magnetic moments if magnetic is on. length must be #imps.
+            List composed of energetic shifts written in electronvolts.
+            This will initialize the spin blocks of the sigma with a diagonal shift
+            With -shift for the up block, and +shift for the down block
+            (positive shift favours the up spin component, not compatible with spin-orbit coupling)
 enforce_off_diag : bool, optional, default=False
             enforce off diagonal elements in block structure finder
 h_field : float, optional, default=0.0
@@ -182,6 +181,14 @@ sampling_iterations : int, optional, default= 0
             for how many iterations should the solution sampled after the CSC loop is converged
 sampling_h5_save_freq : int, optional, default= 5
             overwrites h5_save_freq when sampling has started
+calc_mu_method : string, optional, default = 'dichotomy'
+            optimization method used for finding the chemical potential:
+
+            * 'dichotomy': usual method from TRIQS, should always converge but may be slow
+            * 'newton': scipy Newton root finder, much faster but might be unstable
+            * 'brent': scipy hyperbolic Brent root finder preconditioned with dichotomy to find edge, a compromise between speed and stability
+prec_mu : float
+            general precision for determining the chemical potential at any time calc_mu is called
 fixed_mu_value : float, optional, default= 'none'
             If given, the chemical potential remains fixed in calculations
 mu_update_freq : int, optional, default= 1
@@ -467,6 +474,7 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
 
                                  'solver_type': {'valid for': lambda x, _: x in ['cthyb', 'ctint', 'ftps', 'hubbardI','ctseg', 'hartree'],
                                                  'used': True},
+                                 
 
                                  'n_l': {'converter': int, 'valid for': lambda x, _: x > 0,
                                          'used': lambda params: params['general']['solver_type'] in ['cthyb', 'inchworm', 'hubbardI', 'ctseg']
@@ -576,6 +584,11 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                                            'default': 5},
 
                                  'fixed_mu_value': {'converter': float, 'used': True, 'default': 'none'},
+
+                                 'calc_mu_method': {'valid for': lambda x, _: x in ['dichotomy', 'newton', 'brent'],
+                                                 'used': True,
+                                                 'default': 'dichotomy',
+                                                 },
 
                                  'mu_update_freq': {'converter': int, 'valid for': lambda x, _: x > 0,
                                                     'used': lambda params: params['general']['fixed_mu_value'] == 'none',
