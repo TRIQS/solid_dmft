@@ -102,7 +102,7 @@ def _run_qe(general_params, dft_params, iter_dmft, iteration_offset):
                                                    dft_params['mpi_env'], general_params['seedname'])
 
     if iter_dmft == 1: # scf
-        qe_scf = start_qe(dft_params['n_cores'], 'scf')
+        start_qe(dft_params['n_cores'], 'scf')
     else: # use modified scf
 
         # if calculation is restarted, need to check in first iteration if DFT step needs to be skipped
@@ -111,17 +111,17 @@ def _run_qe(general_params, dft_params, iter_dmft, iteration_offset):
             mpi.report('  solid_dmft: ...skipping DFT step')
             return
 
-        qe_scf = start_qe(dft_params['n_cores'], 'mod_scf')
+        start_qe(dft_params['n_cores'], 'mod_scf')
     # optionally do bnd, bands, proj if files are present
     for nscf in ['bnd', 'bands', 'proj']:
         if os.path.isfile(f'{general_params["seedname"]}.{nscf}.in'):
-            qe_nscf = start_qe(dft_params['n_cores'], nscf)
+            start_qe(dft_params['n_cores'], nscf)
     # nscf
-    qe_nscf = start_qe(dft_params['n_cores'], 'nscf')
+    start_qe(dft_params['n_cores'], 'nscf')
     # w90 parts
-    qe_w90 = start_qe(dft_params['n_cores'], 'win_pp')
-    qe_pw2wan = start_qe(dft_params['n_cores'], 'pw2wan')
-    qe_w90 = start_qe(dft_params['n_cores'], 'win')
+    start_qe(dft_params['n_cores'], 'win_pp')
+    start_qe(dft_params['n_cores'], 'pw2wan')
+    start_qe(dft_params['n_cores'], 'win')
 
     # launch Wannier90Converter
     _run_w90converter(general_params['seedname'], dft_params['w90_tolerance'])
@@ -306,19 +306,25 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
 
     iter_dft = 0
     irred_indices = None
-    if dft_params['dft_code'] == 'vasp':
-        # if GAMMA file already exists, load it by doing extra DFT iterations
-        if os.path.exists('GAMMA'):
-            iter_dft = -dft_params['n_iter']
-            mpi.barrier()
 
+
+    # Removes legacy file vasp.suppress_projs if present
+    _remove_projections_suppressed()
+
+    # Starts VASP
+    if dft_params['dft_code'] == 'vasp':
         vasp_process_id = vasp.start(dft_params['n_cores'], dft_params['dft_exec'],
                                      dft_params['mpi_env'])
-        # Removes legacy file vasp.suppress_projs if present
-        _remove_projections_suppressed()
         mpi.report('  solid_dmft: Waiting for VASP to start (lock appears)...')
         while not vasp.is_lock_file_present():
             time.sleep(1)
+        mpi.barrier()
+
+    # if GAMMA file already exists, load it by doing extra DFT iterations
+    if dft_params['dft_code'] == 'vasp' and os.path.exists('GAMMA'):
+        raise NotImplementedError('GAMMA file found but restarting not yet implemented for Vasp.')
+        iter_dft = -dft_params['n_iter']
+        mpi.barrier()
 
     # Reads in iteration offset if restarting
     iteration_offset = 0
@@ -331,6 +337,7 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
     iter_dmft = iteration_offset+1
     start_time_dft = timer()
     sum_k = None
+
     while iter_dmft <= general_params['n_iter_dmft'] + iteration_offset:
         mpi.report('  solid_dmft: Running {}...'.format(dft_params['dft_code'].upper()))
         mpi.barrier()
@@ -343,8 +350,8 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
         elif dft_params['dft_code'] == 'qe':
             _run_qe(general_params, dft_params, iter_dmft, iteration_offset)
 
+        # Runs the converter
         if dft_params['dft_code'] == 'vasp':
-            # Runs the converter
             if dft_params['projector_type'] == 'plo':
                 _run_plo_converter(general_params)
             elif dft_params['projector_type'] == 'w90':

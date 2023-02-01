@@ -567,11 +567,6 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
         mpi.report('** Sampling finished ***')
         mpi.report('#'*80)
 
-    # for one-shot calculations, we can use the updated GAMMA file for postprocessing
-    if not general_params['csc'] and general_params['oneshot_postproc_gamma_file']:
-        # Write the density correction to file after the one-shot calculation
-        sum_k.calc_density_correction(filename=os.path.join(general_params['jobname'], 'GAMMA'), dm_type='vasp')
-
     mpi.barrier()
 
     # close the h5 archive
@@ -719,17 +714,11 @@ def _dmft_step(sum_k, solvers, it, general_params,
     E_bandcorr = 0.0
     if general_params['csc']:
         # handling the density correction for fcsc calculations
-        # TODO: keep only code in "else", the rest is redundant with handling inside
-        #     sum_k.calc_density_correction. Code in "if" only implemented for
-        #     compatibility with last official dft_tools release
         if dft_params['dft_code'] == 'vasp':
-            if dft_irred_kpt_indices is None:
-                deltaN, dens, E_bandcorr = sum_k.calc_density_correction(filename='GAMMA', dm_type='vasp')
-            else:
-                deltaN, dens, E_bandcorr = sum_k.calc_density_correction(filename='GAMMA', dm_type='vasp',
-                                                                         kpts_to_write=dft_irred_kpt_indices)
+            deltaN, dens, E_bandcorr = sum_k.calc_density_correction(dm_type='vasp',
+                                                                     kpts_to_write=dft_irred_kpt_indices)
         elif dft_params['dft_code'] == 'qe':
-            deltaN, dens, E_bandcorr = sum_k.calc_density_correction(dm_type=dft_params['dft_code'])
+            deltaN, dens, E_bandcorr = sum_k.calc_density_correction(dm_type='qe')
 
     # for a one shot calculation we are using our own method
     if not general_params['csc'] and general_params['calc_energies']:
