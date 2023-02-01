@@ -335,7 +335,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
         dft_mu = sum_k.calc_mu(precision=general_params['prec_mu'],
                                broadening=general_params['eta'])
     else:
-        dft_mu = sum_k.calc_mu(precision=general_params['prec_mu'])
+        dft_mu = sum_k.calc_mu(precision=general_params['prec_mu'], method=general_params['calc_mu_method'])
 
     # calculate E_kin_dft for one shot calculations
     if not general_params['csc'] and general_params['calc_energies']:

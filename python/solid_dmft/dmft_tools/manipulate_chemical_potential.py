@@ -304,7 +304,7 @@ def set_initial_mu(general_params, sum_k, iteration_offset, archive, shell_multi
         if general_params['solver_type'] in ['ftps']:
             sum_k.calc_mu(precision=general_params['prec_mu'], broadening=general_params['eta'])
         else:
-            sum_k.calc_mu(precision=general_params['prec_mu'])
+            sum_k.calc_mu(precision=general_params['prec_mu'], method=general_params['calc_mu_method'])
         return sum_k
 
     # If continuing calculation and not updating mu, loads sold value
@@ -348,7 +348,7 @@ def set_initial_mu(general_params, sum_k, iteration_offset, archive, shell_multi
     if general_params['solver_type'] in ['ftps']:
         sum_k.calc_mu(precision=general_params['prec_mu'], broadening=general_params['eta'])
     else:
-        sum_k.calc_mu(precision=general_params['prec_mu'])
+        sum_k.calc_mu(precision=general_params['prec_mu'], method=general_params['calc_mu_method'])
 
     # Applies mu mixing to dichotomy result
     sum_k.chemical_potential = _mix_chemical_potential(general_params, occupation,
@@ -422,7 +422,7 @@ def update_mu(general_params, sum_k, it, archive):
     if general_params['solver_type'] in ['ftps']:
         sum_k.calc_mu(precision=general_params['prec_mu'], broadening=general_params['eta'])
     else:
-        sum_k.calc_mu(precision=general_params['prec_mu'])
+        sum_k.calc_mu(precision=general_params['prec_mu'], method=general_params['calc_mu_method'])
 
     # Applies mu mixing to dichotomy result
     sum_k.chemical_potential = _mix_chemical_potential(general_params, occupation,
