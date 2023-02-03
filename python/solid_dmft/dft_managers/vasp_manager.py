@@ -31,6 +31,7 @@ check if the lock file is there and finally kill VASP. Needed for CSC calculatio
 
 import os
 import signal
+import time
 
 import triqs.utility.mpi as mpi
 
@@ -74,7 +75,19 @@ def _fork_and_start_vasp(mpi_exe, arguments, env_vars):
     return vasp_process_id
 
 
-def start(number_cores, vasp_command, cluster_name):
+def _is_lock_file_present():
+    """
+    Checks if the lock file 'vasp.lock' is there, i.e. if VASP is still working.
+    """
+
+    res_bool = False
+    if mpi.is_master_node():
+        res_bool = os.path.isfile('./vasp.lock')
+    res_bool = mpi.bcast(res_bool)
+    return res_bool
+
+
+def run_initial_scf(number_cores, vasp_command, cluster_name):
     """
     Starts the VASP child process. Takes care of initializing a clean
     environment for the child process. This is needed so that VASP does not
@@ -114,27 +127,29 @@ def start(number_cores, vasp_command, cluster_name):
     mpi_helpers.poll_barrier(mpi.MPI.COMM_WORLD)
     vasp_process_id = mpi.bcast(vasp_process_id)
 
+    # Waits for VASP to start
+    while not _is_lock_file_present():
+        time.sleep(1)
+    mpi.barrier()
+
+    # Waits for VASP to finish
+    while _is_lock_file_present():
+        time.sleep(1)
+    mpi.barrier()
+
     return vasp_process_id
 
 
-def reactivate():
+def run_charge_update():
     """ Reactivates VASP by creating the vasp.lock file. """
     if mpi.is_master_node():
         open('./vasp.lock', 'a').close()
     mpi.barrier()
 
-
-def is_lock_file_present():
-    """
-    Checks if the lock file 'vasp.lock' is there, i.e. if VASP is still working.
-    """
-
-    res_bool = False
-    if mpi.is_master_node():
-        res_bool = os.path.isfile('./vasp.lock')
+    # Waits for VASP to finish
+    while _is_lock_file_present():
+        time.sleep(1)
     mpi.barrier()
-    res_bool = mpi.bcast(res_bool)
-    return res_bool
 
 
 def kill(vasp_process_id):

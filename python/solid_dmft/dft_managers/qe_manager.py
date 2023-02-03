@@ -38,16 +38,15 @@ import triqs.utility.mpi as mpi
 from solid_dmft.dft_managers import mpi_helpers
 
 
-def _fork_and_start_qe(mpi_exe, arguments, env_vars, seedname):
+def _start_with_piping(mpi_exe, mpi_arguments, qe_file_ext, env_vars, seedname):
     """
-    Forks a process from the master process that then calls mpi to start vasp.
-    The child process running VASP never leaves this function whereas the main
-    process returns the child's process id and continues.
+    Handles the piping of the output when starting QE.
 
     Parameters
     ----------
     mpi_exe: string, mpi command
-    arguments: list of string, arguments to start mpi with
+    mpi_arguments: list of string, arguments to start mpi with
+    qe_file_ext : string, file name for QE
     env_vars: dict of string, environment variables containing PATH
     seedname: string, QE input file
 
@@ -55,8 +54,6 @@ def _fork_and_start_qe(mpi_exe, arguments, env_vars, seedname):
     -------
     int: id of the VASP child process
     """
-
-    mpi_arguments, qe_file_ext = arguments[0], arguments[1]
 
     if qe_file_ext in ['scf', 'nscf', 'pw2wan', 'mod_scf', 'bnd', 'bands', 'proj']:
 
@@ -67,30 +64,26 @@ def _fork_and_start_qe(mpi_exe, arguments, env_vars, seedname):
         print('  solid_dmft: Starting {} calculation...'.format(qe_file_ext))
 
         # start subprocess
-        qe_process_id = subprocess.run(mpi_arguments, stdin=inp, env=env_vars, capture_output=True,
-                                       text=True, shell=False)
+        qe_result = subprocess.run(mpi_arguments, stdin=inp, env=env_vars, capture_output=True,
+                                   text=True, shell=False)
 
         # write output and error file
-        output = qe_process_id.stdout
-        error = qe_process_id.stderr
+        output = qe_result.stdout
+        error = qe_result.stderr
         out.writelines(output)
         err.writelines(error)
 
-        if qe_process_id.returncode != 0:
+        if qe_result.returncode != 0:
             mpi.report('QE calculation failed. Exiting programm.')
             sys.exit(1)
 
     elif 'win' in qe_file_ext:
-
         print('  solid_dmft: Starting Wannier90 {}...'.format(qe_file_ext))
-
         # don't need any piping for Wannier90
-        qe_process_id = subprocess.check_call(mpi_arguments + [seedname], env=env_vars, shell=False)
-
-    return qe_process_id
+        subprocess.check_call(mpi_arguments + [seedname], env=env_vars, shell=False)
 
 
-def start(number_cores, qe_file_ext, qe_exec, mpi_profile, seedname):
+def run(number_cores, qe_file_ext, qe_exec, mpi_profile, seedname):
     """
     Starts the VASP child process. Takes care of initializing a clean
     environment for the child process. This is needed so that VASP does not
@@ -105,8 +98,6 @@ def start(number_cores, qe_file_ext, qe_exec, mpi_profile, seedname):
     """
 
     # get MPI env
-    qe_process_id = 0
-
     hostfile = mpi_helpers.create_hostfile(number_cores, mpi_profile)
     qe_exec_path = qe_exec.strip(qe_exec.rsplit('/')[-1])
     qe_exec = qe_exec_path
@@ -137,9 +128,7 @@ def start(number_cores, qe_file_ext, qe_exec, mpi_profile, seedname):
             qe_exec += 'wannier90.x'
 
         arguments = mpi_helpers.get_mpi_arguments(mpi_profile, mpi_exe, number_cores, qe_exec, hostfile)
-        qe_process_id = _fork_and_start_qe(mpi_exe, (arguments, qe_file_ext), env_vars, seedname)
+        _start_with_piping(mpi_exe, arguments, qe_file_ext, env_vars, seedname)
 
     mpi_helpers.poll_barrier(mpi.MPI.COMM_WORLD)
-    qe_process_id = mpi.bcast(qe_process_id)
 
-    return qe_process_id
