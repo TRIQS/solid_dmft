@@ -112,7 +112,7 @@ class SolverStructure:
         solve impurity problem
     '''
 
-    def __init__(self, general_params, solver_params, sum_k, icrsh, h_int, iteration_offset, solver_struct_ftps):
+    def __init__(self, general_params, solver_params, advanced_params, sum_k, icrsh, h_int, iteration_offset, solver_struct_ftps):
         r'''
         Initialisation of the solver instance with h_int for impurity "icrsh" based on soliDMFT parameters.
 
@@ -134,6 +134,7 @@ class SolverStructure:
 
         self.general_params = general_params
         self.solver_params = solver_params
+        self.advanced_params = advanced_params
         self.sum_k = sum_k
         self.icrsh = icrsh
         self.h_int = h_int
@@ -686,10 +687,63 @@ class SolverStructure:
         from hartree_fock.impurity import ImpuritySolver as hartree_solver
 
         gf_struct = self.sum_k.gf_struct_solver_list[self.icrsh]
+        n_orb = self.sum_k.corr_shells[self.icrsh]['dim']
+
+
         # Construct the triqs_solver instances
+        # Always initialize the solver with dc_U and dc_J equal to U and J and let the _interface_hartree_dc function
+        # take care of changing the parameters
         triqs_solver = hartree_solver(beta=self.general_params['beta'], gf_struct=gf_struct,
                                       n_iw=self.general_params['n_iw'], force_real=self.solver_params['force_real'],
-                                      symmetries=[self._make_spin_equal])
+                                      symmetries=[self._make_spin_equal],
+                                      dc_U= self.general_params['U'][self.icrsh],
+                                      dc_J= self.general_params['J'][self.icrsh],
+                                      n_orb = n_orb
+                                      )
+
+        def _interface_hartree_dc(hartree_instance, general_params, advanced_params, icrsh):
+            """ Modifies in-place class attributes to infercace with options in solid_dmft 
+                for the moment supports only DC-relevant parameters
+
+            Parameters
+            ----------
+                general_params : dict
+                    solid_dmft general parameter dictionary
+                advanced_params : dict
+                    solid_dmft advanced parameter dictionary
+                icrsh : int
+                    correlated shell number
+            """
+            for key in ['dc', 'dc_type']:
+                if key in general_params and general_params[key] != 'none':
+                    setattr(hartree_instance, key, general_params[key])
+
+            for key in ['dc_factor', 'dc_fixed_value']:
+                if key in advanced_params and advanced_params[key] != 'none':
+                    setattr(hartree_instance, key, advanced_params[key])
+
+            #list valued keys
+            for key in ['dc_U', 'dc_J', 'dc_fixed_occ']:
+                if key in advanced_params and advanced_params[key] != 'none':
+                    setattr(hartree_instance, key, advanced_params[key][icrsh])
+
+            # Handle special cases
+            if 'dc_dmft' in general_params:
+                if general_params['dc_dmft'] == False:
+                    mpi.report('HARTREE SOLVER: Warning dft occupation in the DC calculations are meaningless for the hartree solver, reverting to dmft occupations')
+
+            if hartree_instance.dc_type == 0:
+                    mpi.report(f"HARTREE SOLVER: Detected dc_type = {hartree_instance.dc_type}, changing to 'cFLL'")
+                    hartree_instance.dc_type = 'cFLL'
+            elif hartree_instance.dc_type == 1:
+                    mpi.report(f"HARTREE SOLVER: Detected dc_type = {hartree_instance.dc_type}, changing to 'cHeld'")
+                    hartree_instance.dc_type = 'cHeld'
+            elif hartree_instance.dc_type == 2:
+                    mpi.report(f"HARTREE SOLVER: Detected dc_type = {hartree_instance.dc_type}, changing to 'cAMF'")
+                    hartree_instance.dc_type = 'cAMF'
+
+        # Give dc information to the solver in order to customize DC calculation
+        _interface_hartree_dc(triqs_solver, self.general_params, self.advanced_params, self.icrsh)
 
         return triqs_solver
 
@@ -927,6 +981,7 @@ class SolverStructure:
             self.Sigma_Refreq[bl] << self.triqs_solver.Sigma_HF[bl]
         self.G_time << Fourier(self.G_freq)
         self.interaction_energy = self.triqs_solver.interaction_energy()
+        self.DC_energy = self.triqs_solver.DC_energy()
 
         return
 
