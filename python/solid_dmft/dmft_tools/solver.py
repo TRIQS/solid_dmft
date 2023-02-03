@@ -684,7 +684,10 @@ class SolverStructure:
         # Construct the triqs_solver instances
         triqs_solver = hartree_solver(beta=self.general_params['beta'], gf_struct=gf_struct,
                                       n_iw=self.general_params['n_iw'], force_real=self.solver_params['force_real'],
-                                      symmetries=[self._make_spin_equal])
+                                      symmetries=[self._make_spin_equal],
+                                      U= self.general_params['U'][self.icrsh],
+                                      J= self.general_params['J'][self.icrsh]
+                                      )
 
         return triqs_solver
 
@@ -922,6 +925,7 @@ class SolverStructure:
             self.Sigma_Refreq[bl] << self.triqs_solver.Sigma_HF[bl]
         self.G_time << Fourier(self.G_freq)
         self.interaction_energy = self.triqs_solver.interaction_energy()
+        self.DC_energy = self.triqs_solver.DC_energy()
 
         return
 

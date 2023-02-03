@@ -697,9 +697,15 @@ def _dmft_step(sum_k, solvers, it, general_params,
     solvers = gf_mixer.mix_sigma(general_params, sum_k.n_inequiv_shells, solvers, Sigma_freq_previous)
 
     # calculate new DC
+    # for the hartree solver the DC potential will be formally set to zero as it is already present in the Sigma
     if general_params['dc'] and general_params['dc_dmft']:
         sum_k = initial_sigma.calculate_double_counting(sum_k, density_mat,
                                                         general_params, advanced_params)
+    
+    #The hartree solver computes the DC energy internally, set it in sum_k
+    if general_params['solver_type'] == 'hartree':
+        for icrsh in range(sum_k.n_inequiv_shells):
+            sum_k.dc_energ[icrsh] = solvers[icrsh].DC_energy
 
     # doing the dmft loop and set new sigma into sumk
     sum_k.put_Sigma([solvers[icrsh].Sigma_freq for icrsh in range(sum_k.n_inequiv_shells)])

@@ -63,6 +63,13 @@ def calculate_double_counting(sum_k, density_matrix, general_params, advanced_pa
     # copy the density matrix to not change it
     density_matrix_DC = deepcopy(density_matrix)
 
+    if general_params['solver_type'] == 'hartree':
+        mpi.report('\nHartree solver, zeroing out the DC correction. This gets computed at the solver level')
+        for icrsh in range(sum_k.n_inequiv_shells):
+            sum_k.calc_dc(density_matrix_DC[icrsh], orb=icrsh,
+                          use_dc_value=0.0)
+        return sum_k
+
     # Sets the DC and exits the function if advanced_params['dc_fixed_value'] is specified
     if advanced_params['dc_fixed_value'] != 'none':
         for icrsh in range(sum_k.n_inequiv_shells):
