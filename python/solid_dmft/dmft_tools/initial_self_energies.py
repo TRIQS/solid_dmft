@@ -64,7 +64,7 @@ def calculate_double_counting(sum_k, density_matrix, general_params, advanced_pa
     density_matrix_DC = deepcopy(density_matrix)
 
     if general_params['solver_type'] == 'hartree':
-        mpi.report('\nHartree solver, zeroing out the DC correction. This gets computed at the solver level')
+        mpi.report('\nSOLID_DMFT: Hartree solver detected, zeroing out the DC correction. This gets computed at the solver level')
         for icrsh in range(sum_k.n_inequiv_shells):
             sum_k.calc_dc(density_matrix_DC[icrsh], orb=icrsh,
                           use_dc_value=0.0)
@@ -484,5 +484,11 @@ def determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
 
     # Updates the sum_k object with the Matsubara self-energy
     sum_k.put_Sigma([solvers[icrsh].Sigma_freq for icrsh in range(sum_k.n_inequiv_shells)])
+    
+    # load sigma as first guess in the hartree solver if applicable
+    if general_params['solver_type'] == 'hartree':
+        for icrsh in range(sum_k.n_inequiv_shells):
+            mpi.report(f"SOLID_DMFT: setting first guess hartree solver for impurity {icrsh}")
+            solvers[icrsh].triqs_solver._reinitialize_sigma(start_sigma[icrsh])
 
     return sum_k, solvers

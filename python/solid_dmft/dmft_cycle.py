@@ -469,11 +469,11 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
             if general_params['solver_type'] in ['ftps']:
                 archive['DMFT_input']['solver_struct_ftps'] = solver_struct_ftps
 
-    # Initializes the solvers
     solvers = [None] * sum_k.n_inequiv_shells
     for icrsh in range(sum_k.n_inequiv_shells):
         # Construct the Solver instances
-        solvers[icrsh] = SolverStructure(general_params, solver_params, sum_k, icrsh, h_int[icrsh],
+        solvers[icrsh] = SolverStructure(general_params, solver_params, advanced_params,
+                                         sum_k, icrsh, h_int[icrsh],
                                          iteration_offset, solver_struct_ftps)
 
     # store solver hash to archive
@@ -487,6 +487,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
                                                                   archive, iteration_offset, density_mat_dft, solvers)
 
     sum_k = manipulate_mu.set_initial_mu(general_params, sum_k, iteration_offset, archive, shell_multiplicity)
+
 
     # setup of measurement of chi(SzSz(tau) if requested
     if general_params['measure_chi'] != 'none':
@@ -787,7 +788,7 @@ def _dmft_step(sum_k, solvers, it, general_params,
                                         sum_k.spin_block_names[sum_k.SO])
     if general_params['calc_energies']:
         formatter.print_summary_energetics(observables)
-    if not general_params['csc'] and general_params['magnetic'] and sum_k.SO == 0:
+    if general_params['magnetic']:
         # if a magnetic calculation is done print out a summary of up/down occ
         formatter.print_summary_magnetic_occ(observables, sum_k.n_inequiv_shells)
     formatter.print_summary_convergence(conv_obs, general_params, sum_k.n_inequiv_shells)

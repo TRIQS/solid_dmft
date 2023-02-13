@@ -112,7 +112,7 @@ class SolverStructure:
         solve impurity problem
     '''
 
-    def __init__(self, general_params, solver_params, sum_k, icrsh, h_int, iteration_offset, solver_struct_ftps):
+    def __init__(self, general_params, solver_params, advanced_params, sum_k, icrsh, h_int, iteration_offset, solver_struct_ftps):
         r'''
         Initialisation of the solver instance with h_int for impurity "icrsh" based on soliDMFT parameters.
 
@@ -134,6 +134,7 @@ class SolverStructure:
 
         self.general_params = general_params
         self.solver_params = solver_params
+        self.advanced_params = advanced_params
         self.sum_k = sum_k
         self.icrsh = icrsh
         self.h_int = h_int
@@ -681,13 +682,20 @@ class SolverStructure:
         from hartree_fock.impurity import ImpuritySolver as hartree_solver
 
         gf_struct = self.sum_k.gf_struct_solver_list[self.icrsh]
+        n_orb = self.sum_k.corr_shells[self.icrsh]['dim']
+
+
         # Construct the triqs_solver instances
         triqs_solver = hartree_solver(beta=self.general_params['beta'], gf_struct=gf_struct,
                                       n_iw=self.general_params['n_iw'], force_real=self.solver_params['force_real'],
                                       symmetries=[self._make_spin_equal],
                                       U= self.general_params['U'][self.icrsh],
-                                      J= self.general_params['J'][self.icrsh]
+                                      J= self.general_params['J'][self.icrsh],
+                                      n_orb = n_orb
                                       )
+
+        #triqs_solver._reinitialize_sigma(self.sum_k.Sigma_imp[self.icrsh])
+        triqs_solver._interface_to_solid_dmft(self.general_params, self.advanced_params, self.icrsh)
 
         return triqs_solver
 

@@ -521,7 +521,7 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                               'used': True, 'default': False},
 
                                  'magmom': {'converter': lambda s: list(map(float, s.split(','))),
-                                            'used': lambda params: not params['general']['csc'] and params['general']['magnetic'],
+                                            'used': lambda params: params['general']['magnetic'],
                                             'default': []},
 
                                  'h_field': {'converter': float, 'used': True, 'default': 0.0},
@@ -532,7 +532,7 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                                            'used': lambda params: not params['general']['csc'], 'default': 'none'},
 
                                  'afm_order': {'converter': BOOL_PARSER,
-                                               'used': lambda params: not params['general']['csc'] and params['general']['magnetic'],
+                                               'used': lambda params: params['general']['magnetic'],
                                                'default': False},
 
                                  'sigma_mix': {'converter': float,
