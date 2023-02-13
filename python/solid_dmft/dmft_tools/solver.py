@@ -694,7 +694,7 @@ class SolverStructure:
                                       n_orb = n_orb
                                       )
 
-        #triqs_solver._reinitialize_sigma(self.sum_k.Sigma_imp[self.icrsh])
+        # Give dc information to the solver in order to customize DC calculation
         triqs_solver._interface_to_solid_dmft(self.general_params, self.advanced_params, self.icrsh)
 
         return triqs_solver
