@@ -27,6 +27,8 @@
 """
 Contains the handling of the VASP process. It can start VASP, reactivate it,
 check if the lock file is there and finally kill VASP. Needed for CSC calculations.
+
+This functionality is contained in the more simpler public functions.
 """
 
 import os
@@ -104,6 +106,7 @@ def run_initial_scf(number_cores, vasp_command, cluster_name):
     # Removes STOPCAR
     if mpi.is_master_node() and os.path.isfile('STOPCAR'):
         os.remove('STOPCAR')
+    mpi.barrier()
 
     # get MPI env
     vasp_process_id = 0
@@ -154,6 +157,20 @@ def run_charge_update():
     while _is_lock_file_present():
         time.sleep(1)
     mpi.barrier()
+
+
+def read_dft_energy():
+    """
+    Reads DFT energy from the last line of Vasp's OSZICAR.
+    """
+    with open('OSZICAR', 'r') as file:
+        nextline = file.readline()
+        while nextline.strip():
+            line = nextline
+            nextline = file.readline()
+    dft_energy = float(line.split()[2])
+
+    return dft_energy
 
 
 def kill(vasp_process_id):

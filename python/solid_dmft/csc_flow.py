@@ -34,13 +34,11 @@ import numpy as np
 # triqs
 from h5 import HDFArchive
 import triqs.utility.mpi as mpi
+
 from triqs_dft_tools.converters.wannier90 import Wannier90Converter
-try:
-    from triqs_dft_tools.converters.vasp import VaspConverter
-    from triqs_dft_tools.converters.plovasp.vaspio import VaspData
-    import triqs_dft_tools.converters.plovasp.converter as plo_converter
-except ImportError:
-    pass
+from triqs_dft_tools.converters.vasp import VaspConverter
+from triqs_dft_tools.converters.plovasp.vaspio import VaspData
+import triqs_dft_tools.converters.plovasp.converter as plo_converter
 
 from solid_dmft.dmft_cycle import dmft_cycle
 from solid_dmft.dft_managers import vasp_manager as vasp
@@ -95,12 +93,12 @@ def _run_w90converter(seedname, tolerance):
             assert archive['dft_input']['use_rotations'], 'Creation of rot_mat failed in W90 converter'
     mpi.barrier()
 
-def _full_qe_run(general_params, dft_params, mode):
+def _full_qe_run(seedname, dft_params, mode):
     assert mode in ('initial', 'restart', 'update')
 
     # runs a full iteration of DFT
     qe_wrapper = lambda calc_type: qe.run(dft_params['n_cores'], calc_type, dft_params['dft_exec'],
-                                          dft_params['mpi_env'], general_params['seedname'])
+                                          dft_params['mpi_env'], seedname)
 
     # Initially run an scf calculation
     if mode == 'initial':
@@ -112,7 +110,7 @@ def _full_qe_run(general_params, dft_params, mode):
     # Rest is executed regardless of mode
     # Optionally does bnd, bands, proj if files are present
     for nscf in ['bnd', 'bands', 'proj']:
-        if os.path.isfile(f'{general_params["seedname"]}.{nscf}.in'):
+        if os.path.isfile(f'{seedname}.{nscf}.in'):
             qe_wrapper(dft_params['n_cores'], nscf)
 
     # nscf
@@ -121,74 +119,7 @@ def _full_qe_run(general_params, dft_params, mode):
     qe_wrapper('win_pp')
     qe_wrapper('pw2wan')
     qe_wrapper('win')
-    _run_w90converter(general_params['seedname'], dft_params['w90_tolerance'])
-
-def read_dft_energy_vasp():
-    """
-    Reads DFT energy from the last line of Vasp's OSZICAR.
-    """
-    with open('OSZICAR', 'r') as file:
-        nextline = file.readline()
-        while nextline.strip():
-            line = nextline
-            nextline = file.readline()
-    dft_energy = float(line.split()[2])
-
-    return dft_energy
-
-def read_dft_energy_qe(seedname, n_iter):
-    """
-    Reads DFT energy from quantum espresso's out files
-
-    1. At the first iteration, the DFT energy is read from the scf file.
-
-    2. After the first iteration the band energy computed in the mod_scf calculation is wrong,
-       and needs to be subtracted from the reported total energy. The correct band energy
-       is computed in the nscf calculation.
-
-    """
-    dft_energy = 0.0
-    RYDBERG = 13.605693123 # eV
-
-    if n_iter == 1:
-        with open(f'{seedname}.scf.out', 'r') as file:
-            dft_output = file.readlines()
-        for line in dft_output:
-            if '!' in line:
-                print("\nReading total energy from the scf calculation \n")
-                dft_energy = float(line.split()[-2]) * RYDBERG
-                print(f"The DFT energy is: {dft_energy} eV")
-                break
-            if  line =="":
-                raise EOFError("Did not find scf total energy")
-    else:
-        with open(f'{seedname}.mod_scf.out', 'r') as file:
-            dft_output = file.readlines()
-        for line in dft_output:
-            #if 'eband, Ef (eV)' in line:
-            if "(sum(wg*et))" in line:
-                print("\nReading band energy from the mod_scf calculation \n")
-                #band_energy = float(line.split())
-                band_energy_modscf = float(line.split()[-2])*RYDBERG
-                print(f"The mod_scf band energy is: {band_energy_modscf} eV")
-            if 'total energy' in line:
-                print("\nReading total energy from the mod_scf calculation \n")
-                dft_energy = float(line.split()[-2]) * RYDBERG
-                print(f"The uncorrected DFT energy is: {dft_energy} eV")
-        dft_energy -= band_energy_modscf
-        print(f"The DFT energy without kinetic part is: {dft_energy} eV")
-
-        with open(f'{seedname}.nscf.out', 'r') as file:
-            dft_output = file.readlines()
-        for line in dft_output:
-            if 'The nscf band energy' in line:
-                print("\nReading band energy from the nscf calculation\n")
-                band_energy_nscf = float(line.split()[-2]) * RYDBERG
-                dft_energy += band_energy_nscf
-                print(f"The nscf band energy is: {band_energy_nscf} eV")
-                print(f"The corrected DFT energy is: {dft_energy} eV")
-                break
-    return dft_energy
+    _run_w90converter(seedname, dft_params['w90_tolerance'])
 
 
 def _remove_projections_suppressed():
@@ -394,9 +325,9 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
 
     if dft_params['dft_code'] == 'qe':
         if iteration_offset == 0:
-            _full_qe_run(general_params, dft_params, 'initial')
+            _full_qe_run(general_params['seedname'], dft_params, 'initial')
         else:
-            _full_qe_run(general_params, dft_params, 'restart')
+            _full_qe_run(general_params['seedname'], dft_params, 'restart')
     elif dft_params['dft_code'] == 'vasp':
         vasp_process_id, irred_indices = _full_vasp_run(general_params, dft_params, True)
 
@@ -406,9 +337,9 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
 
     # Now that everything is ready, starts DFT+DMFT loop
     while True:
-        # Writes eigenvals to archive if requested
         dft_energy = None
         if mpi.is_master_node():
+            # Writes eigenvals to archive if requested
             if dft_params['store_eigenvals']:
                 if dft_params['dft_code'] == 'qe':
                     # TODO: implement
@@ -417,10 +348,11 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
                                    iteration=iter_dmft,
                                    projector_type=dft_params['projector_type'])
 
+            # Reads the DFT energy
             if dft_params['dft_code'] == 'vasp':
-                dft_energy = read_dft_energy_vasp()
+                dft_energy = vasp.read_dft_energy()
             elif dft_params['dft_code'] == 'qe':
-                dft_energy = read_dft_energy_qe(general_params['seedname'], n_iter = iter_dmft)
+                dft_energy = qe.read_dft_energy(general_params['seedname'], iter_dmft)
         dft_energy = mpi.bcast(dft_energy)
 
         if mpi.is_master_node():
@@ -470,7 +402,7 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
 
         # Runs DFT and converter
         if dft_params['dft_code'] == 'qe':
-            _full_qe_run(general_params, dft_params, 'update')
+            _full_qe_run(general_params['seedname'], dft_params, 'update')
         elif dft_params['dft_code'] == 'vasp':
             # Determines number of DFT steps
             if iter_dmft == general_params['n_iter_dmft_first'] + 1:
@@ -483,8 +415,7 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
         end_time_dft = timer()
         mpi.report('  solid_dmft: DFT cycle took {:10.3f} seconds'.format(end_time_dft-start_time_dft))
 
-    # Stops after maximum number of dmft iterations or convergence
-    if mpi.is_master_node():
-        print('  solid_dmft: Stopping {}\n'.format(dft_params['dft_code'].upper()), flush=True)
-        if dft_params['dft_code'] == 'vasp':
-            vasp.kill(vasp_process_id)
+    # Kills background VASP process for clean end
+    if mpi.is_master_node() and dft_params['dft_code'] == 'vasp':
+        print('  solid_dmft: Stopping VASP\n', flush=True)
+        vasp.kill(vasp_process_id)

@@ -639,7 +639,8 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                              'projector_type': {'valid for': lambda x, params: x == 'w90' or x == 'plo' and params['dft']['dft_code'] == 'vasp',
                                                 'used': lambda params: params['general']['csc'], 'default': 'w90'},
 
-                             'w90_exec': {'used': lambda params: params['general']['csc'] and params['dft']['projector_type'] == 'w90',
+                             'w90_exec': {'used': lambda params: (params['general']['csc']
+                                                                  and params['dft']['dft_code'] == 'vasp' and params['dft']['projector_type'] == 'w90'),
                                                 'default': 'wannier90.x'},
 
                              'w90_tolerance': {'converter': lambda s: float(s),

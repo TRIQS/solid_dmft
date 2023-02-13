@@ -25,8 +25,7 @@
 ################################################################################
 
 """
-Contains the handling of the QE process. It can start QE, reactivate it,
-check if the lock file is there and finally kill QE. Needed for CSC calculations.
+Contains the function to run a QuantumEspresso iteration. Needed for CSC calculations.
 """
 
 import os
@@ -132,3 +131,57 @@ def run(number_cores, qe_file_ext, qe_exec, mpi_profile, seedname):
 
     mpi_helpers.poll_barrier(mpi.MPI.COMM_WORLD)
 
+
+def read_dft_energy(seedname, iter_dmft):
+    """
+    Reads DFT energy from quantum espresso's out files
+
+    1. At the first iteration, the DFT energy is read from the scf file.
+
+    2. After the first iteration the band energy computed in the mod_scf calculation is wrong,
+       and needs to be subtracted from the reported total energy. The correct band energy
+       is computed in the nscf calculation.
+
+    """
+    dft_energy = 0.0
+    RYDBERG = 13.605693123 # eV
+
+    if iter_dmft == 1:
+        with open(f'{seedname}.scf.out', 'r') as file:
+            dft_output = file.readlines()
+        for line in dft_output:
+            if '!' in line:
+                print("\nReading total energy from the scf calculation \n")
+                dft_energy = float(line.split()[-2]) * RYDBERG
+                print(f"The DFT energy is: {dft_energy} eV")
+                break
+            if  line =="":
+                raise EOFError("Did not find scf total energy")
+    else:
+        with open(f'{seedname}.mod_scf.out', 'r') as file:
+            dft_output = file.readlines()
+        for line in dft_output:
+            #if 'eband, Ef (eV)' in line:
+            if "(sum(wg*et))" in line:
+                print("\nReading band energy from the mod_scf calculation \n")
+                #band_energy = float(line.split())
+                band_energy_modscf = float(line.split()[-2])*RYDBERG
+                print(f"The mod_scf band energy is: {band_energy_modscf} eV")
+            if 'total energy' in line:
+                print("\nReading total energy from the mod_scf calculation \n")
+                dft_energy = float(line.split()[-2]) * RYDBERG
+                print(f"The uncorrected DFT energy is: {dft_energy} eV")
+        dft_energy -= band_energy_modscf
+        print(f"The DFT energy without kinetic part is: {dft_energy} eV")
+
+        with open(f'{seedname}.nscf.out', 'r') as file:
+            dft_output = file.readlines()
+        for line in dft_output:
+            if 'The nscf band energy' in line:
+                print("\nReading band energy from the nscf calculation\n")
+                band_energy_nscf = float(line.split()[-2]) * RYDBERG
+                dft_energy += band_energy_nscf
+                print(f"The nscf band energy is: {band_energy_nscf} eV")
+                print(f"The corrected DFT energy is: {dft_energy} eV")
+                break
+    return dft_energy
