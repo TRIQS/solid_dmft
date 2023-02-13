@@ -91,7 +91,8 @@ def run_initial_scf(number_cores, vasp_command, cluster_name):
     """
     Starts the VASP child process. Takes care of initializing a clean
     environment for the child process. This is needed so that VASP does not
-    get confused with all the standard slurm environment variables.
+    get confused with all the standard slurm environment variables. Returns when
+    VASP has completed its initial scf cycle.
 
     Parameters
     ----------
@@ -141,7 +142,10 @@ def run_initial_scf(number_cores, vasp_command, cluster_name):
 
 
 def run_charge_update():
-    """ Reactivates VASP by creating the vasp.lock file. """
+    """
+    Performs one step of the charge update with VASP by creating the vasp.lock
+    file and then waiting until it gets delete by VASP when it has finished.
+    """
     if mpi.is_master_node():
         open('./vasp.lock', 'a').close()
     mpi.barrier()

@@ -270,6 +270,36 @@ def _store_dft_eigvals(path_to_h5, iteration, projector_type):
         archive['dft_eigvals']['it_'+str(iteration)] = eigenvals
 
 def _full_vasp_run(general_params, dft_params, initial_run, n_iter_dft=1, sum_k=None):
+    """
+    Performs a complete DFT cycle in Vasp and the correct converter. If
+    initial_run, Vasp is starting and performing a normal scf calculation
+    followed by a converter run. Otherwise, it performs n_iter_dft runs of DFT,
+    generating the projectors with the converter, and recalculating the charge
+    density correction with the new projectors.
+
+    Parameters
+    ----------
+    general_params : dict
+        general parameters as a dict
+    dft_params : dict
+        dft parameters as a dict
+    initial_run : bool
+        True when VASP is called for the first time. initial_run = True requires
+        n_iter_dft = 1.
+    n_iter_dft : int, optional
+        Number of DFT iterations to perform. The default is 1.
+    sum_k : SumkDFT, optional
+        The SumkDFT object required to recalculate the charge-density correction
+        if n_iter_dft > 1. The default is None.
+
+    Returns
+    -------
+    vasp_process_id : int
+        The process ID of the forked VASP process.
+    irred_indices : np.array
+        Integer indices of kpts in the irreducible Brillouin zone. Only needed
+        for Wannier projectors, which are normally run with symmetries.
+    """
 
 
     if initial_run:
@@ -287,6 +317,7 @@ def _full_vasp_run(general_params, dft_params, initial_run, n_iter_dft=1, sum_k=
 
         if dft_params['projector_type'] == 'plo':
             _run_plo_converter(general_params)
+            irred_indices = None
         elif dft_params['projector_type'] == 'w90':
             _run_wannier90(general_params, dft_params)
             mpi.barrier()
@@ -314,13 +345,13 @@ def _full_vasp_run(general_params, dft_params, initial_run, n_iter_dft=1, sum_k=
         # Writes out GAMMA file
         sum_k.calc_density_correction(dm_type='vasp',  kpts_to_write=irred_indices)
 
-    return vasp_process_id
+    return vasp_process_id, irred_indices
 
 
 # Main CSC flow method
 def csc_flow_control(general_params, solver_params, dft_params, advanced_params):
     """
-    function to run the csc cycle. It writes and removes the vasp.lock file to
+    Function to run the csc cycle. It writes and removes the vasp.lock file to
     start and stop Vasp, run the converter, run the dmft cycle and abort the job
     if all iterations are finished.
 
@@ -334,21 +365,14 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
         dft parameters as a dict
     advanced_params : dict
         advanced parameters as a dict
-
-    Returns
-    -------
-    nothing
-
     """
-
-    irred_indices = None
-
 
     # Removes legacy file vasp.suppress_projs if present
     _remove_projections_suppressed()
 
     # if GAMMA file already exists, load it by doing extra DFT iterations
     if dft_params['dft_code'] == 'vasp' and os.path.exists('GAMMA'):
+        # TODO: implement
         raise NotImplementedError('GAMMA file found but restarting from updated '
                                   + 'charge density not yet implemented for Vasp.')
 
@@ -364,17 +388,17 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
 
     # Runs DFT once and converter
     mpi.barrier()
+    irred_indices = None
     start_time_dft = timer()
     mpi.report('  solid_dmft: Running {}...'.format(dft_params['dft_code'].upper()))
 
     if dft_params['dft_code'] == 'qe':
-        # if calculation is restarted, need to check in first iteration if DFT step needs to be skipped
         if iteration_offset == 0:
             _full_qe_run(general_params, dft_params, 'initial')
         else:
             _full_qe_run(general_params, dft_params, 'restart')
     elif dft_params['dft_code'] == 'vasp':
-        vasp_process_id = _full_vasp_run(general_params, dft_params, True)
+        vasp_process_id, irred_indices = _full_vasp_run(general_params, dft_params, True)
 
     mpi.barrier()
     end_time_dft = timer()
@@ -387,7 +411,7 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
         if mpi.is_master_node():
             if dft_params['store_eigenvals']:
                 if dft_params['dft_code'] == 'qe':
-                    # TODO
+                    # TODO: implement
                     raise NotImplementedError('store_eigenvals not yet compatible with dft_code = qe')
                 _store_dft_eigvals(path_to_h5=general_params['seedname']+'.h5',
                                    iteration=iter_dmft,
@@ -453,7 +477,7 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
                 n_iter_dft = dft_params['n_iter_first']
             else:
                 n_iter_dft = dft_params['n_iter']
-            _full_vasp_run(general_params, dft_params, False, n_iter_dft, sum_k)
+            _, irred_indices = _full_vasp_run(general_params, dft_params, False, n_iter_dft, sum_k)
 
         mpi.barrier()
         end_time_dft = timer()
