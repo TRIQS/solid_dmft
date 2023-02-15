@@ -487,6 +487,9 @@ def determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
     
     # load sigma as first guess in the hartree solver if applicable
     if general_params['solver_type'] == 'hartree':
+        # TODO:
+        # should this be moved to before the solve() call? Having it only here means there is a mismatch
+        # between the mixing at the level of the solver and the sumk (solver mixes always 100%)
         for icrsh in range(sum_k.n_inequiv_shells):
             mpi.report(f"SOLID_DMFT: setting first guess hartree solver for impurity {icrsh}")
             solvers[icrsh].triqs_solver._reinitialize_sigma(start_sigma[icrsh])
