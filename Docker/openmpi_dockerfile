@@ -1,4 +1,4 @@
-FROM ubuntu:21.10
+FROM ubuntu:22.04
 
 # This platform includes dependencies for building docs
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
@@ -15,23 +15,11 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
       libgfortran5 \
       libgmp-dev \
       libhdf5-dev \
-      libopenmpi-dev \
+      libhwloc-dev \
+      libevent-dev \
+      libpmi2-0-dev \
       cython3 \
-      openmpi-bin \
-      openmpi-common \
-      openmpi-doc \
-      python3-dev \
-      python3-mako \
-      python3-numpy \
-      python3-scipy \
-      python3-matplotlib \
-      python3-mpi4py \
-      python3-pip \
-      python3-sphinx \
-      python3-skimage \ 
-      python3-nbsphinx \
-      python3-notebook \
-      libpython3-dev \
+      libfabric-dev \
       git \
       curl \
       ca-certificates \
@@ -48,13 +36,44 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
       texlive-latex-extra \
       texlive-fonts-recommended \
       nodejs \
-      npm \
+      npm 
+      
+# install openmpi and compile openmpi manually
+# this is to ensure PMI compatibility with cray systems
+
+RUN wget -q https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.4.tar.gz \
+    && tar xf openmpi-4.1.4.tar.gz \
+    && cd openmpi-4.1.4 \
+    && ./configure --prefix=/usr --enable-mpi-cxx --with-libfabric=/usr \
+        --with-hwloc=/usr --with-hwloc-libdir=/usr/lib/x86_64-linux-gnu \
+        --with-libevent=/usr --with-libevent-libdir=/usr/lib/x86_64-linux-gnu \
+        --with-pmi=/usr/include/slurm --with-pmi-libdir=/usr/lib/x86_64-linux-gnu \
+        CFLAGS="-I/usr/include/slurm" \
+    && make -j$(nproc) \
+    && make install \
+    && ldconfig \
+    && cd .. \
+    && rm -rf openmpi-4.1.4.tar.gz openmpi-4.1.4
+
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+      python3-dev \
+      python3-mako \
+      python3-numpy \
+      python3-scipy \
+      python3-matplotlib \
+      python3-pip \
+      python3-sphinx \
+      python3-skimage \ 
+      python3-nbsphinx \
+      python3-notebook \
+      libpython3-dev \
       && \
       apt-get autoremove --purge -y && \
       apt-get autoclean -y && \
       rm -rf /var/cache/apt/* /var/lib/apt/lists/*
-     
+      
 RUN pip3 install --no-cache-dir \
+    mpi4py \
     cython \
     decorator \
     jupyter \
@@ -66,7 +85,7 @@ RUN pip3 install --no-cache-dir \
     mpi4py \
     pymatgen \
     ase \ 
-    Jinja2<3.1.0 \
+    Jinja2 \
     Mako \
     tornado \
     zmq \
@@ -84,6 +103,8 @@ RUN pip3 install --no-cache-dir \
 
 RUN jupyter-lab build
 
+
+
 ENV OMP_NUM_THREADS=1
 ENV MKL_NUM_THREADS=1
 ARG NCORES=12
@@ -97,7 +118,8 @@ RUN cd /source && git clone -b develop --depth 1 https://github.com/wannier-deve
     # Using gfortran compiler 
     && echo "F90 = mpif90 \n COMMS  = mpi \n MPIF90 = mpif90 \n FCOPTS = -O3 -fallow-argument-mismatch \n LIBS = -Wl,--no-as-needed -lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lpthread -lm -ldl \n" > make.inc \
     && cd /source/wannier90 \
-    && make default lib \
+    #&& make default lib \
+    && make libdir=/usr/lib \
     && make install
 
 # install qe
@@ -136,7 +158,7 @@ ENV CPATH=/triqs/include:${CPATH} \
     PATH=/triqs/bin:${PATH} \
     LIBRARY_PATH=/triqs/lib:${LIBRARY_PATH} \
     LD_LIBRARY_PATH=/triqs/lib:${LD_LIBRARY_PATH} \
-    PYTHONPATH=/triqs/lib/python3.9/site-packages:${PYTHONPATH} \
+    PYTHONPATH=/triqs/lib/python3.10/site-packages:${PYTHONPATH} \
     CMAKE_PREFIX_PATH=/triqs/share/cmake:${CMAKE_PREFIX_PATH} \
     TRIQS_ROOT=/triqs
 
@@ -160,7 +182,7 @@ RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/cthyb
 # maxent
 RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/maxent.git maxent.src \
     && mkdir -p maxent.build && cd maxent.build \
-    && cmake ../maxent.src \ 
+    && cmake ../maxent.src \
     && make -j$NCORES && ctest -j$NCORES && make install
 
 # TPRF
@@ -202,4 +224,5 @@ RUN ["chmod", "+x", "/usr/local/bin/jupyter.sh"]
 
 # change user and group id to match host machine if options are passed accordingly
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
 
