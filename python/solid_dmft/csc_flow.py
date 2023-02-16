@@ -122,63 +122,6 @@ def _full_qe_run(seedname, dft_params, mode):
     _run_w90converter(seedname, dft_params['w90_tolerance'])
 
 
-def _remove_projections_suppressed():
-    if mpi.is_master_node():
-        if os.path.isfile('./vasp.suppress_projs'):
-            print('  solid_dmft: Removing legacy file vasp.suppress_projs', flush=True)
-            os.remove('./vasp.suppress_projs')
-    mpi.barrier()
-
-def _read_irred_kpoints_from_vasp(general_params):
-    irred_indices = None
-    if mpi.is_master_node():
-        with HDFArchive(general_params['seedname'] + '.h5', 'r') as archive:
-            kpts = archive['dft_input/kpts']
-
-        def read_outcar(file):
-            has_started_reading = False
-            for line in file:
-                if 'IBZKPT_HF' in line:
-                    has_started_reading = True
-                    continue
-
-                if not has_started_reading:
-                    continue
-
-                if 't-inv' in line:
-                    yield line
-                    continue
-
-                if '-'*10 in line:
-                    break
-
-        with open('OUTCAR', 'r') as file:
-            outcar_data_raw = np.loadtxt(read_outcar(file), usecols=[0, 1, 2, 4])
-        outcar_kpoints = outcar_data_raw[:, :3]
-        outcar_indices = (outcar_data_raw[:, 3]-.5).astype(int)
-
-        symmetry_mapping = np.full(outcar_kpoints.shape[0], -1, dtype=int)
-
-        for i, (kpt_outcar, outcar_index) in enumerate(zip(outcar_kpoints, outcar_indices)):
-            for j, kpt in enumerate(kpts):
-                if np.allclose(kpt_outcar, kpt):
-                    # Symmetry-irreducible k points
-                    if i == outcar_index:
-                        symmetry_mapping[j] = outcar_index
-                    # Symmetry-reducible
-                    else:
-                        symmetry_mapping[j] = outcar_index
-                    break
-
-            # Asserts that loop left through break, i.e. a pair was found
-            assert np.allclose(kpt_outcar, kpt)
-
-        irreds, irred_indices = np.unique(symmetry_mapping, return_index=True)
-        assert np.all(np.diff(irreds) == 1)
-        assert np.all(symmetry_mapping >= 0)
-
-    return mpi.bcast(irred_indices)
-
 def _store_dft_eigvals(path_to_h5, iteration, projector_type):
     """
     save the eigenvalues from LOCPROJ/wannier90 file to h5 archive
@@ -254,7 +197,11 @@ def _full_vasp_run(general_params, dft_params, initial_run, n_iter_dft=1, sum_k=
             mpi.barrier()
             _run_w90converter(general_params['seedname'], dft_params['w90_tolerance'])
             mpi.barrier()
-            irred_indices = _read_irred_kpoints_from_vasp(general_params)
+            kpts = None
+            if mpi.is_master_node():
+                with HDFArchive(general_params['seedname']+'.h5', 'r') as archive:
+                    kpts = archive['dft_input/kpts']
+            irred_indices = vasp.read_irred_kpoints(kpts)
 
         # No need for recalculation of density correction if we run DMFT next
         if i == n_iter_dft - 1:
@@ -299,7 +246,7 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
     """
 
     # Removes legacy file vasp.suppress_projs if present
-    _remove_projections_suppressed()
+    vasp.remove_legacy_projections_suppressed()
 
     # if GAMMA file already exists, load it by doing extra DFT iterations
     if dft_params['dft_code'] == 'vasp' and os.path.exists('GAMMA'):

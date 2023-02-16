@@ -28,12 +28,13 @@
 Contains the handling of the VASP process. It can start VASP, reactivate it,
 check if the lock file is there and finally kill VASP. Needed for CSC calculations.
 
-This functionality is contained in the more simpler public functions.
+This functionality is contained in the simpler public functions.
 """
 
 import os
 import signal
 import time
+import numpy as np
 
 import triqs.utility.mpi as mpi
 
@@ -87,6 +88,15 @@ def _is_lock_file_present():
         res_bool = os.path.isfile('./vasp.lock')
     res_bool = mpi.bcast(res_bool)
     return res_bool
+
+
+def remove_legacy_projections_suppressed():
+    """ Removes legacy file vasp.suppress_projs if present. """
+    if mpi.is_master_node():
+        if os.path.isfile('./vasp.suppress_projs'):
+            print('  solid_dmft: Removing legacy file vasp.suppress_projs', flush=True)
+            os.remove('./vasp.suppress_projs')
+    mpi.barrier()
 
 
 def run_initial_scf(number_cores, vasp_command, cluster_name):
@@ -171,6 +181,57 @@ def read_dft_energy():
     dft_energy = float(line.split()[2])
 
     return dft_energy
+
+
+def read_irred_kpoints(kpts):
+    """ Reads the indices of the irreducible k-points from the OUTCAR. """
+
+    def read_outcar(file):
+        has_started_reading = False
+        for line in file:
+            if 'IBZKPT_HF' in line:
+                has_started_reading = True
+                continue
+
+            if not has_started_reading:
+                continue
+
+            if 't-inv' in line:
+                yield line
+                continue
+
+            if '-'*10 in line:
+                break
+
+    irred_indices = None
+    if mpi.is_master_node():
+        with open('OUTCAR', 'r') as file:
+            outcar_data_raw = np.loadtxt(read_outcar(file), usecols=[0, 1, 2, 4])
+        outcar_kpoints = outcar_data_raw[:, :3]
+        outcar_indices = (outcar_data_raw[:, 3]-.5).astype(int)
+        assert np.allclose(outcar_kpoints, kpts)
+
+        symmetry_mapping = np.full(outcar_kpoints.shape[0], -1, dtype=int)
+
+        for i, (kpt_outcar, outcar_index) in enumerate(zip(outcar_kpoints, outcar_indices)):
+            for j, kpt in enumerate(kpts):
+                if np.allclose(kpt_outcar, kpt):
+                    # Symmetry-irreducible k points
+                    if i == outcar_index:
+                        symmetry_mapping[j] = outcar_index
+                    # Symmetry-reducible
+                    else:
+                        symmetry_mapping[j] = outcar_index
+                    break
+
+            # Asserts that loop left through break, i.e. a pair was found
+            assert np.allclose(kpt_outcar, kpt)
+
+        irreds, irred_indices = np.unique(symmetry_mapping, return_index=True)
+        assert np.all(np.diff(irreds) == 1)
+        assert np.all(symmetry_mapping >= 0)
+
+    return mpi.bcast(irred_indices)
 
 
 def kill(vasp_process_id):

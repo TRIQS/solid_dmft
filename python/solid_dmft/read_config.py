@@ -340,7 +340,8 @@ dft_code : string
 n_cores : int
             number of cores for the DFT code (VASP)
 n_iter : int, optional, default= 6
-            number of DFT iterations to feed the DMFT charge density into DFT.
+            only needed for VASP. Number of DFT iterations to feed the DMFT
+            charge density into DFT, which generally takes multiple Davidson steps.
             For every DFT iterations, the charge-density correction is recalculated
             using newly generated projectors and hoppings from the previous DFT run
 n_iter_first : int, optional, default= dft/n_iter
