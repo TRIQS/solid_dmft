@@ -2,6 +2,30 @@
 
 # Changelog
 
+## Version 3.1.4
+
+solid_dmft version 3.1.4 is a patch-release that improves / fixes the following issues:
+
+* fix and improve rootfinder in PCB for quasiparticle dispersion
+* fix pypi package version.py module
+
+Contributors: Sophie Beck, Alberto Carta, Alexander Hampel, Max Merkel:
+
+## Version 3.1.3
+
+solid_dmft version 3.1.3 is a patch-release that improves / fixes the following issues:
+
+* fix delta interface of cthyb for multiple sites with different block structures
+* correctly use tail fitted Sigma from cthyb not via double dyson equation
+* magnetic param not available in CSC crash PM calc
+* improve PCB script from unstable branch
+* convert warmup cycles to int automatically
+* fix function calls in gap finder
+* fix delta_interface with SOC and store solver options
+* fix: update svo example for PCB test from unstable
+
+Contributors: Sophie Beck, Alberto Carta, Alexander Hampel, Max Merkel
+
 ## Version 3.1.2
 
 solid_dmft version 3.1.1 is a patch-release that improves / fixes the following issues:
