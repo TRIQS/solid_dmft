@@ -111,7 +111,7 @@ def _full_qe_run(seedname, dft_params, mode):
     # Optionally does bnd, bands, proj if files are present
     for nscf in ['bnd', 'bands', 'proj']:
         if os.path.isfile(f'{seedname}.{nscf}.in'):
-            qe_wrapper(dft_params['n_cores'], nscf)
+            qe_wrapper(nscf)
 
     # nscf
     qe_wrapper('nscf')
