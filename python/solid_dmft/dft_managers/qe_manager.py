@@ -25,8 +25,7 @@
 ################################################################################
 
 """
-Contains the handling of the QE process. It can start QE, reactivate it,
-check if the lock file is there and finally kill QE. Needed for CSC calculations.
+Contains the function to run a QuantumEspresso iteration. Needed for CSC calculations.
 """
 
 import os
@@ -149,16 +148,30 @@ def _get_mpi_arguments(cluster_name, mpi_exe, number_cores, qe_exec, hostfile):
 
     return None
 
-def _fork_and_start_qe(mpi_exe, arguments, env_vars, seedname):
+def _poll_barrier(comm, poll_interval = 0.1):
     """
-    Forks a process from the master process that then calls mpi to start vasp.
-    The child process running VASP never leaves this function whereas the main
-    process returns the child's process id and continues.
+    Use asynchronous synchronization, otherwise mpi.barrier uses up all the CPU time during
+    the run of subprocess.
+
+    Parameters
+    ----------
+    comm: MPI communicator
+    poll_interval: float, time step for pinging the status of the sleeping ranks
+    """
+
+    req = comm.Ibarrier()
+    while not req.Test():
+        time.sleep(poll_interval)
+
+def _start_with_piping(mpi_exe, mpi_arguments, qe_file_ext, env_vars, seedname):
+    """
+    Handles the piping of the output when starting QE.
 
     Parameters
     ----------
     mpi_exe: string, mpi command
-    arguments: list of string, arguments to start mpi with
+    mpi_arguments: list of string, arguments to start mpi with
+    qe_file_ext : string, file name for QE
     env_vars: dict of string, environment variables containing PATH
     seedname: string, QE input file
 
@@ -166,8 +179,6 @@ def _fork_and_start_qe(mpi_exe, arguments, env_vars, seedname):
     -------
     int: id of the VASP child process
     """
-
-    mpi_arguments, qe_file_ext = arguments[0], arguments[1]
 
     if qe_file_ext in ['scf', 'nscf', 'pw2wan', 'mod_scf', 'bnd', 'bands', 'proj']:
 
@@ -178,30 +189,26 @@ def _fork_and_start_qe(mpi_exe, arguments, env_vars, seedname):
         print('  solid_dmft: Starting {} calculation...'.format(qe_file_ext))
 
         # start subprocess
-        qe_process_id = subprocess.run(mpi_arguments, stdin=inp, env=env_vars, capture_output=True,
-                                       text=True, shell=False)
+        qe_result = subprocess.run(mpi_arguments, stdin=inp, env=env_vars, capture_output=True,
+                                   text=True, shell=False)
 
         # write output and error file
-        output = qe_process_id.stdout
-        error = qe_process_id.stderr
+        output = qe_result.stdout
+        error = qe_result.stderr
         out.writelines(output)
         err.writelines(error)
 
-        if qe_process_id.returncode != 0:
+        if qe_result.returncode != 0:
             mpi.report('QE calculation failed. Exiting programm.')
             sys.exit(1)
 
     elif 'win' in qe_file_ext:
-
         print('  solid_dmft: Starting Wannier90 {}...'.format(qe_file_ext))
-
         # don't need any piping for Wannier90
-        qe_process_id = subprocess.check_call(mpi_arguments + [seedname], env=env_vars, shell=False)
-
-    return qe_process_id
+        subprocess.check_call(mpi_arguments + [seedname], env=env_vars, shell=False)
 
 
-def start(number_cores, qe_file_ext, qe_exec, cluster_name, seedname):
+def run(number_cores, qe_file_ext, qe_exec, mpi_profile, seedname):
     """
     Starts the VASP child process. Takes care of initializing a clean
     environment for the child process. This is needed so that VASP does not
@@ -215,9 +222,7 @@ def start(number_cores, qe_file_ext, qe_exec, cluster_name, seedname):
     """
 
     # get MPI env
-    qe_process_id = 0
-
-    hostfile = _create_hostfile(number_cores, cluster_name)
+    hostfile = _create_hostfile(number_cores, mpi_profile)
     qe_exec_path = qe_exec.strip(qe_exec.rsplit('/')[-1])
     qe_exec = qe_exec_path
 
@@ -246,26 +251,61 @@ def start(number_cores, qe_file_ext, qe_exec, cluster_name, seedname):
         elif qe_file_ext in ['win']:
             qe_exec += 'wannier90.x'
 
-        arguments = _get_mpi_arguments(cluster_name, mpi_exe, number_cores, qe_exec, hostfile)
-        qe_process_id = _fork_and_start_qe(mpi_exe, (arguments, qe_file_ext), env_vars, seedname)
+        arguments = _get_mpi_arguments(mpi_profile, mpi_exe, number_cores, qe_exec, hostfile)
+        _start_with_piping(mpi_exe, arguments, qe_file_ext, env_vars, seedname)
 
-    poll_barrier(mpi.MPI.COMM_WORLD)
-    qe_process_id = mpi.bcast(qe_process_id)
+    _poll_barrier(mpi.MPI.COMM_WORLD)
 
-    return qe_process_id
-
-
-def poll_barrier(comm, poll_interval = 0.1):
+def read_dft_energy(seedname, iter_dmft):
     """
-    Use asynchronous synchronization, otherwise mpi.barrier uses up all the CPU time during
-    the run of subprocess.
+    Reads DFT energy from quantum espresso's out files
 
-    Parameters
-    ----------
-    comm: MPI communicator
-    poll_interval: float, time step for pinging the status of the sleeping ranks
+    1. At the first iteration, the DFT energy is read from the scf file.
+
+    2. After the first iteration the band energy computed in the mod_scf calculation is wrong,
+       and needs to be subtracted from the reported total energy. The correct band energy
+       is computed in the nscf calculation.
+
     """
+    dft_energy = 0.0
+    RYDBERG = 13.605693123 # eV
 
-    req = comm.Ibarrier()
-    while not req.Test():
-        time.sleep(poll_interval)
+    if iter_dmft == 1:
+        with open(f'{seedname}.scf.out', 'r') as file:
+            dft_output = file.readlines()
+        for line in dft_output:
+            if '!' in line:
+                print("\nReading total energy from the scf calculation \n")
+                dft_energy = float(line.split()[-2]) * RYDBERG
+                print(f"The DFT energy is: {dft_energy} eV")
+                break
+            if  line =="":
+                raise EOFError("Did not find scf total energy")
+    else:
+        with open(f'{seedname}.mod_scf.out', 'r') as file:
+            dft_output = file.readlines()
+        for line in dft_output:
+            #if 'eband, Ef (eV)' in line:
+            if "(sum(wg*et))" in line:
+                print("\nReading band energy from the mod_scf calculation \n")
+                #band_energy = float(line.split())
+                band_energy_modscf = float(line.split()[-2])*RYDBERG
+                print(f"The mod_scf band energy is: {band_energy_modscf} eV")
+            if 'total energy' in line:
+                print("\nReading total energy from the mod_scf calculation \n")
+                dft_energy = float(line.split()[-2]) * RYDBERG
+                print(f"The uncorrected DFT energy is: {dft_energy} eV")
+        dft_energy -= band_energy_modscf
+        print(f"The DFT energy without kinetic part is: {dft_energy} eV")
+
+        with open(f'{seedname}.nscf.out', 'r') as file:
+            dft_output = file.readlines()
+        for line in dft_output:
+            if 'The nscf band energy' in line:
+                print("\nReading band energy from the nscf calculation\n")
+                band_energy_nscf = float(line.split()[-2]) * RYDBERG
+                dft_energy += band_energy_nscf
+                print(f"The nscf band energy is: {band_energy_nscf} eV")
+                print(f"The corrected DFT energy is: {dft_energy} eV")
+                break
+    return dft_energy

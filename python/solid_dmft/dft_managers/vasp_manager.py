@@ -27,12 +27,15 @@
 """
 Contains the handling of the VASP process. It can start VASP, reactivate it,
 check if the lock file is there and finally kill VASP. Needed for CSC calculations.
+
+This functionality is contained in the simpler public functions.
 """
 
 import os
 import socket
 import signal
-from collections import defaultdict
+import time
+import numpy as np
 
 import triqs.utility.mpi as mpi
 
@@ -183,11 +186,33 @@ def _fork_and_start_vasp(mpi_exe, arguments, env_vars):
     return vasp_process_id
 
 
-def start(number_cores, vasp_command, cluster_name):
+def _is_lock_file_present():
+    """
+    Checks if the lock file 'vasp.lock' is there, i.e. if VASP is still working.
+    """
+
+    res_bool = False
+    if mpi.is_master_node():
+        res_bool = os.path.isfile('./vasp.lock')
+    res_bool = mpi.bcast(res_bool)
+    return res_bool
+
+
+def remove_legacy_projections_suppressed():
+    """ Removes legacy file vasp.suppress_projs if present. """
+    if mpi.is_master_node():
+        if os.path.isfile('./vasp.suppress_projs'):
+            print('  solid_dmft: Removing legacy file vasp.suppress_projs', flush=True)
+            os.remove('./vasp.suppress_projs')
+    mpi.barrier()
+
+
+def run_initial_scf(number_cores, vasp_command, cluster_name):
     """
     Starts the VASP child process. Takes care of initializing a clean
     environment for the child process. This is needed so that VASP does not
-    get confused with all the standard slurm environment variables.
+    get confused with all the standard slurm environment variables. Returns when
+    VASP has completed its initial scf cycle.
 
     Parameters
     ----------
@@ -199,6 +224,7 @@ def start(number_cores, vasp_command, cluster_name):
     # Removes STOPCAR
     if mpi.is_master_node() and os.path.isfile('STOPCAR'):
         os.remove('STOPCAR')
+    mpi.barrier()
 
     # get MPI env
     vasp_process_id = 0
@@ -224,27 +250,97 @@ def start(number_cores, vasp_command, cluster_name):
     mpi.barrier()
     vasp_process_id = mpi.bcast(vasp_process_id)
 
+    # Waits for VASP to start
+    while not _is_lock_file_present():
+        time.sleep(1)
+    mpi.barrier()
+
+    # Waits for VASP to finish
+    while _is_lock_file_present():
+        time.sleep(1)
+    mpi.barrier()
+
     return vasp_process_id
 
 
-def reactivate():
-    """ Reactivates VASP by creating the vasp.lock file. """
+def run_charge_update():
+    """
+    Performs one step of the charge update with VASP by creating the vasp.lock
+    file and then waiting until it gets delete by VASP when it has finished.
+    """
     if mpi.is_master_node():
         open('./vasp.lock', 'a').close()
     mpi.barrier()
 
-
-def is_lock_file_present():
-    """
-    Checks if the lock file 'vasp.lock' is there, i.e. if VASP is still working.
-    """
-
-    res_bool = False
-    if mpi.is_master_node():
-        res_bool = os.path.isfile('./vasp.lock')
+    # Waits for VASP to finish
+    while _is_lock_file_present():
+        time.sleep(1)
     mpi.barrier()
-    res_bool = mpi.bcast(res_bool)
-    return res_bool
+
+
+def read_dft_energy():
+    """
+    Reads DFT energy from the last line of Vasp's OSZICAR.
+    """
+    with open('OSZICAR', 'r') as file:
+        nextline = file.readline()
+        while nextline.strip():
+            line = nextline
+            nextline = file.readline()
+    dft_energy = float(line.split()[2])
+
+    return dft_energy
+
+
+def read_irred_kpoints(kpts):
+    """ Reads the indices of the irreducible k-points from the OUTCAR. """
+
+    def read_outcar(file):
+        has_started_reading = False
+        for line in file:
+            if 'IBZKPT_HF' in line:
+                has_started_reading = True
+                continue
+
+            if not has_started_reading:
+                continue
+
+            if 't-inv' in line:
+                yield line
+                continue
+
+            if '-'*10 in line:
+                break
+
+    irred_indices = None
+    if mpi.is_master_node():
+        with open('OUTCAR', 'r') as file:
+            outcar_data_raw = np.loadtxt(read_outcar(file), usecols=[0, 1, 2, 4])
+        outcar_kpoints = outcar_data_raw[:, :3]
+        outcar_indices = (outcar_data_raw[:, 3]-.5).astype(int)
+        assert np.allclose(outcar_kpoints, kpts)
+
+        symmetry_mapping = np.full(outcar_kpoints.shape[0], -1, dtype=int)
+
+        for i, (kpt_outcar, outcar_index) in enumerate(zip(outcar_kpoints, outcar_indices)):
+            for j, kpt in enumerate(kpts):
+                if np.allclose(kpt_outcar, kpt):
+                    # Symmetry-irreducible k points
+                    if i == outcar_index:
+                        symmetry_mapping[j] = outcar_index
+                    # Symmetry-reducible
+                    else:
+                        symmetry_mapping[j] = outcar_index
+                    break
+
+            # Asserts that loop left through break, i.e. a pair was found
+            assert np.allclose(kpt_outcar, kpt)
+
+        irreds, irred_indices = np.unique(symmetry_mapping, return_index=True)
+        assert np.all(np.diff(irreds) == 1)
+        assert np.all(symmetry_mapping >= 0)
+
+    return mpi.bcast(irred_indices)
 
 
 def kill(vasp_process_id):
