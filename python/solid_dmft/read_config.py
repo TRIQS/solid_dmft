@@ -207,8 +207,6 @@ afm_order : bool, optional, default=False
 set_rot : string, optional, default='none'
             use density_mat_dft to diagonalize occupations = 'den'
             use hloc_dft to diagonalize occupations = 'hloc'
-oneshot_postproc_gamma_file : bool, optional, default=False
-            write the GAMMA file for vasp after completed one-shot calculations
 measure_chi_SzSz : bool, optional, default=False
             measure the dynamic spin suszeptibility chi(sz,sz(tau))
             triqs.github.io/cthyb/unstable/guide/dynamic_susceptibility_notebook.html
@@ -342,17 +340,23 @@ dft_code : string
 n_cores : int
             number of cores for the DFT code (VASP)
 n_iter : int, optional, default= 6
-            number of dft iterations per cycle
+            only needed for VASP. Number of DFT iterations to feed the DMFT
+            charge density into DFT, which generally takes multiple Davidson steps.
+            For every DFT iterations, the charge-density correction is recalculated
+            using newly generated projectors and hoppings from the previous DFT run
+n_iter_first : int, optional, default= dft/n_iter
+            number of DFT iterations in the first charge correction because this
+            first charge correction usually changes the DFT wave functions the most.
 dft_exec :  string, default= 'vasp_std'
-            command for the DFT / VASP executable
+            command for the DFT executable
 store_eigenvals : bool, optional, default= False
             stores the dft eigenvals from LOCPROJ (projector_type=plo) or
             wannier90.eig (projector_type=w90) file in h5 archive
 mpi_env : string, default= 'local'
             selection for mpi env for DFT / VASP in default this will only call VASP as mpirun -np n_cores_dft dft_exec
-projector_type : string, optional, default= 'plo'
+projector_type : string, optional, default= 'w90'
             plo: uses VASP's PLO formalism, requires LOCPROJ in the INCAR
-            w90: uses Wannier90, requires LWANNIER90 in the INCAR
+            w90: uses Wannier90 (for VASP and QuantumEspresso)
 w90_exec :  string, default='wannier90.x'
             the command to start a single-core wannier run
 w90_tolerance :  float, default=1e-6
@@ -590,9 +594,6 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                  'set_rot': {'valid for': lambda x, _: x in ('none', 'den', 'hloc'),
                                              'used': True, 'default': 'none'},
 
-                                 'oneshot_postproc_gamma_file': {'converter': BOOL_PARSER,
-                                                                 'used': lambda params: not params['general']['csc'], 'default': False},
-
                                  'measure_chi': {'valid for': lambda x, _: x in ('SzSz', 'NN', 'none'), 'used': True, 'default': 'none'},
 
                                  'measure_chi_insertions': {'converter': int, 'used': True, 'default': 100},
@@ -620,7 +621,12 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                          'used': lambda params: params['general']['csc']},
 
                              'n_iter': {'converter': int, 'valid for': lambda x, _: x > 0,
-                                        'used': lambda params: params['general']['csc'], 'default': 6},
+                                        'used': lambda params: params['general']['csc'] and params['dft']['dft_code'] == 'vasp',
+                                        'default': 4},
+
+                             'n_iter_first': {'converter': int, 'valid for': lambda x, _: x > 0,
+                                              'used': lambda params: params['general']['csc'] and params['dft']['dft_code'] == 'vasp',
+                                              'default': lambda params: params['dft']['n_iter']},
 
                              'dft_exec': {'used': lambda params: params['general']['csc'], 'default': 'vasp_std'},
 
@@ -631,16 +637,15 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                              'mpi_env': {'valid for': lambda x, _: x in ('default', 'openmpi', 'openmpi-intra', 'mpich'),
                                          'used': lambda params: params['general']['csc'], 'default': 'default'},
 
-                             'projector_type': {'valid for': lambda x, _: x in ('plo', 'w90'),
-                                                'used': lambda params: params['general']['csc'], 'default': 'plo'},
+                             'projector_type': {'valid for': lambda x, params: x == 'w90' or x == 'plo' and params['dft']['dft_code'] == 'vasp',
+                                                'used': lambda params: params['general']['csc'], 'default': 'w90'},
 
                              'w90_exec': {'used': lambda params: (params['general']['csc']
-                                                                  and params['dft']['projector_type'] == 'w90'),
+                                                                  and params['dft']['dft_code'] == 'vasp' and params['dft']['projector_type'] == 'w90'),
                                                 'default': 'wannier90.x'},
 
                              'w90_tolerance': {'converter': lambda s: float(s),
-                                                'used': lambda params: (params['general']['csc']
-                                                                      and params['dft']['projector_type'] == 'w90'),
+                                                'used': lambda params: params['general']['csc'] and params['dft']['projector_type'] == 'w90',
                                                 'default': 1e-6},
                             },
                      'solver': {
