@@ -86,71 +86,36 @@ def main(argv=sys.argv):
     dft_params = mpi.bcast(dft_params)
     advanced_params = mpi.bcast(advanced_params)
 
-    # start CSC calculation if csc is set to true
     if general_params['csc']:
-
-        # check if seedname is only one Value
-        if len(general_params['seedname']) > 1:
-            mpi.report('!!! WARNING !!!')
-            mpi.report('CSC calculations can only be done for one set of file at a time')
-
-        # some basic setup that needs to be done for CSC calculations
-        general_params['seedname'] = general_params['seedname'][0]
+        # Start CSC calculation, always in same folder as dmft_config
         general_params['jobname'] = '.'
-        general_params['previous_file'] = 'none'
-
-        # run the whole machinery
         csc_flow_control(general_params, solver_params, dft_params, advanced_params)
-
-    # do a one-shot calculation with given h5 archive
     else:
-        # extract filenames and do a dmft iteration for every h5 archive given
-        number_calculations = len(general_params['seedname'])
-        filenames = general_params['seedname']
-        foldernames = general_params['jobname']
-        mpi.report('{} DMFT calculation will be made for the following files: {}'.format(number_calculations, filenames))
-
-        # check for h5 file(s)
+        # Sets up one-shot calculation
         if mpi.is_master_node():
-            for file in filenames:
-                if not os.path.exists(file+'.h5'):
-                    mpi.report('*** Input h5 file(s) not found! I was looking for '+file+'.h5 ***')
-                    mpi.MPI.COMM_WORLD.Abort(1)
+            # Checks for h5 file
+            print('#'*80)
+            print(f'Using input file {general_params["seedname"]}.h5'
+                  + f'and running in folder {general_params["jobname"]}\n')
+            if not os.path.exists(general_params['seedname']+'.h5'):
+                raise FileNotFoundError('Input h5 file not found')
 
-        for i, file in enumerate(foldernames):
-            general_params['seedname'] = filenames[i]
-            general_params['jobname'] = foldernames[i]
-            if i == 0:
-                general_params['previous_file'] = 'none'
-            else:
-                previous_file = filenames[i-1]
-                previous_folder = foldernames[i-1]
-                general_params['previous_file'] = previous_folder+'/'+previous_file+'.h5'
+            # Creates output directory if it does not exist
+            if not os.path.exists(general_params['jobname']):
+                os.makedirs(general_params['jobname'])
 
-            if mpi.is_master_node():
-                # create output directory
-                print('calculation is performed in subfolder: '+general_params['jobname'])
-                if not os.path.exists(general_params['jobname']):
-                    os.makedirs(general_params['jobname'])
+            # Copies h5 archive and config file to subfolder if are not there
+            for file in (general_params['seedname']+'.h5',
+                         general_params['config_file']):
+                if not os.path.isfile(general_params['jobname']+'/'+file):
+                    shutil.copyfile(file, general_params['jobname']+'/'+file)
+        mpi.barrier()
 
-                    # copy h5 archive and config file to created folder
-                    shutil.copyfile(general_params['seedname']+'.h5',
-                                    general_params['jobname']+'/'+general_params['seedname']+'.h5')
-                    shutil.copyfile(general_params['config_file'],
-                                    general_params['jobname']+'/'+general_params['config_file'])
-                else:
-                    print('#'*80+'\n WARNING! specified job folder already exists continuing previous job! \n'+'#'*80+'\n')
+        # Runs dmft_cycle
+        dmft_cycle(general_params, solver_params, advanced_params,
+                   dft_params, general_params['n_iter_dmft'])
 
-            mpi.report('#'*80)
-            mpi.report('starting the DMFT calculation for '+str(general_params['seedname']))
-            mpi.report('#'*80)
-
-            ############################################################
-            # run the dmft_cycle
-            dmft_cycle(general_params, solver_params, advanced_params,
-                       dft_params, general_params['n_iter_dmft'])
-            ############################################################
-
+    mpi.barrier()
     if mpi.is_master_node():
         global_end = timer()
         print('-------------------------------')

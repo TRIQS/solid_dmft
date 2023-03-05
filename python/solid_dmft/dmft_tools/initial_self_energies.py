@@ -328,10 +328,8 @@ def determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
     in five different ways:
     * Calculation resumed: use the previous DC and the Sigma of the last complete calculation.
 
-    * Calculation started from previous_file: use the DC and Sigma from the previous file.
-
-    * Calculation initialized with load_sigma: same as for previous_file. Additionally,
-      if the DC changed (and therefore the Hartree shift), the initial Sigma is adjusted by that.
+    * Calculation initialized with load_sigma: use the DC and Sigma from the previous file.
+      If the DC changed (and therefore the Hartree shift), the initial Sigma is adjusted by that.
 
     * New calculation, with DC: calculate the DC, then initialize the Sigma as the DC,
       effectively starting the calculation from the DFT Green's function.
@@ -374,11 +372,6 @@ def determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
             start_sigma, sum_k.dc_imp, sum_k.dc_energ, last_g0,  _ = _load_sigma_from_h5(archive, -1)
             if general_params['csc'] and not general_params['dc_dmft']:
                 sum_k = calculate_double_counting(sum_k, density_mat_dft, general_params, advanced_params)
-        # Series of calculations, loads previous sigma
-        elif general_params['previous_file'] != 'none':
-            print('\nFrom {}:'.format(general_params['previous_file']), end=' ')
-            with HDFArchive(general_params['previous_file'], 'r') as previous_archive:
-                start_sigma, sum_k.dc_imp, sum_k.dc_energ, _, _ = _load_sigma_from_h5(previous_archive, -1)
         # Loads Sigma from different calculation
         elif general_params['load_sigma']:
             print('\nFrom {}:'.format(general_params['path_to_sigma']), end=' ')

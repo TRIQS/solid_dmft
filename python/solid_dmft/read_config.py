@@ -40,10 +40,10 @@ List of all parameters, sorted by sections:
 [  general  ]
 -------------
 
-seedname : str or list of str
-            seedname for h5 archive or for multiple if calculations should be connected
-jobname : str or list of str, optional, default=seedname
-            one or multiple jobnames specifying the output directories
+seedname : str
+            seedname for h5 archive with DMFT input and output
+jobname : str, optional, default='dmft_dir'
+            the output directory for one-shot calculations
 csc : bool, optional, default=False
             are we doing a CSC calculation?
 plo_cfg : str, optional, default='plo.cfg'
@@ -140,9 +140,6 @@ h_field : float, optional, default=0.0
             magnetic field
 h_field_it : int, optional, default=0
             number of iterations the magnetic field is kept on
-energy_shift_orbitals : list of floats, optional, default= 'none'
-            orbitals will be shifted by this energy
-            The entries can be python code, to be combined with configparser's interpolation
 sigma_mix : float, optional, default=1.0
             careful: Sigma mixing can break orbital symmetries, use G0 mixing
             mixing sigma with previous iteration sigma for better convergency. 1.0 means no mixing
@@ -415,7 +412,7 @@ BOOL_PARSER = lambda b: ConfigParser()._convert_to_boolean(b)
 #   - default: default value for parameter. Can be a function of params but can only
 #              use values that have NO default value. If it is None but 'used'
 #              is True, the parameter becomes an optional parameter
-PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace(' ', '').split(','), 'used': True},
+PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
 
                                  'h_int_type': {'valid for': lambda x, _: all(hint in ('density_density',
                                                                                        'kanamori',
@@ -496,9 +493,7 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                                                      and params['dft']['projector_type'] == 'plo'),
                                              'default': 'plo.cfg'},
 
-                                 'jobname': {'converter': lambda s: s.replace(' ', '').split(','),
-                                             'valid for': lambda x, params: len(x) == len(params['general']['seedname']),
-                                             'used': True, 'default': lambda params: params['general']['seedname']},
+                                 'jobname': {'used': lambda params: not params['general']['csc'], 'default': lambda params: 'dmft_dir'},
 
                                  'h5_save_freq': {'converter': int, 'valid for': lambda x, _: x > 0,
                                                   'used': True, 'default': 5},
@@ -513,9 +508,6 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                  'h_field': {'converter': float, 'used': True, 'default': 0.0},
 
                                  'h_field_it': {'converter': int, 'used': True, 'default': 0},
-
-                                 'energy_shift_orbitals': {'converter': lambda s: [float(eval(x)) for x in s.split(',')],
-                                                           'used': lambda params: not params['general']['csc'], 'default': 'none'},
 
                                  'afm_order': {'converter': BOOL_PARSER,
                                                'used': lambda params: not params['general']['csc'] and params['general']['magnetic'],
