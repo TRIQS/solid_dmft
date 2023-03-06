@@ -155,6 +155,33 @@ def calculate_double_counting(sum_k, density_matrix, general_params, advanced_pa
                 mpi.report('DC for shell {} and block {} = {}'.format(icrsh, spin, dc_per_spin[0][0]))
             mpi.report('DC energy for shell {} = {}'.format(icrsh, energy_per_shell))
 
+    matrix = None
+    if advanced_params['quad_xz'] != 'none':
+        matrix = np.zeros((6, 6))
+        matrix[[0, 4], [4, 0]] = -np.sqrt(3)/2
+        matrix[1::2, 1::2] = matrix[::2, ::2]
+        matrix *= advanced_params['quad_xz']
+    elif advanced_params['quad_x2y2'] != 'none':
+        if matrix is None:
+            matrix = np.zeros((6, 6))
+        matrix[0, 0] = np.sqrt(3)/2
+        matrix[2, 2] = -np.sqrt(3)/2
+        matrix[1::2, 1::2] = matrix[::2, ::2]
+        matrix *= advanced_params['quad_x2y2']
+
+    if matrix is not None:
+        rescaled_dc_imp = [{spin: dc_per_spin + matrix
+                            for spin, dc_per_spin in dc_per_shell.items()}
+                           for dc_per_shell in sum_k.dc_imp]
+        sum_k.set_dc(rescaled_dc_imp, sum_k.dc_energ)
+        dc = sum_k.add_dc()
+        with np.printoptions(precision=3):
+            mpi.report(dc[0]['ud'].data[0].real)
+            mpi.report(dc[1]['ud'].data[0].real)
+
+    # Notes: DC per corr shell not imp. Mapping takes care of sign?
+    # Sigma is set with DC[0, 0]. So if quadrupole modifies this, problem
+
     return sum_k
 
 

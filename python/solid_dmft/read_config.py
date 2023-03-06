@@ -392,6 +392,8 @@ pick_solver_struct : list of dict, optional, default=no additional picking
 soc_make_real : list, optional, default=none
             Make impurity Hamiltonian with spin-orbit coupling purely real.
             List should be of the form of [1,1j,1j]. Currently only implemented with t2g.
+quad_xz : float
+quad_x2y2 : float
 
 ---XXX---end
 """
@@ -834,6 +836,10 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                                     'used': lambda params: params['general']['solver_type'] not in ['ftps']
                                                         and params['general']['set_rot'] in ['soc_real'],
                                                     'default': 'none'},
+
+                                  'quad_xz': {'converter': float, 'used': True, 'default': 'none'},
+
+                                  'quad_x2y2': {'converter': float, 'used': True, 'default': 'none'},
                                  }
                     }
 
