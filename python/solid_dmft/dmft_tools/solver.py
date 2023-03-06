@@ -739,10 +739,48 @@ class SolverStructure:
             self.G_freq_unsym << self.G_freq
             self.sum_k.symm_deg_gf(self.G_freq, ish=self.icrsh)
             self.sum_k.symm_deg_gf(self.G_time, ish=self.icrsh)
+            self.G_freq << symmetrize_opt(self.G_freq)
             # Dyson equation to get Sigma_freq
             self.Sigma_freq << inverse(self.G0_freq) - inverse(self.G_freq)
 
-            return
+        def symmetrize_opt(G_in):
+            mpi.report('Time-symmetry averaging.')
+            G = G_in.copy()
+            def swap_with_blocks():
+                # Time-reversal means G_ij(iw) -> G*_ij(-iw)
+                # Because of hermitianicy, G_ij(iw) -> G_ji(iw)
+                G['ud_1'].data[:] = G['ud_1'].data.transpose((0, 2, 1))
+                # Additionally, sign changes for all elements involving different spin,
+                # and again, if they got a 1j factor from make_soc_real
+                # i.e., all involving yz
+                for i in (0, 2):
+                    G['ud_1'][i, 1] = -G['ud_1'][i, 1]
+                    G['ud_1'][1, i] = -G['ud_1'][1, i]
+
+            def time_reversal_without_blocks(G):
+                G_tr = G.copy()
+                # Transpose
+                G_tr['ud_0'].data[:] = G_tr['ud_0'].data.transpose((0, 2, 1))
+                # Opposite spins get -1
+                G_tr['ud_0'].data[:, ::2] *= -1
+                G_tr['ud_0'].data[:, :, ::2] *= -1
+                # Complex orbitals get -1
+                G_tr['ud_0'].data[:, 2:] *= -1
+                G_tr['ud_0'].data[:, :, 2:] *= -1
+                # Swaps spins
+                G_tr['ud_0'].data[:] = G_tr['ud_0'].data[:, [1, 0, 3, 2, 5, 4]]
+                G_tr['ud_0'].data[:] = G_tr['ud_0'].data[:, :, [1, 0, 3, 2, 5, 4]]
+                return G_tr
+
+            if False:
+                swap_with_blocks()
+                G['ud_0'] = 0.5*(G['ud_0'] + G['ud_1'])
+                G['ud_1'] = G['ud_0']
+                swap_with_blocks()
+            else:
+                G += time_reversal_without_blocks(G)
+                G /= 2
+            return G
 
         # get Delta_time from solver
         self.Delta_time << self.triqs_solver.Delta_tau
