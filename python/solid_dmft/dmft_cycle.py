@@ -300,13 +300,12 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
             archive['DMFT_input']['version']['solid_dmft_hash'] = solid_dmft_hash
             archive['DMFT_input']['version']['solid_dmft_version'] = solid_dmft_version
 
-        print('#'*80)
         if 'iteration_count' in archive['DMFT_results']:
-            print(f'RESTART RUN at iteration {iteration_offset+1} using last self-energy')
             iteration_offset = archive['DMFT_results/iteration_count']
             sum_k.chemical_potential = archive['DMFT_results/last_iter/chemical_potential_post']
+            print(f'RESTARTING DMFT RUN at iteration {iteration_offset+1} using last self-energy')
         else:
-            print('INITIAL RUN')
+            print('INITIAL DMFT RUN')
         print('#'*80, '\n')
     else:
         archive = None

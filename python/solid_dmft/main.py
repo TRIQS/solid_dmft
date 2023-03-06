@@ -92,11 +92,12 @@ def main(argv=sys.argv):
         csc_flow_control(general_params, solver_params, dft_params, advanced_params)
     else:
         # Sets up one-shot calculation
+        mpi.report('', '#'*80)
+        mpi.report(f'Using input file {general_params["seedname"]}.h5 '
+                   + f'and running in folder {general_params["jobname"]}')
+
         if mpi.is_master_node():
             # Checks for h5 file
-            print('#'*80)
-            print(f'Using input file {general_params["seedname"]}.h5'
-                  + f'and running in folder {general_params["jobname"]}\n')
             if not os.path.exists(general_params['seedname']+'.h5'):
                 raise FileNotFoundError('Input h5 file not found')
 
