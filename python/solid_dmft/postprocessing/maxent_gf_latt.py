@@ -31,11 +31,6 @@ mpi parallelized for the generation of the imaginary-frequency lattice GF over
 k points.
 
 Author: Maximilian Merkel, Materials Theory Group, ETH Zurich, 2020 - 2022
-
-Known problems:
-    * when using parameter `energy_shift_orbitals` in soliDMFT, this is not
-      accounted for in this routine. It requires a similar modification of the
-      hopping matrix of SumkDFT as in dmft_cycle.py.
 """
 
 import sys

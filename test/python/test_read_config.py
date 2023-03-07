@@ -91,11 +91,10 @@ def test_config_file_1():
                                                         'csc': False, 'enforce_off_diag': True,
                                                         'dc_dmft': False, 'diag_delta': False,
                                                         'occ_conv_crit': -1,'g0_conv_crit': -1,'gimp_conv_crit': -1,'sigma_conv_crit': -1,
-                                                        'seedname': [u'fancy_system'],
+                                                        'seedname': u'fancy_system',
                                                         'J': [2.0], 'h5_save_freq': 5, 'ratio_F4_F2' : [u'none'],
-                                                        'dc': True, 'jobname': [u'out_DMFT_fancy'],
-                                                        'n_iter_dmft': 4, 'U': [2.0],
-                                                        'energy_shift_orbitals': 'none', 'n_tau': 10001,
+                                                        'dc': True, 'jobname': u'out_DMFT_fancy',
+                                                        'n_iter_dmft': 4, 'U': [2.0], 'n_tau': 10001,
                                                         'measure_chi_insertions': 100, 'h_field': 0.0, 'h_field_it': 0,
                                                         'calc_energies': True, 'g0_mix': 0.7, 'sigma_mix': 1.0,
                                                         'g0_mix_type' : 'linear',
@@ -136,7 +135,6 @@ J = 1.0
 n_l = 35
 
 beta = 40
-energy_shift_orbitals = 2*%(U)s, 0, 3.8*%(J)s + %(U)s, 2.1
 
 n_iter_dmft = 6
 
@@ -212,12 +210,11 @@ def test_config_file_2():
                                                         'csc': False,
                                                         'enforce_off_diag': True, 'fixed_mu_value': 'none',
                                                         'mu_update_freq': 1, 'solver_type': 'cthyb',
-                                                        'seedname': [u'orbital_model'], 'dc_dmft': False,
+                                                        'seedname': u'orbital_model', 'dc_dmft': False,
                                                         'occ_conv_crit': -1,'g0_conv_crit': -1,'gimp_conv_crit': -1,'sigma_conv_crit': -1,
                                                         'J': [1.0], 'h5_save_freq': 2,
-                                                        'dc': True, 'jobname': [u'out_60M_afm'],
+                                                        'dc': True, 'jobname': u'out_60M_afm',
                                                         'beta': 40.0, 'U': [5.5], 'diag_delta': False,
-                                                        'energy_shift_orbitals': [11, 0, 9.3, 2.1],
                                                         'measure_chi_insertions': 100, 'h_field': 0.0, 'h_field_it': 0,
                                                         'calc_energies': False, 'sigma_mix': 0.6, 'g0_mix': 1.0,
                                                         'g0_mix_type': 'linear',

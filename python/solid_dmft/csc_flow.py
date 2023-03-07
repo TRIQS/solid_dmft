@@ -302,12 +302,7 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
                 dft_energy = qe.read_dft_energy(general_params['seedname'], iter_dmft)
         dft_energy = mpi.bcast(dft_energy)
 
-        if mpi.is_master_node():
-            print('\n' + '='*80)
-            print('Calling dmft_cycle')
-            print('DMFT iteration {} / {}'.format(iter_dmft,
-                                                  general_params['n_iter_dmft']+iteration_offset))
-            print('='*80 + '\n')
+        mpi.report('', '#'*80, 'Calling dmft_cycle')
 
         if mpi.is_master_node():
             start_time_dmft = timer()
