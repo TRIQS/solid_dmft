@@ -387,7 +387,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
                 if general_params['solver_type'] in ['ftps']:
                     solver_struct_ftps = old_calc['DMFT_input/solver_struct_ftps']
 
-            if not np.allclose(sum_k.rot_mat, previous_rot_mat):
+            if not all(np.allclose(x, y) for x, y in zip(sum_k.rot_mat, previous_rot_mat)):
                 print('WARNING: rot_mat in current run is different from loaded_sigma run.')
             else:
                 previous_rot_mat = None
@@ -407,7 +407,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
             sum_k.block_structure = archive['DMFT_input']['block_structure']
             sum_k.deg_shells = archive['DMFT_input/deg_shells']
             previous_rot_mat = archive['DMFT_input']['rot_mat']
-            if not np.allclose(sum_k.rot_mat, previous_rot_mat):
+            if not all(np.allclose(x, y) for x, y in zip(sum_k.rot_mat, previous_rot_mat)):
                 print('WARNING: rot_mat in current step is different from previous step.')
                 archive['DMFT_input']['rot_mat'] = sum_k.rot_mat
             else:
