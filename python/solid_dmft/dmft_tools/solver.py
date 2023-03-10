@@ -686,16 +686,59 @@ class SolverStructure:
 
 
         # Construct the triqs_solver instances
+        # Always initialize the solver with dc_U and dc_J equal to U and J and let the _interface_hartree_dc function
+        # take care of changing the parameters
         triqs_solver = hartree_solver(beta=self.general_params['beta'], gf_struct=gf_struct,
                                       n_iw=self.general_params['n_iw'], force_real=self.solver_params['force_real'],
                                       symmetries=[self._make_spin_equal],
-                                      U= self.general_params['U'][self.icrsh],
-                                      J= self.general_params['J'][self.icrsh],
+                                      dc_U= self.general_params['U'][self.icrsh],
+                                      dc_J= self.general_params['J'][self.icrsh],
                                       n_orb = n_orb
                                       )
 
+        def _interface_hartree_dc(hartree_instance, general_params, advanced_params, icrsh):
+            """ Modifies in-place class attributes to infercace with options in solid_dmft 
+                for the moment supports only DC-relevant parameters
+
+            Parameters
+            ----------
+                general_params : dict
+                    solid_dmft general parameter dictionary
+                advanced_params : dict
+                    solid_dmft advanced parameter dictionary
+                icrsh : int
+                    correlated shell number
+            """
+            for key in ['dc', 'dc_type']:
+                if key in general_params and general_params[key] != 'none':
+                    setattr(hartree_instance, key, general_params[key])
+
+            for key in ['dc_factor', 'dc_fixed_value']:
+                if key in advanced_params and advanced_params[key] != 'none':
+                    setattr(hartree_instance, key, advanced_params[key])
+
+            #list valued keys
+            for key in ['dc_U', 'dc_J', 'dc_fixed_occ']:
+                if key in advanced_params and advanced_params[key] != 'none':
+                    setattr(hartree_instance, key, advanced_params[key][icrsh])
+
+            # Handle special cases
+            if 'dc_dmft' in general_params:
+                if general_params['dc_dmft'] == False:
+                    mpi.report('HARTREE SOLVER: Warning dft occupation in the DC calculations are meaningless for the hartree solver, reverting to dmft occupations')
+
+            if hartree_instance.dc_type == 0:
+                    mpi.report(f"HARTREE SOLVER: Detected dc_type = {hartree_instance.dc_type}, changing to 'cFLL'")
+                    hartree_instance.dc_type = 'cFLL'
+            elif hartree_instance.dc_type == 1:
+                    mpi.report(f"HARTREE SOLVER: Detected dc_type = {hartree_instance.dc_type}, changing to 'cHeld'")
+                    hartree_instance.dc_type = 'cHeld'
+            elif hartree_instance.dc_type == 2:
+                    mpi.report(f"HARTREE SOLVER: Detected dc_type = {hartree_instance.dc_type}, changing to 'cAMF'")
+                    hartree_instance.dc_type = 'cAMF'
+
         # Give dc information to the solver in order to customize DC calculation
-        triqs_solver._interface_to_solid_dmft(self.general_params, self.advanced_params, self.icrsh)
+        _interface_hartree_dc(triqs_solver, self.general_params, self.advanced_params, self.icrsh)
 
         return triqs_solver
 

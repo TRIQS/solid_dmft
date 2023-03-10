@@ -788,7 +788,7 @@ def _dmft_step(sum_k, solvers, it, general_params,
                                         sum_k.spin_block_names[sum_k.SO])
     if general_params['calc_energies']:
         formatter.print_summary_energetics(observables)
-    if general_params['magnetic']:
+    if general_params['magnetic'] and sum_k.SO == 0:
         # if a magnetic calculation is done print out a summary of up/down occ
         formatter.print_summary_magnetic_occ(observables, sum_k.n_inequiv_shells)
     formatter.print_summary_convergence(conv_obs, general_params, sum_k.n_inequiv_shells)

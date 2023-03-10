@@ -428,9 +428,9 @@ def determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
                     # if magmom positive the up channel will be favored
                     for spin_channel in sum_k.gf_struct_solver[icrsh].keys():
                         if 'up' in spin_channel:
-                            start_sigma[icrsh][spin_channel] << -fac
+                            start_sigma[icrsh][spin_channel] << -fac + dc_value
                         else:
-                            start_sigma[icrsh][spin_channel] << fac
+                            start_sigma[icrsh][spin_channel] << fac + dc_value
                 else:
                     start_sigma[icrsh] << dc_value
         # Sets Sigma to zero because neither initial Sigma nor DC given
@@ -492,6 +492,6 @@ def determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
         # between the mixing at the level of the solver and the sumk (solver mixes always 100%)
         for icrsh in range(sum_k.n_inequiv_shells):
             mpi.report(f"SOLID_DMFT: setting first guess hartree solver for impurity {icrsh}")
-            solvers[icrsh].triqs_solver._reinitialize_sigma(start_sigma[icrsh])
+            solvers[icrsh].triqs_solver.reinitialize_sigma(start_sigma[icrsh])
 
     return sum_k, solvers
