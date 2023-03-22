@@ -35,7 +35,6 @@ Author: Maximilian Merkel, Materials Theory Group, ETH Zurich, 2020 - 2022
 
 import sys
 import time
-import distutils.util
 import numpy as np
 
 from triqs_maxent.tau_maxent import TauMaxEnt
@@ -273,13 +272,29 @@ def main(external_path, iteration=None, sum_spins=False, maxent_error=.02,
     return unpacked_results
 
 
+def _strtobool(val):
+    """Convert a string representation of truth to true (1) or false (0).
+    True values are 'y', 'yes', 't', 'true', 'on', and '1'; false values
+    are 'n', 'no', 'f', 'false', 'off', and '0'.  Raises ValueError if
+    'val' is anything else.
+    Copied from distutils.util in python 3.10.
+    """
+    val = val.lower()
+    if val in ('y', 'yes', 't', 'true', 'on', '1'):
+        return 1
+    elif val in ('n', 'no', 'f', 'false', 'off', '0'):
+        return 0
+    else:
+        raise ValueError("invalid truth value {!r}".format(val))
+
+
 if __name__ == '__main__':
     # Casts input parameters
     if len(sys.argv) > 2:
         if sys.argv[2].lower() == 'none':
             sys.argv[2] = None
     if len(sys.argv) > 3:
-        sys.argv[3] = distutils.util.strtobool(sys.argv[3])
+        sys.argv[3] = _strtobool(sys.argv[3])
     if len(sys.argv) > 4:
         sys.argv[4] = float(sys.argv[4])
     if len(sys.argv) > 5:
