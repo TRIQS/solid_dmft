@@ -189,7 +189,7 @@ def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, orbital_order_dmft=
 
     sigma_interpolated = np.zeros((n_orb, n_orb, freq_dict['n_w']), dtype=complex)
 
-    if specs['linearize']:
+    if 'linearize' in specs and specs['linearize']:
         print('Linearizing Sigma at zero frequency:')
         eta = eta * 1j
         iw0 = np.where(np.sign(w_mesh_dmft) is True)[0][0]-1
@@ -558,6 +558,8 @@ def setup_plot_kslice(ax):
 
 def plot_bands(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb, tb=True, alatt=False, qp_bands=False, **plot_dict):
 
+    assert tb_data['special_k'] is not None, 'a regular k point mesh has been used, please call plot_dos'
+
     proj_on_orb = tb_data['proj_on_orb']
     total_proj = tb_data['proj_nuk']
 
@@ -595,6 +597,29 @@ def plot_bands(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb, tb=True, alatt=Fal
 
     _setup_plot_bands(ax, tb_data['special_k'], tb_data['k_points_labels'], freq_dict)
 
+
+def plot_dos(fig, ax, alatt_k_w, tb_data, freq_dict, tb=False, alatt=True, label=None, color=None):
+
+    assert tb == False, 'plotting TB DOS is not supported yet.'
+
+    assert len(alatt_k_w.shape) == 2, 'input Akw should only have a k and omega index'
+
+    if not label:
+        label = ''
+
+    if not color:
+        ax.plot(freq_dict['w_mesh'], np.sum(alatt_k_w, axis=0)/alatt_k_w.shape[0], label=label)
+    else:
+        ax.plot(freq_dict['w_mesh'], np.sum(alatt_k_w, axis=0) /
+                alatt_k_w.shape[0], label=label, color=color)
+
+    ax.axvline(x=0, c='gray', ls='--', zorder=0)
+    ax.set_xlabel(r'$\omega - \mu$ (eV)')
+    ax.set_ylabel(r'A($\omega$)')
+
+    ax.set_xlim(*freq_dict['window'])
+
+    return
 
 def plot_kslice(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb, tb_dict, tb=True, alatt=False, quarter=0, **plot_dict):
 
@@ -762,7 +787,6 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, mu_tb, add_spin=False, add_lambda=
     if add_spin and add_lambda:
         H_add_loc += lambda_matrix_w90_t2g(add_lambda)
     eta = eta * 1j
-    n_k = specs['n_k']
 
     tb = TB_from_wannier90(path=w90_path, seed=w90_seed, extend_to_spin=add_spin, add_local=H_add_loc)
     # print local H(R)
@@ -771,18 +795,54 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, mu_tb, add_spin=False, add_lambda=
     if n_orb <= 12:
         print_matrix(h_of_r, n_orb, 'H(R=0)')
 
-    # bands info
-    w90_paths = list(map(lambda section: (np.array(specs[section[0]]), np.array(specs[section[1]])), specs['bands_path']))
-    k_points_labels = [k[0] for k in specs['bands_path']] + [specs['bands_path'][-1][1]]
-
-    # calculate tight-binding eigenvalues
-    if not fermi_slice:
+    # kmesh prep
+    if ('bands_path' in specs and 'kmesh' in specs) or ('bands_path' not in specs and 'kmesh' not in specs):
+        raise ValueError('choose either a bands_path or kmesh!')
+    elif 'bands_path' in specs:
+        w90_paths = list(map(lambda section: (
+            np.array(specs[section[0]]), np.array(specs[section[1]])), specs['bands_path']))
+        k_points_labels = [k[0] for k in specs['bands_path']] + [specs['bands_path'][-1][1]]
+        n_k = specs['n_k']
         k_vec, k_1d = k_space_path(w90_paths, bz=tb.bz, num=n_k)
         special_k = np.append(k_1d[0::n_k], k_1d[-1::])
+    elif 'kmesh' in specs:
+        assert 'reg' in specs['kmesh'], 'only regular kmesh is implemented'
+
+        special_k = k_points_labels = None
+
+        # read kmesh size
+        if 'n_k' in specs:
+            k_dim = specs['n_k']
+        elif 'k_dim' in specs:
+            k_dim = specs['k_dim']
+        else:
+            raise ValueError('please specify either n_k or k_dim')
+
+        # create regular kmesh
+        if isinstance(k_dim, int):
+            k_spacing = np.linspace(0, 1, k_dim, endpoint=False)
+            k_vec = np.array(np.meshgrid(k_spacing, k_spacing, k_spacing)).T.reshape(-1, 3)
+            n_k = k_dim**3
+            k_1d = (k_dim, k_dim, k_dim)
+        elif all(isinstance(x, int) for x in k_dim) and len(k_dim) == 3:
+            k_x = np.linspace(0, 1, k_dim[0], endpoint=False)
+            k_y = np.linspace(0, 1, k_dim[1], endpoint=False)
+            k_z = np.linspace(0, 1, k_dim[2], endpoint=False)
+            k_vec = np.array(np.meshgrid(k_x, k_y, k_z)).T.reshape(-1, 3)
+            n_k = k_dim[0]*k_dim[1]*k_dim[2]
+            k_1d = k_dim
+        else:
+            raise ValueError(
+                'k_dim / n_k needs to be either an int or a list / tuple of int length 3')
+
+    # calculate tight-binding eigenvalues for non slices
+    if not fermi_slice:
+        # Fourier trafo on input grid / path
         e_mat = tb.fourier(k_vec).transpose(1, 2, 0)
         if add_spin:
             e_mat = e_mat[2:5, 2:5]
-        e_mat = np.einsum('ij, jkl -> ikl', np.linalg.inv(change_of_basis), np.einsum('ijk, jm -> imk', e_mat, change_of_basis))
+        e_mat = np.einsum('ij, jkl -> ikl', np.linalg.inv(change_of_basis),
+                          np.einsum('ijk, jm -> imk', e_mat, change_of_basis))
     else:
         assert 'Z' in specs, 'Please provide Z point coordinate in tb_data_dict as input coordinate'
         Z = np.array(specs['Z'])
@@ -854,7 +914,6 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, mu_tb, add_spin=False, add_lambda=
         else:
             alatt_k_w = _calc_kslice(n_orb, mu, eta, e_mat, delta_sigma, qp_bands, e_vecs=e_vecs,
                                      proj_nuk=proj_nuk, **freq_dict)
-        freq_dict['sigma'] = delta_sigma
     else:
         freq_dict = {}
         freq_dict['w_mesh'] = None

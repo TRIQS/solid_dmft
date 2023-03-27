@@ -91,5 +91,19 @@ class test_convergence(unittest.TestCase):
         assert np.allclose(tb_data['e_mat'], emat_ref)
         assert np.allclose(alatt_k_w, Akw_ref)
 
+    def test_get_dmft_bands_reg_mesh(self):
+        tb_bands = {'kmesh': 'regular', 'n_k': 7}
+
+        tb_data, alatt_k_w, freq_dict = pcb.get_dmft_bands(with_sigma='calc', add_mu_tb=True,
+                                                           orbital_order_to=self.orbital_order_to,
+                                                           **self.w90_dict, **tb_bands, **self.sigma_dict)
+
+        with HDFArchive('test_pcb_ref.h5', 'a') as ar:
+            emat_ref = ar['tb_emat_reg_mesh']
+            Akw_ref = ar['Akw_reg_mesh']
+
+        assert np.allclose(tb_data['e_mat'], emat_ref)
+        assert np.allclose(alatt_k_w, Akw_ref)
+
 if __name__ == '__main__':
     unittest.main()
