@@ -22,13 +22,7 @@
 #
 ################################################################################
 """
-contains all functions related to the observables
-prep_observables
-prepare_obs_files
-add_dmft_observables
-write_obs
-calc_dft_kin_en
-calc_bandcorr_man
+Contains all functions related to the observables.
 """
 
 # system
@@ -537,8 +531,7 @@ def calc_dft_kin_en(general_params, sum_k, dft_mu):
     # E_kin should be divided by the number of k-points
     E_kin_dft = E_kin_dft/num_kpts
 
-    if mpi.is_master_node():
-        print('Kinetic energy contribution dft part: '+str(E_kin_dft))
+    mpi.report(f'Kinetic energy contribution dft part: {E_kin_dft:.8f}')
 
     return E_kin_dft
 

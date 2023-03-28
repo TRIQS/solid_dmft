@@ -35,6 +35,7 @@ import numpy as np
 # triqs
 from triqs.operators.util.observables import S_op, N_op
 from triqs.version import git_hash as triqs_hash
+from triqs.version import version as triqs_version
 from h5 import HDFArchive
 import triqs.utility.mpi as mpi
 from triqs.gf import Gf, make_hermitian, MeshReFreq, MeshImFreq
@@ -43,6 +44,7 @@ from triqs_dft_tools.sumk_dft import SumkDFT
 
 # own modules
 from solid_dmft.version import solid_dmft_hash
+from solid_dmft.version import version as solid_dmft_version
 from solid_dmft.dmft_tools.observables import (calc_dft_kin_en, add_dmft_observables, calc_bandcorr_man, write_obs,
                                          add_dft_values_as_zeroth_iteration, write_header_to_file, prep_observables)
 from solid_dmft.dmft_tools.solver import SolverStructure
@@ -276,18 +278,8 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
                                S='Fermion',
                                n_iw=general_params['n_iw'])
 
-    if general_params['csc']:
-        sum_k = SumkDFT(hdf_file=general_params['seedname']+'.h5', use_dft_blocks=False,
-                        mesh=sumk_mesh, h_field=general_params['h_field'])
-    else:
-        sum_k = SumkDFT(hdf_file=general_params['jobname']+'/'+general_params['seedname']+'.h5',
-                        mesh=sumk_mesh, use_dft_blocks=False, h_field=general_params['h_field'])
-        # This is a quick-and-dirty feature for a magnetic field with spin-orbit coupling
-        # TODO: replace by more elegant implementation, e.g. new field in h5 giving spin
-        if general_params['energy_shift_orbitals'] != 'none':
-            assert np.allclose(sum_k.n_orbitals, sum_k.n_orbitals[0]), 'Energy shift in projector formalism not implemented'
-            assert len(general_params['energy_shift_orbitals']) == sum_k.n_orbitals[0]
-            sum_k.hopping += np.diag(general_params['energy_shift_orbitals'])
+    sum_k = SumkDFT(hdf_file=general_params['jobname']+'/'+general_params['seedname']+'.h5',
+                    mesh=sumk_mesh, use_dft_blocks=False, h_field=general_params['h_field'])
 
     iteration_offset = 0
 
@@ -300,15 +292,21 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
             archive['DMFT_results'].create_group('last_iter')
         if 'DMFT_input' not in archive:
             archive.create_group('DMFT_input')
+            archive['DMFT_input']['program'] = 'solid_dmft'
             archive['DMFT_input'].create_group('solver')
             archive['DMFT_input'].create_group('version')
             archive['DMFT_input']['version']['triqs_hash'] = triqs_hash
+            archive['DMFT_input']['version']['triqs_version'] = triqs_version
             archive['DMFT_input']['version']['solid_dmft_hash'] = solid_dmft_hash
+            archive['DMFT_input']['version']['solid_dmft_version'] = solid_dmft_version
+
         if 'iteration_count' in archive['DMFT_results']:
             iteration_offset = archive['DMFT_results/iteration_count']
-            print('previous iteration count of {} '.format(iteration_offset)
-                  + 'will be added to total number of iterations')
             sum_k.chemical_potential = archive['DMFT_results/last_iter/chemical_potential_post']
+            print(f'RESTARTING DMFT RUN at iteration {iteration_offset+1} using last self-energy')
+        else:
+            print('INITIAL DMFT RUN')
+        print('#'*80, '\n')
     else:
         archive = None
 
@@ -382,7 +380,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
                 if general_params['solver_type'] in ['ftps']:
                     solver_struct_ftps = old_calc['DMFT_input/solver_struct_ftps']
 
-            if not np.allclose(sum_k.rot_mat, previous_rot_mat):
+            if not all(np.allclose(x, y) for x, y in zip(sum_k.rot_mat, previous_rot_mat)):
                 print('WARNING: rot_mat in current run is different from loaded_sigma run.')
             else:
                 previous_rot_mat = None
@@ -402,7 +400,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
             sum_k.block_structure = archive['DMFT_input']['block_structure']
             sum_k.deg_shells = archive['DMFT_input/deg_shells']
             previous_rot_mat = archive['DMFT_input']['rot_mat']
-            if not np.allclose(sum_k.rot_mat, previous_rot_mat):
+            if not all(np.allclose(x, y) for x, y in zip(sum_k.rot_mat, previous_rot_mat)):
                 print('WARNING: rot_mat in current step is different from previous step.')
                 archive['DMFT_input']['rot_mat'] = sum_k.rot_mat
             else:
@@ -480,7 +478,9 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
     if mpi.is_master_node():
         if 'version' not in archive['DMFT_input']:
             archive['DMFT_input'].create_group('version')
+        archive['DMFT_input']['version']['solver_name'] = general_params['solver_type']
         archive['DMFT_input']['version']['solver_hash'] = solvers[0].git_hash
+        archive['DMFT_input']['version']['solver_version'] = solvers[0].version
 
     # Determines initial Sigma and DC
     sum_k, solvers = initial_sigma.determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
@@ -561,18 +561,13 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
         mpi.report('** Sampling finished ***')
         mpi.report('#'*80)
 
-    # for one-shot calculations, we can use the updated GAMMA file for postprocessing
-    if not general_params['csc'] and general_params['oneshot_postproc_gamma_file']:
-        # Write the density correction to file after the one-shot calculation
-        sum_k.calc_density_correction(filename=os.path.join(general_params['jobname'], 'GAMMA'), dm_type='vasp')
-
     mpi.barrier()
 
     # close the h5 archive
     if mpi.is_master_node():
         del archive
 
-    return is_converged
+    return is_converged, sum_k
 
 
 def _dmft_step(sum_k, solvers, it, general_params,
@@ -717,30 +712,20 @@ def _dmft_step(sum_k, solvers, it, general_params,
 
     # if we do a CSC calculation we need always an updated GAMMA file
     E_bandcorr = 0.0
+    deltaN = None
+    dens = None
     if general_params['csc']:
         # handling the density correction for fcsc calculations
-        # TODO: keep only code in "else", the rest is redundant with handling inside
-        #     sum_k.calc_density_correction. Code in "if" only implemented for
-        #     compatibility with last official dft_tools release
-        if dft_params['dft_code'] == 'vasp':
-            if dft_irred_kpt_indices is None:
-                deltaN, dens, E_bandcorr = sum_k.calc_density_correction(filename='GAMMA', dm_type='vasp')
-            else:
-                deltaN, dens, E_bandcorr = sum_k.calc_density_correction(filename='GAMMA', dm_type='vasp',
-                                                                         kpts_to_write=dft_irred_kpt_indices)
-        elif dft_params['dft_code'] == 'qe':
-            deltaN, dens, E_bandcorr = sum_k.calc_density_correction(dm_type=dft_params['dft_code'])
-
-    # for a one shot calculation we are using our own method
-    if not general_params['csc'] and general_params['calc_energies']:
+        assert dft_irred_kpt_indices is None or dft_params['dft_code'] == 'vasp'
+        deltaN, dens, E_bandcorr = sum_k.calc_density_correction(dm_type=dft_params['dft_code'],
+                                                                 kpts_to_write=dft_irred_kpt_indices)
+    elif general_params['calc_energies']:
+        # for a one shot calculation we are using our own method
         E_bandcorr = calc_bandcorr_man(general_params, sum_k, E_kin_dft)
 
-    if general_params['csc']:
-        results_to_archive.write(archive, sum_k, general_params, solver_params, solvers, it,
-                                 is_sampling, previous_mu, density_mat_pre, density_mat, deltaN, dens)
-    else:
-        results_to_archive.write(archive, sum_k, general_params, solver_params, solvers, it,
-                                 is_sampling, previous_mu, density_mat_pre, density_mat)
+    # Writes results to h5 archive
+    results_to_archive.write(archive, sum_k, general_params, solver_params, solvers, it,
+                             is_sampling, previous_mu, density_mat_pre, density_mat, deltaN, dens)
 
     mpi.barrier()
 

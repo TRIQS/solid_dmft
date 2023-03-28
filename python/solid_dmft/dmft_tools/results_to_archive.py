@@ -39,8 +39,9 @@ def _compile_information(sum_k, general_params, solver_params, solvers,
                    'dens_mat_post': density_mat,
                   }
 
-    if general_params['csc']:
+    if deltaN is not None:
         write_to_h5['deltaN'] = deltaN
+    if dens is not None:
         write_to_h5['deltaN_trace'] = dens
 
     for icrsh in range(sum_k.n_inequiv_shells):

@@ -40,6 +40,7 @@ from matplotlib.colors import Normalize
 from matplotlib import cm
 from scipy.optimize import brentq
 from scipy.interpolate import interp1d
+from scipy.signal import argrelextrema
 import numpy as np
 import itertools
 import skimage.measure
@@ -188,7 +189,7 @@ def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, orbital_order_dmft=
 
     sigma_interpolated = np.zeros((n_orb, n_orb, freq_dict['n_w']), dtype=complex)
 
-    if specs['linearize']:
+    if 'linearize' in specs and specs['linearize']:
         print('Linearizing Sigma at zero frequency:')
         eta = eta * 1j
         iw0 = np.where(np.sign(w_mesh_dmft) is True)[0][0]-1
@@ -373,13 +374,24 @@ def _calc_kslice(n_orb, mu, eta, e_mat, sigma, qp_bands, e_vecs=None, proj_nuk=N
 
     else:
         assert n_kx == n_ky, 'Not implemented for N_kx != N_ky'
+
+        def search_for_extrema(data):
+            # return None for no extrema, [] if ends of interval are the only extrema,
+            # list of indices if local extrema are present
+            answer = np.all(data > 0) or np.all(data < 0)
+            if answer:
+                return
+            else:
+                roots = []
+                roots.append(list(argrelextrema(data, np.greater)[0]))
+                roots.append(list(argrelextrema(data, np.less)[0]))
+                roots = sorted([item for sublist in roots for item in sublist])
+            return roots
+
         alatt_k_w = np.zeros((n_kx, n_ky, n_orb))
+        # go through grid horizontally, then vertically
         for it in range(2):
             kslice = np.zeros((n_kx, n_ky, n_orb))
-            if it == 0:
-                def kslice_interp(ik, orb): return interp1d(range(n_kx), kslice[:, ik, orb])
-            else:
-                def kslice_interp(ik, orb): return interp1d(range(n_kx), kslice[ik, :, orb])
 
             for ik1 in range(n_kx):
                 e_temp = e_mat[:, :, :, ik1] if it == 0 else e_mat[:, :, ik1, :]
@@ -389,12 +401,21 @@ def _calc_kslice(n_orb, mu, eta, e_mat, sigma, qp_bands, e_vecs=None, proj_nuk=N
                     kslice[k1, k2] = e_val
 
                 for orb in range(n_orb):
-                    try:
-                        x0 = brentq(kslice_interp(ik1, orb), 0, n_kx - 1)
-                        k1, k2 = [int(np.floor(x0)), ik1] if it == 0 else [ik1, int(np.floor(x0))]
-                        alatt_k_w[k1, k2, orb] += 1
-                    except ValueError:
-                        pass
+                    temp_kslice = kslice[:,ik1,orb] if it == 0 else kslice[ik1,:,orb]
+                    roots = search_for_extrema(temp_kslice)
+                    # iterate through sections between extrema
+                    if roots is not None:
+                        idx_1 = 0
+                        for root_ct in range(len(roots) + 1):
+                            idx_2 = roots[root_ct] if root_ct < len(roots) else n_kx
+                            root_section = temp_kslice[idx_1:idx_2+1]
+                            try:
+                                x0 = brentq(interp1d(np.linspace(idx_1, idx_2, len(root_section)), root_section), idx_1, idx_2)
+                                k1, k2 = [int(np.floor(x0)), ik1] if it == 0 else [ik1, int(np.floor(x0))]
+                                alatt_k_w[k1, k2, orb] += 1
+                            except(ValueError):
+                                pass
+                            idx_1 = idx_2
 
         alatt_k_w[np.where(alatt_k_w > 1)] = 1
 
@@ -537,6 +558,8 @@ def setup_plot_kslice(ax):
 
 def plot_bands(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb, tb=True, alatt=False, qp_bands=False, **plot_dict):
 
+    assert tb_data['special_k'] is not None, 'a regular k point mesh has been used, please call plot_dos'
+
     proj_on_orb = tb_data['proj_on_orb']
     total_proj = tb_data['proj_nuk']
 
@@ -558,7 +581,8 @@ def plot_bands(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb, tb=True, alatt=Fal
             colorbar.set_label(r'$A(k, \omega)$')
 
     if tb:
-        if isinstance(proj_on_orb, np.ndarray) or isinstance(proj_on_orb, list):
+        # if projection is requested, _get_tb_bands() ran already
+        if proj_on_orb[0] is not None:
             eps_nuk = tb_data['e_mat']
             evec_nuk = tb_data['e_vecs']
         else:
@@ -573,6 +597,29 @@ def plot_bands(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb, tb=True, alatt=Fal
 
     _setup_plot_bands(ax, tb_data['special_k'], tb_data['k_points_labels'], freq_dict)
 
+
+def plot_dos(fig, ax, alatt_k_w, tb_data, freq_dict, tb=False, alatt=True, label=None, color=None):
+
+    assert tb == False, 'plotting TB DOS is not supported yet.'
+
+    assert len(alatt_k_w.shape) == 2, 'input Akw should only have a k and omega index'
+
+    if not label:
+        label = ''
+
+    if not color:
+        ax.plot(freq_dict['w_mesh'], np.sum(alatt_k_w, axis=0)/alatt_k_w.shape[0], label=label)
+    else:
+        ax.plot(freq_dict['w_mesh'], np.sum(alatt_k_w, axis=0) /
+                alatt_k_w.shape[0], label=label, color=color)
+
+    ax.axvline(x=0, c='gray', ls='--', zorder=0)
+    ax.set_xlabel(r'$\omega - \mu$ (eV)')
+    ax.set_ylabel(r'A($\omega$)')
+
+    ax.set_xlim(*freq_dict['window'])
+
+    return
 
 def plot_kslice(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb, tb_dict, tb=True, alatt=False, quarter=0, **plot_dict):
 
@@ -713,20 +760,17 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, mu_tb, add_spin=False, add_lambda=
     assert with_sigma or eta != 0.0, 'if no Sigma is provided eta has to be different from 0.0'
 
     # proj_on_orb
-    if not isinstance(proj_on_orb, type(None)):
-        assert isinstance(proj_on_orb, (int, type(None))) or all(isinstance(x, (int, type(None))) for x in proj_on_orb), 'proj_on_orb should be '\
-            f'an integer or list of integers, but is {type(specs["proj_on_orb"])}.'
+    assert isinstance(proj_on_orb, (int, type(None))) or all(isinstance(x, (int, type(None))) for x in proj_on_orb), 'proj_on_orb should be '\
+        f'an integer or list of integers, but is {type(specs["proj_on_orb"])}.'
 
-        if isinstance(proj_on_orb, (int, type(None))):
-            proj_on_orb = [proj_on_orb]
-        else:
-            proj_on_orb = proj_on_orb
-
-        # if projection is requested we have to use band_basis
-        if proj_on_orb[0] is not None:
-            band_basis = True
+    if isinstance(proj_on_orb, (int, type(None))):
+        proj_on_orb = [proj_on_orb]
     else:
-        proj_on_orb = [None]
+        proj_on_orb = proj_on_orb
+
+    # if projection is requested we have to use band_basis
+    if proj_on_orb[0] is not None:
+        band_basis = True
 
     # if proj_nuk is given we need to use the band_basis
     if isinstance(proj_nuk, np.ndarray) and not band_basis:
@@ -743,7 +787,6 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, mu_tb, add_spin=False, add_lambda=
     if add_spin and add_lambda:
         H_add_loc += lambda_matrix_w90_t2g(add_lambda)
     eta = eta * 1j
-    n_k = specs['n_k']
 
     tb = TB_from_wannier90(path=w90_path, seed=w90_seed, extend_to_spin=add_spin, add_local=H_add_loc)
     # print local H(R)
@@ -752,18 +795,54 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, mu_tb, add_spin=False, add_lambda=
     if n_orb <= 12:
         print_matrix(h_of_r, n_orb, 'H(R=0)')
 
-    # bands info
-    w90_paths = list(map(lambda section: (np.array(specs[section[0]]), np.array(specs[section[1]])), specs['bands_path']))
-    k_points_labels = [k[0] for k in specs['bands_path']] + [specs['bands_path'][-1][1]]
-
-    # calculate tight-binding eigenvalues
-    if not fermi_slice:
+    # kmesh prep
+    if ('bands_path' in specs and 'kmesh' in specs) or ('bands_path' not in specs and 'kmesh' not in specs):
+        raise ValueError('choose either a bands_path or kmesh!')
+    elif 'bands_path' in specs:
+        w90_paths = list(map(lambda section: (
+            np.array(specs[section[0]]), np.array(specs[section[1]])), specs['bands_path']))
+        k_points_labels = [k[0] for k in specs['bands_path']] + [specs['bands_path'][-1][1]]
+        n_k = specs['n_k']
         k_vec, k_1d = k_space_path(w90_paths, bz=tb.bz, num=n_k)
         special_k = np.append(k_1d[0::n_k], k_1d[-1::])
+    elif 'kmesh' in specs:
+        assert 'reg' in specs['kmesh'], 'only regular kmesh is implemented'
+
+        special_k = k_points_labels = None
+
+        # read kmesh size
+        if 'n_k' in specs:
+            k_dim = specs['n_k']
+        elif 'k_dim' in specs:
+            k_dim = specs['k_dim']
+        else:
+            raise ValueError('please specify either n_k or k_dim')
+
+        # create regular kmesh
+        if isinstance(k_dim, int):
+            k_spacing = np.linspace(0, 1, k_dim, endpoint=False)
+            k_vec = np.array(np.meshgrid(k_spacing, k_spacing, k_spacing)).T.reshape(-1, 3)
+            n_k = k_dim**3
+            k_1d = (k_dim, k_dim, k_dim)
+        elif all(isinstance(x, int) for x in k_dim) and len(k_dim) == 3:
+            k_x = np.linspace(0, 1, k_dim[0], endpoint=False)
+            k_y = np.linspace(0, 1, k_dim[1], endpoint=False)
+            k_z = np.linspace(0, 1, k_dim[2], endpoint=False)
+            k_vec = np.array(np.meshgrid(k_x, k_y, k_z)).T.reshape(-1, 3)
+            n_k = k_dim[0]*k_dim[1]*k_dim[2]
+            k_1d = k_dim
+        else:
+            raise ValueError(
+                'k_dim / n_k needs to be either an int or a list / tuple of int length 3')
+
+    # calculate tight-binding eigenvalues for non slices
+    if not fermi_slice:
+        # Fourier trafo on input grid / path
         e_mat = tb.fourier(k_vec).transpose(1, 2, 0)
         if add_spin:
             e_mat = e_mat[2:5, 2:5]
-        e_mat = np.einsum('ij, jkl -> ikl', np.linalg.inv(change_of_basis), np.einsum('ijk, jm -> imk', e_mat, change_of_basis))
+        e_mat = np.einsum('ij, jkl -> ikl', np.linalg.inv(change_of_basis),
+                          np.einsum('ijk, jm -> imk', e_mat, change_of_basis))
     else:
         assert 'Z' in specs, 'Please provide Z point coordinate in tb_data_dict as input coordinate'
         Z = np.array(specs['Z'])
@@ -835,7 +914,6 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, mu_tb, add_spin=False, add_lambda=
         else:
             alatt_k_w = _calc_kslice(n_orb, mu, eta, e_mat, delta_sigma, qp_bands, e_vecs=e_vecs,
                                      proj_nuk=proj_nuk, **freq_dict)
-        freq_dict['sigma'] = delta_sigma
     else:
         freq_dict = {}
         freq_dict['w_mesh'] = None

@@ -1,0 +1,211 @@
+FROM ubuntu:jammy
+
+##################################################
+# Essential packages and libraries               #
+##################################################
+
+# get essential packages
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+# Generally needed
+    libmkl-full-dev \
+    sudo \
+    libmpich-dev \
+    mpich \
+    build-essential \
+    cmake \
+# OpenMP problem
+    libmkl-gnu-thread \
+    libomp-dev \
+    libgomp1 \
+# Vasp, doesn't work with newer gfortran versions
+    gfortran \
+    gcc \
+    g++ \
+    git \
+    rsync \
+# TODO: add scaLAPACK
+#    libmkl-scalapack-lp64 \
+#    libmkl-blacs-intelmpi-lp64
+# For TRIQS
+    libgmp-dev \
+    libhdf5-dev \
+    clang \
+    libclang-dev \
+    libboost-dev \
+    python3-pip \
+    python3-setuptools \
+    python3-dev \
+    libfftw3-dev \
+    libnfft3-dev \
+    less \
+    vim \
+# Jupyter lab packages
+    texlive \
+    dvipng \
+    texlive-latex-extra \
+    texlive-fonts-recommended \
+    nodejs \
+    npm \
+    && \
+    apt-get autoremove --purge -y && \
+    apt-get autoclean -y && \
+    rm -rf /var/cache/apt/* /var/lib/apt/lists/*
+
+# For old sarus version, needs to remove ligfortran5. ligfortran5 needed for previous
+# MKL installation but two different libgfortran versions (libgfortran4 comes from gfortran7
+# for Vasp) are not supported by sarus < 1.3.2 on daint
+# RUN rm /usr/lib/x86_64-linux-gnu/libgfortran.so.5* && rm /etc/ld.so.cache
+
+RUN ldconfig -v
+
+##################################################
+# Python modules                                 #
+##################################################
+
+# Install python packages
+RUN pip3 install --no-cache-dir \
+    cython \
+    numpy \
+    scipy \
+    matplotlib \
+    decorator \
+    jupyter \
+    ipywidgets \
+    pytest \
+    pylint \
+    pandas \
+    shapely \
+    monty \
+    mpi4py \
+    pymatgen \
+    Jinja2 \
+    Mako \
+    tornado \
+    zmq \
+    notebook \
+    tk \
+    scikit-image \
+    # Jupyter lab packages
+    jupyterlab \
+    descartes \
+    ipympl \
+    RISE
+
+# jupyter lab extension
+# TODO: fix, right now it crashes with "nodejs required"
+#RUN jupyter-labextension install @jupyter-widgets/jupyterlab-manager jupyter-matplotlib @jupyterlab/toc
+#RUN jupyter-lab build
+
+##################################################
+# TRIQS and its packages                         #
+##################################################
+
+# set some compiler flags
+ENV CFLAGS="-m64 -O3 -Wl,--no-as-needed"
+ENV CXXFLAGS="-m64 -O3 -Wl,--no-as-needed"
+ENV LDFLAGS="-ldl -lm"
+ENV FFLAGS="-m64 -O3"
+
+# triqs
+RUN cd / && mkdir -p triqs && mkdir -p source
+
+RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/triqs triqs.src \
+    && mkdir -p triqs.build && cd triqs.build \
+    && cmake ../triqs.src -DCMAKE_INSTALL_PREFIX=/triqs \
+       -DBLAS_LIBRARIES=/lib/x86_64-linux-gnu/libmkl_rt.so \
+       -DLIBCLANG_LOCATION=/usr/lib/llvm-13/lib/libclang.so \
+    && make -j2
+RUN cd /source/triqs.build && make -j2 test && make install
+
+ENV CPATH=/triqs/include:${CPATH}
+ENV PATH=/triqs/bin:${PATH}
+ENV LIBRARY_PATH=/triqs/lib:${LIBRARY_PATH}
+ENV LD_LIBRARY_PATH=/triqs/lib:${LD_LIBRARY_PATH}
+ENV PYTHONPATH=/triqs/lib/python3.10/site-packages:${PYTHONPATH}
+ENV CMAKE_PREFIX_PATH=/triqs/share/cmake:${CMAKE_PREFIX_PATH}
+ENV TRIQS_ROOT=/triqs
+
+# dft_tools
+RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/dft_tools.git dft_tools.src \
+    && mkdir -p dft_tools.build && cd dft_tools.build \
+    && cmake ../dft_tools.src -DCMAKE_INSTALL_PREFIX=/triqs \
+    && make -j2 && make -j2 test && make install
+
+# cthyb
+RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/cthyb.git cthyb.src \
+    && mkdir -p cthyb.build && cd cthyb.build \
+    && cmake ../cthyb.src -DCMAKE_INSTALL_PREFIX=/triqs \
+    && make -j2 && make -j2 test && make install
+
+# maxent
+RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/maxent.git maxent.src \
+    && mkdir -p maxent.build && cd maxent.build \
+    && cmake ../maxent.src -DCMAKE_INSTALL_PREFIX=/triqs \
+    && make -j2 && make -j2 test && make install
+
+# ctint
+# ADD ctint-3.0.x.tar.gz /source/ctint.src
+# RUN cd /source && mkdir -p ctint.build && cd ctint.build \
+#     && cmake ../ctint.src -DCMAKE_INSTALL_PREFIX=/triqs \
+#     && make -j2 && make -j2 test && make install
+
+# hubbardI
+RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hubbardI hubbardI.src \
+    && mkdir -p hubbardI.build && cd hubbardI.build \
+    && cmake ../hubbardI.src -DCMAKE_INSTALL_PREFIX=/triqs \
+    && make -j2 && make -j2 test && make install
+
+# solid_dmft
+RUN cd /source && git clone -b unstable --depth 1 https://github.com/flatironinstitute/solid_dmft.git solid_dmft.src \
+    && mkdir -p solid_dmft.build && cd solid_dmft.build \
+    && cmake ../solid_dmft.src -DCMAKE_INSTALL_PREFIX=/triqs \
+    && make -j2 && make -j2 test && make install
+
+
+##################################################
+# Wannier90 and VASP                             #
+##################################################
+
+# W90
+# Uncomment the lines in this and the following VASP block to have W90 as a library in VASP, allowing for the tag LWANNIER90=.TRUE.
+RUN cd / && git clone -b v3.1.0 --depth 1 https://github.com/wannier-developers/wannier90.git
+# Make gfort use the intel libraries
+COPY wannier90.make.inc /wannier90/make.inc
+RUN cd /wannier90 && make default lib && rm -r test-suite
+
+# TODO: include scalapack
+# VASP for CSC calculations
+ADD csc_vasp.tar.gz /vasp/
+COPY mpich_vasp.makefile_vasp5 /vasp/makefile.include
+# Install vasp
+RUN cd /vasp/ \
+    && make std \
+    && rm -rf src/ build/ arch/
+
+ENV PATH=/vasp/bin:/wannier90:${PATH}
+
+##################################################
+# Cleanup                                        #
+##################################################
+
+# remove source
+RUN cd / && rm -rf source
+
+# make sure openmp does not start
+ENV OMP_NUM_THREADS=1
+# allow safe forking to start DFT in CSC calculations
+ENV RDMAV_FORK_SAFE=1
+
+# expose port for jupyter
+EXPOSE 8378
+
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY jupyter_start.sh /usr/local/bin/jupyter.sh
+
+RUN ["chmod", "+x", "/usr/local/bin/entrypoint.sh"]
+RUN ["chmod", "+x", "/usr/local/bin/jupyter.sh"]
+
+# change user and group id to match host machine if options are passed accordingly
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
