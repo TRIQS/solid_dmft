@@ -689,8 +689,6 @@ class SolverStructure:
         from hartree_fock.impurity import ImpuritySolver as hartree_solver
 
         gf_struct = self.sum_k.gf_struct_solver_list[self.icrsh]
-        n_orb = self.sum_k.corr_shells[self.icrsh]['dim']
-
 
         # Construct the triqs_solver instances
         # Always initialize the solver with dc_U and dc_J equal to U and J and let the _interface_hartree_dc function
@@ -733,15 +731,21 @@ class SolverStructure:
                 if general_params['dc_dmft'] == False:
                     mpi.report('HARTREE SOLVER: Warning dft occupation in the DC calculations are meaningless for the hartree solver, reverting to dmft occupations')
 
-            if hartree_instance.dc_type == 0:
+            if hartree_instance.dc_type == 0 and not self.general_params['magnetic']:
                     mpi.report(f"HARTREE SOLVER: Detected dc_type = {hartree_instance.dc_type}, changing to 'cFLL'")
                     hartree_instance.dc_type = 'cFLL'
+            elif hartree_instance.dc_type == 0 and self.general_params['magnetic']:
+                    mpi.report(f"HARTREE SOLVER: Detected dc_type = {hartree_instance.dc_type}, changing to 'sFLL'")
+                    hartree_instance.dc_type = 'sFLL'
             elif hartree_instance.dc_type == 1:
                     mpi.report(f"HARTREE SOLVER: Detected dc_type = {hartree_instance.dc_type}, changing to 'cHeld'")
                     hartree_instance.dc_type = 'cHeld'
-            elif hartree_instance.dc_type == 2:
+            elif hartree_instance.dc_type == 2 and not self.general_params['magnetic']:
                     mpi.report(f"HARTREE SOLVER: Detected dc_type = {hartree_instance.dc_type}, changing to 'cAMF'")
                     hartree_instance.dc_type = 'cAMF'
+            elif hartree_instance.dc_type == 2 and self.general_params['magnetic']:
+                    mpi.report(f"HARTREE SOLVER: Detected dc_type = {hartree_instance.dc_type}, changing to 'sAMF'")
+                    hartree_instance.dc_type = 'sAMF'
 
         # Give dc information to the solver in order to customize DC calculation
         _interface_hartree_dc(triqs_solver, self.general_params, self.advanced_params, self.icrsh)
