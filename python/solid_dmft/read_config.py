@@ -340,9 +340,9 @@ with_fock : bool, optional, default=False
 force_real : bool, optional, default=True
         force the self energy from Hartree fock to be real
 one_shot : bool, optional, default=True
-        Perform a self-consitent root finding in each DMFT step of the Hartree solver. Default is True
+        Perform a one-shot or self-consitent root finding in each DMFT step of the Hartree solver.
 method : bool, optional, default=True
-        method for root finder. Only used if one_shot=False, see scipy.optimize.root for options. Default : krylov
+        method for root finder. Only used if one_shot=False, see scipy.optimize.root for options.
 tol : float, optional, default=1e-5
         tolerance for root finder if one_shot=False.
 
