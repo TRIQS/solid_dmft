@@ -339,8 +339,12 @@ with_fock : bool, optional, default=False
         include Fock exchange terms in the self-energy
 force_real : bool, optional, default=True
         force the self energy from Hartree fock to be real
-one_shot : bool, optional, default=False
-        True if the calcualtion is just one shot and not self consistent. Default is False
+one_shot : bool, optional, default=True
+        Perform a self-consitent root finding in each DMFT step of the Hartree solver. Default is True
+method : bool, optional, default=True
+        method for root finder. Only used if one_shot=False, see scipy.optimize.root for options. Default : krylov
+tol : float, optional, default=1e-5
+        tolerance for root finder if one_shot=False.
 
 [  dft  ]
 ---------
@@ -775,6 +779,12 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                 'force_real': {'converter': BOOL_PARSER,
                                                  'used': lambda params: params['general']['solver_type'] in ['hartree'],
                                                  'default': True},
+                                'method': {'valid for': lambda x, _: x in ['krylov', 'broyden1', 'broyden2', 'hybr', 'linearmixing'],
+                                                 'used': lambda params: params['general']['solver_type'] in ['hartree'],
+                                                 'default': 'krylov'},
+                                'tol': {'converter': float, 'valid for': lambda x, _: x >= 0,
+                                              'used': lambda params: params['general']['solver_type'] in ['hartree'],
+                                              'default': 1e-5},
 
                                 #
                                 # ftps parameters

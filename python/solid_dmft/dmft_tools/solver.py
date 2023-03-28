@@ -176,7 +176,7 @@ class SolverStructure:
             self.version = version
 
         elif self.general_params['solver_type'] == 'hartree':
-            from hartree_fock.version import hartree_fock_hash
+            from hartree_fock.version import hartree_fock_hash, version
 
             # sets up necessary GF objects on ImFreq
             self._init_ImFreq_objects()
@@ -184,6 +184,7 @@ class SolverStructure:
             # sets up solver
             self.triqs_solver = self._create_hartree_solver()
             self.git_hash = hartree_fock_hash
+            self.version = version
 
         elif self.general_params['solver_type'] == 'ftps':
             from forktps.version import forktps_hash, version
@@ -436,7 +437,8 @@ class SolverStructure:
             # *************************************
             # this is done on every node due to very slow bcast of the AtomDiag object as of now
             self.triqs_solver.solve(h_int=self.h_int, with_fock=self.solver_params['with_fock'],
-                                    one_shot=self.solver_params['one_shot'])
+                                    one_shot=self.solver_params['one_shot'],
+                                    method=self.solver_params['method'], tol=self.solver_params['tol'])
 
             # call postprocessing
             self._hartree_postprocessing()
@@ -697,8 +699,7 @@ class SolverStructure:
                                       n_iw=self.general_params['n_iw'], force_real=self.solver_params['force_real'],
                                       symmetries=[self._make_spin_equal],
                                       dc_U= self.general_params['U'][self.icrsh],
-                                      dc_J= self.general_params['J'][self.icrsh],
-                                      n_orb = n_orb
+                                      dc_J= self.general_params['J'][self.icrsh]
                                       )
 
         def _interface_hartree_dc(hartree_instance, general_params, advanced_params, icrsh):
