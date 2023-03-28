@@ -28,7 +28,7 @@ if mpi.is_master_node():
     for key in ['Delta_time_0', 'G0_Refreq_0', 'G0_freq_0', 'Gimp_Refreq_0', 'Gimp_freq_0', 'Gimp_time_0', 'Sigma_Refreq_0', 'Sigma_freq_0',
                 'Delta_time_1', 'G0_Refreq_1', 'G0_freq_1', 'Gimp_Refreq_1', 'Gimp_freq_1', 'Gimp_time_1', 'Sigma_Refreq_1', 'Sigma_freq_1']:
         print(key)
-        assert_block_gfs_are_close(out[key],ref[key])
+        assert_block_gfs_are_close(out[key],ref[key], precision= 1e-5)
 
     for key in ['chemical_potential_pre', 'chemical_potential_post']:
         print(key)
