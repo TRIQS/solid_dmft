@@ -93,7 +93,7 @@ def _determine_block_structure(sum_k, general_params, advanced_params):
     # for certain systems it is needed to keep off diag elements
     # this enforces to use the full corr subspace matrix
     solver_struct_ftps = None
-    if general_params['enforce_off_diag'] or general_params['solver_type'] in ['ftps']:
+    if general_params['enforce_off_diag'] or general_params['solver_type'] in ['ftps', 'hartree']:
         if general_params['solver_type'] in ['ftps']:
             # first round to determine real blockstructure
             mock_sumk = deepcopy(sum_k)
@@ -333,7 +333,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
         dft_mu = sum_k.calc_mu(precision=general_params['prec_mu'],
                                broadening=general_params['eta'])
     else:
-        dft_mu = sum_k.calc_mu(precision=general_params['prec_mu'])
+        dft_mu = sum_k.calc_mu(precision=general_params['prec_mu'], method=general_params['calc_mu_method'])
 
     # calculate E_kin_dft for one shot calculations
     if not general_params['csc'] and general_params['calc_energies']:
@@ -467,11 +467,11 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
             if general_params['solver_type'] in ['ftps']:
                 archive['DMFT_input']['solver_struct_ftps'] = solver_struct_ftps
 
-    # Initializes the solvers
     solvers = [None] * sum_k.n_inequiv_shells
     for icrsh in range(sum_k.n_inequiv_shells):
         # Construct the Solver instances
-        solvers[icrsh] = SolverStructure(general_params, solver_params, sum_k, icrsh, h_int[icrsh],
+        solvers[icrsh] = SolverStructure(general_params, solver_params, advanced_params,
+                                         sum_k, icrsh, h_int[icrsh],
                                          iteration_offset, solver_struct_ftps)
 
     # store solver hash to archive
@@ -487,6 +487,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
                                                                   archive, iteration_offset, density_mat_dft, solvers)
 
     sum_k = manipulate_mu.set_initial_mu(general_params, sum_k, iteration_offset, archive, shell_multiplicity)
+
 
     # setup of measurement of chi(SzSz(tau) if requested
     if general_params['measure_chi'] != 'none':
@@ -692,9 +693,15 @@ def _dmft_step(sum_k, solvers, it, general_params,
     solvers = gf_mixer.mix_sigma(general_params, sum_k.n_inequiv_shells, solvers, Sigma_freq_previous)
 
     # calculate new DC
+    # for the hartree solver the DC potential will be formally set to zero as it is already present in the Sigma
     if general_params['dc'] and general_params['dc_dmft']:
         sum_k = initial_sigma.calculate_double_counting(sum_k, density_mat,
                                                         general_params, advanced_params)
+    
+    #The hartree solver computes the DC energy internally, set it in sum_k
+    if general_params['solver_type'] == 'hartree':
+        for icrsh in range(sum_k.n_inequiv_shells):
+            sum_k.dc_energ[icrsh] = solvers[icrsh].DC_energy
 
     # doing the dmft loop and set new sigma into sumk
     sum_k.put_Sigma([solvers[icrsh].Sigma_freq for icrsh in range(sum_k.n_inequiv_shells)])
@@ -766,7 +773,7 @@ def _dmft_step(sum_k, solvers, it, general_params,
                                         sum_k.spin_block_names[sum_k.SO])
     if general_params['calc_energies']:
         formatter.print_summary_energetics(observables)
-    if not general_params['csc'] and general_params['magnetic'] and sum_k.SO == 0:
+    if general_params['magnetic'] and sum_k.SO == 0:
         # if a magnetic calculation is done print out a summary of up/down occ
         formatter.print_summary_magnetic_occ(observables, sum_k.n_inequiv_shells)
     formatter.print_summary_convergence(conv_obs, general_params, sum_k.n_inequiv_shells)

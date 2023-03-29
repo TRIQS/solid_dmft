@@ -63,6 +63,13 @@ def calculate_double_counting(sum_k, density_matrix, general_params, advanced_pa
     # copy the density matrix to not change it
     density_matrix_DC = deepcopy(density_matrix)
 
+    if general_params['solver_type'] == 'hartree':
+        mpi.report('\nSOLID_DMFT: Hartree solver detected, zeroing out the DC correction. This gets computed at the solver level')
+        for icrsh in range(sum_k.n_inequiv_shells):
+            sum_k.calc_dc(density_matrix_DC[icrsh], orb=icrsh,
+                          use_dc_value=0.0)
+        return sum_k
+
     # Sets the DC and exits the function if advanced_params['dc_fixed_value'] is specified
     if advanced_params['dc_fixed_value'] != 'none':
         for icrsh in range(sum_k.n_inequiv_shells):
@@ -414,12 +421,29 @@ def determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
                     # if magmom positive the up channel will be favored
                     for spin_channel in sum_k.gf_struct_solver[icrsh].keys():
                         if 'up' in spin_channel:
-                            start_sigma[icrsh][spin_channel] << (1+fac)*dc_value
+                            start_sigma[icrsh][spin_channel] << -fac + dc_value
                         else:
-                            start_sigma[icrsh][spin_channel] << (1-fac)*dc_value
+                            start_sigma[icrsh][spin_channel] << fac + dc_value
                 else:
                     start_sigma[icrsh] << dc_value
         # Sets Sigma to zero because neither initial Sigma nor DC given
+
+        elif (not general_params['dc'] and general_params['magnetic']):
+            start_sigma = [sum_k.block_structure.create_gf(ish=iineq, gf_function=Gf, space='solver', mesh=sum_k.mesh)
+                                for iineq in range(sum_k.n_inequiv_shells)]
+            for icrsh in range(sum_k.n_inequiv_shells):
+                if (general_params['magnetic'] and general_params['magmom'] and sum_k.SO == 0):
+                    mpi.report(f'\n*** Adding magnetic bias to initial sigma for impurity {icrsh} ***')
+                    # if we are doing a magnetic calculation and initial magnetic moments
+                    # are set, manipulate the initial sigma accordingly
+                    fac = general_params['magmom'][icrsh]
+
+                    # if magmom positive the up channel will be favored
+                    for spin_channel in sum_k.gf_struct_solver[icrsh].keys():
+                        if 'up' in spin_channel:
+                            start_sigma[icrsh][spin_channel] << -fac
+                        else:
+                            start_sigma[icrsh][spin_channel] << fac
         else:
             if general_params['solver_type'] in ['ftps']:
                 start_sigma = [sum_k.block_structure.create_gf(ish=iineq, gf_function=Gf, space='solver',
@@ -453,5 +477,14 @@ def determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
 
     # Updates the sum_k object with the Matsubara self-energy
     sum_k.put_Sigma([solvers[icrsh].Sigma_freq for icrsh in range(sum_k.n_inequiv_shells)])
+    
+    # load sigma as first guess in the hartree solver if applicable
+    if general_params['solver_type'] == 'hartree':
+        # TODO:
+        # should this be moved to before the solve() call? Having it only here means there is a mismatch
+        # between the mixing at the level of the solver and the sumk (solver mixes always 100%)
+        for icrsh in range(sum_k.n_inequiv_shells):
+            mpi.report(f"SOLID_DMFT: setting first guess hartree solver for impurity {icrsh}")
+            solvers[icrsh].triqs_solver.reinitialize_sigma(start_sigma[icrsh])
 
     return sum_k, solvers

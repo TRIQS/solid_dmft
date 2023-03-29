@@ -317,6 +317,8 @@ def add_dmft_observables(observables, general_params, solver_params, dft_energy,
             and solver_params["measure_density_matrix"]):
             E_int = [trace_rho_op(density_matrix[icrsh], h_int[icrsh], diag_local_ham[icrsh])
                      for icrsh in range(sum_k.n_inequiv_shells)]
+        elif general_params['solver_type'] == 'hartree':
+            E_int = [solvers[icrsh].interaction_energy for icrsh in range(sum_k.n_inequiv_shells)]
         else:
             warning = ( "!-------------------------------------------------------------------------------------------!\n"
                         "! WARNING: calculating interaction energy using Migdal formula                              !\n"
