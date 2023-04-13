@@ -156,6 +156,12 @@ RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hubba
     && cmake ../hubbardI.src -DCMAKE_INSTALL_PREFIX=/triqs \
     && make -j2 && make -j2 test && make install
 
+# Hartree-Fock
+RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hartree_fock hartree.src \
+    && mkdir -p hartree.build && cd hartree.build \
+    && cmake ../hartree.src -DCMAKE_INSTALL_PREFIX=/triqs \
+    && make -j2 && make -j2 test && make install
+
 # solid_dmft
 RUN cd /source && git clone -b unstable --depth 1 https://github.com/flatironinstitute/solid_dmft.git solid_dmft.src \
     && mkdir -p solid_dmft.build && cd solid_dmft.build \
