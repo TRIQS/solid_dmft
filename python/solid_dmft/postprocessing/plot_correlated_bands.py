@@ -44,6 +44,7 @@ from scipy.signal import argrelextrema
 import numpy as np
 import itertools
 import skimage.measure
+from warnings import warn
 
 from h5 import HDFArchive
 from triqs.gf import BlockGf, MeshReFreq, Gf
@@ -51,33 +52,17 @@ from triqs.lattice.utils import TB_from_wannier90, k_space_path
 from triqs_dft_tools.sumk_dft import SumkDFT
 
 
-def _linefit(x, y, interval, spacing=50, addspace=0.0):
-
-    def calc_Z(slope): return 1/(1-slope)
-
-    x = np.array(x)
-    lim_l, lim_r = interval
-    indices = np.where(np.logical_and(x >= lim_l, x <= lim_r))
-    fit = np.polyfit(x[indices], y[indices], 1)
-    slope = fit[1]
-    Z = calc_Z(slope)
-    f_x = np.poly1d(fit)
-    x_cont = np.linspace(x[indices][0] - addspace, x[indices][-1] + addspace, spacing)
-
-    return x_cont, f_x(x_cont), fit
-
-
 def lambda_matrix_w90_t2g(add_lambda):
 
     lambda_x, lambda_y, lambda_z = add_lambda
 
     lambda_matrix = np.zeros((6, 6), dtype=complex)
-    lambda_matrix[0, 1] = -1j*lambda_z/2.0
-    lambda_matrix[0, 5] = 1j*lambda_x/2.0
-    lambda_matrix[1, 5] = -lambda_y/2.0
-    lambda_matrix[2, 3] = -1j*lambda_x/2.0
-    lambda_matrix[2, 4] = lambda_y/2.0
-    lambda_matrix[3, 4] = 1j*lambda_z/2.0
+    lambda_matrix[0, 1] = +1j*lambda_z/2.0
+    lambda_matrix[0, 5] = -1j*lambda_x/2.0
+    lambda_matrix[1, 5] =    -lambda_y/2.0
+    lambda_matrix[2, 3] = +1j*lambda_x/2.0
+    lambda_matrix[2, 4] =    +lambda_y/2.0
+    lambda_matrix[3, 4] = -1j*lambda_z/2.0
     lambda_matrix += np.transpose(np.conjugate(lambda_matrix))
 
     return lambda_matrix
@@ -107,7 +92,7 @@ def print_matrix(matrix, n_orb, text):
         print((' '*4 + fmt).format(*row))
 
 
-def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, orbital_order_dmft=None, eta=0.0, **specs):
+def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, orbital_order_dmft=None, **specs):
 
     if orbital_order_dmft is None:
         orbital_order_dmft = orbital_order
@@ -189,51 +174,39 @@ def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, orbital_order_dmft=
 
     sigma_interpolated = np.zeros((n_orb, n_orb, freq_dict['n_w']), dtype=complex)
 
-    if 'linearize' in specs and specs['linearize']:
-        print('Linearizing Sigma at zero frequency:')
-        eta = eta * 1j
-        iw0 = np.where(np.sign(w_mesh_dmft) is True)[0][0]-1
-        if SOC:
-            sigma_interpolated += np.expand_dims(sigma_mat[iw0, :, :], axis=-1)
-        # linearize diagonal elements of sigma
-        for ct in range(n_orb):
-            _, _, fit_params = _linefit(w_mesh_dmft, sigma_mat[:, ct, ct], specs['linearize']['window'])
-            zeroth_order, first_order = fit_params[::-1].real
-            print('Zeroth and first order fit parameters: [{0:.4f}, {1:.4f}]'.format(zeroth_order, first_order))
-            sigma_interpolated[ct, ct] = zeroth_order + freq_dict['w_mesh'] * first_order
+    # interpolate sigma
+    def interpolate_sigma(w_mesh, w_mesh_dmft, orb1, orb2): return np.interp(w_mesh, w_mesh_dmft, sigma_mat[:, orb1, orb2])
 
-    else:
-        # eta is added on the level of the spectral function!
-        eta = 0 * 1j
-        # interpolate sigma
-        def interpolate_sigma(w_mesh, w_mesh_dmft, orb1, orb2): return np.interp(w_mesh, w_mesh_dmft, sigma_mat[:, orb1, orb2])
-
-        for ct1, ct2 in itertools.product(range(n_orb), range(n_orb)):
-            if ct1 != ct2 and not SOC:
-                continue
-            sigma_interpolated[ct1, ct2] = interpolate_sigma(w_mesh, w_mesh_dmft, ct1, ct2)
+    for ct1, ct2 in itertools.product(range(n_orb), range(n_orb)):
+        if ct1 != ct2 and not SOC:
+            continue
+        sigma_interpolated[ct1, ct2] = interpolate_sigma(w_mesh, w_mesh_dmft, ct1, ct2)
 
     return sigma_interpolated, mu_dmft, freq_dict
 
 
-def _sigma_from_model(n_orb, orbital_order, zeroth_order, first_order, eta=0.0, **w):
+def sigma_FL(n_orb, orbital_order, Sigma_0, Sigma_Z, freq_dict, eta=0.0, mu_dmft=None):
 
-    print('Setting model Sigma')
+    print('Setting Re[Sigma] with Fermi liquid approximation')
+
+    if np.any(Sigma_0) and mu_dmft == None:
+        raise ValueError('Sigma_0 does not preserve electron count. Please provide "mu_dmft".')
+    elif not np.any(Sigma_0) and mu_dmft == None:
+        mu_dmft = 0.
 
     eta = eta * 1j
 
     # set up mesh
-    freq_dict = w['w_mesh']
     w_mesh = np.linspace(*freq_dict['window'], freq_dict['n_w'])
     freq_dict.update({'w_mesh': w_mesh})
 
-    # interpolate sigma
-    sigma_interpolated = np.zeros((n_orb, n_orb, freq_dict['n_w']), dtype=complex)
-    def approximate_sigma(zeroth_order, first_order, orb): return zeroth_order[orb] + freq_dict['w_mesh'] * first_order[orb]
+    # setting up sigma
+    sigma_array = np.zeros((n_orb, n_orb, freq_dict['n_w']), dtype=complex)
+    def approximate_sigma(orb): return (1-1/Sigma_Z[orb]) * freq_dict['w_mesh'] + Sigma_0[orb] - mu_dmft
     for ct, orb in enumerate(orbital_order):
-        sigma_interpolated[ct, ct] = approximate_sigma(zeroth_order, first_order, ct)
+        sigma_array[ct, ct] = approximate_sigma(ct) + 1j * eta
 
-    return sigma_interpolated, freq_dict
+    return sigma_array, freq_dict
 
 
 def _calc_alatt(n_orb, mu, eta, e_mat, sigma, qp_bands=False, e_vecs=None,
@@ -589,7 +562,10 @@ def plot_bands(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb, tb=True, alatt=Fal
             eps_nuk, evec_nuk, _ = _get_tb_bands(**tb_data)
         for band in range(n_orb):
             if not proj_on_orb[0] is not None:
-                color = eval('cm.'+plot_dict['colorscheme_bands'])(1.0)
+                if isinstance(plot_dict['colorscheme_bands'], str):
+                    color = eval('cm.'+plot_dict['colorscheme_bands'])(1.0)
+                else:
+                    color = plot_dict['colorscheme_bands']
                 ax.plot(tb_data['k_mesh'], eps_nuk[band, band].real - tb_data['mu_tb'], c=color, label=r'tight-binding', zorder=1., lw=1)
             else:
                 color = eval('cm.'+plot_dict['colorscheme_bands'])(total_proj[band])
@@ -777,11 +753,11 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, mu_tb, add_spin=False, add_lambda=
         band_basis = True
 
     # set up Wannier Hamiltonian
-    n_orb_rescale = 2 * n_orb if add_spin else n_orb
+    n_orb = 2 * n_orb if add_spin else n_orb
     change_of_basis = change_basis(n_orb, orbital_order_to, orbital_order_w90)
-    H_add_loc = np.zeros((n_orb_rescale, n_orb_rescale), dtype=complex)
+    H_add_loc = np.zeros((n_orb, n_orb), dtype=complex)
     if not isinstance(add_local, type(None)):
-        assert np.shape(add_local) == (n_orb_rescale, n_orb_rescale), 'add_local must have dimension (n_orb, n_orb), but has '\
+        assert np.shape(add_local) == (n_orb, n_orb), 'add_local must have dimension (n_orb, n_orb), but has '\
                 f'dimension {np.shape(add_local)}'
         H_add_loc += add_local
     if add_spin and add_lambda:
@@ -790,8 +766,7 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, mu_tb, add_spin=False, add_lambda=
 
     tb = TB_from_wannier90(path=w90_path, seed=w90_seed, extend_to_spin=add_spin, add_local=H_add_loc)
     # print local H(R)
-    h_of_r = tb.hoppings[(0, 0, 0)][2:5, 2:5] if add_spin else tb.hoppings[(0, 0, 0)]
-    h_of_r = np.einsum('ij, jk -> ik', np.linalg.inv(change_of_basis), np.einsum('ij, jk -> ik', h_of_r, change_of_basis))
+    h_of_r = np.einsum('ij, jk -> ik', np.linalg.inv(change_of_basis), np.einsum('ij, jk -> ik', tb.hoppings[(0, 0, 0)], change_of_basis))
     if n_orb <= 12:
         print_matrix(h_of_r, n_orb, 'H(R=0)')
 
@@ -839,8 +814,6 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, mu_tb, add_spin=False, add_lambda=
     if not fermi_slice:
         # Fourier trafo on input grid / path
         e_mat = tb.fourier(k_vec).transpose(1, 2, 0)
-        if add_spin:
-            e_mat = e_mat[2:5, 2:5]
         e_mat = np.einsum('ij, jkl -> ikl', np.linalg.inv(change_of_basis),
                           np.einsum('ijk, jm -> imk', e_mat, change_of_basis))
     else:
@@ -848,7 +821,7 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, mu_tb, add_spin=False, add_lambda=
         Z = np.array(specs['Z'])
 
         k_vec = np.zeros((n_k*n_k, 3))
-        e_mat = np.zeros((n_orb_rescale, n_orb_rescale, n_k, n_k), dtype=complex)
+        e_mat = np.zeros((n_orb, n_orb, n_k, n_k), dtype=complex)
 
         upper_left = np.diff(w90_paths[0][::-1], axis=0)[0]
         lower_right = np.diff(w90_paths[1], axis=0)[0]
@@ -857,8 +830,8 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, mu_tb, add_spin=False, add_lambda=
             k_vec[ik_y*n_k:ik_y*n_k+n_k, :], k_1d = k_space_path(path_along_x, bz=tb.bz, num=n_k)
             special_k = np.append(k_1d[0::n_k], k_1d[-1::])
             e_mat[:, :, :, ik_y] = tb.fourier(k_vec[ik_y*n_k:ik_y*n_k+n_k, :]).transpose(1, 2, 0)
-        if add_spin:
-            e_mat = e_mat[2:5, 2:5]
+        #if add_spin:
+        #    e_mat = e_mat[2:5, 2:5]
         e_mat = np.einsum('ij, jklm -> iklm', np.linalg.inv(change_of_basis), np.einsum('ijkl, jm -> imkl', e_mat, change_of_basis))
 
     if band_basis:
@@ -883,7 +856,8 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, mu_tb, add_spin=False, add_lambda=
 
         # get sigma
         if with_sigma == 'model':
-            delta_sigma, freq_dict = _sigma_from_model(n_orb, orbital_order_to, **specs)
+            mu_dmft = None if 'mu_dmft' not in specs else specs['mu_dmft']
+            delta_sigma, freq_dict = sigma_FL(n_orb, orbital_order_to, specs['Sigma_0'], specs['Sigma_Z'], specs['w_mesh'], eta=eta, mu_dmft=mu_dmft)
             mu = mu_tb + mu_shift
         # else is from dmft or memory:
         else:
