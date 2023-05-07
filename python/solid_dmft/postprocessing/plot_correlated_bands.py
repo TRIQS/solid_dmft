@@ -638,15 +638,15 @@ def plot_kslice(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb, tb_dict, tb=True,
         for sheet in FS_kx_ky.keys():
             for k_on_sheet in range(FS_kx_ky[sheet].shape[0]):
                 if not proj_on_orb[0] is not None:
-                    if isinstance(plot_dict['colorscheme_kslice'], str):
-                        color = eval('cm.'+plot_dict['colorscheme_kslice'])(1.0)
+                    if isinstance(plot_dict['colorscheme_bands'], str):
+                        color = eval('cm.'+plot_dict['colorscheme_bands'])(1.0)
                     else:
-                        color = plot_dict['colorscheme_kslice']
+                        color = plot_dict['colorscheme_bands']
                 else:
                     total_proj = 0
                     for orb in proj_on_orb:
                         total_proj += band_char[sheet][k_on_sheet][orb]
-                    color = eval('cm.'+plot_dict['colorscheme_kslice'])(total_proj)
+                    color = eval('cm.'+plot_dict['colorscheme_bands'])(total_proj)
                 for (qx, qy) in used_quarters:
                     ax.plot(2*qx * FS_kx_ky[sheet][k_on_sheet:k_on_sheet+2, 0], 2*qy * FS_kx_ky[sheet][k_on_sheet:k_on_sheet+2, 1], '-',
                             solid_capstyle='round', c=color, zorder=1., label=plot_dict['label'] if 'label' in plot_dict else '')
