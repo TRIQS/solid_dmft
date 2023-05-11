@@ -448,7 +448,7 @@ class SolverStructure:
             from forktps.DiscreteBath import DiscretizeBath, TimeStepEstimation
             from forktps.BathFitting import BathFitter
             from forktps.Helpers import MakeGFstruct
-            from . import OffDiagFitter as off_fitter
+            # from . import OffDiagFitter as off_fitter
 
             def make_positive_definite(G):
                 # ensure that Delta is positive definite

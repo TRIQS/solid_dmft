@@ -227,11 +227,11 @@ def _chi_setup(sum_k, general_params, solver_params):
         if general_params['measure_chi'] == 'SzSz':
             Op_list[icrsh] = S_op('z',
                                   spin_names=sum_k.spin_block_names[sum_k.SO],
-                                  orb_names=orb_names,
+                                  n_orb=n_orb,
                                   map_operator_structure=sum_k.sumk_to_solver[icrsh])
         elif general_params['measure_chi'] == 'NN':
             Op_list[icrsh] = N_op(spin_names=sum_k.spin_block_names[sum_k.SO],
-                                  orb_names=orb_names,
+                                  n_orb=n_orb,
                                   map_operator_structure=sum_k.sumk_to_solver[icrsh])
 
     solver_params['measure_O_tau_min_ins'] = general_params['measure_chi_insertions']
