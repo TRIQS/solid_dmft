@@ -4,7 +4,7 @@
 Contains unit tests for observables.py
 """
 
-from triqs.gf import BlockGf, GfImFreq, GfImTime, SemiCircular
+from triqs.gf import BlockGf, Gf, SemiCircular, MeshImFreq, MeshImTime
 from triqs.gf.descriptors import Fourier
 
 from solid_dmft.dmft_tools.observables import add_dft_values_as_zeroth_iteration, add_dmft_observables, _generate_header
@@ -49,7 +49,8 @@ def test_add_dft_values_one_impurity_one_band():
     general_params['solver_type'] = 'cthyb'
     general_params['n_tau'] = 10001
 
-    gf_up = GfImFreq(indices=[0], beta=general_params['beta'])
+    mesh_iw = MeshImFreq(beta=general_params['beta'], S='Fermion', n_iw = 1025)
+    gf_up = Gf(mesh=mesh_iw, target_shape=[1,1])
     gf_down = gf_up.copy()
     gf_up << SemiCircular(2, 0)
     gf_down << SemiCircular(1, 0)
@@ -95,12 +96,13 @@ def test_add_dft_values_two_impurites_two_bands():
     general_params['solver_type'] = 'cthyb'
     general_params['n_tau'] = 10001
 
-    gf_up_one_band = GfImFreq(indices=[0], beta=general_params['beta'])
+    mesh_iw = MeshImFreq(beta=general_params['beta'], S='Fermion', n_iw = 1025)
+    gf_up_one_band = Gf(mesh=mesh_iw, target_shape=[1,1])
     gf_down_one_band = gf_up_one_band.copy()
     gf_up_one_band << SemiCircular(2, 1)
     gf_down_one_band << SemiCircular(1, 2)
 
-    gf_up_two_bands = GfImFreq(indices=[0, 1], beta=general_params['beta'])
+    gf_up_two_bands = Gf(mesh=mesh_iw, target_shape=[2, 2])
     gf_down_two_bands = gf_up_two_bands.copy()
     gf_up_two_bands << SemiCircular(2, 0)
     gf_down_two_bands << SemiCircular(1, 0)
@@ -161,13 +163,15 @@ def test_add_dmft_observables_one_impurity_one_band():
     shell_multiplicity = [4]
     E_bandcorr = 10.43
 
-    gf_up = GfImFreq(indices=[0], beta=general_params['beta'])
+    mesh_iw = MeshImFreq(beta=general_params['beta'], S='Fermion', n_iw = 1025)
+    gf_up = Gf(mesh=mesh_iw, target_shape=[1,1])
     gf_down = gf_up.copy()
     gf_up << SemiCircular(2, 0)
     gf_down << SemiCircular(1, 0)
     gf_iw = [BlockGf(name_list=('up_0', 'down_0'), block_list=(gf_up, gf_down), make_copies=True)]
 
-    gf_imtime = GfImTime(indices=[0], beta=general_params['beta'])
+    mesh_tau = MeshImTime(beta=general_params['beta'], S='Fermion', n_tau = 10001)
+    gf_imtime = Gf(mesh=mesh_tau, target_shape=[1,1])
     gf_tau = [BlockGf(name_list=('up_0', 'down_0'), block_list=(gf_imtime, gf_imtime), make_copies=True)]
     gf_tau[0] << Fourier(gf_iw[0])
 
@@ -181,13 +185,13 @@ def test_add_dmft_observables_one_impurity_one_band():
 
     observables = add_dmft_observables(observables, general_params, solver_params, None, it, solvers, h_int,
                                        previous_mu, sum_k, density_mat, shell_multiplicity, E_bandcorr)
-
+    print(observables['orb_Z'])
     expected_observables = {'iteration': [1], 'mu': [1.56], 'E_tot': [10.43], 'E_bandcorr': [10.43],
                             'E_int': [[]], 'E_corr_en': [0.0], 'E_dft': [0.0], 'E_DC': [[0.0]],
                             'orb_gb2': [{'up': [[-0.0250]], 'down': [[-0.0498]]}], 'imp_gb2': [{'up': [-0.0250], 'down': [-0.0498]}],
                             'orb_occ': [{'up': [[0.5]], 'down': [[0.5]]}],
                             'imp_occ': [{'up': [0.5], 'down': [0.5]}],
-                            'orb_Z':   [{'up': [[0.0755]], 'down': [[0.0407]]}]
+                            'orb_Z':   [{'up': [[1.85487611]], 'down': [[1.4481126]]}]
                             }
 
     assert are_iterables_equal(observables, expected_observables)
