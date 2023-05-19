@@ -590,13 +590,13 @@ def calc_bandcorr_man(general_params, sum_k, E_kin_dft):
 def calc_Z(Sigma):
     """
     calculates the inverse mass enhancement from the impurity
-    self-energy by a simple estimate:
-    [ 1 - (Im S_iw[n_iw0]/iw[n_iw0]) ]^-1
+    self-energy by a simple linear fit estimate:
+    [ 1 - ((Im S_iw[n_iw0+1]-S_iw[n_iw0])/(iw[n_iw0+1]-iw[n_iw0])) ]^-1
 
     Parameters
     ----------
-    dft_mu: Gf_Im_Freq
-        self-energy in Matsubara
+    Sigma: Gf on MeshImFreq
+        self-energy on Matsubara mesh
 
 
     Returns
@@ -613,8 +613,9 @@ def calc_Z(Sigma):
 
     for orb in range(0,Sigma.target_shape[0]):
         Im_S_iw = Sigma[orb,orb].data.imag
-        # simple extraction from S_iw_0
-        Z = 1/(1 - (Im_S_iw[n_iw0]/iw[n_iw0]) )
+        # simple extraction from linear fit to first two Matsubara freq of Sigma
+        # assuming Fermi liquid like self energy
+        Z = 1/(1 - (Im_S_iw[n_iw0+1]-Im_S_iw[n_iw0]) / (iw[n_iw0+1]-iw[n_iw0]) )
         orb_Z.append(abs(Z))
 
     return np.array(orb_Z)
