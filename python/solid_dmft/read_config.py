@@ -269,6 +269,10 @@ random_seed : int, optional default by triqs
             numbers on all mpi ranks
 legendre_fit : bool, optional default= False
             filter noise of G(tau) with G_l, cutoff is taken from n_l
+loc_n_min : int, optional
+            Restrict local Hilbert space to states with at least this number of particles
+loc_n_max : int, optional
+            Restrict local Hilbert space to states with at most this number of particles
 
 ftps parameters
 ===============
@@ -705,6 +709,15 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                 'legendre_fit': {'converter': BOOL_PARSER,
                                                  'used': lambda params: params['general']['solver_type'] in ['cthyb','ctseg'],
                                                  'default': False},
+
+                                'loc_n_min': {'converter': int, 'valid for': lambda x, _: x >= 0,
+                                              'used': lambda params: params['general']['solver_type'] in ['cthyb'],
+                                              'default': None},
+
+                                'loc_n_max': {'converter': int, 'valid for': lambda x, _: x >= 0,
+                                              'used': lambda params: params['general']['solver_type'] in ['cthyb'],
+                                              'default': None},
+
 
                                 #
                                 # extra ctseg params
