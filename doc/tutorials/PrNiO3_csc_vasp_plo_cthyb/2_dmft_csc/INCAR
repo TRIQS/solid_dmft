@@ -1,23 +1,18 @@
 SYSTEM = PrNiO3
-ENCUT = 550
-PREC = Normal
-NBANDS = 128
 ICHARG = 5 ! 5 for DMFT calculations
 
 ISYM = -1 ! Vasp-PLO CSC doesn't work with symmetries
 NELM = 1000 ! to prevent VASP from stopping too early, solid_dmft will stop Vasp
 NELMIN = 1000
-NELMDL = -12 ! converge the KS wave function first
+NELMDL = 0 ! converge the KS wave function first
 
-ISMEAR = -5
-SIGMA = 0.01
-
-NCORE = 1
+ISMEAR = 0
+SIGMA = 0.02
 
 LMAXMIX = 6
 LORBIT = 14
 NEDOS = 2001
-EMIN = -1.5
-EMAX = 2.5
+EMIN = 3.7
+EMAX = 7.8
 LOCPROJ = 5 6 7 8 : d : Pr 1 
 
