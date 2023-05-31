@@ -1,4 +1,4 @@
-FROM ubuntu:impish
+FROM ubuntu:22.04
 
 ##################################################
 # Essential packages and libraries               #
