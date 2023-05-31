@@ -1,11 +1,16 @@
 FROM ubuntu:22.04
 
+# install basics
+RUN apt-get update &&  DEBIAN_FRONTEND=noninteractive apt-get install -y curl sudo wget git less rsync nano openssl ca-certificates
+
+# for nodejs 20
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+
 # This platform includes dependencies for building docs
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
       cmake \
       g++ \
       gfortran \
-      git \
       vim \
       hdf5-tools \
       libmkl-full-dev \ 
@@ -20,23 +25,13 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
       libpmi2-0-dev \
       cython3 \
       libfabric-dev \
-      git \
-      curl \
-      ca-certificates \
-      openssl \
-      wget \
-      rsync \
       libomp-dev \
-      nano \
-      sudo \
-      less \
       # Jupyter lab packages
       texlive \
       dvipng \
       texlive-latex-extra \
       texlive-fonts-recommended \
-      nodejs \
-      npm 
+      nodejs
       
 # install openmpi and compile openmpi manually
 # this is to ensure PMI compatibility with cray systems
@@ -103,11 +98,9 @@ RUN pip3 install --no-cache-dir \
 
 RUN jupyter-lab build
 
-
-
 ENV OMP_NUM_THREADS=1
 ENV MKL_NUM_THREADS=1
-ARG NCORES=12
+ARG NCORES=10
 
 # create source dirs
 RUN cd / && mkdir -p triqs && mkdir -p source
@@ -118,14 +111,15 @@ RUN cd /source && git clone -b develop --depth 1 https://github.com/wannier-deve
     # Using gfortran compiler 
     && echo "F90 = mpif90 \n COMMS  = mpi \n MPIF90 = mpif90 \n FCOPTS = -O3 -fallow-argument-mismatch \n LIBS = -Wl,--no-as-needed -lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lpthread -lm -ldl \n" > make.inc \
     && cd /source/wannier90 \
-    #&& make default lib \
-    && make libdir=/usr/lib \
-    && make install
+    && make PREFIX=/triqs wannier lib post w90chk2chk \
+    && make PREFIX=/triqs install \
+    && mkdir /triqs/include \
+    && cp src/obj/* /triqs/include/
 
 # install qe
-RUN cd /source && wget --quiet https://gitlab.com/QEF/q-e/-/archive/qe-7.0/q-e-qe-7.0.tar.gz \
-   && tar -xf q-e-qe-7.0.tar.gz \
-   && cd q-e-qe-7.0 \
+RUN cd /source && wget --quiet https://gitlab.com/QEF/q-e/-/archive/qe-7.2/q-e-qe-7.2.tar.gz \
+   && tar -xf q-e-qe-7.2.tar.gz \
+   && cd q-e-qe-7.2 \
    && mkdir -p build && cd build \
    && cmake -D CMAKE_C_COMPILER=mpicc -D CMAKE_Fortran_COMPILER=mpif90 \
         -D CMAKE_VERBOSE_MAKEFILE=ON \
@@ -133,6 +127,9 @@ RUN cd /source && wget --quiet https://gitlab.com/QEF/q-e/-/archive/qe-7.0/q-e-q
         -D QE_ENABLE_HDF5=ON \
         -D QE_FFTW_VENDOR=FFTW3 \
         -D QE_ENABLE_SCALAPACK=OFF \
+        -D QE_ENABLE_OPENMP=ON \
+        -D QE_WANNIER90_INTERNAL=OFF \
+        -D WANNIER90_ROOT=/triqs \
         ../ \
     && make -j$NCORES all \ 
     && make install
@@ -195,6 +192,12 @@ RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/tprf.
 RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hubbardI.git hubbardI.src \
     && mkdir -p hubbardI.build && cd hubbardI.build \
     && cmake ../hubbardI.src \ 
+    && make -j$NCORES && ctest -j$NCORES && make install
+
+# hartree_fock
+RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hartree_fock.git hartree_fock.src \
+    && mkdir -p hartree_fock.build && cd hartree_fock.build \
+    && cmake ../hartree_fock.src \
     && make -j$NCORES && ctest -j$NCORES && make install
 
 # download solid_dmft and install
