@@ -244,7 +244,7 @@ def fit_slater_fulld(u_ijij_crpa, u_ijji_crpa, U_init, J_init, fixed_F4_F2=True)
         averaged J value
     '''
 
-    from triqs.operators.util.U_matrix import U_matrix, spherical_to_cubic, reduce_4index_to_2index, transform_U_matrix
+    from triqs.operators.util.U_matrix import U_matrix_slater, spherical_to_cubic, reduce_4index_to_2index, transform_U_matrix
     from scipy.optimize import minimize
 
     # input checks
@@ -253,7 +253,7 @@ def fit_slater_fulld(u_ijij_crpa, u_ijji_crpa, U_init, J_init, fixed_F4_F2=True)
 
     def minimizer(parameters):
         U_int, J_hund = parameters
-        Umat_full = U_matrix(l=2, U_int=U_int, J_hund=J_hund, basis='spherical')
+        Umat_full = U_matrix_slater(l=2, U_int=U_int, J_hund=J_hund, basis='spherical')
         Umat_full = transform_U_matrix(Umat_full, T)
 
         Umat, u_ijij_slater = reduce_4index_to_2index(Umat_full)
@@ -262,7 +262,7 @@ def fit_slater_fulld(u_ijij_crpa, u_ijji_crpa, U_init, J_init, fixed_F4_F2=True)
 
     def minimizer_radial(parameters):
         F0, F2, F4 = parameters
-        Umat_full = U_matrix(l=2, radial_integrals=[F0, F2, F4], basis='spherical')
+        Umat_full = U_matrix_slater(l=2, radial_integrals=[F0, F2, F4], basis='spherical')
         Umat_full = transform_U_matrix(Umat_full, T)
 
         Umat, u_ijij_slater = reduce_4index_to_2index(Umat_full)

@@ -154,7 +154,7 @@ def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, orbital_order_dmft=
         mu_dmft = specs['mu_dmft']
 
     SOC = (spin == 'ud')
-    w_mesh_dmft = np.linspace(sigma.mesh.omega_min, sigma.mesh.omega_max, len(sigma.mesh))
+    w_mesh_dmft = np.linspace(sigma.mesh.w_min, sigma.mesh.w_max, len(sigma.mesh))
     assert sigma.target_shape[0] == n_orb, f'Number of Wannier orbitals: {n_orb} and self-energy target_shape {sigma.target_shape} does not match'
 
     sigma_mat = sigma.data.real - np.eye(n_orb) * dc + 1j * sigma.data.imag
@@ -170,7 +170,7 @@ def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, orbital_order_dmft=
         freq_dict.update({'w_mesh': w_mesh})
     else:
         w_mesh = w_mesh_dmft
-        freq_dict = {'w_mesh': w_mesh_dmft, 'n_w': len(sigma.mesh), 'window': [sigma.mesh.omega_min, sigma.mesh.omega_max]}
+        freq_dict = {'w_mesh': w_mesh_dmft, 'n_w': len(sigma.mesh), 'window': [sigma.mesh.w_min, sigma.mesh.w_max]}
 
     sigma_interpolated = np.zeros((n_orb, n_orb, freq_dict['n_w']), dtype=complex)
 

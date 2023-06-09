@@ -526,7 +526,7 @@ def calc_dft_kin_en(general_params, sum_k, dft_mu):
             E_kin += np.trace(np.dot(H_ks[ik, 0, :nb, :nb], G_freq_lat_beta[spin][:, :]))
     E_kin = np.real(E_kin)
     # collect data and put into E_kin_dft
-    E_kin_dft = mpi.all_reduce(mpi.world, E_kin, lambda x, y: x+y)
+    E_kin_dft = mpi.all_reduce(E_kin)
     mpi.barrier()
     # E_kin should be divided by the number of k-points
     E_kin_dft = E_kin_dft/num_kpts
@@ -575,7 +575,7 @@ def calc_bandcorr_man(general_params, sum_k, E_kin_dft):
     E_kin = np.real(E_kin)
 
     # collect data and put into E_kin_dmft
-    E_kin_dmft = mpi.all_reduce(mpi.world, E_kin, lambda x, y: x+y)
+    E_kin_dmft = mpi.all_reduce(E_kin)
     mpi.barrier()
     # E_kin should be divided by the number of k-points
     E_kin_dmft = E_kin_dmft/num_kpts

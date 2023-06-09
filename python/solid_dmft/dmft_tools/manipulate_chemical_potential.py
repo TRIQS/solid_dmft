@@ -115,8 +115,8 @@ def _initialize_lattice_gf(sum_k, general_params):
         trace_gf_latt.data[:] += np.trace(sum(g.data for _, g in gf_latt), axis1=1, axis2=2).reshape(-1, 1, 1)
         occupation += gf_latt.total_density()
 
-    trace_gf_latt << mpi.all_reduce(mpi.world, trace_gf_latt, lambda x, y: x + y)
-    occupation = mpi.all_reduce(mpi.world, occupation, lambda x, y: x + y)
+    trace_gf_latt << mpi.all_reduce(trace_gf_latt)
+    occupation = mpi.all_reduce(occupation)
 
     # Lattice GF as BlockGf, required for compatibility with MaxEnt functions
     gf_lattice_iw = BlockGf(name_list=['total'], block_list=[trace_gf_latt])

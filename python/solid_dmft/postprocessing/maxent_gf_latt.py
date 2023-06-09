@@ -122,7 +122,7 @@ def _generate_lattice_gf(sum_k, sum_spins):
                                                      axis1=1, axis2=2).reshape(-1, 1, 1)
 
     for s in spin_blocks:
-        trace_gf_latt[s] << mpi.all_reduce(mpi.world, trace_gf_latt[s], lambda x, y: x + y)
+        trace_gf_latt[s] << mpi.all_reduce(trace_gf_latt[s])
 
     # Lattice GF as BlockGf, required for compatibility with MaxEnt functions
     gf_lattice_iw = BlockGf(name_list=trace_gf_latt.keys(),

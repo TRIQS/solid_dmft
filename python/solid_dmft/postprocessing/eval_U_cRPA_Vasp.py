@@ -436,7 +436,7 @@ def fit_slater_fulld(uijkl, n_sites, U_init, J_init, fixed_F4_F2=True):
     assumes F4/F2=0.625
     '''
 
-    from triqs.operators.util.U_matrix import U_matrix, reduce_4index_to_2index
+    from triqs.operators.util.U_matrix import U_matrix_slater, reduce_4index_to_2index
     from scipy.optimize import minimize
     # transform U matrix orbital basis ijkl to nmop, note the last two indices need to be switched in the T matrices
 
@@ -445,7 +445,7 @@ def fit_slater_fulld(uijkl, n_sites, U_init, J_init, fixed_F4_F2=True):
 
     def minimizer(parameters):
         U_int, J_hund = parameters
-        Umat_full = U_matrix(l=2, U_int=U_int, J_hund=J_hund, basis='cubic')
+        Umat_full = U_matrix_slater(l=2, U_int=U_int, J_hund=J_hund, basis='cubic')
         Umat_full = transformU(Umat_full, rot_def_to_w90)
 
         Umat, Upmat = reduce_4index_to_2index(Umat_full)
@@ -457,7 +457,7 @@ def fit_slater_fulld(uijkl, n_sites, U_init, J_init, fixed_F4_F2=True):
 
     def minimizer_radial(parameters):
         F0, F2, F4 = parameters
-        Umat_full = U_matrix(l=2, radial_integrals=[F0, F2, F4], basis='cubic')
+        Umat_full = U_matrix_slater(l=2, radial_integrals=[F0, F2, F4], basis='cubic')
         Umat_full = transformU(Umat_full, rot_def_to_w90)
 
         Umat, Upmat = reduce_4index_to_2index(Umat_full)

@@ -192,8 +192,8 @@ def _run_maxent(continuators, error, omega_min, omega_max, n_points_maxent,
 
     # Synchronizes information between ranks
     for i in imps_blocks_indices:
-        spectral_funcs[i] = mpi.all_reduce(mpi.world, spectral_funcs[i], lambda x, y: x+y)
-        opt_alphas[i] = mpi.all_reduce(mpi.world, opt_alphas[i], lambda x, y: x+y)
+        spectral_funcs[i] = mpi.all_reduce(spectral_funcs[i])
+        opt_alphas[i] = mpi.all_reduce(opt_alphas[i])
 
     for i, block_index in enumerate(imps_blocks):
         mpi.report(f'Optimal alphas, block {block_index}:')
