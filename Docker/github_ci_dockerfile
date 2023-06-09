@@ -2,8 +2,8 @@ FROM ubuntu:22.04
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
       cmake \
-      g++ \
-      gfortran \
+      g++-12 \
+      gfortran-12 \
       git \
       hdf5-tools \
       liblapack-dev \ 
@@ -69,6 +69,8 @@ ARG NCORES=4
 # create source dirs
 RUN cd / && mkdir -p triqs && mkdir -p source
 
+ENV PYTHON_VERSION=3.10 \
+    CC=gcc-12 CXX=g++-12
 # triqs
 ENV CPATH=/triqs/include:${CPATH} \
     PATH=/triqs/bin:${PATH} \
@@ -87,7 +89,7 @@ RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/triqs
 RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/dft_tools.git dft_tools.src \
     && mkdir -p dft_tools.build && cd dft_tools.build \
     && cmake ../dft_tools.src -DMPIEXEC_PREFLAGS='--allow-run-as-root' \
-    && make -j$NCORES && ctest -V -R Py_srvo3_Gloc && make install
+    && make -j$NCORES && make test && make install
 
 # cthyb
 RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/cthyb.git cthyb.src \
@@ -105,7 +107,7 @@ RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hubba
 RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hartree_fock.git hartree.src \
     && mkdir -p hartree.build && cd hartree.build \
     && cmake ../hartree.src \ 
-    && make -j$NCORES && ctest -j$NCORES && make install
+    && make -j$NCORES && make install
 
 # maxent needed for doc build
 RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/maxent.git maxent.src \
