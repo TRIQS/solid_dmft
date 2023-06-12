@@ -453,8 +453,12 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                                 'used': True},
 
                                  'U': {'converter': lambda s: list(map(float, s.split(','))), 'used': True},
-                                 
-                                 'U_prime': {'converter': lambda s: list(map(float, s.split(','))), 'used': lambda params: params['general']['h_int_type'] in ['kanamori']},
+
+                                 'U_prime': {'converter': lambda s: list(map(float, s.split(','))),
+                                             'default': ['U-2J'],
+                                             'valid for': lambda x, params: all(r == 'U-2J' or hint in ('kanamori')
+                                                                                    for r, hint in zip(x, params['general']['h_int_type'])),
+                                             'used': True},
 
                                  'J': {'converter': lambda s: list(map(float, s.split(','))), 'used': True},
 
