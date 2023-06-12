@@ -45,9 +45,9 @@ except ImportError:
 
 def _extract_U_J_list(param_name, n_inequiv_shells, general_params):
     """
-    Checks if param_name ('U' or 'J') are a single value or different per
-    inequivalent shell. If just a single value is given, this value is
-    applied to each shell.
+    Checks if param_name ('U', 'U_prime', or 'J') are a single value or 
+    different per inequivalent shell. If just a single value is given, 
+    this value is applied to each shell.
     """
 
     if not isinstance(param_name, str):
@@ -464,6 +464,8 @@ def construct(sum_k, general_params, advanced_params):
         general_params = _extract_U_J_list(param_name, sum_k.n_inequiv_shells, general_params)
     for param_name in ('dc_U', 'dc_J'):
         advanced_params = _extract_U_J_list(param_name, sum_k.n_inequiv_shells, advanced_params)
+    if general_params['h_int_type'] == 'kanamori':
+        general_params = _extract_U_J_list('U_prime', sum_k.n_inequiv_shells, general_params)
 
     # Extracts ratio_F4_F2 if any shell uses a solver supporting it
     if 'density_density' in general_params['h_int_type'] or 'full_slater' in general_params['h_int_type']:
