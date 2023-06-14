@@ -889,6 +889,7 @@ class SolverStructure:
                 # if tailfit has been used replace Sigma with the tail fitted Sigma from cthyb
                 self.Sigma_freq << self.triqs_solver.Sigma_iw
                 self.sum_k.symm_deg_gf(self.Sigma_freq, ish=self.icrsh)
+            # TODO: in this control-flow add path for dlr dyson solve option?
             else:
                 # obtain Sigma via dyson from symmetrized G_freq
                 self.Sigma_freq << inverse(self.G0_freq) - inverse(self.G_freq)

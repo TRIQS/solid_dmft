@@ -4,7 +4,7 @@ import numpy as np
 from pydlr import kernel, dlr  # TODO: switch from pydlr backend to TRIQS dlr backend
 from scipy.optimize import minimize, LinearConstraint, NonlinearConstraint
 
-from triqs.gf import BlockGf, Gf, GfImTime, GfImFreq, MeshImFreq, MeshImTime
+from triqs.gf import * # TODO: what are the necessary imports here?
 
 is_block_gf = lambda x : isinstance(x, BlockGf)
 is_array = lambda x : isinstance(x, np.ndarray)
