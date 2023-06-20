@@ -2,6 +2,17 @@
 
 # Changelog
 
+## Version 3.1.5
+
+solid_dmft version 3.1.5 is a patch-release that improves / fixes the following issues:
+
+* fix to charge-self-consistency with Vasp and QE
+* feat add loc_n_min / max arg for cthyb
+* fix simple Z estimate as linear fit
+* adapt docker images for ubuntu 22.04
+
+Contributors: Sophie Beck, Alberto Carta, Alexander Hampel, Max Merkel:
+
 ## Version 3.1.4
 
 solid_dmft version 3.1.4 is a patch-release that improves / fixes the following issues:
