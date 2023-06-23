@@ -2,6 +2,10 @@
 
 # Changelog
 
+
+## Version 3.2.0
+
+
 ## Version 3.1.5
 
 solid_dmft version 3.1.5 is a patch-release that improves / fixes the following issues:
