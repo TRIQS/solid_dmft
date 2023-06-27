@@ -46,10 +46,10 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
       less \
       # Jupyter lab packages
       nodejs \
-      texlive \
-      dvipng \
-      texlive-latex-extra \
-      texlive-fonts-recommended \
+    #   texlive \
+    #   dvipng \
+    #   texlive-latex-extra \
+    #   texlive-fonts-recommended \
       && \
       apt-get autoremove --purge -y && \
       apt-get autoclean -y && \
@@ -83,11 +83,9 @@ RUN pip3 install --no-cache-dir \
     ipympl \
     RISE 
 
-RUN jupyter-lab build
-
 ENV OMP_NUM_THREADS=1
 ENV MKL_NUM_THREADS=1
-ARG NCORES=12
+ARG NCORES=10
 
 # create source dirs
 RUN cd / && mkdir -p triqs && mkdir -p source
@@ -179,6 +177,12 @@ RUN cd /source && git clone -b 3.1.x --depth 1 https://github.com/TRIQS/tprf.git
 RUN cd /source && git clone -b 3.1.x --depth 1 https://github.com/TRIQS/hubbardI.git hubbardI.src \
     && mkdir -p hubbardI.build && cd hubbardI.build \
     && cmake ../hubbardI.src \ 
+    && make -j$NCORES && ctest -j$NCORES && make install
+
+# hartree Fock
+RUN cd /source && git clone -b 3.1.x --depth 1 https://github.com/TRIQS/hartree_fock.git hartree_fock.src \
+    && mkdir -p hartree_fock.build && cd hartree_fock.build \
+    && cmake ../hartree_fock.src \ 
     && make -j$NCORES && ctest -j$NCORES && make install
 
 # download solid_dmft and install
