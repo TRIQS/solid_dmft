@@ -30,32 +30,14 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
       libevent-dev \
       libpmi2-0-dev \
       cython3 \
+      # comment the next 4 lines if you want to build openmpi manually
+      libopenmpi-dev \
+      openmpi-bin \
+      openmpi-common \
+      openmpi-doc \
       libfabric-dev \
       libomp-${LLVM}-dev \
-      # Jupyter lab packages
-      texlive \
-      dvipng \
-      texlive-latex-extra \
-      texlive-fonts-recommended \
-      nodejs
-      
-# install openmpi and compile openmpi manually
-# this is to ensure PMI compatibility with cray systems
-RUN wget -q https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.5.tar.gz \
-    && tar xf openmpi-4.1.5.tar.gz \
-    && cd openmpi-4.1.5 \
-    && ./configure --prefix=/usr --enable-mpi-cxx --with-libfabric=/usr \
-        --with-hwloc=/usr --with-hwloc-libdir=/usr/lib/x86_64-linux-gnu \
-        --with-libevent=/usr --with-libevent-libdir=/usr/lib/x86_64-linux-gnu \
-        --with-pmi=/usr/include/slurm --with-pmi-libdir=/usr/lib/x86_64-linux-gnu \
-        CFLAGS="-I/usr/include/slurm" \
-    && make -j$(nproc) \
-    && make install \
-    && ldconfig \
-    && cd .. \
-    && rm -rf openmpi-4.1.5.tar.gz openmpi-4.1.5
-
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends\
+      nodejs \
       python3-dev \
       python3-mako \
       python3-numpy \
@@ -73,6 +55,22 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
       apt-get autoclean -y && \
       rm -rf /var/cache/apt/* /var/lib/apt/lists/*
       
+# install openmpi and compile openmpi manually
+# this is to ensure PMI compatibility with cray systems
+# RUN wget -q https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.5.tar.gz \
+#     && tar xf openmpi-4.1.5.tar.gz \
+#     && cd openmpi-4.1.5 \
+#     && ./configure --prefix=/usr --enable-mpi-cxx --with-libfabric=/usr \
+#         --with-hwloc=/usr --with-hwloc-libdir=/usr/lib/x86_64-linux-gnu \
+#         --with-libevent=/usr --with-libevent-libdir=/usr/lib/x86_64-linux-gnu \
+#         --with-pmi=/usr/include/slurm --with-pmi-libdir=/usr/lib/x86_64-linux-gnu \
+#         CFLAGS="-I/usr/include/slurm" \
+#     && make -j$(nproc) \
+#     && make install \
+#     && ldconfig \
+#     && cd .. \
+#     && rm -rf openmpi-4.1.5.tar.gz openmpi-4.1.5
+
 RUN pip3 install --no-cache-dir \
     mpi4py \
     cython \
@@ -101,8 +99,6 @@ RUN pip3 install --no-cache-dir \
     descartes \
     ipympl \
     RISE 
-
-RUN jupyter-lab build
 
 ENV PYTHON_VERSION=3.10 \
     CC=clang-${LLVM} CXX=clang++-${LLVM} CXXFLAGS="-stdlib=libc++"
