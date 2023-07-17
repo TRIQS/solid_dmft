@@ -252,7 +252,9 @@ measure_G_l : bool
 measure_G_tau : bool,optional, default=True
             should the solver measure G(tau)?
 measure_G_iw : bool,optional, default=False
-            should the solver measure G(iw)?
+            should the solver measure G(iw) directly?
+measure_G_n_iw : int, optional, default=20
+            how many Matsubara frequencies should be measured
 measure_density_matrix : bool, optional, default=False
             measures the impurity density matrix and sets also
             use_norm_as_weight to true
@@ -726,7 +728,12 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                                   'used': lambda params: params['general']['solver_type'] in ['hubbardI', 'ctseg']},
 
                                 'measure_G_iw': {'converter': BOOL_PARSER, 'default': False,
-                                                  'used': lambda params: params['general']['solver_type'] in ['ctseg']},
+                                                  'used': lambda params: params['general']['solver_type'] in ['ctseg', 'cthyb']},
+
+                                'measure_G_n_iw': {'converter': lambda s: int(float(s)),
+                                                   'default' : 20,
+                                                   'valid for': lambda x, _: x >= 0,
+                                                   'used': lambda params: params['general']['solver_type'] in ['cthyb']},
 
                                 'measure_G_l': {'converter': BOOL_PARSER, 'default': False,
                                                 'used': lambda params: params['general']['solver_type'] in ['cthyb', 'hubbardI', 'ctseg']},
