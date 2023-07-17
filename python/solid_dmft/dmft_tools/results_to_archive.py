@@ -75,6 +75,9 @@ def _compile_information(sum_k, general_params, solver_params, solvers,
                 write_to_h5['G_time_orig_{}'.format(icrsh)] = solvers[icrsh].G_time_orig
                 write_to_h5['Gimp_l_{}'.format(icrsh)] = solvers[icrsh].G_l
 
+            if solver_params['measure_G_iw']:
+                write_to_h5['Gimp_freq_direct_{}'.format(icrsh)] = solvers[icrsh].G_iw_direct
+
         if general_params['solver_type'] == 'ctint' and solver_params['measure_histogram']:
             write_to_h5['pert_order_imp_{}'.format(icrsh)] = solvers[icrsh].perturbation_order
 
