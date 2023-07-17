@@ -112,6 +112,7 @@ def test_config_file_1():
                                             'solver': {'move_double': True, 'measure_G_l': False,
                                                        'move_shift': False, 'store_solver': False,
                                                        'measure_pert_order': False,
+                                                       'measure_G_n_iw' : 20, 'measure_G_iw' : False,
                                                        'measure_density_matrix': False, 'perform_tail_fit': False,
                                                        'legendre_fit': False, 'delta_interface' : False,
                                                        'off_diag_threshold' : 0.0}}
@@ -237,6 +238,7 @@ def test_config_file_2():
                                                        'n_cycles_tot': 60000000, 'store_solver': False,
                                                        'move_double': True, 'measure_pert_order': False,
                                                        'move_shift': False, 'legendre_fit' : False,
+                                                       'measure_G_n_iw' : 20, 'measure_G_iw' : False,
                                                        'measure_density_matrix': False, 'delta_interface': True,
                                                        'off_diag_threshold' : 0.1}}
 

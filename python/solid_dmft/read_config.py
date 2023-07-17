@@ -300,7 +300,7 @@ loc_n_max : int, optional
 
 ftps parameters
 ===============
-eta : float
+eta : float, default general_params['eta']
             broadening of Green's function in the FTPS solver. Can be different from eta of the lattice
 n_bath :     int
             number of bath sites
@@ -831,7 +831,8 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                 # ftps parameters
                                 #
                                 'eta': {'converter': float, 'valid for': lambda x, _: x >= 0,
-                                         'used': lambda params: params['general']['solver_type'] in ['ftps', 'hubbardI', 'hartree']},
+                                         'used': lambda params: params['general']['solver_type'] in ['ftps', 'hubbardI', 'hartree'],
+                                         'default' : lambda params: params['general']['eta'] if params['general']['solver_type'] in ['ftps', 'hubbardI', 'hartree'] else None},
                                 'n_bath': {'converter': int, 'valid for': lambda x, _: x >= 0,
                                            'used': lambda params: params['general']['solver_type'] in ['ftps'],
                                            'default': 0},
