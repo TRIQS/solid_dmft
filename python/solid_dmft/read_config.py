@@ -298,6 +298,8 @@ loc_n_max : int, optional
 
 ftps parameters
 ===============
+eta : float
+            broadening of Green's function in the FTPS solver. Can be different from eta of the lattice
 n_bath :     int
             number of bath sites
 bath_fit :   bool, default=False
@@ -821,6 +823,8 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                 #
                                 # ftps parameters
                                 #
+                                'eta': {'converter': float, 'valid for': lambda x, _: x >= 0,
+                                         'used': lambda params: params['general']['solver_type'] in ['ftps', 'hubbardI', 'hartree']},
                                 'n_bath': {'converter': int, 'valid for': lambda x, _: x >= 0,
                                            'used': lambda params: params['general']['solver_type'] in ['ftps'],
                                            'default': 0},
