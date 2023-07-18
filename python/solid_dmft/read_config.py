@@ -219,8 +219,8 @@ afm_order : bool, optional, default=False
 set_rot : string, optional, default='none'
             use density_mat_dft to diagonalize occupations = 'den'
             use hloc_dft to diagonalize occupations = 'hloc'
-measure_chi_SzSz : bool, optional, default=False
-            measure the dynamic spin suszeptibility chi(sz,sz(tau))
+measure_chi : bool, optional, default=None
+            measure the dynamic suszeptibility chi 'SzSz' or den-den 'NN'
             triqs.github.io/cthyb/unstable/guide/dynamic_susceptibility_notebook.html
 measure_chi_insertions : int, optional, default=100
             number of insertation for measurement of chi
