@@ -45,9 +45,9 @@ except ImportError:
 
 def _extract_U_J_list(param_name, n_inequiv_shells, general_params):
     """
-    Checks if param_name ('U' or 'J') are a single value or different per
-    inequivalent shell. If just a single value is given, this value is
-    applied to each shell.
+    Checks if param_name ('U', 'U_prime', or 'J') are a single value or
+    different per inequivalent shell. If just a single value is given,
+    this value is applied to each shell.
     """
 
     if not isinstance(param_name, str):
@@ -189,18 +189,25 @@ def _construct_kanamori(sum_k, general_params, icrsh):
         mpi.report('warning: are you sure you want to use the kanamori hamiltonian '
                    + 'outside the t2g or eg manifold?')
 
+    # check if Uprime has been specified manually
+    if general_params['U_prime'][icrsh] == 'U-2J':
+        U_prime = general_params['U'][icrsh] - 2.0 * general_params['J'][icrsh]
+    else:
+        U_prime = general_params['U_prime'][icrsh]
+
     if general_params['solver_type'] == 'ftps':
         # 1-band modell requires J and U' equals zero
         if n_orb == 1:
             up, j = 0.0, 0.0
         else:
-            up = general_params['U'][icrsh] - 2.0 * general_params['J'][icrsh]
+            up = U_prime
             j = general_params['J'][icrsh]
         h_int = ftps.solver_core.HInt(u=general_params['U'][icrsh], j=j, up=up, dd=False)
     elif sum_k.SO == 0:
         # Constructs U matrix
         Umat, Upmat = util.U_matrix_kanamori(n_orb=n_orb, U_int=general_params['U'][icrsh],
-                                             J_hund=general_params['J'][icrsh])
+                                             J_hund=general_params['J'][icrsh],
+                                             Up_int=U_prime)
 
         h_int = util.h_int_kanamori(sum_k.spin_block_names[sum_k.SO], n_orb,
                                     map_operator_structure=sum_k.sumk_to_solver[icrsh],
@@ -453,7 +460,7 @@ def construct(sum_k, general_params, advanced_params):
 
     Note also that for all Hamiltonians except Kanamori, the order of the
     orbitals matters. The correct order is specified here:
-    https://triqs.github.io/triqs/2.1.x/reference/operators/util/U_matrix.html#triqs.operators.util.U_matrix.spherical_to_cubic
+    triqs.github.io/triqs/unstable/documentation/python_api/triqs.operators.util.U_matrix.spherical_to_cubic.html
     """
 
     # Extracts U and J
@@ -462,6 +469,8 @@ def construct(sum_k, general_params, advanced_params):
     general_params = _extract_U_J_list('h_int_type', sum_k.n_inequiv_shells, general_params)
     for param_name in ('U', 'J'):
         general_params = _extract_U_J_list(param_name, sum_k.n_inequiv_shells, general_params)
+    if 'kanamori' in general_params['h_int_type']:
+        general_params = _extract_U_J_list('U_prime', sum_k.n_inequiv_shells, general_params)
     for param_name in ('dc_U', 'dc_J'):
         advanced_params = _extract_U_J_list(param_name, sum_k.n_inequiv_shells, advanced_params)
 

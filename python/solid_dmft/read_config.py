@@ -68,6 +68,9 @@ h_int_basis : string
               * 'qe' (equivalent to 'wannier90')
 U :  float or comma separated list of floats
             U values for impurities if only one value is given, the same U is assumed for all impurities
+U_prime :  float or comma separated list of floats
+            U prime values for impurities if only one value is given, the same U prime is assumed for all impurities
+            only used if h_int_type is kanamori
 J :  float or comma separated list of floats
             J values for impurities if only one value is given, the same J is assumed for all impurities
 ratio_F4_F2 : float or comma separated list of floats, optional, default='none'
@@ -450,6 +453,12 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                                 'used': True},
 
                                  'U': {'converter': lambda s: list(map(float, s.split(','))), 'used': True},
+
+                                 'U_prime': {'converter': lambda s: list(map(float, s.split(','))),
+                                             'default': ['U-2J'],
+                                             'valid for': lambda x, params: all(r == 'U-2J' or hint in ('kanamori')
+                                                                                    for r, hint in zip(x, params['general']['h_int_type'])),
+                                             'used': True},
 
                                  'J': {'converter': lambda s: list(map(float, s.split(','))), 'used': True},
 
