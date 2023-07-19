@@ -27,20 +27,20 @@ def read_h5(external_path, h5_internal_path):
     
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-U_vec = np.arange(4, 7.5, 0.5)
+U_vec = np.arange(4, 7.0, 0.5)
 J=0.0
 print(U_vec)
 
 for u in range(len(U_vec)):
     U = np.format_float_positional(float(U_vec[u]), trim='-')
-    filepath = f'./J{J}/U{U}/out'
+    filepath = f'./J{J}/U{U}'
     print(f'I am currently reading the folder: {filepath}')
         
-    filename = f'./J{J}/U{U}/out/svo.h5'
-    internal_prefix = 'DMFT_results/last_iter/Aimp_w_0/'
-    a = np.array(read_h5(filename, f'{internal_prefix}Aimp_w_line_fit/up_0'))
-    en = np.array(read_h5(filename, f'{internal_prefix}mesh/up_0'))
-    plt.plot(en, a[0,0][:]-u*1, label=f'U={U}eV ', color=colorcycle[u])
+    filename = f'{filepath}/out/svo.h5'
+    internal_prefix =  'DMFT_results/last_iter/Aimp_maxent_0'
+    A_imp = np.array(read_h5(filename, f'{internal_prefix}/Aimp_w_line_fit/up_0'))
+    omega = np.array(read_h5(filename, f'{internal_prefix}/mesh'))
+    plt.plot(omega, A_imp[0,0][:].real-u*1,label=f'U={U}eV ', color=colorcycle[u])
 
 
 plt.legend()

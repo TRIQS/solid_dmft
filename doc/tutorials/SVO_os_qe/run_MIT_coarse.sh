@@ -38,8 +38,6 @@ sigma_mix = 1.0
 
 h5_save_freq = 2
 load_sigma = False
-path_to_sigma = pre/vasp.h5
-load_sigma_iter = 1
 
 [solver]
 length_cycle = 120
@@ -58,7 +56,7 @@ EOF
   pwd
   echo "Running the DMFT cycle for parameters: U=$U eV, J=$J eV"
   
-  mpirun -n 30 solid_dmft
+  mpirun -n 72 solid_dmft
   
   cd ..
   cd ..

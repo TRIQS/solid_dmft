@@ -13,24 +13,22 @@ def read_h5(external_path, h5_internal_path):
     return read_arr
     
 # %%
-U = 4.25
-J = 0.0
+U = 4
+J = 0.75
+filepath = f'./J{J}/U{U}'
 
-filename = f'./J{J}/U{U}/out/svo.h5'
-internal_prefix =  'DMFT_results/last_iter/Aimp_w_0/'
+filename = f'{filepath}/out/svo.h5'
+internal_prefix =  'DMFT_results/last_iter/Aimp_maxent_0'
 
 # %%
-a = np.array(read_h5(filename, f'{internal_prefix}Aimp_w_line_fit/up_0'))
-#b = np.array(file['DMFT_results']['last_iter']['Aimp_w_0']['Aimp_w_chi2_curvature']['down_0'])
-en = np.array(read_h5(filename, f'{internal_prefix}mesh/up_0'))
-print(a.shape)
+A_imp = np.array(read_h5(filename, f'{internal_prefix}/Aimp_w_line_fit/up_0'))
+omega = np.array(read_h5(filename, f'{internal_prefix}/mesh'))
 # %%
-plt.plot(en, a[0,0][:])
-# plt.plot(en, b[0,0][:,0])
+plt.plot(omega, A_imp[0,0][:].real)
 
 plt.xlabel('Energy [eV]')
 plt.xlim([-7,7])
 plt.ylabel('Spectral functions [eV^-1]')
-plt.title(f'Correlated metal Phase (J = {J} eV U = {U} eV)')
+plt.title(f'J = {J} eV U = {U} eV')
 plt.savefig(f'A_func_{J=}_{U=}.jpg')
 # %%

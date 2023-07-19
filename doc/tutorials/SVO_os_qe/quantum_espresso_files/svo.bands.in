@@ -1,0 +1,6 @@
+&BANDS
+   prefix  = 'svo',
+   outdir  = './QE_tmp/',
+   filband = 'svo_bands.dat'
+   lsym    = .false.,
+/

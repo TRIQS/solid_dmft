@@ -1,12 +1,11 @@
 import numpy as np
-
 #avoid connecting to the X window manager, needs to be here before importing pyplot
 import matplotlib
 matplotlib.use('Agg')
-
+from heatmap_func import heatmap, annotate_heatmap
 import matplotlib.pyplot as plt
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-J_vec = np.array([0.0, 0.25, 0.5, 0.65, 0.75, 1])
+J_vec = np.array([0.0, 0.25, 0.5, 0.75, 1])
 U_vec = np.array(range(2, 11, 2))
 G_array = np.zeros((len(J_vec), len(U_vec)))
 for j in range(len(J_vec)) :
@@ -26,23 +25,13 @@ for j in range(len(J_vec)) :
             print(G_bet2)
 
 #plotting routine
-fig, ax = plt.subplots()
-im = ax.imshow(X=G_array.transpose(), cmap="Purples", extent=[0, 1, 2, 10], aspect='auto', origin='lower')
-fig.colorbar(im, ax=ax)
+fig, ax = plt.subplots(figsize=(8, 8))
+im, cbar = heatmap(G_array.transpose(),U_vec,J_vec, ax=ax,
+                   cmap="viridis", cbarlabel="|G(beta/2)| [eV^-1]", origin='lower', aspect='auto')
+texts = annotate_heatmap(im, valfmt="{x:.2f}")
+plt.ylabel("Hubbard U [eV]", size =16)
+plt.xlabel("Hund J [eV]", size=16)
 
-
-ax.set_xticklabels(J_vec)
-#ax.set_xticks( range(len(J_vec)) )
-ax.set_yticklabels(U_vec)
-ax.set_yticks(U_vec)
-#ax.set_xticklabels(piv.columns, rotation=90)
-#ax.set_yticklabels(piv.index)
-ax.set_xlabel("J [eV]")
-ax.set_ylabel("U [eV]")
-ax.set_title("G(beta/2) [eV^-1]")
-
-plt.tight_layout()
-plt.gcf()
-plt.savefig('MIT_transition.jpg', dpi=300)
+plt.savefig("MIT_coarse.jpg", dpi=300, bbox_inches='tight')
 plt.show()
 
