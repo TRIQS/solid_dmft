@@ -125,10 +125,10 @@ def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, orbital_order_dmft=
             sum_k = SumkDFT(specs['dmft_path'], mesh=sigma.mesh)
             sum_k.block_structure = ar['DMFT_input/block_structure']
             sum_k.deg_shells = ar['DMFT_input/deg_shells']
-            sum_k.set_mu = mu_dmft
+            sum_k.set_mu(mu_dmft)
             # set Sigma and DC into sum_k
             sum_k.dc_imp = dc_imp_list
-            sum_k.put_Sigma(sigma_imp_list)
+            sum_k.set_Sigma(sigma_imp_list)
 
             # use add_dc function to rotate to sumk block structure and subtract the DC
             sigma_sumk = sum_k.add_dc()
@@ -442,6 +442,7 @@ def get_tb_kslice(tb, mu_tb, **specs):
     lower_right = np.diff(w90_paths[1], axis=0)[0]
     Z = np.array(specs['Z'])
 
+    # calculate FS at the mu_tb value
     FS_kx_ky, band_char = get_kx_ky_FS(lower_right, upper_left, Z, tb, N_kxy=specs['n_k'], kz=specs['kz'], fermi=mu_tb)
 
     return FS_kx_ky, band_char
@@ -456,29 +457,27 @@ def _fract_ind_to_val(x, ind):
 
 def get_kx_ky_FS(lower_right, upper_left, Z, tb, select=None, N_kxy=10, kz=0.0, fermi=0.0):
 
-    assert np.abs(fermi) < 1e-2, 'finite value of Fermi level not implemented. Subtract Fermi level from local Hamiltonian.'
-
     # create mesh
     kx = np.linspace(0, 0.5, N_kxy)
     ky = np.linspace(0, 0.5, N_kxy)
 
     if select is None:
-        select = np.array(range(tb.NOrbitalsInUnitCell))
+        select = np.array(range(tb.n_orbitals))
 
     # go in horizontal arrays from bottom to top
-    E_FS = np.zeros((tb.NOrbitalsInUnitCell, N_kxy, N_kxy))
+    E_FS = np.zeros((tb.n_orbitals, N_kxy, N_kxy))
     for kyi in range(N_kxy):
         path_FS = [(upper_left/(N_kxy-1)*kyi + kz*Z, lower_right+upper_left/(N_kxy-1)*kyi+kz*Z)]
         k_vec, _ = k_space_path(path_FS, num=N_kxy)
-        E_FS[:, :, kyi] = tb.dispersion(k_vec).transpose()
+        E_FS[:, :, kyi] = tb.dispersion(k_vec).transpose() - fermi
 
     contours = {}
     FS_kx_ky = {}
     FS_kx_ky_prim = {}
     band_char = {}
     # contour for each sheet
-    for sheet in range(tb.NOrbitalsInUnitCell):
-        contours[sheet] = skimage.measure.find_contours(E_FS[sheet, :, :], fermi)
+    for sheet in range(tb.n_orbitals):
+        contours[sheet] = skimage.measure.find_contours(E_FS[sheet, :, :], 0.0)
 
     sheet_ct = 0
     for sheet in contours.keys():
