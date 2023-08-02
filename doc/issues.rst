@@ -30,7 +30,7 @@ directly a pull request with new features or helpful postprocessing scripts
 via github.
 
 Reporting issues
-================
+****************
 
 Please report all problems and bugs directly at the github issue page
 `<https://github.com/flatironinstitute/solid_dmft/issues>`_.  In order to make
