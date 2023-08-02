@@ -176,14 +176,14 @@ class SolverStructure:
             self.version = version
 
         elif self.general_params['solver_type'] == 'hartree':
-            from hartree_fock.version import hartree_fock_hash, version
+            from triqs_hartree_fock.version import triqs_hartree_fock_hash, version
 
             # sets up necessary GF objects on ImFreq
             self._init_ImFreq_objects()
             self._init_ReFreq_hartree()
             # sets up solver
             self.triqs_solver = self._create_hartree_solver()
-            self.git_hash = hartree_fock_hash
+            self.git_hash = triqs_hartree_fock_hash
             self.version = version
 
         elif self.general_params['solver_type'] == 'ftps':
@@ -686,7 +686,7 @@ class SolverStructure:
         r'''
         Initialize hartree_fock solver instance
         '''
-        from hartree_fock.impurity import ImpuritySolver as hartree_solver
+        from triqs_hartree_fock import ImpuritySolver as hartree_solver
 
         gf_struct = self.sum_k.gf_struct_solver_list[self.icrsh]
 
