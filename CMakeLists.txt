@@ -19,11 +19,8 @@
 #
 # ##############################################################################
 
-cmake_minimum_required(VERSION 3.12.4 FATAL_ERROR)
-cmake_policy(VERSION 3.12.4)
-if(POLICY CMP0077)
-  cmake_policy(SET CMP0077 NEW)
-endif()
+cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
+cmake_policy(VERSION 3.20)
 
 # ############
 # Define Project
@@ -102,7 +99,7 @@ endif()
 add_subdirectory(python/${PROJECT_NAME})
 
 # Docs
-if(Build_Documentation)
+if(NOT IS_SUBPROJECT AND Build_Documentation)
   add_subdirectory(doc)
 endif()
 

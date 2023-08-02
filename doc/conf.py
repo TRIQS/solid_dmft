@@ -89,7 +89,12 @@ html_sidebars = {'index': ['sideb.html', 'searchbox.html']}
 
 htmlhelp_basename = '@PROJECT_NAME@doc'
 
-intersphinx_mapping = {'python': ('https://docs.python.org/3.8', None), 'triqslibs': ('https://triqs.github.io/triqs/latest', None)}
+# Plot options
+plot_include_source = True
+plot_html_show_source_link = False
+plot_html_show_formats = False
+
+intersphinx_mapping = {'python': ('https://docs.python.org/3.11', None), 'triqslibs': ('https://triqs.github.io/triqs/latest', None)}
 
 
 # open links in new tab instead
