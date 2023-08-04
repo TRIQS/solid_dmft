@@ -88,7 +88,7 @@ foreach(file test_maxent.py helper.py)
 endforeach()
 
 add_test(NAME maxent_${test}
-         COMMAND ${MPIEXEC_EXECUTABLE} ${MPIEXEC_PREFLAGS} ${TRIQS_PYTHON_EXECUTABLE} test_maxent.py
+         COMMAND ${TRIQS_PYTHON_EXECUTABLE} test_maxent.py
          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         )
 
