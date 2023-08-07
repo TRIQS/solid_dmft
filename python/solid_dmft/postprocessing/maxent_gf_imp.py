@@ -39,6 +39,7 @@ import numpy as np
 from triqs_maxent.elementwise_maxent import PoormanMaxEnt
 from triqs_maxent.omega_meshes import HyperbolicOmegaMesh
 from triqs_maxent.alpha_meshes import LogAlphaMesh
+from triqs_maxent.logtaker import VerbosityFlags
 from h5 import HDFArchive
 from triqs.utility import mpi
 from triqs.gf import BlockGf
@@ -108,7 +109,7 @@ def _sum_greens_functions(block_gf, sum_spins):
     return BlockGf(name_list=summed_gf_imp.keys(), block_list=summed_gf_imp.values())
 
 
-def _run_maxent(gf_imp_tau, maxent_error, n_points_maxent, n_points_alpha,
+def _run_maxent(gf_imp_list, maxent_error, n_points_maxent, n_points_alpha,
                 omega_min, omega_max, analyzer='LineFitAnalyzer'):
     """
     Runs maxent to get the spectral functions from the list of block GFs.
@@ -117,59 +118,77 @@ def _run_maxent(gf_imp_tau, maxent_error, n_points_maxent, n_points_alpha,
     omega_mesh = HyperbolicOmegaMesh(omega_min=omega_min, omega_max=omega_max,
                                      n_points=n_points_maxent)
 
-    if not mpi.is_master_node():
-        return None, omega_mesh
+    mpi.report(f'Continuing impurities with blocks: ')
+    imps_blocks = []
+    for i, block_gf in enumerate(gf_imp_list):
+        blocks = list(block_gf.indices)
+        mpi.report('- Imp {}: {}'.format(i, blocks))
+        for block in blocks:
+            imps_blocks.append((i, block))
+    mpi.report('-'*50)
+    imps_blocks_indices = np.arange(len(imps_blocks))
 
-    # Initializes and runs the maxent solver
-    # TODO: parallelization over blocks
-    results = [{} for _ in range(len(gf_imp_tau))]
-    for i, block_gf in enumerate(gf_imp_tau):
-        print('-'*50 + '\nSolving impurity {}/{}\n'.format(i+1, len(gf_imp_tau)) + '-'*50)
-        print('Found blocks {}'.format(list(block_gf.indices)))
-        for block, gf in block_gf:
-            solver = PoormanMaxEnt(use_complex=True)
-            solver.set_G_tau(gf)
-            solver.set_error(maxent_error)
-            solver.omega = omega_mesh
-            solver.alpha_mesh = LogAlphaMesh(alpha_min=1e-6, alpha_max=1e2,
-                                             n_points=n_points_alpha)
-            results[i][block] = solver.run()
+    # Initialize collective results
+    data_linefit = [np.zeros(n_points_maxent)] * len(imps_blocks)
+    data_chi2 =  [np.zeros(n_points_maxent)] * len(imps_blocks)
 
-            n_orb = gf.target_shape[0]
-            opt_alpha = np.zeros((n_orb, n_orb, 2), dtype=int)
-            opt_alpha[:,:,:] = -1 # set results to -1 to distinguish them from 0
-            for i_orb in range(n_orb):
-                for j_orb in range(n_orb):
-                    for l_com in range(2):  # loop over complex numbers
-                        if results[i][block].analyzer_results[i_orb][j_orb][l_com] == {}:
-                            continue
-                        opt_alpha[i_orb, j_orb, l_com] = results[i][block].analyzer_results[i_orb][j_orb][l_com][analyzer]['alpha_index']
+    mpi.barrier()
+    for i in mpi.slice_array(imps_blocks_indices):
+        imp, block = imps_blocks[i]
+        print(f"\nRank {mpi.rank}: solving impurity {imp+1} block '{block}'")
 
-            mpi.report(f'Optimal alphas , block {block}:')
-            mpi.report('--- Real part ---', opt_alpha[:, :, 0])
-            if np.any(opt_alpha[:, :, 1] != -1):
-                mpi.report('--- Imag part ---', opt_alpha[:, :, 1])
-            if np.any(opt_alpha[:,:,0] == -1):
-                mpi.report('(a -1 indicates that maxent did not run for this block due to symmetry)')
+        solver = PoormanMaxEnt(use_complex=True)
+        solver.set_G_tau(gf_imp_list[imp][block])
+        solver.set_error(maxent_error)
+        solver.omega = omega_mesh
+        solver.alpha_mesh = LogAlphaMesh(alpha_min=1e-6, alpha_max=1e2,
+                                         n_points=n_points_alpha)
+        # silence output
+        solver.maxent_diagonal.logtaker.verbose = VerbosityFlags.Quiet
+        solver.maxent_offdiagonal.logtaker.verbose = VerbosityFlags.Quiet
+        results = solver.run()
 
-    return results, omega_mesh
+        n_orb = gf_imp_list[imp][block].target_shape[0]
+        opt_alpha = np.zeros((n_orb, n_orb, 2), dtype=int)
+        opt_alpha[:, :, :] = -1  # set results to -1 to distinguish them from 0
+        for i_orb in range(n_orb):
+            for j_orb in range(n_orb):
+                for l_com in range(2):  # loop over complex numbers
+                    if results.analyzer_results[i_orb][j_orb][l_com] == {}:
+                        continue
+                    opt_alpha[i_orb, j_orb,
+                              l_com] = results.analyzer_results[i_orb][j_orb][l_com][analyzer]['alpha_index']
 
+        print(
+            f"Optimal alphas , Imp {imp+1} block '{block}': \n--- Real part ---\n", opt_alpha[:, :, 0])
+        if np.any(opt_alpha[:, :, 1] != -1):
+            print('Imp {i+1} block {block} Imag part ---\n', opt_alpha[:, :, 1])
+        if np.any(opt_alpha[:, :, 0] == -1):
+            print('(a -1 indicates that maxent did not run for this block due to symmetry)')
 
-def _unpack_maxent_results(results, omega_mesh):
-    """
-    Converts maxent result to impurity list of dict with mesh
-    and spectral function from each analyzer.
-    """
+        # store unpacked data in flatted list / maxent res object not bcastable
+        data_linefit[i] = results.get_A_out('LineFitAnalyzer')
+        data_chi2[i] = results.get_A_out('Chi2CurvatureAnalyzer')
 
-    data_linefit = [{key: r.get_A_out('LineFitAnalyzer') for key, r in block_res.items()}
-                    for block_res in results]
-    data_chi2 = [{key: r.get_A_out('Chi2CurvatureAnalyzer') for key, r in block_res.items()}
-                 for block_res in results]
+    # slow barrier to reduce CPU load of waiting ranks
+    mpi.barrier(1000)
+    # Synchronizes information between ranks
+    for i in imps_blocks_indices:
+        data_linefit[i] = mpi.all_reduce(data_linefit[i])
+        data_chi2[i] = mpi.all_reduce(data_chi2[i])
 
-    data_per_impurity = [{'mesh': np.array(omega_mesh), 'Aimp_w_line_fit': dl,
-                          'Aimp_w_chi2_curvature': dc}
-                         for dl, dc in zip(data_linefit, data_chi2)]
-    return data_per_impurity
+    # final result list
+    unpacked_results = [{'mesh': np.array(omega_mesh),
+                         'Aimp_w_line_fit': {},
+                         'Aimp_w_chi2_curvature': {}
+                         } for _ in range(len(gf_imp_list))]
+
+    for i in imps_blocks_indices:
+        imp, block = imps_blocks[i]
+        unpacked_results[imp]['Aimp_w_line_fit'][block] = data_linefit[i]
+        unpacked_results[imp]['Aimp_w_chi2_curvature'][block] = data_chi2[i]
+
+    return unpacked_results
 
 
 def _write_spectral_function_to_h5(unpacked_results, external_path, iteration):
@@ -213,32 +232,31 @@ def main(external_path, iteration=None, sum_spins=False, maxent_error=0.02,
 
     Returns
     -------
-    unpacked_results : list
+    maxent_results : list
         The omega mesh and impurity spectral function from two different analyzers
         in a dict for each impurity
     """
 
-    # Not mpi parallelized
-    unpacked_results = None
+    gf_imp_tau = []
     if mpi.is_master_node():
         start_time = time.time()
 
         gf_imp_tau = _read_h5(external_path, iteration)
         for i, gf in enumerate(gf_imp_tau):
             gf_imp_tau[i] = _sum_greens_functions(gf, sum_spins)
+    gf_imp_tau = mpi.bcast(gf_imp_tau)
 
-        maxent_results, omega_mesh = _run_maxent(gf_imp_tau, maxent_error, n_points_maxent,
-                                                 n_points_alpha, omega_min, omega_max)
+    maxent_results = _run_maxent(gf_imp_tau, maxent_error, n_points_maxent,
+                                             n_points_alpha, omega_min, omega_max)
 
-        unpacked_results = _unpack_maxent_results(maxent_results, omega_mesh)
-        _write_spectral_function_to_h5(unpacked_results, external_path, iteration)
+    if mpi.is_master_node():
+        _write_spectral_function_to_h5(maxent_results, external_path, iteration)
 
         total_time = time.time() - start_time
         mpi.report('-'*80, 'DONE')
         mpi.report(f'Total run time: {total_time:.0f} s.')
-    unpacked_results = mpi.bcast(unpacked_results)
 
-    return unpacked_results
+    return maxent_results
 
 
 def _strtobool(val):
