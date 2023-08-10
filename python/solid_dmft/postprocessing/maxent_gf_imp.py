@@ -129,8 +129,8 @@ def _run_maxent(gf_imp_list, maxent_error, n_points_maxent, n_points_alpha,
     imps_blocks_indices = np.arange(len(imps_blocks))
 
     # Initialize collective results
-    data_linefit = [np.zeros(n_points_maxent)] * len(imps_blocks)
-    data_chi2 =  [np.zeros(n_points_maxent)] * len(imps_blocks)
+    data_linefit = [0] * len(imps_blocks)
+    data_chi2 =  [0] * len(imps_blocks)
 
     mpi.barrier()
     for i in mpi.slice_array(imps_blocks_indices):
