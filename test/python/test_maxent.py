@@ -18,5 +18,3 @@ if mpi.is_master_node():
     print('Comparing Alatt_maxent')
     with HDFArchive('svo_hubbardI_basic/out/inp.h5', 'r')['DMFT_results']['last_iter'] as out, HDFArchive('svo_hubbardI_basic/ref.h5', 'r')['DMFT_results']['last_iter'] as ref:
         assert are_iterables_equal(out['Alatt_maxent'], ref['Alatt_maxent'])
-
-mpi.barrier(1000)
