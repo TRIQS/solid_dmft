@@ -28,7 +28,7 @@ RUN cd / && git clone -b 3.1.x --depth 1 https://github.com/TRIQS/hartree_fock.g
     && make install
 
 # maxent
-RUN cd / && git clone -b 3.1.x --depth 1 https://github.com/TRIQS/maxent.git maxent.src \
+RUN cd / && git clone -b 1.1.x --depth 1 https://github.com/TRIQS/maxent.git maxent.src \
     && mkdir -p maxent.build && cd maxent.build \
     && cmake ../maxent.src \
     && make install
