@@ -2,6 +2,37 @@
 FROM flatironinstitute/cthyb:master-ubuntu-clang
 ARG APPNAME=solid_dmft
 
+# install dfttools maxent hubbardI and HartreeFock
+# cthyb (should be not necessary ...)
+RUN cd / && git clone -b unstable --depth 1 https://github.com/TRIQS/cthyb.git cthyb.src \
+    && mkdir -p cthyb.build && cd cthyb.build \
+    && cmake ../cthyb.src \
+    && make -j4 install
+
+# dft_tools
+RUN cd / && git clone -b unstable --depth 1 https://github.com/TRIQS/dft_tools.git dft_tools.src \
+    && mkdir -p dft_tools.build && cd dft_tools.build \
+    && cmake ../dft_tools.src \
+    && make -j4 install
+
+# hubbardI
+RUN cd / && git clone -b unstable --depth 1 https://github.com/TRIQS/hubbardI.git hubbardI.src \
+    && mkdir -p hubbardI.build && cd hubbardI.build \
+    && cmake ../hubbardI.src \
+    && make install
+
+# Hartree-Fock solver
+RUN cd / && git clone -b unstable --depth 1 https://github.com/TRIQS/hartree_fock.git hartree.src \
+    && mkdir -p hartree.build && cd hartree.build \
+    && cmake ../hartree.src \
+    && make install
+
+# maxent
+RUN cd / && git clone -b unstable --depth 1 https://github.com/TRIQS/maxent.git maxent.src \
+    && mkdir -p maxent.build && cd maxent.build \
+    && cmake ../maxent.src \
+    && make install
+
 COPY requirements.txt /src/$APPNAME/requirements.txt
 RUN pip3 install -r /src/$APPNAME/requirements.txt
 
