@@ -3,12 +3,6 @@ FROM flatironinstitute/cthyb:master-ubuntu-clang
 ARG APPNAME=solid_dmft
 
 # install dfttools maxent hubbardI and HartreeFock
-# cthyb (should be not necessary ...)
-RUN cd / && git clone -b 3.1.x --depth 1 https://github.com/TRIQS/cthyb.git cthyb.src \
-    && mkdir -p cthyb.build && cd cthyb.build \
-    && cmake ../cthyb.src \
-    && make -j4 install
-
 # dft_tools
 RUN cd / && git clone -b 3.1.x --depth 1 https://github.com/TRIQS/dft_tools.git dft_tools.src \
     && mkdir -p dft_tools.build && cd dft_tools.build \
