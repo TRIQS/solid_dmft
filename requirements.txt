@@ -1,2 +1,6 @@
-# Required python packages for this application (these should also be added to Dockerfile for Jenkins)
-numpy scipy argparse pytest scikit-image
+# Required python packages for this application
+numpy
+scipy
+argparse
+pytest
+scikit-image
