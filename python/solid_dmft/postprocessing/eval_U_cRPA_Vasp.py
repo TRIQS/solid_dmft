@@ -316,7 +316,7 @@ def calc_u_avg_fulld(uijkl, n_sites, n_orb, out=False):
     formula 23, 25
     works atm only for full d shell (l=2)
 
-    Returns F0=U, and J=(F2+F4)/2
+    Returns F0=U, and J=(F2+F4)/14
 
     Parameters
     ----------
@@ -387,7 +387,7 @@ def calculate_interaction_from_averaging(uijkl, n_sites, n_orb, out=False):
     of the choosen basis (cubic or spherical harmonics) the same results
     if Uijkl is a true Slater matrix.
 
-    Returns F0=U, and J=(F2+F4)/2
+    Returns F0=U, and J=(F2+F4)/14
 
     Parameters
     ----------
