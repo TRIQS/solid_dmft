@@ -468,7 +468,7 @@ def get_kx_ky_FS(lower_right, upper_left, Z, tb, select=None, N_kxy=10, kz=0.0, 
     E_FS = np.zeros((tb.n_orbitals, N_kxy, N_kxy))
     for kyi in range(N_kxy):
         path_FS = [(upper_left/(N_kxy-1)*kyi + kz*Z, lower_right+upper_left/(N_kxy-1)*kyi+kz*Z)]
-        k_vec, _ = k_space_path(path_FS, num=N_kxy)
+        k_vec, dst, tks = k_space_path(path_FS, num=N_kxy)
         E_FS[:, :, kyi] = tb.dispersion(k_vec).transpose() - fermi
 
     contours = {}
@@ -777,8 +777,7 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, mu_tb, add_spin=False, add_lambda=
             np.array(specs[section[0]]), np.array(specs[section[1]])), specs['bands_path']))
         k_points_labels = [k[0] for k in specs['bands_path']] + [specs['bands_path'][-1][1]]
         n_k = specs['n_k']
-        k_vec, k_1d = k_space_path(w90_paths, bz=tb.bz, num=n_k)
-        special_k = np.append(k_1d[0::n_k], k_1d[-1::])
+        k_vec, k_1d, special_k = k_space_path(w90_paths, bz=tb.bz, num=n_k)
     elif 'kmesh' in specs:
         assert 'reg' in specs['kmesh'], 'only regular kmesh is implemented'
 
@@ -826,8 +825,7 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, mu_tb, add_spin=False, add_lambda=
         lower_right = np.diff(w90_paths[1], axis=0)[0]
         for ik_y in range(n_k):
             path_along_x = [(upper_left/(n_k-1)*ik_y + specs['kz']*Z, lower_right+upper_left/(n_k-1)*ik_y+specs['kz']*Z)]
-            k_vec[ik_y*n_k:ik_y*n_k+n_k, :], k_1d = k_space_path(path_along_x, bz=tb.bz, num=n_k)
-            special_k = np.append(k_1d[0::n_k], k_1d[-1::])
+            k_vec[ik_y*n_k:ik_y*n_k+n_k, :], k_1d, special_k = k_space_path(path_along_x, bz=tb.bz, num=n_k)
             e_mat[:, :, :, ik_y] = tb.fourier(k_vec[ik_y*n_k:ik_y*n_k+n_k, :]).transpose(1, 2, 0)
         #if add_spin:
         #    e_mat = e_mat[2:5, 2:5]
