@@ -80,37 +80,37 @@ ENV CPATH=/triqs/include:${CPATH} \
     CMAKE_PREFIX_PATH=/triqs/share/cmake:${CMAKE_PREFIX_PATH} \
     TRIQS_ROOT=/triqs
 
-RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/triqs triqs.src \
+RUN cd /source && git clone -b 3.2.x --depth 1 https://github.com/TRIQS/triqs triqs.src \
     && mkdir -p triqs.build && cd triqs.build \
     && cmake ../triqs.src -DCMAKE_INSTALL_PREFIX=/triqs -DMPIEXEC_PREFLAGS='--allow-run-as-root' \
     && make -j$NCORES && ctest -j$NCORES && make install
 
 # dft_tools
-RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/dft_tools.git dft_tools.src \
+RUN cd /source && git clone -b 3.2.x --depth 1 https://github.com/TRIQS/dft_tools.git dft_tools.src \
     && mkdir -p dft_tools.build && cd dft_tools.build \
     && cmake ../dft_tools.src -DMPIEXEC_PREFLAGS='--allow-run-as-root' \
     && make -j$NCORES && make test && make install
 
 # cthyb
-RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/cthyb.git cthyb.src \
+RUN cd /source && git clone -b 3.2.x --depth 1 https://github.com/TRIQS/cthyb.git cthyb.src \
     && mkdir -p cthyb.build && cd cthyb.build \
     && cmake ../cthyb.src -DMPIEXEC_PREFLAGS='--allow-run-as-root'  \
     && make -j$NCORES && ctest -j$NCORES && make install
 
 # hubbardI
-RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hubbardI.git hubbardI.src \
+RUN cd /source && git clone -b 3.2.x --depth 1 https://github.com/TRIQS/hubbardI.git hubbardI.src \
     && mkdir -p hubbardI.build && cd hubbardI.build \
     && cmake ../hubbardI.src \ 
     && make -j$NCORES && ctest -j$NCORES && make install
 
 # Hartree-Fock solver
-RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hartree_fock.git hartree.src \
+RUN cd /source && git clone -b 3.2.x --depth 1 https://github.com/TRIQS/hartree_fock.git hartree.src \
     && mkdir -p hartree.build && cd hartree.build \
     && cmake ../hartree.src \ 
     && make -j$NCORES && make install
 
 # maxent needed for doc build
-RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/maxent.git maxent.src \
+RUN cd /source && git clone -b 1.2.x --depth 1 https://github.com/TRIQS/maxent.git maxent.src \
     && mkdir -p maxent.build && cd maxent.build \
     && cmake ../maxent.src \ 
     && make -j$NCORES && make install
