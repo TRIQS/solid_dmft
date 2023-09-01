@@ -5,6 +5,109 @@
 
 ## Version 3.2.0
 
+solid_dmft version 3.2.0 is a release that
+* adds Jenkins CI support via flatiron-jenkins
+* includes several fixes to match the latest triqs 3.2.x release
+* changes the Z estimate to a correct linear fit of the first two Matsubara frequencies
+* fixes for QE and Vasp CSC
+* add option to add a magnetic field in DMFT
+* add solid_dmft JOSS paper reference (doi.org/10.21105/joss.04623)
+* add simple Ntot interaction
+* allow Uprime!=U-2J in Kanamori
+* updates the tutorials
+* introduces input output documentation
+* add support for the TRIQS Hartree Solver
+* add RESPACK support
+
+We thank all contributors: Sophie Beck, Alberto Carta, Alexander Hampel, Max Merkel, Harrison LaBollita, Nils Wentzell
+
+Find below an itemized list of changes in this release.
+
+General
+-------
+* fix SzSz measurement in triqs unstable
+* Updated mpich VASP5 docker file to include HF solver
+* add hartree solver
+* feat: add regular kmesh option to pcb postproc
+* Fix to charge-self-consistency with Vasp (#48)
+* removed QE fix files which are now in official release
+* Modified dockerfile to add pmi support for cray supercomputing environments
+* add RESPACK postprocessing routines (#38)
+* Added correction to energy calculation
+* add triqs logos to skeleton and include ico in install directive of doc
+* change name of dft_mu to mu_initial_guess
+* support different DFT cubic basis conventions (#36)
+* allow magnetic calculation for CSC (output den correction is always averaged)
+* fix sym bug in hubbardI postprocessing
+* always calculate dft_mu at start of calculation
+* add h_field_it to remove magnetic field after x iterations
+* Write solid_dmft hash to h5
+* fix delta interface of cthyb for multiple sites with different block structures
+* correctly use tail fitted Sigma from cthyb not via double dyson equation
+* add paper ref to toml
+* minor addition of post-processing script: add_local Hamiltonian, separate from add_lambda. We might remove add_lambda
+* update doc with JOSS references
+* Bug fix for changes in sumk mesh definition in maxent_gf_latt
+* adapt vasp patch files for ver6.3.2
+* function to det n_orb_solver, fix test
+* apply block picker before block mapping
+* fix header writing for obs file
+* add pick solver struct option to select specific blocks for the impurity problem
+* fix print for failing comparison test
+* allow different interaction Hamiltonians per impurity
+* enforce PEP standard in interaction Hamiltonian
+* print optimal alpha in other maxent scripts
+* final corrections for PCB functions
+* add proj_on_orb functionality to Akw
+* fix bug in max_G_diff function ignoring norm_temp
+* change Sigma_imp_iw / _w to Sigma_imp (DFTTools unstable)
+* fix load Sigma with new gf_struct in triqs 3.1.x
+* adapt to sumk mesh changes in dfttools
+* Made the way mesh is stored in maxent_gf_latt consistent with maxent_gf_imp
+
+fix
+---
+* fix deg shells in magnetic calculations
+* fix parameter n_orb in hint construction
+* doc strings of cRPA avering for Slater
+* critical bug in hubbardI interface
+* PCB fermi surface plot
+* updates from triqs unstable
+* simple Z estimate as linear fit
+* PCB: removing "linearize" function, changing the model
+* delta_interface with SOC and store solver options
+* convert warmup cycles to int automatically
+* problem with ish vs icrsh in PCB Thanks @HenryScottx for reporting!
+* h_int uses now n_orb instead of orb_names
+
+build
+-----
+* adapt jenkins CI files
+* simplify docker image
+* update openmpi docker file with clang-15
+* update CI dockerfile
+* Updated docker file to ubuntu 22
+
+feat
+----
+* enable MPI for maxent_gf_imp post-processing routines
+* add possibility to specify Uprime in Kanamori interaction
+* add loc_n_min / max arg for cthyb
+* add additional support for hartree when computing DC from the solver
+* add Ntot interaction
+
+doc
+---
+* Added observables documentation for DMFT output
+* Updated tutorial svo one-shot
+
+test
+----
+* fix tests after Hartree additions
+* add Hartree Solver test
+* Integration test for maxent gf imp and latt, bug fixes to both scripts (#30)
+* add new test for pcb get_dmft_bands function
+
 
 ## Version 3.1.5
 
