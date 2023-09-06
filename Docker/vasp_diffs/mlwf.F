@@ -12,11 +12,11 @@
 >        IF (NUM_WANN == 0) NUM_WANN = P_MLWF%NUM_WANN
 >    ENDIF
 > 
-563c574
+566c577
 <       CALL LPRJ_WRITE(MLWF%LPRJ_functions,MLWF%LPRJ_COVL,IO%IU6,IO%IU0,W)
 ---
 >       CALL LPRJ_WRITE(MLWF%LPRJ_functions,MLWF%LPRJ_COVL,IO%IU6,IO%IU0,W, FERMILEVEL)
-576,579d586
+579,582d589
 <    ! or the one-shot method
 <    ! or unitary matrix contrained optimization (umco)
 <    ELSE
