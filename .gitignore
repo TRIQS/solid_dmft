@@ -10,7 +10,7 @@ ipynb_checkpoints
 .ipynb_checkpoints
 
 POTCAR
-vasp.6.3.0.tgz
+vasp*.tgz
 
 doc/input_output/DMFT_input/advanced.rst
 doc/input_output/DMFT_input/dft.rst
