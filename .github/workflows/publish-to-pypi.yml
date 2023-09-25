@@ -23,8 +23,9 @@ jobs:
         pip install
         build toml
         --user
-    - name: copy version.in
+    - name: prepare python distribution
       run: |
+        cp packaging/pypi/* ./
         mkdir build && cd build 
         cmake ../
         mv python/solid_dmft/version.py ../python/solid_dmft/version.py
