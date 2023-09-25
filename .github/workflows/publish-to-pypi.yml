@@ -1,4 +1,4 @@
-name: Publish PyPI and TestPyPI
+name: PyPI
 
 on:
   push:
@@ -39,7 +39,7 @@ jobs:
         path: dist/
 
   publish-to-pypi:
-    name: Publish to PyPI 🐍
+    name: Publish PyPI 🐍
     if: startsWith(github.ref, 'refs/tags/')  # only publish to PyPI on tag pushes
     needs:
     - build
@@ -62,7 +62,7 @@ jobs:
         skip-existing: true # skip if version name package already exists on pypi
 
   publish-to-testpypi:
-    name: Publish to TestPyPI 🐍
+    name: Publish TestPyPI 🐍
     needs:
     - build
     runs-on: ubuntu-latest

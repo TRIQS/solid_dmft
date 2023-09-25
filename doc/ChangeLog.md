@@ -2,6 +2,8 @@
 
 # Changelog
 
+## Version 3.2.1
+solid_dmft version 3.2.1 is a minor release that automatizes the pypi packaging release
 
 ## Version 3.2.0
 

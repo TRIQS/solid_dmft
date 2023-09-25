@@ -1,7 +1,7 @@
 easyblock = 'CMakeMake'
 
 name = 'solid_dmft'
-version = '3.2.0'
+version = '3.2.1'
 
 homepage = 'https://triqs.github.io/solid_dmft/'
 description = """
