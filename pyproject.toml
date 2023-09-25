@@ -24,7 +24,8 @@ dependencies = [
     "numpy",
     "scipy",
     "pytest",
-    "scikit-image"
+    "scikit-image",
+    "argparse"
 ]
 
 [project.urls]
