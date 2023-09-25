@@ -2,7 +2,10 @@ name: PyPI
 
 on:
   push:
-    branches: [ 3.2.x ]
+    branches:
+      - 3.2.x
+    tags:
+      - 3.2.*
 
 jobs:
   build:
