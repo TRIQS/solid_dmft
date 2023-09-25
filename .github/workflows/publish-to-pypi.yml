@@ -2,14 +2,14 @@ name: Publish PyPI and TestPyPI
 
 on:
   push:
-    branches: [ unstable ]
+    branches: [ 3.1.x ]
 
 jobs:
   build:
     name: Build distribution 📦
     runs-on: ubuntu-latest
     container:   # we have to provide a working triqs installation to make the cmake step work
-      image: materialstheory/solid_dmft_ci
+      image: materialstheory/solid_dmft_ci:3.1.x
 
     steps:
     - uses: actions/checkout@v4
