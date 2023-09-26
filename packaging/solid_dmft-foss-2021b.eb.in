@@ -1,8 +1,7 @@
 easyblock = 'CMakeMake'
 
-name = 'TRIQS-solid_dmft'
-version = '3.1.5'
-versionsuffix = '-Python-%(pyver)s'
+name = 'solid_dmft'
+version = '@PROJECT_VERSION@'
 
 homepage = 'https://triqs.github.io/solid_dmft/'
 description = """
