@@ -109,6 +109,9 @@ add_subdirectory(share)
 # executable
 add_subdirectory(bin)            # Executables
 
+# packaging versions
+add_subdirectory(packaging)
+
 # #############
 # Debian Package
 

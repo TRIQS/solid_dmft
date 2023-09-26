@@ -1,4 +1,4 @@
-{% set version = "3.2.1" %}
+{% set version = "@PROJECT_VERSION@" %}
 
 package:
   name: solid_dmft

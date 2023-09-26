@@ -7,7 +7,7 @@ where = ["python"]
 
 [project]
 name = "solid_dmft"
-version = "3.2.1"
+version = "@PROJECT_VERSION@"
 authors = [
   { name="Alexander Hampel", email="ahampel@flatironinstitute.org" }
 ]
