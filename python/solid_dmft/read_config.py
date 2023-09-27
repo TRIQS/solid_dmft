@@ -435,6 +435,13 @@ import numpy as np
 # Workaround to get the default configparser boolean converter
 BOOL_PARSER = lambda b: ConfigParser()._convert_to_boolean(b)
 
+# Converts to an integer if possible, implemented to keep legacy mode in DC_type
+def TRY_INT_PARSER(s):
+    try:
+        result = int(s)
+    except:
+        result = str(s)
+    return result
 # TODO: it might be nicer to not have optional parameters at all and instead use
 #       explicit default values
 
@@ -485,7 +492,7 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
 
                                  'dc': {'converter': BOOL_PARSER, 'used': True, 'default': True},
 
-                                 'dc_type': {'converter': int, 'valid for': lambda x, _: x in (0, 1, 2, 3, 4),
+                                 'dc_type': {'converter': TRY_INT_PARSER, 'valid for': lambda x, _: x in [0, 1, 2, 3, 4, 'cFLL','sFLL', 'cAMF', 'sAMF', 'cHeld'],
                                              'used': lambda params: params['general']['dc']},
 
                                  'prec_mu': {'converter': float, 'valid for': lambda x, _: x > 0, 'used': True},
@@ -557,7 +564,20 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                  'afm_order': {'converter': BOOL_PARSER,
                                                'used': lambda params: params['general']['magnetic'],
                                                'default': False},
-
+                                 
+                                 'mix_quantity': {'converter': lambda s: list(map(str, s.split(','))),
+                                            'used': True,
+                                            'default': []},
+                                 
+                                 'mix_type': {'valid for': lambda x, _: x in ('linear', 'broyden'),
+                                                'used': True, 'default': 'linear'},
+                                 
+                                 'mix_greed': {'converter': float, 'valid for': lambda x, _: x > 0,
+                                               'used': True, 'default': 1.0},
+                                 
+                                 'broy_max_it': {'converter': int, 'valid for': lambda x, _: x >= 1 or x==-1 ,
+                                                'used': True, 'default': 2},
+                                                
                                  'sigma_mix': {'converter': float,
                                                'valid for': lambda x, params: x >= 0 and (np.isclose(params['general']['g0_mix'], 1)
                                                                                          or np.isclose(x, 1)),
@@ -569,8 +589,6 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                  'g0_mix_type': {'valid for': lambda x, _: x in ('linear', 'broyden'),
                                                 'used': True, 'default': 'linear'},
 
-                                 'broy_max_it': {'converter': int, 'valid for': lambda x, _: x >= 1 or x==-1 ,
-                                                'used': lambda params: params['general']['g0_mix_type'] == 'broyden', 'default': -1},
 
                                  'calc_energies': {'converter': BOOL_PARSER, 'used': True, 'default': False},
 
@@ -1228,11 +1246,6 @@ def read_config(config_file):
                 invalid_error_string += '\n- Section "{}": '.format(section_name) + ', '.join(section_params)
         raise ValueError('The following parameters are not valid:'
                          + invalid_error_string)
-
-    # warning if sigma mixing is used, remove in future versions
-    if parameters['general']['sigma_mix'] < 1.0:
-        if parameters['general']['g0_mix'] < 1.0:
-            raise ValueError('You shall not use Sigma and G0 mixing together!')
 
     # Workarounds for some parameters
 

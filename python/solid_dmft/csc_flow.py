@@ -256,10 +256,13 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
 
     # Reads in iteration offset if restarting
     iteration_offset = 0
+    iter_csc = 0
     if mpi.is_master_node() and os.path.isfile(general_params['seedname']+'.h5'):
         with HDFArchive(general_params['seedname']+'.h5', 'r') as archive:
             if 'DMFT_results' in archive and 'iteration_count' in archive['DMFT_results']:
                 iteration_offset = archive['DMFT_results']['iteration_count']
+            if 'DMFT_results' in archive and 'iter_csc' in archive['DMFT_results']:
+                iter_csc = archive['DMFT_results']['iter_csc']
     iteration_offset = mpi.bcast(iteration_offset)
 
     iter_dmft = iteration_offset+1
@@ -333,6 +336,15 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
             print('DMFT cycle took {:10.3f} seconds'.format(end_time_dmft-start_time_dmft))
             print('='*80 + '\n')
 
+
+        iter_csc += 1
+
+        if mpi.is_master_node() and os.path.isfile(general_params['seedname']+'.h5'):
+
+            with HDFArchive(general_params['seedname']+'.h5', 'a') as archive:
+                if not 'iter_csc' in archive['DMFT_results']:
+                    archive['DMFT_results'].create_group('iter_csc')
+                archive['DMFT_results']['iter_csc'] = iter_csc
         # If all steps are executed or calculation is converged, finish DFT+DMFT loop
         if is_converged or iter_dmft > general_params['n_iter_dmft'] + iteration_offset:
             break
@@ -340,6 +352,7 @@ def csc_flow_control(general_params, solver_params, dft_params, advanced_params)
         # Restarts DFT
         mpi.barrier()
         start_time_dft = timer()
+        mpi.report(f'  solid_dmft: Starting CSC iteration {iter_csc}')
         mpi.report('  solid_dmft: Running {}...'.format(dft_params['dft_code'].upper()))
 
         # Runs DFT and converter
