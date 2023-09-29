@@ -437,7 +437,6 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
         G_loc_all_dft = sum_k.extract_G_loc(broadening=general_params['eta'], with_Sigma=False, mu=dft_mu)
     else:
         G_loc_all_dft = sum_k.extract_G_loc(with_Sigma=False, mu=dft_mu)
-    density_mat_dft = [G_loc_all_dft[iineq].density() for iineq in range(sum_k.n_inequiv_shells)]
 
     for iineq in range(sum_k.n_inequiv_shells):
         density_shell_dft = G_loc_all_dft[iineq].total_density()
@@ -448,6 +447,19 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
 
         if general_params['afm_order']:
             general_params = afm_mapping.determine(general_params, archive, sum_k.n_inequiv_shells)
+
+    # load gw / crpa input from disc here and store in general_params
+    if general_params['crpa_code'] == 'bdft':
+        general_params['Uloc_dlr'] = None
+        general_params['Wloc_dlr'] = None
+        general_params['Vloc'] = None
+        if mpi.is_master_node():
+            general_params['Uloc_dlr'] = archive['DMFT_input']['Uloc_dlr']
+            general_params['Wloc_dlr'] = archive['DMFT_input']['Wloc_dlr']
+            general_params['Vloc'] = archive['DMFT_input']['Vloc']
+        general_params['Uloc_dlr'] = mpi.bcast(general_params['Uloc_dlr'])
+        general_params['Wloc_dlr'] = mpi.bcast(general_params['Wloc_dlr'])
+        general_params['Vloc'] = mpi.bcast(general_params['Vloc'])
 
     # Constructs interaction Hamiltonian and writes it to the h5 archive
     h_int = interaction_hamiltonian.construct(sum_k, general_params, advanced_params)
@@ -484,7 +496,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
 
     # Determines initial Sigma and DC
     sum_k, solvers = initial_sigma.determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
-                                                                  archive, iteration_offset, density_mat_dft, solvers)
+                                                                  archive, iteration_offset, G_loc_all_dft, solvers)
 
     sum_k = manipulate_mu.set_initial_mu(general_params, sum_k, iteration_offset, archive, shell_multiplicity)
 
@@ -509,7 +521,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
     if mpi.is_master_node() and iteration_offset == 0:
         write_header_to_file(general_params, sum_k)
         observables = add_dft_values_as_zeroth_iteration(observables, general_params, dft_mu, dft_energy, sum_k,
-                                                         G_loc_all_dft, density_mat_dft, shell_multiplicity)
+                                                         G_loc_all_dft, shell_multiplicity)
         write_obs(observables, sum_k, general_params)
         # write convergence file
         convergence.prep_conv_file(general_params, sum_k)
@@ -640,6 +652,8 @@ def _dmft_step(sum_k, solvers, it, general_params,
 
          # store solver to h5 archive
         if general_params['store_solver'] and mpi.is_master_node():
+            if not 'solver' in archive['DMFT_input']:
+                archive['DMFT_input'].create_group('solver')
             archive['DMFT_input/solver'].create_group('it_'+str(it))
             archive['DMFT_input/solver/it_'+str(it)]['S_'+str(icrsh)] = solvers[icrsh].triqs_solver
 

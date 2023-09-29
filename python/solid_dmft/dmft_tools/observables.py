@@ -147,7 +147,7 @@ def write_header_to_file(general_params, sum_k):
 
 
 def add_dft_values_as_zeroth_iteration(observables, general_params, dft_mu, dft_energy,
-                                       sum_k, G_loc_all_dft, density_mat_dft, shell_multiplicity):
+                                       sum_k, G_loc_all_dft, shell_multiplicity):
     """
     Calculates the DFT observables that should be written as the zeroth iteration.
 
@@ -163,8 +163,6 @@ def add_dft_values_as_zeroth_iteration(observables, general_params, dft_mu, dft_
 
     G_loc_all_dft : Gloc from DFT for G(beta/2)
 
-    density_mat_dft : occupations from DFT
-
     shell_multiplicity : degeneracy of impurities
 
     Returns
@@ -173,6 +171,7 @@ def add_dft_values_as_zeroth_iteration(observables, general_params, dft_mu, dft_
     observables: list of dicts
     """
     dft_energy = 0.0 if dft_energy is None else dft_energy
+    density_mat_dft = [G_loc_all_dft[iineq].density() for iineq in range(sum_k.n_inequiv_shells)]
     observables['iteration'].append(0)
     observables['mu'].append(float(dft_mu))
 

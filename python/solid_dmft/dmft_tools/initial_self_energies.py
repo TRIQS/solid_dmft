@@ -350,7 +350,7 @@ def _set_loaded_sigma(sum_k, loaded_sigma, loaded_dc_imp, general_params):
 
 
 def determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
-                                   archive, iteration_offset, density_mat_dft, solvers):
+                                   archive, iteration_offset, G_loc_all, solvers):
     """
     Determines the double counting (DC) and the initial Sigma. This can happen
     in five different ways:
@@ -378,8 +378,8 @@ def determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
         the archive of the current calculation
     iteration_offset : int
         the iterations done before this calculation
-    density_mat_dft : numpy array
-        DFT density matrix
+    G_loc_all : Gf
+        local Green function for all shells
     solvers : list
         list of Solver instances
 
@@ -393,6 +393,7 @@ def determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
     """
     start_sigma = None
     last_g0 = None
+    density_mat_dft = [G_loc_all[iineq].density() for iineq in range(sum_k.n_inequiv_shells)]
     if mpi.is_master_node():
         # Resumes previous calculation
         if iteration_offset > 0:
@@ -419,7 +420,7 @@ def determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
             start_sigma = _set_loaded_sigma(sum_k, loaded_sigma, loaded_dc_imp, general_params)
 
         # Sets DC as Sigma because no initial Sigma given
-        elif general_params['dc']:
+        elif general_params['dc'] and general_params['dc_type'] != 5:
             sum_k = calculate_double_counting(sum_k, density_mat_dft, general_params, advanced_params)
 
             # initialize Sigma from sum_k

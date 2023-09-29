@@ -28,6 +28,7 @@ set(all_tests
     test_matheval
     test_plot_correlated_bands
     test_respack_sfo
+    test_gw_embedding
     )
 
   # copy input files for PCB test from documentation tutorial
@@ -42,7 +43,10 @@ set(all_tests
   # copy reference data for respack test
   FILE(COPY respack_sfo_data DESTINATION ${test_dir})
 
-  foreach(test ${all_tests})
+  # copy reference data for respack test
+  FILE(COPY gw_embedding DESTINATION ${test_dir})
+  
+foreach(test ${all_tests})
   get_filename_component(test_name ${test} NAME_WE)
   get_filename_component(test_dir ${test} DIRECTORY)
   add_test(NAME ${test_name} COMMAND ${TRIQS_PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${test_dir}/${test_name}.py WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${test_dir})
@@ -58,6 +62,7 @@ set (integration_tests
      lno_hubbardI_mag
      svo_cthyb_basic_gl
      svo_cthyb_basic_tf
+     svo_ctseg_dyn
      )
 
 # copy other test files

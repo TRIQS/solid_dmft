@@ -93,6 +93,8 @@ dc_type : int
             * 1: held formula, needs to be used with slater-kanamori h_int_type=2
             * 2: AMF
             * 3: FLL for eg orbitals only with U,J for Kanamori
+            * 4: cpa
+            * 5: dyn
 dc_dmft : bool
            Whether to use DMFT or DFT occupations:
 
@@ -460,21 +462,26 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                                                                        'full_slater',
                                                                                        'crpa',
                                                                                        'crpa_density_density',
-                                                                                       'dynamic',
-                                                                                       'ntot',
-                                                                                       'simple_intra') for hint in x),
+                                                                                       'simple_intra',
+                                                                                       'dyn_density_density',
+                                                                                       'dyn_full',
+                                                                                       'ntot') for hint in x),
                                                 'converter': lambda s: list(map(str, s.replace(" ", "").split(','))),
                                                 'used': True},
 
-                                 'U': {'converter': lambda s: list(map(float, s.split(','))), 'used': True},
+                                 'U': {'converter': lambda s: list(map(float, s.split(','))),
+                                       'default': ['none'],
+                                       'used': lambda params: any(params['general']['h_int_type']) in ('density_density', 'kanamori', 'full_slater', 'ntot')},
 
                                  'U_prime': {'converter': lambda s: list(map(float, s.split(','))),
                                              'default': ['U-2J'],
                                              'valid for': lambda x, params: all(r == 'U-2J' or hint in ('kanamori')
                                                                                     for r, hint in zip(x, params['general']['h_int_type'])),
-                                             'used': True},
+                                             'used': lambda params: any(params['general']['h_int_type']) in ('density_density', 'kanamori', 'full_slater', 'ntot')},
 
-                                 'J': {'converter': lambda s: list(map(float, s.split(','))), 'used': True},
+                                 'J': {'converter': lambda s: list(map(float, s.split(','))),
+                                       'default' : ['none'],
+                                       'used': lambda params: any(params['general']['h_int_type']) in ('density_density', 'kanamori', 'full_slater', 'ntot')},
 
                                  'ratio_F4_F2': {'converter': lambda s: list(map(float, s.split(','))),
                                                  'default': ['none'],
@@ -489,12 +496,13 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
 
                                  'dc': {'converter': BOOL_PARSER, 'used': True, 'default': True},
 
-                                 'dc_type': {'converter': int, 'valid for': lambda x, _: x in (0, 1, 2, 3, 4),
+                                 'dc_type': {'converter': int, 'valid for': lambda x, _: x in (0, 1, 2, 3, 4, 5),
                                              'used': lambda params: params['general']['dc']},
 
                                  'prec_mu': {'converter': float, 'valid for': lambda x, _: x > 0, 'used': True},
 
                                  'dc_dmft': {'converter': BOOL_PARSER,
+                                             'default': False,
                                              'used': lambda params: params['general']['dc']},
 
                                  'cpa_zeta': {'converter': lambda s: list(map(float, s.split(','))),
@@ -657,7 +665,14 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                                           'default': 'none'},
 
                                  'h_int_basis' : {'valid for': lambda x, _: x in ('triqs', 'wien2k', 'wannier90', 'qe', 'vasp'),
-                                            'used': True, 'default' : 'triqs'}
+                                            'used': True, 'default' : 'triqs'},
+
+                                #
+                                # dynamic interaction / gw /etc
+                                #
+                                'crpa_code': {'valid for': lambda x, _: x in ('none', 'Vasp', 'bdft'),
+                                             'used': True, 'default': 'none'},
+
 
                                 },
                      'dft': {'dft_code': {'used': lambda params: params['general']['csc'],
@@ -799,7 +814,6 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                 'loc_n_max': {'converter': int, 'valid for': lambda x, _: x >= 0,
                                               'used': lambda params: params['general']['solver_type'] in ['cthyb'],
                                               'default': None},
-
 
                                 #
                                 # extra ctseg params

@@ -650,7 +650,7 @@ class SolverStructure:
 
         gf_struct = self.sum_k.gf_struct_solver_list[self.icrsh]
 
-        if self.general_params['h_int_type'] == 'dynamic':
+        if self.general_params['h_int_type'][self.icrsh] == 'dyn_density_density':
             self.U_iw = None
             if  mpi.is_master_node():
                 with HDFArchive(self.general_params['jobname']+'/'+self.general_params['seedname']+'.h5', 'r') as archive:
