@@ -744,12 +744,14 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                                   'used': lambda params: params['general']['solver_type'] in ['hubbardI', 'ctseg']},
 
                                 'measure_G_iw': {'converter': BOOL_PARSER, 'default': False,
-                                                  'used': lambda params: params['general']['solver_type'] in ['ctseg', 'cthyb']},
-
-                                'measure_G_n_iw': {'converter': lambda s: int(float(s)),
-                                                   'default' : 20,
-                                                   'valid for': lambda x, _: x >= 0,
-                                                   'used': lambda params: params['general']['solver_type'] in ['cthyb']},
+                                                  'used': lambda params: params['general']['solver_type'] in ['ctseg']},
+                                # 'measure_G_iw': {'converter': BOOL_PARSER, 'default': False,
+                                #                   'used': lambda params: params['general']['solver_type'] in ['ctseg', 'cthyb']},
+                                #
+                                # 'measure_G_n_iw': {'converter': lambda s: int(float(s)),
+                                #                    'default' : 20,
+                                #                    'valid for': lambda x, _: x >= 0,
+                                #                    'used': lambda params: params['general']['solver_type'] in ['cthyb']},
 
                                 'measure_G_l': {'converter': BOOL_PARSER, 'default': False,
                                                 'used': lambda params: params['general']['solver_type'] in ['cthyb', 'hubbardI', 'ctseg']},
