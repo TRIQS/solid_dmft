@@ -94,7 +94,8 @@ dc_type : int
             * 2: AMF
             * 3: FLL for eg orbitals only with U,J for Kanamori
             * 4: cpa
-            * 5: dyn
+            * 5: crpa static
+            * 6: crpa dynamic
 dc_dmft : bool
            Whether to use DMFT or DFT occupations:
 
@@ -471,17 +472,17 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
 
                                  'U': {'converter': lambda s: list(map(float, s.split(','))),
                                        'default': ['none'],
-                                       'used': lambda params: any(params['general']['h_int_type']) in ('density_density', 'kanamori', 'full_slater', 'ntot')},
+                                       'used': True},
 
                                  'U_prime': {'converter': lambda s: list(map(float, s.split(','))),
                                              'default': ['U-2J'],
                                              'valid for': lambda x, params: all(r == 'U-2J' or hint in ('kanamori')
                                                                                     for r, hint in zip(x, params['general']['h_int_type'])),
-                                             'used': lambda params: any(params['general']['h_int_type']) in ('density_density', 'kanamori', 'full_slater', 'ntot')},
+                                             'used': True},
 
                                  'J': {'converter': lambda s: list(map(float, s.split(','))),
                                        'default' : ['none'],
-                                       'used': lambda params: any(params['general']['h_int_type']) in ('density_density', 'kanamori', 'full_slater', 'ntot')},
+                                       'used': True},
 
                                  'ratio_F4_F2': {'converter': lambda s: list(map(float, s.split(','))),
                                                  'default': ['none'],
@@ -496,7 +497,7 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
 
                                  'dc': {'converter': BOOL_PARSER, 'used': True, 'default': True},
 
-                                 'dc_type': {'converter': int, 'valid for': lambda x, _: x in (0, 1, 2, 3, 4, 5),
+                                 'dc_type': {'converter': int, 'valid for': lambda x, _: x in (0, 1, 2, 3, 4, 5, 6),
                                              'used': lambda params: params['general']['dc']},
 
                                  'prec_mu': {'converter': float, 'valid for': lambda x, _: x > 0, 'used': True},
@@ -1302,6 +1303,9 @@ def read_config(config_file):
     if parameters['general']['solver_type'] in ['cthyb'] and parameters['solver']['measure_density_matrix']:
         # also required to measure the density matrix
         parameters['solver']['use_norm_as_weight'] = True
+
+    if parameters['general']['crpa_code'] == 'bdft':
+        parameters['general']['enforce_off_diag'] = True
 
     if parameters['general']['solver_type'] in ['ftps'] and parameters['general']['calc_energies']:
         raise ValueError('"calc_energies" is not valid for solver_type = "ftps"')

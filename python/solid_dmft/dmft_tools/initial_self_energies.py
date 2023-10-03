@@ -35,8 +35,10 @@ import numpy as np
 # triqs
 from h5 import HDFArchive
 import triqs.utility.mpi as mpi
-from triqs.gf import BlockGf, Gf
+from triqs.gf import BlockGf, Gf, make_gf_imfreq, MeshDLRImFreq, make_gf_dlr
 
+from triqs.plot.mpl_interface import *
+from solid_dmft.gw_embedding.bdft_converter import calc_Sigma_DC_gw
 
 def calculate_double_counting(sum_k, density_matrix, general_params, advanced_params):
     """
@@ -420,7 +422,7 @@ def determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
             start_sigma = _set_loaded_sigma(sum_k, loaded_sigma, loaded_dc_imp, general_params)
 
         # Sets DC as Sigma because no initial Sigma given
-        elif general_params['dc'] and general_params['dc_type'] != 5:
+        elif general_params['dc'] and general_params['dc_type'] not in (5,6):
             sum_k = calculate_double_counting(sum_k, density_mat_dft, general_params, advanced_params)
 
             # initialize Sigma from sum_k
@@ -448,8 +450,45 @@ def determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
                             start_sigma[icrsh][spin_channel] << fac + dc_value
                 else:
                     start_sigma[icrsh] << dc_value
-        # Sets Sigma to zero because neither initial Sigma nor DC given
+        elif general_params['dc'] and general_params['dc_type'] in (5,6):
+            mpi.report(f'\n*** Using dynamic interactions to calculate DC ***')
+            assert general_params['crpa_code'] == 'bdft'
+            start_sigma = [sum_k.block_structure.create_gf(ish=iineq, space='solver', mesh=sum_k.mesh)
+                for iineq in range(sum_k.n_inequiv_shells)]
+            for icrsh in range(sum_k.n_inequiv_shells):
+                mesh = MeshDLRImFreq(beta=general_params['Wloc_dlr'][icrsh].mesh.beta,
+                                     statistic='Fermion',
+                                     w_max=general_params['Wloc_dlr'][icrsh].mesh.w_max,
+                                     eps=general_params['Wloc_dlr'][icrsh].mesh.eps)
+                Gloc_dlr_iw = sum_k.block_structure.create_gf(ish=icrsh, space='solver', mesh=mesh)
+                for block, gf in Gloc_dlr_iw:
+                    for iw in gf.mesh:
+                        gf[iw] = G_loc_all[icrsh][block](iw)
+                Gloc_dlr = make_gf_dlr(Gloc_dlr_iw)
 
+                Sig_DC_dlr, Sig_DC_hartree = calc_Sigma_DC_gw(general_params['Wloc_dlr'][icrsh],
+                                                              Gloc_dlr,
+                                                              general_params['Vloc'][icrsh])
+                if general_params['dc_type'] == 5:
+                    # transform dc to sumk blocks
+                    sum_k.dc_imp[icrsh] = sum_k.block_structure.convert_matrix(Sig_DC_hartree,
+                                                                               ish_from=sum_k.inequiv_to_corr[icrsh],
+                                                                               space_from='solver', space_to='sumk')
+                    for block, gf in start_sigma[icrsh]:
+                        gf << Sig_DC_hartree[block]
+                else:
+                    sum_k.dc_imp[icrsh] = sum_k.block_structure.convert_matrix(Sig_DC_hartree,
+                                                                               ish_from=sum_k.inequiv_to_corr[icrsh],
+                                                                               space_from='solver', space_to='sumk')
+                    # TODO: this required some change in DFTTools
+                    # sum_k.dc_imp[icrsh] = sum_k.block_structure.convert_gf(make_gf_imfreq(Sig_DC_dlr,
+                    #                                                                       n_iw=sum_k.mesh_values.shape[0]//2), 
+                    #                                                        ish_from=sum_k.inequiv_to_corr[icrsh], 
+                    #                                                        space_from='solver', space_to='sumk')
+                    # TODO: add n_iw as MeshImFreq attribute in TRIQS
+                    start_sigma[icrsh] = make_gf_imfreq(Sig_DC_dlr, n_iw=len(sum_k.mesh)//2)
+
+        # Sets Sigma to zero because neither initial Sigma nor DC given
         elif (not general_params['dc'] and general_params['magnetic']):
             start_sigma = [sum_k.block_structure.create_gf(ish=iineq, gf_function=Gf, space='solver', mesh=sum_k.mesh)
                                 for iineq in range(sum_k.n_inequiv_shells)]

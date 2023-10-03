@@ -117,8 +117,9 @@ def _load_crpa_interaction_matrix(sum_k, general_params, filename='UIJKL'):
     if general_params['crpa_code'] == 'bdft':
         u_matrix_four_indices_per_shell = []
         for icrsh in range(sum_k.n_inequiv_shells):
-            Uloc_0 = make_gf_imfreq(general_params['Uloc_dlr'][icrsh],1)
-            u_matrix_four_indices_per_shell.append(Uloc_0.data[0,:,:,:,:] + general_params['Vloc'][icrsh])
+            # for now we assume that up / down are equal
+            Uloc_0 = make_gf_imfreq(general_params['Uloc_dlr'][icrsh]['up_0'],1)
+            u_matrix_four_indices_per_shell.append(Uloc_0.data[0,:,:,:,:] + general_params['Vloc'][icrsh]['up_0'])
 
 
     return u_matrix_four_indices_per_shell

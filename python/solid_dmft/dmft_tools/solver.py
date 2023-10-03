@@ -29,6 +29,7 @@ from triqs.gf.tools import inverse, make_zero_tail
 from triqs.gf.descriptors import Fourier
 from triqs.operators import c_dag, c, Operator
 import triqs.utility.mpi as mpi
+import itertools
 from h5 import HDFArchive
 
 from . import legendre_filter
@@ -602,8 +603,12 @@ class SolverStructure:
 
         if self.general_params['solver_type'] == 'ctseg':
             # fill G0_freq from sum_k to solver
-            self.triqs_solver.G0_iw << self.G0_freq
-
+            for block, gf in self.G0_freq:
+                for i, j in itertools.product(range(gf.target_shape[0]), range(gf.target_shape[1])):
+                    if i == j:
+                        self.triqs_solver.G0_iw[block][i,j] << gf[i,j]
+                    else:
+                        self.triqs_solver.G0_iw[block][i,j] << 0.0+0.0j
 
             if self.general_params['h_int_type'] == 'dynamic':
                 for b1, b2 in product(self.sum_k.gf_struct_solver_dict[self.icrsh].keys(), repeat=2):

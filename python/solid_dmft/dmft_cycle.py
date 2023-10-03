@@ -455,11 +455,21 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
         general_params['Vloc'] = None
         if mpi.is_master_node():
             general_params['Uloc_dlr'] = archive['DMFT_input']['Uloc_dlr']
+            # TODO: in principle we have to transform to solver struct, however LGR is not able to convert 4d tensors!
+            # for now enforce off_diag terms and use default block structure
+            # for iineq in range(sum_k.n_inequiv_shells):
+            #     general_params['Uloc_dlr'][iineq] = sum_k.block_structure.convert_gf(Uloc_dlr[iineq], ish_from=sum_k.inequiv_to_corr[iineq], space_from='sumk')
             general_params['Wloc_dlr'] = archive['DMFT_input']['Wloc_dlr']
             general_params['Vloc'] = archive['DMFT_input']['Vloc']
         general_params['Uloc_dlr'] = mpi.bcast(general_params['Uloc_dlr'])
         general_params['Wloc_dlr'] = mpi.bcast(general_params['Wloc_dlr'])
         general_params['Vloc'] = mpi.bcast(general_params['Vloc'])
+
+        # some basic consistency checks for the loaded objects
+        for iineq in range(sum_k.n_inequiv_shells):
+            assert general_params['Uloc_dlr'][iineq].mesh.beta == sum_k.mesh.beta, f"Error: DMFT calculation has to be performed at the same temperature as GW! Loaded GW objects are β={general_params['Uloc_dlr'][0].mesh.beta} and Sumk is β={sum_k.mesh.beta}"
+            for block, gf in general_params['Uloc_dlr'][iineq]:
+                assert gf.target_shape[0] == sum_k.gf_struct_solver[iineq][block], "target shape of two-particle objects does not match impurity solver structure"
 
     # Constructs interaction Hamiltonian and writes it to the h5 archive
     h_int = interaction_hamiltonian.construct(sum_k, general_params, advanced_params)
