@@ -100,6 +100,10 @@ def _compile_information(sum_k, general_params, solver_params, solvers,
             if solver_params['measure_ft']:
                 write_to_h5['F_freq_{}'.format(icrsh)] = solvers[icrsh].F_freq
                 write_to_h5['F_time_{}'.format(icrsh)] = solvers[icrsh].F_time
+            if general_params['h_int_type'][icrsh] in ('dyn_density_density'):
+                write_to_h5['D0_freq_{}'.format(icrsh)] = solvers[icrsh].triqs_solver.D0_iw
+                write_to_h5['K_time_{}'.format(icrsh)] = solvers[icrsh].triqs_solver.K_tau
+                write_to_h5['Kprime_time_{}'.format(icrsh)] = solvers[icrsh].triqs_solver.Kprime_tau
 
     return write_to_h5
 

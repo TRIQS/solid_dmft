@@ -201,6 +201,7 @@ def _run_maxent(continuators, error, omega_min, omega_max, n_points_maxent,
                         continue
                     opt_alphas[i][k, j, l] = result.analyzer_results[k][j][l][analyzer]['alpha_index']
 
+    mpi.barrier(1000)
     # Synchronizes information between ranks
     for i in imps_blocks_indices:
         spectral_funcs[i] = mpi.all_reduce(spectral_funcs[i])

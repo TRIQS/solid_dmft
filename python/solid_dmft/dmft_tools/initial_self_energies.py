@@ -36,6 +36,7 @@ import numpy as np
 from h5 import HDFArchive
 import triqs.utility.mpi as mpi
 from triqs.gf import BlockGf, Gf, make_gf_imfreq, MeshDLRImFreq, make_gf_dlr
+from triqs.operators import util
 
 from triqs.plot.mpl_interface import *
 from solid_dmft.gw_embedding.bdft_converter import calc_Sigma_DC_gw
@@ -466,9 +467,19 @@ def determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
                         gf[iw] = G_loc_all[icrsh][block](iw)
                 Gloc_dlr = make_gf_dlr(Gloc_dlr_iw)
 
-                Sig_DC_dlr, Sig_DC_hartree = calc_Sigma_DC_gw(general_params['Wloc_dlr'][icrsh],
+                # rotate Wloc and Vloc to solver space
+                ish = sum_k.inequiv_to_corr[icrsh]
+                Wloc_rot = general_params['Wloc_dlr'][icrsh].copy()
+                Vloc_rot = {}
+                for block, gf in Wloc_rot:
+                    Vloc_rot[block] = util.transform_U_matrix(general_params['Vloc'][icrsh][block], sum_k.rot_mat[ish].T)
+                    for coeff in gf.mesh:
+                        # Transposes rotation matrix here because TRIQS has a slightly different definition
+                        Wloc_rot[block][coeff] = util.transform_U_matrix(general_params['Wloc_dlr'][icrsh][block][coeff], sum_k.rot_mat[ish].T)
+
+                Sig_DC_dlr, Sig_DC_hartree = calc_Sigma_DC_gw(Wloc_rot,
                                                               Gloc_dlr,
-                                                              general_params['Vloc'][icrsh])
+                                                              Vloc_rot)
                 if general_params['dc_type'] == 5:
                     # transform dc to sumk blocks
                     sum_k.dc_imp[icrsh] = sum_k.block_structure.convert_matrix(Sig_DC_hartree,

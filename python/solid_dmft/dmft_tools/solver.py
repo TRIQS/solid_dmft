@@ -24,10 +24,12 @@
 import numpy as np
 from itertools import product
 
-from triqs.gf import MeshImTime, MeshReTime, MeshReFreq, MeshLegendre, Gf, BlockGf, make_hermitian, Omega, iOmega_n, make_gf_from_fourier, fit_hermitian_tail
+from triqs.gf import MeshImTime, MeshReTime, MeshReFreq, MeshLegendre, Gf, BlockGf, make_gf_imfreq, make_hermitian, Omega, iOmega_n, make_gf_from_fourier, fit_hermitian_tail
 from triqs.gf.tools import inverse, make_zero_tail
+from triqs.gf import make_gf_imfreq
 from triqs.gf.descriptors import Fourier
-from triqs.operators import c_dag, c, Operator
+from triqs.operators import c_dag, c, Operator, util
+from triqs.operators.util.U_matrix import reduce_4index_to_2index
 import triqs.utility.mpi as mpi
 import itertools
 from h5 import HDFArchive
@@ -610,9 +612,43 @@ class SolverStructure:
                     else:
                         self.triqs_solver.G0_iw[block][i,j] << 0.0+0.0j
 
-            if self.general_params['h_int_type'] == 'dynamic':
+            if self.general_params['h_int_type'][self.icrsh] in ('dyn_density_density'):
+                mpi.report('add dynamic interaction from bdft')
+                # convert 4 idx tensor to two index tensor
+                ish = self.sum_k.inequiv_to_corr[self.icrsh]
+                # rotate bare interaction and reduce to two index
+                Vloc_rot = util.transform_U_matrix(self.general_params['Vloc'][self.icrsh]['up_0'], self.sum_k.rot_mat[ish].T)
+                V, Vp = reduce_4index_to_2index(Vloc_rot)
+                # prepare dynamic 2 idx parts
+                Uloc_dlr = self.general_params['Uloc_dlr'][self.icrsh]['up_0']
+                Uloc_dlr_2idx = Gf(mesh=Uloc_dlr.mesh, target_shape=[Uloc_dlr.target_shape[0],Uloc_dlr.target_shape[1]])
+                Uloc_dlr_2idx_prime = Gf(mesh=Uloc_dlr.mesh, target_shape=[Uloc_dlr.target_shape[0],Uloc_dlr.target_shape[1]])
+
+                for coeff in Uloc_dlr.mesh:
+                    # Transposes rotation matrix here because TRIQS has a slightly different definition
+                    Uloc_dlr_rot_idx = util.transform_U_matrix(Uloc_dlr[coeff], self.sum_k.rot_mat[ish].T)
+                    U, Uprime = reduce_4index_to_2index(Uloc_dlr_rot_idx)
+                    # apply rot mat here
+                    Uloc_dlr_2idx[coeff] = U
+                    Uloc_dlr_2idx_prime[coeff] = Uprime
+
+                # create full frequency objects
+                Uloc_iw_2idx = make_gf_imfreq(Uloc_dlr_2idx, n_iw=self.general_params['n_w_b_nn']) + V
+                Uloc_iw_2idx_prime = make_gf_imfreq(Uloc_dlr_2idx_prime, n_iw=self.general_params['n_w_b_nn']) + Vp
+                # subtract static part treated in hint
+                Uloc_iw_2idx = Uloc_iw_2idx - Uloc_iw_2idx(0)
+                Uloc_iw_2idx_prime = Uloc_iw_2idx_prime - Uloc_iw_2idx_prime(0)
+                mpi.report(Uloc_iw_2idx(Uloc_iw_2idx.mesh.last_index()).real)
+                mpi.report(Uloc_iw_2idx_prime(Uloc_iw_2idx_prime.mesh.last_index()).real)
+
                 for b1, b2 in product(self.sum_k.gf_struct_solver_dict[self.icrsh].keys(), repeat=2):
-                    self.triqs_solver.D0_iw[b1+"|"+b2] << self.U_iw[self.icrsh]
+                    if b1 == b2:
+                        # cast to real here for now
+                        self.triqs_solver.D0_iw[b1+"|"+b2] << Uloc_iw_2idx.real
+                    else:
+                        self.triqs_solver.D0_iw[b1+"|"+b2] << Uloc_iw_2idx_prime.real
+
+                # self.triqs_solver. Jperp_iw << make_gf_imfreq(Uloc_dlr_2idx, n_iw=self.general_params['n_w_b_nn']) + V
 
             # Solve the impurity problem for icrsh shell
             # *************************************
@@ -787,26 +823,18 @@ class SolverStructure:
         '''
         from triqs_ctseg import Solver as ctseg_solver
 
-        if self.general_params['h_int_type'] == 'dynamic':
-            self.U_iw = None
-            if  mpi.is_master_node():
-                with HDFArchive(self.general_params['jobname']+'/'+self.general_params['seedname']+'.h5', 'r') as archive:
-                    self.U_iw = archive['dynamic_U']['U_iw']
-            self.U_iw = mpi.bcast(self.U_iw)
-            n_w_b_nn = self.U_iw[self.icrsh].mesh.last_index()+1
-        else:
-            n_w_b_nn = 1001
-
         gf_struct = self.sum_k.gf_struct_solver_list[self.icrsh]
         # Construct the triqs_solver instances
         if self.solver_params['measure_gl']:
             triqs_solver = ctseg_solver(beta=self.general_params['beta'], gf_struct=gf_struct,
                             n_iw=self.general_params['n_iw'], n_tau=self.general_params['n_tau'],
-                            n_legendre_g=self.general_params['n_l'], n_w_b_nn = n_w_b_nn, n_tau_k=int(n_w_b_nn*2.5), n_tau_jperp=int(n_w_b_nn*2.5))
+                            n_legendre_g=self.general_params['n_l'], n_w_b_nn = self.general_params['n_w_b_nn'],
+                            n_tau_k=int(self.general_params['n_w_b_nn']*2.5), n_tau_jperp=int(self.general_params['n_w_b_nn']*2.5))
         else:
             triqs_solver = ctseg_solver(beta=self.general_params['beta'], gf_struct=gf_struct,
                             n_iw=self.general_params['n_iw'], n_tau=self.general_params['n_tau'],
-                            n_w_b_nn = n_w_b_nn, n_tau_k=int(n_w_b_nn*2.5), n_tau_jperp=int(n_w_b_nn*2.5))
+                            n_w_b_nn = self.general_params['n_w_b_nn'], n_tau_k=int(self.general_params['n_w_b_nn']*2.5),
+                            n_tau_jperp=int(self.general_params['n_w_b_nn']*2.5))
 
         return triqs_solver
 

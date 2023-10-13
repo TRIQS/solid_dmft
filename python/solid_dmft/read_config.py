@@ -349,6 +349,8 @@ ctseg parameters
 ================
 measure_hist : bool, optional, default=False
                measure perturbation_order histograms
+n_w_b_nn : int, optional, default = 1025
+                Number of bosonic Matsub. freqs for dynamic interaction
 improved_estimator  : bool, optional, default=False
               measure improved estimators
               Sigma_iw will automatically be calculated via
@@ -824,6 +826,8 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                 'improved_estimator': {'converter': BOOL_PARSER,
                                                  'used': lambda params: params['general']['solver_type'] in ['ctseg'],
                                                  'default': False},
+                                 'n_w_b_nn': {'converter': int, 'valid for': lambda x, _: x > 0,
+                                          'used': lambda params: params['general']['solver_type'] in ['ctseg'], 'default': 1025},
 
                                 #
                                 # extra hartree params
@@ -1301,6 +1305,9 @@ def read_config(config_file):
 
         parameters['solver']['measure_hist'] = parameters['solver']['measure_pert_order']
         del parameters['solver']['measure_pert_order']
+
+        parameters['general']['n_w_b_nn'] = parameters['solver']['n_w_b_nn']
+        del parameters['solver']['n_w_b_nn']
 
     if parameters['general']['solver_type'] in ['cthyb'] and parameters['solver']['measure_density_matrix']:
         # also required to measure the density matrix
