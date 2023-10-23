@@ -4,15 +4,20 @@ ICHARG = 5 ! 5 for DMFT calculations
 ISYM = -1 ! Vasp-PLO CSC doesn't work with symmetries
 NELM = 1000 ! to prevent VASP from stopping too early, solid_dmft will stop Vasp
 NELMIN = 1000
-NELMDL = 0 ! converge the KS wave function first
+NELMDL = -1 ! converge the KS wave function first
 
-ISMEAR = 0
-SIGMA = 0.02
+! slow mixing for charge order
+IMIX = 1
+AMIX = 0.04
+BMIX = 0.3
+IALGO = 38
+
+ISMEAR = -5
 
 LMAXMIX = 6
 LORBIT = 14
 NEDOS = 2001
-EMIN = 3.7
-EMAX = 7.8
-LOCPROJ = 5 6 7 8 : d : Pr 1 
+EMIN = 1.0
+EMAX = 10.0
+LOCPROJ = 5 6 7 8 : d : Pr 1
 
