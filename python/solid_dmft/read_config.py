@@ -147,7 +147,9 @@ sigma_mix : float, optional, default=1.0
             careful: Sigma mixing can break orbital symmetries, use G0 mixing
             mixing sigma with previous iteration sigma for better convergency. 1.0 means no mixing
 g0_mix : float, optional, default=1.0
-            mixing the weiss field G0 with previous iteration G0 for better convergency. 1.0 means no mixing
+            Mixing the weiss field G0 with previous iteration G0 for better convergency. 1.0 means no mixing.
+            Setting g0_mix to 0.0 with linear mixing can be used for statistic sampling when
+            restarting a calculation
 g0_mix_type : string, optional, default='linear'
             which type of mixing is used. Possible values are:
             linear: linear mixing
@@ -549,11 +551,11 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                                'default': False},
 
                                  'sigma_mix': {'converter': float,
-                                               'valid for': lambda x, params: x > 0 and (np.isclose(params['general']['g0_mix'], 1)
+                                               'valid for': lambda x, params: x >= 0 and (np.isclose(params['general']['g0_mix'], 1)
                                                                                          or np.isclose(x, 1)),
                                                'used': True, 'default': 1.0},
 
-                                 'g0_mix': {'converter': float, 'valid for': lambda x, _: x > 0,
+                                 'g0_mix': {'converter': float, 'valid for': lambda x, _: x >= 0,
                                                'used': True, 'default': 1.0},
 
                                  'g0_mix_type': {'valid for': lambda x, _: x in ('linear', 'broyden'),
