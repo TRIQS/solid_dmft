@@ -32,6 +32,7 @@ import triqs.utility.mpi as mpi
 from h5 import HDFArchive
 
 from . import legendre_filter
+from .matheval import MathExpr
 
 def get_n_orbitals(sum_k):
     """
@@ -108,7 +109,7 @@ class SolverStructure:
 
     Methods
     -------
-    solve(self)
+    solve(self, **kwargs)
         solve impurity problem
     '''
 
@@ -140,6 +141,10 @@ class SolverStructure:
         self.h_int = h_int
         self.iteration_offset = iteration_offset
         self.solver_struct_ftps = solver_struct_ftps
+        if solver_params.get("random_seed") is None:
+            self.random_seed_generator = None
+        else:
+            self.random_seed_generator = MathExpr(solver_params["random_seed"])
 
         # initialize solver object, options are cthyb
         if self.general_params['solver_type'] == 'cthyb':
@@ -336,10 +341,15 @@ class SolverStructure:
     # solver-specific solve() command
     # ********************************************************************
 
-    def solve(self):
+    def solve(self, **kwargs):
         r'''
         solve impurity problem with current solver
         '''
+
+        if self.random_seed_generator is None:
+            random_seed = {}
+        else:
+            random_seed = { "random_seed": int(self.random_seed_generator(it=kwargs["it"], rank=mpi.rank)) }
 
         if self.general_params['solver_type'] == 'cthyb':
 
@@ -387,7 +397,7 @@ class SolverStructure:
 
             # Solve the impurity problem for icrsh shell
             # *************************************
-            self.triqs_solver.solve(h_int=self.h_int, **self.solver_params)
+            self.triqs_solver.solve(h_int=self.h_int, **(self.solver_params | random_seed ))
             # *************************************
 
             # call postprocessing
@@ -403,7 +413,7 @@ class SolverStructure:
 
             # Solve the impurity problem for icrsh shell
             # *************************************
-            self.triqs_solver.solve(h_int=self.h_int, **self.solver_params)
+            self.triqs_solver.solve(h_int=self.h_int, **(self.solver_params | random_seed ))
             # *************************************
 
             # call postprocessing
@@ -577,7 +587,7 @@ class SolverStructure:
 
             # Solve the impurity problem for icrsh shell
             # *************************************
-            self.triqs_solver.solve(h_int=self.h_int, **self.solver_params)
+            self.triqs_solver.solve(h_int=self.h_int, **(self.solver_params | random_seed ))
             # *************************************
 
             # call postprocessing
@@ -594,7 +604,7 @@ class SolverStructure:
 
             # Solve the impurity problem for icrsh shell
             # *************************************
-            self.triqs_solver.solve(h_int=self.h_int, **self.solver_params)
+            self.triqs_solver.solve(h_int=self.h_int, **(self.solver_params | random_seed ))
             # *************************************
 
             # call postprocessing

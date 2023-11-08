@@ -281,7 +281,7 @@ fit_min_w : float, optional
             start matsubara frequency to start with
 fit_max_w : float, optional
             highest matsubara frequency to fit
-random_seed : int, optional default by triqs
+random_seed : str, optional default by triqs
             if specified the int will be used for random seeds! Careful, this will give the same random
             numbers on all mpi ranks
 legendre_fit : bool, optional default= False
@@ -733,7 +733,7 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                 'move_shift': {'converter': BOOL_PARSER, 'default': False,
                                                 'used': lambda params: params['general']['solver_type'] in ['cthyb']},
 
-                                'random_seed': {'converter': int, 'default': None,
+                                'random_seed': {'converter': str, 'default': None,
                                                 'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint', 'ctseg']},
 
                                 'perform_tail_fit': {'converter': BOOL_PARSER,
