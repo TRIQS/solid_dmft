@@ -37,8 +37,8 @@ jobs:
         run: |
           cmake --build build/ --target test
 
-      - name: Deploy pages
-        uses: JamesIves/github-pages-deploy-action@v4.4.3
+      - name: Deploy pages 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
           folder: build/doc/html/
