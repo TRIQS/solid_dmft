@@ -711,7 +711,7 @@ class SolverStructure:
                                       )
 
         def _interface_hartree_dc(hartree_instance, general_params, advanced_params, icrsh):
-            """ Modifies in-place class attributes to infercace with options in solid_dmft 
+            """ Modifies in-place class attributes to infercace with options in solid_dmft
                 for the moment supports only DC-relevant parameters
 
             Parameters

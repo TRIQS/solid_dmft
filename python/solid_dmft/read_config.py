@@ -284,6 +284,9 @@ fit_max_w : float, optional
 random_seed : str, optional default by triqs
             if specified the int will be used for random seeds! Careful, this will give the same random
             numbers on all mpi ranks
+            You can also pass a string that will convert the keywords it or rank on runtime, e.g.
+            34788 * it + 928374 * rank will convert each iteration the variables it and rank for the random
+            seed
 legendre_fit : bool, optional default= False
             filter noise of G(tau) with G_l, cutoff is taken from n_l
 loc_n_min : int, optional
