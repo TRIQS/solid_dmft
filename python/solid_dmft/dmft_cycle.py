@@ -660,7 +660,7 @@ def _dmft_step(sum_k, solvers, it, general_params,
             mpi.report('\nSolving the impurity problem for shell {} ...'.format(icrsh))
             mpi.barrier()
             start_time = timer()
-            solvers[icrsh].solve()
+            solvers[icrsh].solve(it=it)
             mpi.barrier()
             mpi.report('Actual time for solver: {:.2f} s'.format(timer() - start_time))
 
