@@ -4,6 +4,17 @@ on:
   push:
     branches: [ unstable ]
 
+env:
+  CMAKE_BUILD_PARALLEL_LEVEL: 2
+  CTEST_PARALLEL_LEVEL: 2
+  CTEST_OUTPUT_ON_FAILURE: 1
+  OMPI_ALLOW_RUN_AS_ROOT: 1
+  OMPI_ALLOW_RUN_AS_ROOT_CONFIRM: 1
+  OMPI_MCA_rmaps_base_oversubscribe: "yes"
+
+permissions: 
+  contents: write
+
 jobs:
   build:
 
@@ -15,36 +26,20 @@ jobs:
       image: materialstheory/solid_dmft_ci
 
     steps:
-      - uses: actions/checkout@v2
-        with: 
-          path: 'solid_dmft.src'
+      - uses: actions/checkout@v4
 
       - name: Build solid_dmft
         run: |
-          mkdir solid_dmft.build && cd solid_dmft.build && cmake ../solid_dmft.src -DBuild_Documentation=ON -DMPIEXEC_PREFLAGS='--allow-run-as-root' 
-          make
+          cmake -S . -B build/ -DBuild_Documentation=ON
+          cmake --build build/ --verbose
 
       - name: Test solid_dmft
         run: |
-          cd solid_dmft.build
-          ctest --output-on-failure
+          cmake --build build/ --target test
 
-      - name: checkout github pages branch
-        uses: actions/checkout@v2
+      - name: Deploy pages
+        uses: JamesIves/github-pages-deploy-action@v4.4.3
         with:
-          ref: gh-pages
-          path: 'gh-pages'
-
-      - name: copy documentation files
-        run: rsync -av solid_dmft.build/doc/html/ gh-pages/
-
-      - name: commit changes to gh-pages branch
-        run: |
-          cd gh-pages/
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git add -f .
-          git commit -m "generated doc"
-          git push origin gh-pages
-
-
+          branch: gh-pages
+          folder: build/doc/html/
+          single-commit: true
