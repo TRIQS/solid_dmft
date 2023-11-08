@@ -25,6 +25,7 @@ endforeach()
 # all other tests
 set(all_tests 
     test_convergence
+    test_matheval
     test_plot_correlated_bands
     test_respack_sfo
     )
