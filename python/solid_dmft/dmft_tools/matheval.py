@@ -39,7 +39,10 @@ class MathExpr(object):
         "max": max,
         "pow": pow,
         "round": round,
-    } | {key: value for (key, value) in vars(math).items() if not key.startswith("_")}
+    }
+    functions.update(
+        {key: value for (key, value) in vars(math).items() if not key.startswith("_")}
+    )
 
     def __init__(self, expr):
         if any(elem in expr for elem in "\n#"):
@@ -53,4 +56,4 @@ class MathExpr(object):
         self.code = compile(node, "<string>", "eval")
 
     def __call__(self, **kwargs):
-        return eval(self.code, {"__builtins__": None}, self.functions | kwargs)
+        return eval(self.code, {"__builtins__": None}, {**self.functions, **kwargs})
