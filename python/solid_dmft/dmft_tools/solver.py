@@ -397,7 +397,7 @@ class SolverStructure:
 
             # Solve the impurity problem for icrsh shell
             # *************************************
-            self.triqs_solver.solve(h_int=self.h_int, **(self.solver_params | random_seed ))
+            self.triqs_solver.solve(h_int=self.h_int, **{ **self.solver_params, **random_seed })
             # *************************************
 
             # call postprocessing
@@ -413,7 +413,7 @@ class SolverStructure:
 
             # Solve the impurity problem for icrsh shell
             # *************************************
-            self.triqs_solver.solve(h_int=self.h_int, **(self.solver_params | random_seed ))
+            self.triqs_solver.solve(h_int=self.h_int, **{ **self.solver_params, **random_seed })
             # *************************************
 
             # call postprocessing
@@ -587,7 +587,7 @@ class SolverStructure:
 
             # Solve the impurity problem for icrsh shell
             # *************************************
-            self.triqs_solver.solve(h_int=self.h_int, **(self.solver_params | random_seed ))
+            self.triqs_solver.solve(h_int=self.h_int, **{ **self.solver_params, **random_seed })
             # *************************************
 
             # call postprocessing
@@ -604,7 +604,7 @@ class SolverStructure:
 
             # Solve the impurity problem for icrsh shell
             # *************************************
-            self.triqs_solver.solve(h_int=self.h_int, **(self.solver_params | random_seed ))
+            self.triqs_solver.solve(h_int=self.h_int, **{ **self.solver_params, **random_seed })
             # *************************************
 
             # call postprocessing
