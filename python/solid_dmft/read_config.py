@@ -498,7 +498,7 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                                  'used': True},
 
                                  'beta': {'converter': float, 'valid for': lambda x, _: x > 0,
-                                          'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint', 'inchworm', 'hubbardI','ctseg','hartree']},
+                                          'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint', 'inchworm', 'hubbardI', 'ctseg', 'w2dyn_cthyb','hartree']},
 
                                  'n_iter_dmft': {'converter': int, 'valid for': lambda x, _: x >= 0, 'used': True},
 
@@ -518,7 +518,7 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                  'cpa_x': {'converter': lambda s: list(map(float, s.split(','))),
                                            'used': lambda params: params['general']['dc'] and params['general']['dc_type'] == 4},
 
-                                 'solver_type': {'valid for': lambda x, _: x in ['cthyb', 'ctint', 'ftps', 'hubbardI','ctseg', 'hartree'],
+                                 'solver_type': {'valid for': lambda x, _: x in ['cthyb', 'ctint', 'ftps', 'hubbardI', 'ctseg', 'w2dyn_cthyb', 'hartree'],
                                                  'used': True},
                                  
 
@@ -527,10 +527,10 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                          and (params['solver']['measure_G_l'] or params['solver']['legendre_fit'])},
 
                                  'n_iw': {'converter': int, 'valid for': lambda x, _: x > 0,
-                                          'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint', 'inchworm', 'hubbardI','ctseg','hartree'], 'default': 1025},
+                                          'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint', 'inchworm', 'hubbardI', 'ctseg', 'w2dyn_cthyb','hartree'], 'default': 1025},
 
                                  'n_tau': {'converter': int, 'valid for': lambda x, _: x > 0,
-                                           'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint', 'inchworm', 'hubbardI','ctseg','hartree'], 'default': 10001},
+                                           'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint', 'inchworm', 'hubbardI', 'ctseg', 'w2dyn_cthyb','hartree'], 'default': 10001},
 
                                  'n_w': {'converter': int, 'valid for': lambda x, _: x > 0,
                                          'used': lambda params: params['general']['solver_type'] in ['ftps', 'hubbardI', 'hartree'], 'default': 5001},
@@ -662,12 +662,12 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                  # TODO: used for which solvers? Generalize to real freq. solvers without maxent?
                                  'mu_gap_gb2_threshold': {'converter': float,
                                                           'valid for': lambda x, _: x == 'none' or x > 0 or np.isclose(x, 0),
-                                                          'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint','ctseg'],
+                                                          'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint', 'ctseg', 'w2dyn_cthyb'],
                                                           'default': 'none'},
 
                                  'mu_gap_occ_deviation': {'converter': float,
                                                           'valid for': lambda x, _: x == 'none' or x > 0 or np.isclose(x, 0),
-                                                          'used': lambda params: (params['general']['solver_type'] in ['cthyb', 'ctint','ctseg']
+                                                          'used': lambda params: (params['general']['solver_type'] in ['cthyb', 'ctint', 'ctseg', 'w2dyn_cthyb']
                                                                                   and params['general']['mu_gap_gb2_threshold'] != 'none'),
                                                           'default': 'none'},
 
@@ -737,7 +737,7 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                                    'used': lambda params: params['general']['solver_type'] in ['cthyb']},
 
                                 'delta_interface': {'converter': BOOL_PARSER, 'default': False,
-                                                  'used': lambda params: params['general']['solver_type'] in ['cthyb']},
+                                                  'used': lambda params: params['general']['solver_type'] in ['cthyb', 'wd2yn_cthyb']},
 
                                 'measure_G_tau': {'converter': BOOL_PARSER, 'default': True,
                                                   'used': lambda params: params['general']['solver_type'] in ['hubbardI', 'ctseg', 'w2dyn_cthyb']},
@@ -799,7 +799,7 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                               'default': None},
 
                                 'legendre_fit': {'converter': BOOL_PARSER,
-                                                 'used': lambda params: params['general']['solver_type'] in ['cthyb','ctseg'],
+                                                 'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctseg', 'w2dyn_cthyb'],
                                                  'default': False},
 
                                 'loc_n_min': {'converter': int, 'valid for': lambda x, _: x >= 0,
