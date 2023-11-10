@@ -109,6 +109,12 @@ RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hartr
     && cmake ../hartree.src \ 
     && make -j$NCORES && make install
 
+# w2dynamics solver
+RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/w2dynamics_interface.git w2dyn.src \
+    && mkdir -p w2dyn.build && cd w2dyn.build \
+    && cmake ../w2dyn.src \ 
+    && make -j$NCORES && make install
+
 # maxent needed for doc build
 RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/maxent.git maxent.src \
     && mkdir -p maxent.build && cd maxent.build \
