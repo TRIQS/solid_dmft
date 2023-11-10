@@ -98,6 +98,9 @@ def _compile_information(sum_k, general_params, solver_params, solvers,
                 write_to_h5['F_freq_{}'.format(icrsh)] = solvers[icrsh].F_freq
                 write_to_h5['F_time_{}'.format(icrsh)] = solvers[icrsh].F_time
 
+        if general_params['solver_type'] == 'w2dyn_cthyb':
+            pass # TODO
+
     return write_to_h5
 
 def write(archive, sum_k, general_params, solver_params, solvers, it, is_sampling,
