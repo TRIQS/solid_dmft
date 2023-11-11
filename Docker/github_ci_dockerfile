@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:22.04 AS base
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
       cmake \
@@ -62,6 +62,8 @@ RUN pip3 install --no-cache-dir \
     linkify-it-py \
     Pandoc
 
+FROM base AS pkgs
+
 ENV OMP_NUM_THREADS=1
 ENV MKL_NUM_THREADS=1
 ENV OMPI_ALLOW_RUN_AS_ROOT=1
@@ -81,6 +83,9 @@ ENV CPATH=/triqs/include:${CPATH} \
     LD_LIBRARY_PATH=/triqs/lib:${LD_LIBRARY_PATH} \
     PYTHONPATH=/triqs/lib/python3.10/site-packages:${PYTHONPATH} \
     CMAKE_PREFIX_PATH=/triqs/share/cmake:${CMAKE_PREFIX_PATH} \
+    CMAKE_BUILD_PARALLEL_LEVEL=${NCORES} \
+    CTEST_OUTPUT_ON_FAILURE=1 \
+    CTEST_PARALLEL_LEVEL=${NCORES} \
     TRIQS_ROOT=/triqs
 
 RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/triqs \
