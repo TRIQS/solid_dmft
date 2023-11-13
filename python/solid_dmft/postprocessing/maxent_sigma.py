@@ -40,6 +40,7 @@ Warnings:
 import time
 import sys
 import numpy as np
+import warnings
 
 from triqs.utility import mpi
 from triqs_maxent.sigma_continuator import InversionSigmaContinuator, DirectSigmaContinuator
@@ -106,6 +107,16 @@ def _create_sigma_continuator(sigma_iw, dc_potential, chemical_potential, chemic
     * 'inversion_sigmainf': inversion continuator, constant C = Sigma(i infinity) + chemical potential
     * 'direct': direct continuator
     """
+
+    for sigma_imp in sigma_iw:
+        for _, sigma_block in sigma_imp:
+            if sigma_block.data.shape[1] > 1:
+                warnings.warn('Continuation of matrix-valued selfenergies '
+                              + 'with nonzero offdiagonal components can be '
+                              + 'unstable since MaxEnt matrix continuation '
+                              + 'does not guarantee a positive semi-definite, '
+                              + 'Hermitian output.')
+
     n_inequiv_shells = len(sigma_iw)
 
     if continuator_type == 'inversion_dc':
