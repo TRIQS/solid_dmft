@@ -6,7 +6,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
       gfortran-12 \
       git \
       hdf5-tools \
-      liblapack-dev \ 
+      liblapack-dev \
       libboost-dev \
       libfftw3-dev \
       libnfft3-dev \
@@ -27,7 +27,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
       python3-pip \
       python3-sphinx \
       python3-nbsphinx \
-      python3-skimage \ 
+      python3-skimage \
       python3-notebook \
       libpython3-dev \
       curl \
@@ -43,7 +43,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
       apt-get autoremove --purge -y && \
       apt-get autoclean -y && \
       rm -rf /var/cache/apt/* /var/lib/apt/lists/*
-     
+
 RUN pip3 install --no-cache-dir \
     cython \
     decorator \
@@ -53,18 +53,21 @@ RUN pip3 install --no-cache-dir \
     mpi4py \
     Jinja2 \
     Mako \
-    ase \ 
+    ase \
     tornado \
     zmq \
-    tk  \ 
-    myst_parser \ 
+    tk  \
+    myst_parser \
     sphinx_rtd_theme  \
-    linkify-it-py \ 
+    linkify-it-py \
     Pandoc
 
 ENV OMP_NUM_THREADS=1
 ENV MKL_NUM_THREADS=1
-ARG NCORES=4
+ENV OMPI_ALLOW_RUN_AS_ROOT=1
+ENV OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
+ENV OMPI_MCA_rmaps_base_oversubscribe="yes"
+ARG NCORES=8
 
 # create source dirs
 RUN cd / && mkdir -p triqs && mkdir -p source
@@ -80,40 +83,40 @@ ENV CPATH=/triqs/include:${CPATH} \
     CMAKE_PREFIX_PATH=/triqs/share/cmake:${CMAKE_PREFIX_PATH} \
     TRIQS_ROOT=/triqs
 
-RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/triqs triqs.src \
-    && mkdir -p triqs.build && cd triqs.build \
-    && cmake ../triqs.src -DCMAKE_INSTALL_PREFIX=/triqs -DMPIEXEC_PREFLAGS='--allow-run-as-root' \
+RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/triqs \
+    && cd triqs && mkdir -p build && cd build \
+    && cmake ../ -DCMAKE_INSTALL_PREFIX=/triqs \
     && make -j$NCORES && ctest -j$NCORES && make install
 
 # dft_tools
-RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/dft_tools.git dft_tools.src \
-    && mkdir -p dft_tools.build && cd dft_tools.build \
-    && cmake ../dft_tools.src -DMPIEXEC_PREFLAGS='--allow-run-as-root' \
-    && make -j$NCORES && make test && make install
+RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/dft_tools.git \
+    && cd dft_tools && mkdir -p build && cd build \
+    && cmake ../ \
+    && make -j$NCORES && ctest -j$NCORES && make install
 
 # cthyb
-RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/cthyb.git cthyb.src \
-    && mkdir -p cthyb.build && cd cthyb.build \
-    && cmake ../cthyb.src -DMPIEXEC_PREFLAGS='--allow-run-as-root'  \
+RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/cthyb.git \
+    && cd cthyb && mkdir -p build && cd build \
+    && cmake ../ \
     && make -j$NCORES && ctest -j$NCORES && make install
 
 # hubbardI
-RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hubbardI.git hubbardI.src \
-    && mkdir -p hubbardI.build && cd hubbardI.build \
-    && cmake ../hubbardI.src \ 
+RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hubbardI.git \
+    && cd hubbardI && mkdir -p build && cd build \
+    && cmake ../ \
     && make -j$NCORES && ctest -j$NCORES && make install
 
 # Hartree-Fock solver
-RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hartree_fock.git hartree.src \
-    && mkdir -p hartree.build && cd hartree.build \
-    && cmake ../hartree.src \ 
-    && make -j$NCORES && make install
+RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hartree_fock.git \
+    && cd hartree_fock && mkdir -p build && cd build \
+    && cmake ../ \
+    && make -j$NCORES && ctest -j$NCORES && make install
 
 # maxent needed for doc build
-RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/maxent.git maxent.src \
-    && mkdir -p maxent.build && cd maxent.build \
-    && cmake ../maxent.src \ 
-    && make -j$NCORES && make install
+RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/maxent.git \
+    && cd maxent && mkdir -p build && cd build \
+    && cmake ../ \
+    && make -j$NCORES && ctest -j$NCORES && make install
 
 # remove source
 RUN cd / && rm -rf source
