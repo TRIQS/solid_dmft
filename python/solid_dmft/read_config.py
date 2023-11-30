@@ -564,7 +564,10 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                  'afm_order': {'converter': BOOL_PARSER,
                                                'used': lambda params: params['general']['magnetic'],
                                                'default': False},
-                                 
+                                               
+                                 'update_mu_each_imp': {'converter': BOOL_PARSER,
+                                              'used': True, 'default': False},
+                                              
                                  'mix_quantity': {'converter': lambda s: list(map(str, s.split(','))),
                                             'used': True,
                                             'default': []},
@@ -578,16 +581,14 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                  'broy_max_it': {'converter': int, 'valid for': lambda x, _: x >= 1 or x==-1 ,
                                                 'used': True, 'default': 2},
                                                 
-                                 'sigma_mix': {'converter': float,
-                                               'valid for': lambda x, params: x >= 0 and (np.isclose(params['general']['g0_mix'], 1)
-                                                                                         or np.isclose(x, 1)),
-                                               'used': True, 'default': 1.0},
-
-                                 'g0_mix': {'converter': float, 'valid for': lambda x, _: x >= 0,
-                                               'used': True, 'default': 1.0},
-
-                                 'g0_mix_type': {'valid for': lambda x, _: x in ('linear', 'broyden'),
-                                                'used': True, 'default': 'linear'},
+                                 #'sigma_mix': {'converter': float,
+                                 #              'valid for': lambda x, params: x > 0 and (np.isclose(params['general']['g0_mix'], 1)
+                                 #                                                        or np.isclose(x, 1)),
+                                 #              'used': True, 'default': 1.0},
+                                 #'g0_mix': {'converter': float, 'valid for': lambda x, _: x > 0,
+                                 #              'used': True, 'default': 1.0},
+                                 #'g0_mix_type': {'valid for': lambda x, _: x in ('linear', 'broyden'),
+                                 #              'used': True, 'default': 'linear'},
 
 
                                  'calc_energies': {'converter': BOOL_PARSER, 'used': True, 'default': False},

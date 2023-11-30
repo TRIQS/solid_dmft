@@ -628,6 +628,11 @@ def _dmft_step(sum_k, solvers, it, general_params,
     for icrsh in range(sum_k.n_inequiv_shells):
         # copy the block of G_loc into the corresponding instance of the impurity solver
         # TODO: why do we set solvers.G_freq? Isn't that simply an output of the solver?
+        ###
+        
+        if general_params['update_mu_each_imp']:
+          G_loc_all = sum_k.extract_G_loc(iw_or_w='iw')
+        
         solvers[icrsh].G_freq << G_loc_all[icrsh]
 
         density_shell_pre[icrsh] = np.real(solvers[icrsh].G_freq.total_density())
@@ -687,6 +692,14 @@ def _dmft_step(sum_k, solvers, it, general_params,
             mpi.report('Actual time for solver: {:.2f} s'.format(timer() - start_time))
 
         # some printout of the obtained density matrices and some basic checks from the unsymmetrized solver output
+        
+        ###new
+        if general_params['update_mu_each_imp']:
+          sum_k.put_Sigma([solvers[i].Sigma_freq for i in range(sum_k.n_inequiv_shells)])
+          sum_k = manipulate_mu.update_mu(general_params, sum_k, it, archive)
+        
+        
+        
         density_shell[icrsh] = np.real(solvers[icrsh].G_freq_unsym.total_density())
         density_tot += density_shell[icrsh]*shell_multiplicity[icrsh]
         density_mat_unsym[icrsh] = solvers[icrsh].G_freq_unsym.density()
@@ -715,10 +728,10 @@ def _dmft_step(sum_k, solvers, it, general_params,
     #solvers = gf_mixer.mix_sigma(general_params, sum_k.n_inequiv_shells, solvers, Sigma_freq_previous)
     
     if 'Sigma'in general_params['mix_quantity']:
-        if it > 1:
+        if it > 0:
             mpi.report(f"XXXXXXX Calling {general_params['mix_type']} mixing on {general_params['mix_quantity']}")
             for icrsh in range(sum_k.n_inequiv_shells):
-                solvers[icrsh] = gf_mixer.mix_general(general_params, icrsh, solvers[icrsh], Sigma_freq_previous[icrsh], F_type='Sigma', it=it,
+                solvers[icrsh] = gf_mixer.mix_general(general_params, icrsh, solvers[icrsh], Sigma_freq_previous[icrsh], F_type='Sigma', it=it+1,
                             deg_shell=sum_k.deg_shells[icrsh], archive=archive)
 
 
