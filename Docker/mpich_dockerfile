@@ -100,8 +100,6 @@ RUN pip3 install --no-cache-dir \
 #RUN jupyter-labextension install @jupyter-widgets/jupyterlab-manager jupyter-matplotlib @jupyterlab/toc
 #RUN jupyter-lab build
 
-FROM base AS pkgs
-
 ##################################################
 # TRIQS and its packages                         #
 ##################################################
@@ -126,6 +124,38 @@ ENV CMAKE_BUILD_PARALLEL_LEVEL=${NCORES}
 ENV CTEST_OUTPUT_ON_FAILURE=1
 ENV CTEST_PARALLEL_LEVEL=${NCORES}
 ENV TRIQS_ROOT=/triqs
+
+##################################################
+# Wannier90 and VASP                             #
+##################################################
+
+# W90
+# Uncomment the lines in this and the following VASP block to have W90 as a library in VASP, allowing for the tag LWANNIER90=.TRUE.
+RUN cd / && git clone -b v3.1.0 --depth 1 https://github.com/wannier-developers/wannier90.git
+# Make gfort use the intel libraries
+COPY wannier90.make.inc /wannier90/make.inc
+RUN cd /wannier90 && make default lib && rm -r test-suite
+ENV PATH=/wannier90:${PATH}
+
+## TODO: include scalapack
+## Adds modified VASP for CSC calculations
+#ADD vasp.6.3.0.tgz /
+#RUN mv /vasp.6.3.0 /vasp
+#COPY mpich_vasp.makefile /vasp/makefile.include
+#COPY vasp_diffs /vasp/vasp_diffs
+#RUN cd /vasp/src \
+#    && for name in electron.F fileio.F locproj.F mlwf.F .objects; \
+#       do patch $name -p1 -i ../vasp_diffs/$name; done
+#
+## Install vasp
+## TODO: add ncl
+#RUN cd /vasp/ \
+#    && make std \
+#    && rm -rf src/ build/ arch/ vasp_diffs/ testsuite/
+#
+#ENV PATH=/vasp/bin:${PATH}
+
+FROM base AS pkgs
 
 # triqs
 RUN cd / && mkdir -p triqs && mkdir -p source
@@ -177,36 +207,6 @@ RUN cd /source && git clone -b unstable --depth 1 https://github.com/flatironins
     && cmake ../solid_dmft.src -DCMAKE_INSTALL_PREFIX=/triqs \
     && make -j$NCORES && make -j$NCORES test && make install
 
-
-##################################################
-# Wannier90 and VASP                             #
-##################################################
-
-# W90
-# Uncomment the lines in this and the following VASP block to have W90 as a library in VASP, allowing for the tag LWANNIER90=.TRUE.
-RUN cd / && git clone -b v3.1.0 --depth 1 https://github.com/wannier-developers/wannier90.git
-# Make gfort use the intel libraries
-COPY wannier90.make.inc /wannier90/make.inc
-RUN cd /wannier90 && make default lib && rm -r test-suite
-ENV PATH=/wannier90:${PATH}
-
-## TODO: include scalapack
-## Adds modified VASP for CSC calculations
-#ADD vasp.6.3.0.tgz /
-#RUN mv /vasp.6.3.0 /vasp
-#COPY mpich_vasp.makefile /vasp/makefile.include
-#COPY vasp_diffs /vasp/vasp_diffs
-#RUN cd /vasp/src \
-#    && for name in electron.F fileio.F locproj.F mlwf.F .objects; \
-#       do patch $name -p1 -i ../vasp_diffs/$name; done
-#
-## Install vasp
-## TODO: add ncl
-#RUN cd /vasp/ \
-#    && make std \
-#    && rm -rf src/ build/ arch/ vasp_diffs/ testsuite/
-#
-#ENV PATH=/vasp/bin:${PATH}
 
 ##################################################
 # Cleanup                                        #

@@ -100,8 +100,6 @@ RUN pip3 install --no-cache-dir \
     ipympl \
     RISE 
 
-FROM base AS pkgs
-
 ENV PYTHON_VERSION=3.10 \
     CC=clang-${LLVM} CXX=clang++-${LLVM} CXXFLAGS="-stdlib=libc++"
 RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-${LLVM} 60 --slave /usr/bin/clang++ clang++ /usr/bin/clang++-${LLVM} --slave /usr/bin/clang-cpp clang-cpp /usr/bin/clang-cpp-${LLVM}
@@ -116,8 +114,8 @@ ARG NCORES=10
 RUN cd / && mkdir -p triqs && mkdir -p source
 
 # W90
-RUN cd /source && git clone -b develop --depth 1 https://github.com/wannier-developers/wannier90.git wannier90 \
-    && cd wannier90 \
+RUN cd /source && wget -O wannier90.tar.gz https://github.com/wannier-developers/wannier90/archive/d141f9f.tar.gz \
+    && tar xvf wannier90.tar.gz --xform='s/-d141f9f84dcd3ac54729b9e5874dabd451684237//g' && cd wannier90 \
     # Using gfortran compiler 
     && echo "F90 = mpif90 \n COMMS  = mpi \n MPIF90 = mpif90 \n FCOPTS = -O3 -fallow-argument-mismatch \n LIBS = -Wl,--no-as-needed -lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lpthread -lm -ldl \n" > make.inc \
     && cd /source/wannier90 \
@@ -159,6 +157,8 @@ RUN cd /source && wget --quiet https://gitlab.com/QEF/q-e/-/archive/qe-7.2/q-e-q
      #&& rm -rf src/ build/ arch/
 
 #ENV PATH=/vasp/bin:${PATH}
+
+FROM base AS pkgs
 
 # triqs
 ENV CPATH=/triqs/include:/usr/include/mkl:${CPATH} \
