@@ -44,6 +44,9 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
       apt-get autoclean -y && \
       rm -rf /var/cache/apt/* /var/lib/apt/lists/*
 
+# make python3 default
+RUN `ln -s /usr/bin/python3 /usr/bin/python`
+
 RUN pip3 install --no-cache-dir \
     cython \
     decorator \
@@ -62,6 +65,7 @@ RUN pip3 install --no-cache-dir \
     linkify-it-py \
     Pandoc
 
+# the above is cached by the github action workflow
 FROM base AS pkgs
 
 ENV OMP_NUM_THREADS=1
@@ -125,7 +129,4 @@ RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/maxen
 
 # remove source
 RUN cd / && rm -rf source
-
-# make python3 default
-RUN `ln -s /usr/bin/python3 /usr/bin/python`
 

@@ -4,7 +4,7 @@ ARG LLVM=15
 # install basics
 RUN apt-get update &&  DEBIAN_FRONTEND=noninteractive apt-get install -y curl sudo wget git less rsync nano openssl ca-certificates make vim
 
-# for nodejs 20
+# for nodejs 20 for sphinx
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 
 # This platform includes dependencies for building docs
@@ -18,7 +18,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
       libc++-${LLVM}-dev \
       libc++abi-${LLVM}-dev \
       hdf5-tools \
-      libmkl-full-dev \ 
+      libmkl-dev \
       libopenblas-dev \
       libboost-dev \
       libfftw3-dev \
@@ -46,7 +46,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
       python3-pip \
       python3-sphinx \
       python3-clang-${LLVM} \
-      python3-skimage \ 
+      python3-skimage \
       python3-nbsphinx \
       python3-notebook \
       libpython3-dev \
@@ -54,7 +54,10 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
       apt-get autoremove --purge -y && \
       apt-get autoclean -y && \
       rm -rf /var/cache/apt/* /var/lib/apt/lists/*
-      
+
+# make python3 default
+RUN `ln -s /usr/bin/python3 /usr/bin/python`
+
 # install openmpi and compile openmpi manually
 # this is to ensure PMI compatibility with cray systems
 # RUN wget -q https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.5.tar.gz \
@@ -83,22 +86,22 @@ RUN pip3 install --no-cache-dir \
     monty \
     mpi4py \
     pymatgen \
-    ase \ 
+    ase \
     Jinja2 \
     Mako \
     tornado \
     zmq \
     notebook \
     tk \
-    myst_parser \ 
+    myst_parser \
     sphinx_rtd_theme  \
-    linkify-it-py \ 
+    linkify-it-py \
     Pandoc \
     # Jupyter lab packages
     jupyterlab \
     descartes \
     ipympl \
-    RISE 
+    RISE
 
 ENV PYTHON_VERSION=3.10 \
     CC=clang-${LLVM} CXX=clang++-${LLVM} CXXFLAGS="-stdlib=libc++"
@@ -108,6 +111,10 @@ ENV OMP_NUM_THREADS=1
 ENV MKL_NUM_THREADS=1
 ENV MKL_INTERFACE_LAYER=GNU,LP64
 ENV MKL_THREADING_LAYER=SEQUENTIAL
+ENV OMPI_ALLOW_RUN_AS_ROOT=1
+ENV OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
+ENV OMPI_MCA_rmaps_base_oversubscribe="yes"
+ENV OMPI_MCA_btl_vader_single_copy_mechanism=none
 ARG NCORES=10
 
 # create source dirs
@@ -116,7 +123,7 @@ RUN cd / && mkdir -p triqs && mkdir -p source
 # W90
 RUN cd /source && wget -O wannier90.tar.gz https://github.com/wannier-developers/wannier90/archive/d141f9f.tar.gz \
     && tar xvf wannier90.tar.gz --xform='s/-d141f9f84dcd3ac54729b9e5874dabd451684237//g' && cd wannier90 \
-    # Using gfortran compiler 
+    # Using gfortran compiler
     && echo "F90 = mpif90 \n COMMS  = mpi \n MPIF90 = mpif90 \n FCOPTS = -O3 -fallow-argument-mismatch \n LIBS = -Wl,--no-as-needed -lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lpthread -lm -ldl \n" > make.inc \
     && cd /source/wannier90 \
     && make PREFIX=/triqs wannier lib post w90chk2chk \
@@ -139,7 +146,7 @@ RUN cd /source && wget --quiet https://gitlab.com/QEF/q-e/-/archive/qe-7.2/q-e-q
         -D QE_WANNIER90_INTERNAL=OFF \
         -D WANNIER90_ROOT=/triqs \
         ../ \
-    && make -j$NCORES all \ 
+    && make -j$NCORES all \
     && make install
 
 # VASP for CSC calculations
@@ -158,6 +165,7 @@ RUN cd /source && wget --quiet https://gitlab.com/QEF/q-e/-/archive/qe-7.2/q-e-q
 
 #ENV PATH=/vasp/bin:${PATH}
 
+# the above is cached by the github action workflow
 FROM base AS pkgs
 
 # triqs
@@ -170,23 +178,24 @@ ENV CPATH=/triqs/include:/usr/include/mkl:${CPATH} \
     CMAKE_BUILD_PARALLEL_LEVEL=${NCORES} \
     CTEST_OUTPUT_ON_FAILURE=1 \
     CTEST_PARALLEL_LEVEL=${NCORES} \
+    BLA_VENDOR=Intel10_64_dyn \
     TRIQS_ROOT=/triqs
 
 RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/triqs triqs.src \
     && mkdir -p triqs.build && cd triqs.build \
-    && cmake ../triqs.src -DCMAKE_INSTALL_PREFIX=/triqs -DMPIEXEC_PREFLAGS='--allow-run-as-root' -DBLA_VENDOR=Intel10_64_dyn \
+    && cmake ../triqs.src -DCMAKE_INSTALL_PREFIX=/triqs \
     && make -j$NCORES && ctest -j$NCORES && make install
 
 # dft_tools
 RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/dft_tools.git dft_tools.src \
     && mkdir -p dft_tools.build && cd dft_tools.build \
-    && cmake ../dft_tools.src -DMPIEXEC_PREFLAGS='--allow-run-as-root' \
+    && cmake ../dft_tools.src \
     && make -j$NCORES && ctest -j$NCORES && make install
 
 # cthyb
 RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/cthyb.git cthyb.src \
     && mkdir -p cthyb.build && cd cthyb.build \
-    && cmake ../cthyb.src -DMPIEXEC_PREFLAGS='--allow-run-as-root'  \
+    && cmake ../cthyb.src \
     && make -j$NCORES && ctest -j$NCORES && make install
 
 # maxent
@@ -198,13 +207,13 @@ RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/maxen
 # TPRF
 RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/tprf.git tprf.src \
     && mkdir -p tprf.build && cd tprf.build \
-    && cmake ../tprf.src -DMPIEXEC_PREFLAGS='--allow-run-as-root'  \
+    && cmake ../tprf.src  \
     && make -j$NCORES && make test && make install
 
 # hubbardI
 RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hubbardI.git hubbardI.src \
     && mkdir -p hubbardI.build && cd hubbardI.build \
-    && cmake ../hubbardI.src \ 
+    && cmake ../hubbardI.src \
     && make -j$NCORES && ctest -j$NCORES && make install
 
 # hartree_fock
@@ -216,7 +225,7 @@ RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hartr
 # download solid_dmft and install
 RUN cd /source && git clone -b unstable --depth 1 https://github.com/flatironinstitute/solid_dmft.git solid_dmft.src \
     && mkdir -p solid_dmft.build && cd solid_dmft.build \
-    && cmake ../solid_dmft.src -DMPIEXEC_PREFLAGS='--allow-run-as-root' \
+    && cmake ../solid_dmft.src \
     && make test && make install
 
 # remove source
@@ -224,10 +233,6 @@ RUN cd / && rm -rf source
 
 # create a useful work dir
 RUN cd / && mkdir work && cd work
-ENV OMPI_MCA_btl_vader_single_copy_mechanism=none
-
-# make python3 default
-RUN `ln -s /usr/bin/python3 /usr/bin/python`
 
 # expose port for jupyter
 EXPOSE 8378
@@ -240,5 +245,4 @@ RUN ["chmod", "+x", "/usr/local/bin/jupyter.sh"]
 
 # change user and group id to match host machine if options are passed accordingly
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-
 
