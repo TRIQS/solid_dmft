@@ -247,6 +247,7 @@ def _calc_alatt(n_orb, mu, eta, e_mat, sigma, qp_bands=False, e_vecs=None,
         def invert_and_trace(w, eta, mu, e_mat, sigma, trace, proj=None):
             # inversion is automatically vectorized over first axis of 3D array (omega first index now)
             Glatt = np.linalg.inv(w + eta[None, ...] + mu[None, ...] - e_mat[None, ...] - sigma.transpose(2, 0, 1))
+            # TODO: fix this is only correct for diagonal Sigma
             A_w_nu = -1.0/np.pi * np.diagonal(Glatt, axis1=1, axis2=2).imag
             if isinstance(proj, np.ndarray):
                 A_w_nu = A_w_nu * proj[None, :]
