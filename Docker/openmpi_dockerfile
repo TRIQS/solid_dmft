@@ -1,11 +1,12 @@
 FROM ubuntu:22.04 AS base
 ARG LLVM=15
+ARG NODE_MAJOR=20
 
-# install basics
-RUN apt-get update &&  DEBIAN_FRONTEND=noninteractive apt-get install -y curl sudo wget git less rsync nano openssl ca-certificates make vim
-
-# for nodejs 20 for sphinx
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+# install basics for modern nodejs required for sphinx
+RUN apt-get update &&  DEBIAN_FRONTEND=noninteractive apt-get install -y curl sudo wget git less rsync nano openssl ca-certificates make vim gnupg \
+    && mkdir -p /etc/apt/keyrings \
+    && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
+    && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
 
 # This platform includes dependencies for building docs
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -113,14 +114,14 @@ ENV OMPI_ALLOW_RUN_AS_ROOT=1
 ENV OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 ENV OMPI_MCA_rmaps_base_oversubscribe="yes"
 ENV OMPI_MCA_btl_vader_single_copy_mechanism=none
-ARG NCORES=10
+ARG NCORES=20
 
 # create source dirs
 RUN cd / && mkdir -p triqs && mkdir -p source
 
 # W90
-RUN cd /source && wget -O wannier90.tar.gz https://github.com/wannier-developers/wannier90/archive/d141f9f.tar.gz \
-    && tar xvf wannier90.tar.gz --xform='s/-d141f9f84dcd3ac54729b9e5874dabd451684237//g' && cd wannier90 \
+RUN cd /source && wget -q -O wannier90.tar.gz https://github.com/wannier-developers/wannier90/archive/d141f9f.tar.gz \
+    && tar xf wannier90.tar.gz --xform='s/-d141f9f84dcd3ac54729b9e5874dabd451684237//g' && cd wannier90 \
     # Using gfortran compiler
     && echo "F90 = mpif90 \n COMMS  = mpi \n MPIF90 = mpif90 \n FCOPTS = -O3 -fallow-argument-mismatch \n LIBS = -Wl,--no-as-needed -lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lpthread -lm -ldl \n" > make.inc \
     && cd /source/wannier90 \
