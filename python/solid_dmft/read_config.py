@@ -457,7 +457,8 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                                                                        'crpa',
                                                                                        'crpa_density_density',
                                                                                        'dynamic',
-                                                                                       'ntot') for hint in x),
+                                                                                       'ntot',
+                                                                                       'simple_intra') for hint in x),
                                                 'converter': lambda s: list(map(str, s.replace(" ", "").split(','))),
                                                 'used': True},
 
@@ -500,7 +501,7 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
 
                                  'solver_type': {'valid for': lambda x, _: x in ['cthyb', 'ctint', 'ftps', 'hubbardI','ctseg', 'hartree'],
                                                  'used': True},
-                                 
+
 
                                  'n_l': {'converter': int, 'valid for': lambda x, _: x > 0,
                                          'used': lambda params: params['general']['solver_type'] in ['cthyb', 'inchworm', 'hubbardI', 'ctseg']

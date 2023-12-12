@@ -440,6 +440,62 @@ def _construct_slater(sum_k, general_params, Umat_full_rotated, icrsh):
 
     return h_int
 
+def h_int_simple_intra(spin_names,n_orb,U,off_diag=None,map_operator_structure=None,H_dump=None):
+    r"""
+    Create a simple intra orbital density-density Hamiltonian.
+    (no inter orbital terms)
+
+    .. math::
+        H = \frac{1}{2} \sum_{i \sigma \neq \sigma')} U_{i i}^{\sigma \sigma'} n_{i \sigma} n_{i \sigma'}.
+
+    Parameters
+    ----------
+    spin_names : list of strings
+               Names of the spins, e.g. ['up','down'].
+    n_orb : int
+               Number of orbitals.
+    U : float
+               U value
+    off_diag : boolean
+               Do we have (orbital) off-diagonal elements?
+               If yes, the operators and blocks are denoted by ('spin', 'orbital'),
+               otherwise by ('spin_orbital',0).
+    map_operator_structure : dict
+               Mapping of names of GF blocks names from one convention to another,
+               e.g. {('up', 0): ('up_0', 0), ('down', 0): ('down_0',0)}.
+               If provided, the operators and blocks are denoted by the mapping of ``('spin', 'orbital')``.
+    H_dump : string
+               Name of the file to which the Hamiltonian should be written.
+
+    Returns
+    -------
+    H : Operator
+        The Hamiltonian.
+
+    """
+    from triqs.operators.util.op_struct import get_mkind
+
+    if H_dump:
+        H_dump_file = open(H_dump,'w')
+        H_dump_file.write("Density-density Hamiltonian:" + '\n')
+
+    H = Operator()
+    mkind = get_mkind(off_diag,map_operator_structure)
+    if H_dump: H_dump_file.write("Density-density terms:" + '\n')
+    for s1, s2 in product(spin_names,spin_names):
+        if (s1 is not s2):
+            for a1 in range(n_orb):
+                H_term = 0.5 * U * n(*mkind(s1,a1)) * n(*mkind(s2,a1))
+                H += H_term
+
+                # Dump terms of H
+                if H_dump and not H_term.is_zero():
+                    H_dump_file.write('%s'%(mkind(s1,a1),) + '\t')
+                    H_dump_file.write('%s'%(mkind(s2,a1),) + '\t')
+                    H_dump_file.write(str(U) + '\n')
+
+    return H
+
 
 def construct(sum_k, general_params, advanced_params):
     """
@@ -528,6 +584,15 @@ def construct(sum_k, general_params, advanced_params):
             h_int[icrsh] = general_params['U'][icrsh]/2.0 * (n_tot_op*n_tot_op - n_tot_op)
             continue
 
+        if general_params['h_int_type'][icrsh] == 'simple_intra':
+            h_int[icrsh] = h_int_simple_intra(sum_k.spin_block_names[sum_k.SO],
+                                              solver.get_n_orbitals(sum_k)[icrsh]['up'],
+                                              map_operator_structure=sum_k.sumk_to_solver[icrsh],
+                                              U=general_params['U'][icrsh],
+                                              H_dump=os.path.join(general_params['jobname'], 'H.txt'))
+            continue
+
+
         # read from file options
         if general_params['h_int_type'][icrsh] in ('crpa', 'crpa_density_density'):
             Umat_full = _load_crpa_interaction_matrix(sum_k, icrsh)
@@ -538,7 +603,7 @@ def construct(sum_k, general_params, advanced_params):
 
             # Rotates the interaction matrix
             Umat_full_rotated = _rotate_four_index_matrix(sum_k, general_params, Umat_full, icrsh)
-    
+
             # construct slater / density density from U tensor
             if general_params['h_int_type'][icrsh] == 'crpa':
                 h_int[icrsh] = _construct_slater(sum_k, general_params, Umat_full_rotated, icrsh)
