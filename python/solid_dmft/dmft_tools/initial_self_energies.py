@@ -498,7 +498,7 @@ def determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
 
     # Updates the sum_k object with the Matsubara self-energy
     sum_k.put_Sigma([solvers[icrsh].Sigma_freq for icrsh in range(sum_k.n_inequiv_shells)])
-    
+
     # load sigma as first guess in the hartree solver if applicable
     if general_params['solver_type'] == 'hartree':
         # TODO:

@@ -257,6 +257,8 @@ def main(external_path, iteration=None, continuator_type='inversion_sigmainf', m
     Main function that reads the Matsubara self-energy from h5, analytically continues it,
     writes the results back to the h5 archive and also returns the results.
 
+    Function parallelizes using MPI over impurities and blocks.
+
     Parameters
     ----------
     external_path : string
