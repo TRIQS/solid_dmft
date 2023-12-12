@@ -54,6 +54,8 @@ h_int_type : string
             * density_density: used for full d-shell or eg- or t2g-subset
             * kanamori: only physical for the t2g or the eg subset
             * full_slater: used for full d-shell or eg- or t2g-subset
+            * ntot: U/2 (Ntot^2 - Ntot) interaction
+            * simple_intra: density-density like but only intra orbital with given U value (no rotations applied)
             * crpa: use the cRPA matrix as interaction Hamiltonian
             * crpa_density_density: use the density-density terms of the cRPA matrix
             * dynamic: use dynamic U from h5 archive
@@ -401,6 +403,8 @@ dc_fixed_value : float, optional, default= 'none'
 dc_fixed_occ : list of float, optional, default= 'none'
             If given, the occupation for the DC for each impurity is set to the provided value.
             Still uses the same kind of DC!
+dc_orb_shift : list of float, optional, default= 'none'
+            extra potential shift per orbital per impurity added to the DC
 dc_U :  float or comma seperated list of floats, optional, default= general_params['U']
             U values for DC determination if only one value is given, the same U is assumed for all impurities
 dc_J :  float or comma seperated list of floats, optional, default= general_params['J']
@@ -869,6 +873,9 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                   'dc_fixed_value': {'converter': float, 'used': True, 'default': 'none'},
 
                                   'dc_fixed_occ': {'converter': lambda s: list(map(float, s.split(','))),
+                                                   'used': True, 'default': 'none'},
+
+                                  'dc_orb_shift': {'converter': lambda s: list(map(float, s.split(','))),
                                                    'used': True, 'default': 'none'},
 
                                   'dc_nominal': {'converter': BOOL_PARSER, 'used': True, 'default': False},

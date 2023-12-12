@@ -162,6 +162,27 @@ def calculate_double_counting(sum_k, density_matrix, general_params, advanced_pa
                 mpi.report('DC for shell {} and block {} = {}'.format(icrsh, spin, dc_per_spin[0][0]))
             mpi.report('DC energy for shell {} = {}'.format(icrsh, energy_per_shell))
 
+    if advanced_params['dc_orb_shift'] != 'none':
+        mpi.report('adding an extra orbital dependent shift per impurity')
+        tot_norb = 0
+        dc_orb_shift = []
+        dc_orb_shift_orig = deepcopy(advanced_params['dc_orb_shift'])
+        for icrsh in range(sum_k.n_inequiv_shells):
+            tot_norb += sum_k.corr_shells[icrsh]['dim']
+            dc_orb_shift.append(dc_orb_shift_orig[:sum_k.corr_shells[icrsh]['dim']])
+            del dc_orb_shift_orig[:sum_k.corr_shells[icrsh]['dim']]
+
+        dc_orb_shift = np.array(dc_orb_shift)
+        dc = []
+        for icrsh in range(sum_k.n_inequiv_shells):
+            mpi.report(f'shift on imp {icrsh}: {dc_orb_shift[icrsh,:]}')
+            dc.append({})
+            for spin, dc_per_spin in sum_k.dc_imp[sum_k.inequiv_to_corr[icrsh]].items():
+                dc[icrsh][spin] = dc_per_spin + np.diag(dc_orb_shift[icrsh,:])
+
+        for ish in range(sum_k.n_corr_shells):
+            sum_k.dc_imp[ish] = dc[sum_k.corr_to_inequiv[ish]]
+
     return sum_k
 
 

@@ -367,7 +367,7 @@ def _generate_four_index_u_matrix(sum_k, general_params, icrsh):
     # the order for the cubic orbitals is given by the convention. The TRIQS
     # convention is as follows ("xy","yz","z^2","xz","x^2-y^2")
     # this is consistent with the order of orbitals in the VASP interface
-    # but not necessarily with wannier90, qe, and wien2k! 
+    # but not necessarily with wannier90, qe, and wien2k!
     # This is also true for the f-shell.
     Umat_full = util.U_matrix_slater(l=sum_k.corr_shells[ish]['l'],
                               radial_integrals=slater_integrals, basis='spherical')
