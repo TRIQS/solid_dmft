@@ -1,57 +1,62 @@
 FROM ubuntu:22.04 AS base
 ARG LLVM=15
-ARG NODE_MAJOR=20
-
-# install basics for modern nodejs required for sphinx
-RUN apt-get update &&  DEBIAN_FRONTEND=noninteractive apt-get install -y curl sudo wget git less rsync nano openssl ca-certificates make vim gnupg \
-    && mkdir -p /etc/apt/keyrings \
-    && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
-    && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
 
 # This platform includes dependencies for building docs
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+      clang-${LLVM} \
       cmake \
+      cython3 \
       g++ \
       gfortran \
-      llvm-${LLVM}-dev \
-      libclang-${LLVM}-dev \
-      clang-${LLVM} \
+      hdf5-tools \
+      jupyter-notebook \
+      libboost-dev \
       libc++-${LLVM}-dev \
       libc++abi-${LLVM}-dev \
-      hdf5-tools \
-      libmkl-dev \
-      libopenblas-dev \
-      libboost-dev \
+      libclang-${LLVM}-dev \
+      libevent-dev \
+      libfabric-dev \
       libfftw3-dev \
-      libnfft3-dev \
       libgfortran5 \
       libgmp-dev \
       libhdf5-dev \
       libhwloc-dev \
-      libevent-dev \
-      libpmi2-0-dev \
-      cython3 \
-      # comment the next 4 lines if you want to build openmpi manually
+      libmkl-dev \
+      libnfft3-dev \
+      libomp-${LLVM}-dev \
+      libopenblas-dev \
       libopenmpi-dev \
+      libpmi2-0-dev \
+      libpython3-dev \
+      llvm-${LLVM}-dev \
       openmpi-bin \
       openmpi-common \
       openmpi-doc \
-      libfabric-dev \
-      libomp-${LLVM}-dev \
-      nodejs \
+      pandoc \
       python-is-python3 \
-      python3-dev \
-      python3-mako \
-      python3-numpy \
-      python3-scipy \
-      python3-matplotlib \
-      python3-pip \
-      python3-sphinx \
+      python3-ase \
       python3-clang-${LLVM} \
-      python3-skimage \
+      python3-decorator \
+      python3-dev \
+      python3-jinja2 \
+      python3-mako \
+      python3-matplotlib \
+      python3-monty \
+      python3-mpi4py \
+      python3-myst-parser \
       python3-nbsphinx \
       python3-notebook \
-      libpython3-dev \
+      python3-numpy \
+      python3-pandas \
+      python3-pip \
+      python3-pymatgen \
+      python3-pytest \
+      python3-scipy \
+      python3-shapely \
+      python3-skimage \
+      python3-sphinx \
+      python3-sphinx-rtd-theme \
+      wget \
       && \
       apt-get autoremove --purge -y && \
       apt-get autoclean -y && \
@@ -72,35 +77,6 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
 #     && ldconfig \
 #     && cd .. \
 #     && rm -rf openmpi-4.1.5.tar.gz openmpi-4.1.5
-
-RUN pip3 install --no-cache-dir \
-    mpi4py \
-    cython \
-    decorator \
-    jupyter \
-    ipywidgets \
-    pytest \
-    pandas \
-    shapely \
-    monty \
-    mpi4py \
-    pymatgen \
-    ase \
-    Jinja2 \
-    Mako \
-    tornado \
-    zmq \
-    notebook \
-    tk \
-    myst_parser \
-    sphinx_rtd_theme  \
-    linkify-it-py \
-    Pandoc \
-    # Jupyter lab packages
-    jupyterlab \
-    descartes \
-    ipympl \
-    RISE
 
 ENV PYTHON_VERSION=3.10 \
     CC=clang-${LLVM} CXX=clang++-${LLVM} CXXFLAGS="-stdlib=libc++"

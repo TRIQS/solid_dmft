@@ -1,67 +1,56 @@
 FROM ubuntu:22.04 AS base
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+      ca-certificates \
       cmake \
+      curl \
+      cython3 \
       g++-12 \
       gfortran-12 \
       git \
       hdf5-tools \
-      liblapack-dev \
       libboost-dev \
       libfftw3-dev \
-      libnfft3-dev \
       libgfortran5 \
       libgmp-dev \
       libhdf5-dev \
+      liblapack-dev \
+      libnfft3-dev \
+      libomp-dev \
       libopenmpi-dev \
-      cython3 \
+      libpython3-dev \
       openmpi-bin \
       openmpi-common \
       openmpi-doc \
-      python-is-python3 \
-      python3-dev \
-      python3-mako \
-      python3-numpy \
-      python3-scipy \
-      python3-matplotlib \
-      python3-mpi4py \
-      python3-pip \
-      python3-sphinx \
-      python3-nbsphinx \
-      python3-skimage \
-      python3-notebook \
-      libpython3-dev \
-      curl \
-      ca-certificates \
       openssl \
-      wget \
+      pandoc \
+      python-is-python3 \
+      python3-ase \
+      python3-decorator \
+      python3-dev \
+      python3-jinja2 \
+      python3-mako \
+      python3-matplotlib \
+      python3-monty \
+      python3-mpi4py \
+      python3-myst-parser \
+      python3-nbsphinx \
+      python3-notebook \
+      python3-numpy \
+      python3-pip \
+      python3-pytest \
+      python3-scipy \
+      python3-shapely \
+      python3-skimage \
+      python3-sphinx \
+      python3-sphinx-rtd-theme \
       rsync \
-      libomp-dev \
       sudo \
-      nodejs \
-      npm \
+      wget \
       && \
       apt-get autoremove --purge -y && \
       apt-get autoclean -y && \
       rm -rf /var/cache/apt/* /var/lib/apt/lists/*
-
-RUN pip3 install --no-cache-dir \
-    cython \
-    decorator \
-    pytest \
-    shapely \
-    monty \
-    mpi4py \
-    Jinja2 \
-    Mako \
-    ase \
-    tornado \
-    zmq \
-    tk  \
-    myst_parser \
-    sphinx_rtd_theme  \
-    linkify-it-py \
-    Pandoc
 
 # the above is cached by the github action workflow
 FROM base AS pkgs
