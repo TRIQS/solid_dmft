@@ -4,8 +4,10 @@ ARG LLVM=15
 # This platform includes dependencies for building docs
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
       build-essential \
+      ca-certificates \
       clang-${LLVM} \
       cmake \
+      curl \
       cython3 \
       debhelper \
       dh-python \
@@ -59,20 +61,19 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
       python3-skimage \
       python3-sphinx \
       python3-sphinx-rtd-theme \
-      wget \
       && \
       apt-get autoremove --purge -y && \
       apt-get autoclean -y && \
       rm -rf /var/cache/apt/* /var/lib/apt/lists/*
 
 RUN mkdir -p /src && cd /src \
- && wget http://archive.ubuntu.com/ubuntu/pool/universe/u/uc-micro-py/uc-micro-py_1.0.1{-3.dsc,.orig.tar.xz,-3.debian.tar.xz} \
+ && curl -LOOO http://archive.ubuntu.com/ubuntu/pool/universe/u/uc-micro-py/uc-micro-py_1.0.1{-3.dsc,.orig.tar.xz,-3.debian.tar.xz} \
  && dpkg-source -x uc-micro-py_1.0.1-3.dsc \
  && cd uc-micro-py-1.0.1 \
  && DEB_BUILD_OPTIONS=nocheck dpkg-buildpackage -b -d -uc -us \
  && cd - \
  && apt-get install ./python3-uc-micro_1.0.1-3_all.deb \
- && wget http://archive.ubuntu.com/ubuntu/pool/universe/l/linkify-it-py/linkify-it-py_2.0.0{-1.dsc,.orig.tar.gz,-1.debian.tar.xz} \
+ && curl -LOOO http://archive.ubuntu.com/ubuntu/pool/universe/l/linkify-it-py/linkify-it-py_2.0.0{-1.dsc,.orig.tar.gz,-1.debian.tar.xz} \
  && dpkg-source -x linkify-it-py_2.0.0-1.dsc \
  && cd linkify-it-py-2.0.0/ \
  && DEB_BUILD_OPTIONS=nocheck dpkg-buildpackage -b -d -uc -us \
@@ -82,7 +83,7 @@ RUN mkdir -p /src && cd /src \
 
 # install openmpi and compile openmpi manually
 # this is to ensure PMI compatibility with cray systems
-# RUN wget -q https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.5.tar.gz \
+# RUN curl -LO https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.5.tar.gz \
 #     && tar xf openmpi-4.1.5.tar.gz \
 #     && cd openmpi-4.1.5 \
 #     && ./configure --prefix=/usr --enable-mpi-cxx --with-libfabric=/usr \
@@ -114,7 +115,7 @@ ARG NCORES=20
 RUN cd / && mkdir -p triqs && mkdir -p source
 
 # W90
-RUN cd /source && wget -q -O wannier90.tar.gz https://github.com/wannier-developers/wannier90/archive/d141f9f.tar.gz \
+RUN cd /source && curl -Lo wannier90.tar.gz https://github.com/wannier-developers/wannier90/archive/d141f9f.tar.gz \
     && tar xf wannier90.tar.gz --xform='s/-d141f9f84dcd3ac54729b9e5874dabd451684237//g' && cd wannier90 \
     # Using gfortran compiler
     && echo "F90 = mpif90 \n COMMS  = mpi \n MPIF90 = mpif90 \n FCOPTS = -O3 -fallow-argument-mismatch \n LIBS = -Wl,--no-as-needed -lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lpthread -lm -ldl \n" > make.inc \
@@ -125,7 +126,7 @@ RUN cd /source && wget -q -O wannier90.tar.gz https://github.com/wannier-develop
     && cp src/obj/* /triqs/include/
 
 # install qe
-RUN cd /source && wget --quiet https://gitlab.com/QEF/q-e/-/archive/qe-7.2/q-e-qe-7.2.tar.gz \
+RUN cd /source && curl -LO https://gitlab.com/QEF/q-e/-/archive/qe-7.2/q-e-qe-7.2.tar.gz \
    && tar -xf q-e-qe-7.2.tar.gz \
    && cd q-e-qe-7.2 \
    && mkdir -p build && cd build \
