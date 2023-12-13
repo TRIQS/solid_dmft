@@ -1,10 +1,13 @@
 FROM ubuntu:22.04 AS base
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+      build-essential \
       ca-certificates \
       cmake \
       curl \
       cython3 \
+      debhelper \
+      dh-python \
       g++-12 \
       gfortran-12 \
       git \
@@ -51,6 +54,21 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
       apt-get autoremove --purge -y && \
       apt-get autoclean -y && \
       rm -rf /var/cache/apt/* /var/lib/apt/lists/*
+
+RUN mkdir -p /src && cd /src \
+ && curl -LOOO http://archive.ubuntu.com/ubuntu/pool/universe/u/uc-micro-py/uc-micro-py_1.0.1{-3.dsc,.orig.tar.xz,-3.debian.tar.xz} \
+ && dpkg-source -x uc-micro-py_1.0.1-3.dsc \
+ && cd uc-micro-py-1.0.1 \
+ && DEB_BUILD_OPTIONS=nocheck dpkg-buildpackage -b -d -uc -us \
+ && cd - \
+ && apt-get install ./python3-uc-micro_1.0.1-3_all.deb \
+ && curl -LOOO http://archive.ubuntu.com/ubuntu/pool/universe/l/linkify-it-py/linkify-it-py_2.0.0{-1.dsc,.orig.tar.gz,-1.debian.tar.xz} \
+ && dpkg-source -x linkify-it-py_2.0.0-1.dsc \
+ && cd linkify-it-py-2.0.0/ \
+ && DEB_BUILD_OPTIONS=nocheck dpkg-buildpackage -b -d -uc -us \
+ && cd - \
+ && apt-get install ./python3-linkify-it_2.0.0-1_all.deb \
+ && cd / && rm -rf /src
 
 # the above is cached by the github action workflow
 FROM base AS pkgs
