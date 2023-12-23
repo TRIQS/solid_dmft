@@ -1,63 +1,92 @@
-FROM ubuntu:22.04
+FROM ubuntu:22.04 AS base
 ARG LLVM=15
-
-# install basics
-RUN apt-get update &&  DEBIAN_FRONTEND=noninteractive apt-get install -y curl sudo wget git less rsync nano openssl ca-certificates make vim
-
-# for nodejs 20
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 
 # This platform includes dependencies for building docs
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+      build-essential \
+      ca-certificates \
+      clang-${LLVM} \
       cmake \
+      curl \
+      cython3 \
+      debhelper \
+      dh-python \
       g++ \
       gfortran \
-      llvm-${LLVM}-dev \
-      libclang-${LLVM}-dev \
-      clang-${LLVM} \
+      git \
+      hdf5-tools \
+      jupyter-notebook \
+      libboost-dev \
       libc++-${LLVM}-dev \
       libc++abi-${LLVM}-dev \
-      hdf5-tools \
-      libmkl-full-dev \ 
-      libopenblas-dev \
-      libboost-dev \
+      libclang-${LLVM}-dev \
+      libevent-dev \
+      libfabric-dev \
       libfftw3-dev \
-      libnfft3-dev \
       libgfortran5 \
       libgmp-dev \
       libhdf5-dev \
       libhwloc-dev \
-      libevent-dev \
-      libpmi2-0-dev \
-      cython3 \
-      # comment the next 4 lines if you want to build openmpi manually
+      libmkl-dev \
+      libnfft3-dev \
+      libomp-${LLVM}-dev \
+      libopenblas-dev \
       libopenmpi-dev \
+      libpmi2-0-dev \
+      libpython3-dev \
+      llvm-${LLVM}-dev \
       openmpi-bin \
       openmpi-common \
       openmpi-doc \
-      libfabric-dev \
-      libomp-${LLVM}-dev \
-      nodejs \
-      python3-dev \
-      python3-mako \
-      python3-numpy \
-      python3-scipy \
-      python3-matplotlib \
-      python3-pip \
-      python3-sphinx \
+      pandoc \
+      python-is-python3 \
+      python3-ase \
       python3-clang-${LLVM} \
-      python3-skimage \ 
+      python3-decorator \
+      python3-dev \
+      python3-jinja2 \
+      python3-mako \
+      python3-matplotlib \
+      python3-monty \
+      python3-mpi4py \
+      python3-myst-parser \
       python3-nbsphinx \
       python3-notebook \
-      libpython3-dev \
+      python3-numpy \
+      python3-pandas \
+      python3-pip \
+      python3-pymatgen \
+      python3-pytest \
+      python3-scipy \
+      python3-shapely \
+      python3-skimage \
+      python3-sphinx \
+      python3-sphinx-rtd-theme \
       && \
       apt-get autoremove --purge -y && \
       apt-get autoclean -y && \
       rm -rf /var/cache/apt/* /var/lib/apt/lists/*
-      
+
+# linkify-it-py (required by sphinx doc build) is not available in Ubuntu 22.04 as package
+# the following manually installs it and its only dependency uc-micro-py
+RUN mkdir -p /src && cd /src \
+ && curl -LOOO http://archive.ubuntu.com/ubuntu/pool/universe/u/uc-micro-py/uc-micro-py_1.0.1{-3.dsc,.orig.tar.xz,-3.debian.tar.xz} \
+ && dpkg-source -x uc-micro-py_1.0.1-3.dsc \
+ && cd uc-micro-py-1.0.1 \
+ && DEB_BUILD_OPTIONS=nocheck dpkg-buildpackage -b -d -uc -us \
+ && cd - \
+ && apt-get install ./python3-uc-micro_1.0.1-3_all.deb \
+ && curl -LOOO http://archive.ubuntu.com/ubuntu/pool/universe/l/linkify-it-py/linkify-it-py_2.0.0{-1.dsc,.orig.tar.gz,-1.debian.tar.xz} \
+ && dpkg-source -x linkify-it-py_2.0.0-1.dsc \
+ && cd linkify-it-py-2.0.0/ \
+ && DEB_BUILD_OPTIONS=nocheck dpkg-buildpackage -b -d -uc -us \
+ && cd - \
+ && apt-get install ./python3-linkify-it_2.0.0-1_all.deb \
+ && cd / && rm -rf /src
+
 # install openmpi and compile openmpi manually
 # this is to ensure PMI compatibility with cray systems
-# RUN wget -q https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.5.tar.gz \
+# RUN curl -LO https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.5.tar.gz \
 #     && tar xf openmpi-4.1.5.tar.gz \
 #     && cd openmpi-4.1.5 \
 #     && ./configure --prefix=/usr --enable-mpi-cxx --with-libfabric=/usr \
@@ -71,35 +100,6 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
 #     && cd .. \
 #     && rm -rf openmpi-4.1.5.tar.gz openmpi-4.1.5
 
-RUN pip3 install --no-cache-dir \
-    mpi4py \
-    cython \
-    decorator \
-    jupyter \
-    ipywidgets \
-    pytest \
-    pandas \
-    shapely \
-    monty \
-    mpi4py \
-    pymatgen \
-    ase \ 
-    Jinja2 \
-    Mako \
-    tornado \
-    zmq \
-    notebook \
-    tk \
-    myst_parser \ 
-    sphinx_rtd_theme  \
-    linkify-it-py \ 
-    Pandoc \
-    # Jupyter lab packages
-    jupyterlab \
-    descartes \
-    ipympl \
-    RISE 
-
 ENV PYTHON_VERSION=3.10 \
     CC=clang-${LLVM} CXX=clang++-${LLVM} CXXFLAGS="-stdlib=libc++"
 RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-${LLVM} 60 --slave /usr/bin/clang++ clang++ /usr/bin/clang++-${LLVM} --slave /usr/bin/clang-cpp clang-cpp /usr/bin/clang-cpp-${LLVM}
@@ -108,15 +108,19 @@ ENV OMP_NUM_THREADS=1
 ENV MKL_NUM_THREADS=1
 ENV MKL_INTERFACE_LAYER=GNU,LP64
 ENV MKL_THREADING_LAYER=SEQUENTIAL
-ARG NCORES=10
+ENV OMPI_ALLOW_RUN_AS_ROOT=1
+ENV OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
+ENV OMPI_MCA_rmaps_base_oversubscribe="yes"
+ENV OMPI_MCA_btl_vader_single_copy_mechanism=none
+ARG NCORES=20
 
 # create source dirs
 RUN cd / && mkdir -p triqs && mkdir -p source
 
 # W90
-RUN cd /source && git clone -b develop --depth 1 https://github.com/wannier-developers/wannier90.git wannier90 \
-    && cd wannier90 \
-    # Using gfortran compiler 
+RUN cd /source && curl -Lo wannier90.tar.gz https://github.com/wannier-developers/wannier90/archive/d141f9f.tar.gz \
+    && tar xf wannier90.tar.gz --xform='s/-d141f9f84dcd3ac54729b9e5874dabd451684237//g' && cd wannier90 \
+    # Using gfortran compiler
     && echo "F90 = mpif90 \n COMMS  = mpi \n MPIF90 = mpif90 \n FCOPTS = -O3 -fallow-argument-mismatch \n LIBS = -Wl,--no-as-needed -lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lpthread -lm -ldl \n" > make.inc \
     && cd /source/wannier90 \
     && make PREFIX=/triqs wannier lib post w90chk2chk \
@@ -125,7 +129,7 @@ RUN cd /source && git clone -b develop --depth 1 https://github.com/wannier-deve
     && cp src/obj/* /triqs/include/
 
 # install qe
-RUN cd /source && wget --quiet https://gitlab.com/QEF/q-e/-/archive/qe-7.2/q-e-qe-7.2.tar.gz \
+RUN cd /source && curl -LO https://gitlab.com/QEF/q-e/-/archive/qe-7.2/q-e-qe-7.2.tar.gz \
    && tar -xf q-e-qe-7.2.tar.gz \
    && cd q-e-qe-7.2 \
    && mkdir -p build && cd build \
@@ -139,7 +143,7 @@ RUN cd /source && wget --quiet https://gitlab.com/QEF/q-e/-/archive/qe-7.2/q-e-q
         -D QE_WANNIER90_INTERNAL=OFF \
         -D WANNIER90_ROOT=/triqs \
         ../ \
-    && make -j$NCORES all \ 
+    && make -j$NCORES all \
     && make install
 
 # VASP for CSC calculations
@@ -158,30 +162,37 @@ RUN cd /source && wget --quiet https://gitlab.com/QEF/q-e/-/archive/qe-7.2/q-e-q
 
 #ENV PATH=/vasp/bin:${PATH}
 
+# the above is cached by the github action workflow
+FROM base AS pkgs
+
 # triqs
-ENV CPATH=/triqs/include:${CPATH} \
+ENV CPATH=/triqs/include:/usr/include/mkl:${CPATH} \
     PATH=/triqs/bin:${PATH} \
     LIBRARY_PATH=/triqs/lib:${LIBRARY_PATH} \
     LD_LIBRARY_PATH=/triqs/lib:${LD_LIBRARY_PATH} \
     PYTHONPATH=/triqs/lib/python3.10/site-packages:${PYTHONPATH} \
     CMAKE_PREFIX_PATH=/triqs/share/cmake:${CMAKE_PREFIX_PATH} \
+    CMAKE_BUILD_PARALLEL_LEVEL=${NCORES} \
+    CTEST_OUTPUT_ON_FAILURE=1 \
+    CTEST_PARALLEL_LEVEL=${NCORES} \
+    BLA_VENDOR=Intel10_64_dyn \
     TRIQS_ROOT=/triqs
 
 RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/triqs triqs.src \
     && mkdir -p triqs.build && cd triqs.build \
-    && cmake ../triqs.src -DCMAKE_INSTALL_PREFIX=/triqs -DMPIEXEC_PREFLAGS='--allow-run-as-root' -DBLA_VENDOR=Intel10_64_dyn \
+    && cmake ../triqs.src -DCMAKE_INSTALL_PREFIX=/triqs \
     && make -j$NCORES && ctest -j$NCORES && make install
 
 # dft_tools
 RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/dft_tools.git dft_tools.src \
     && mkdir -p dft_tools.build && cd dft_tools.build \
-    && cmake ../dft_tools.src -DMPIEXEC_PREFLAGS='--allow-run-as-root' \
+    && cmake ../dft_tools.src \
     && make -j$NCORES && ctest -j$NCORES && make install
 
 # cthyb
 RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/cthyb.git cthyb.src \
     && mkdir -p cthyb.build && cd cthyb.build \
-    && cmake ../cthyb.src -DMPIEXEC_PREFLAGS='--allow-run-as-root'  \
+    && cmake ../cthyb.src \
     && make -j$NCORES && ctest -j$NCORES && make install
 
 # maxent
@@ -193,13 +204,13 @@ RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/maxen
 # TPRF
 RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/tprf.git tprf.src \
     && mkdir -p tprf.build && cd tprf.build \
-    && cmake ../tprf.src -DMPIEXEC_PREFLAGS='--allow-run-as-root'  \
+    && cmake ../tprf.src  \
     && make -j$NCORES && make test && make install
 
 # hubbardI
 RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hubbardI.git hubbardI.src \
     && mkdir -p hubbardI.build && cd hubbardI.build \
-    && cmake ../hubbardI.src \ 
+    && cmake ../hubbardI.src \
     && make -j$NCORES && ctest -j$NCORES && make install
 
 # hartree_fock
@@ -211,7 +222,7 @@ RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hartr
 # download solid_dmft and install
 RUN cd /source && git clone -b unstable --depth 1 https://github.com/flatironinstitute/solid_dmft.git solid_dmft.src \
     && mkdir -p solid_dmft.build && cd solid_dmft.build \
-    && cmake ../solid_dmft.src -DMPIEXEC_PREFLAGS='--allow-run-as-root' \
+    && cmake ../solid_dmft.src \
     && make test && make install
 
 # remove source
@@ -219,10 +230,6 @@ RUN cd / && rm -rf source
 
 # create a useful work dir
 RUN cd / && mkdir work && cd work
-ENV OMPI_MCA_btl_vader_single_copy_mechanism=none
-
-# make python3 default
-RUN `ln -s /usr/bin/python3 /usr/bin/python`
 
 # expose port for jupyter
 EXPOSE 8378
@@ -235,5 +242,4 @@ RUN ["chmod", "+x", "/usr/local/bin/jupyter.sh"]
 
 # change user and group id to match host machine if options are passed accordingly
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-
 
