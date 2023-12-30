@@ -23,7 +23,7 @@ jobs:
 
     runs-on: ubuntu-latest
     container: 
-      image: materialstheory/solid_dmft_ci
+      image: ghcr.io/triqs/solid_dmft_github_ci:unstable
 
     steps:
       - uses: actions/checkout@v4
