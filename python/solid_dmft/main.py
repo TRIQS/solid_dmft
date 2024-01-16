@@ -108,8 +108,8 @@ def main(argv=sys.argv):
             # Copies h5 archive and config file to subfolder if are not there
             for file in (general_params['seedname']+'.h5',
                          general_params['config_file']):
-                if not os.path.isfile(general_params['jobname']+'/'+file):
-                    shutil.copyfile(file, general_params['jobname']+'/'+file)
+                if not os.path.isfile(general_params['jobname']+'/'+os.path.basename(file)):
+                    shutil.copyfile(file, general_params['jobname']+'/'+os.path.basename(file))
         mpi.barrier()
 
         # Runs dmft_cycle
