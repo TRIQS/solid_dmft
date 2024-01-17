@@ -461,6 +461,8 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
             #     general_params['Uloc_dlr'][iineq] = sum_k.block_structure.convert_gf(Uloc_dlr[iineq], ish_from=sum_k.inequiv_to_corr[iineq], space_from='sumk')
             general_params['Wloc_dlr'] = archive['DMFT_input']['Wloc_dlr']
             general_params['Vloc'] = archive['DMFT_input']['Vloc']
+
+        mpi.barrier()
         general_params['Uloc_dlr'] = mpi.bcast(general_params['Uloc_dlr'])
         general_params['Wloc_dlr'] = mpi.bcast(general_params['Wloc_dlr'])
         general_params['Vloc'] = mpi.bcast(general_params['Vloc'])
@@ -721,7 +723,7 @@ def _dmft_step(sum_k, solvers, it, general_params,
     if general_params['dc'] and general_params['dc_dmft']:
         sum_k = initial_sigma.calculate_double_counting(sum_k, density_mat,
                                                         general_params, advanced_params)
-    
+
     #The hartree solver computes the DC energy internally, set it in sum_k
     if general_params['solver_type'] == 'hartree':
         for icrsh in range(sum_k.n_inequiv_shells):

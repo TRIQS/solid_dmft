@@ -45,7 +45,7 @@ set(all_tests
 
   # copy reference data for respack test
   FILE(COPY gw_embedding DESTINATION ${test_dir})
-  
+
 foreach(test ${all_tests})
   get_filename_component(test_name ${test} NAME_WE)
   get_filename_component(test_dir ${test} DIRECTORY)
@@ -62,6 +62,7 @@ set (integration_tests
      lno_hubbardI_mag
      svo_cthyb_basic_gl
      svo_cthyb_basic_tf
+     svo_cthyb_crpa
      svo_ctseg_dyn
      )
 

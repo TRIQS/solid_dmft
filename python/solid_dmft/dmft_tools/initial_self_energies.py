@@ -35,11 +35,12 @@ import numpy as np
 # triqs
 from h5 import HDFArchive
 import triqs.utility.mpi as mpi
-from triqs.gf import BlockGf, Gf, make_gf_imfreq, MeshDLRImFreq, make_gf_dlr
+from triqs.gf import BlockGf, Gf, make_gf_imfreq, MeshDLRImFreq, make_gf_dlr, MeshReFreq
 from triqs.operators import util
+import itertools
 
 from triqs.plot.mpl_interface import *
-from solid_dmft.gw_embedding.bdft_converter import calc_Sigma_DC_gw
+from solid_dmft.gw_embedding.bdft_converter import calc_Sigma_DC_gw, calc_W_from_Gloc
 
 def calculate_double_counting(sum_k, density_matrix, general_params, advanced_params):
     """
@@ -469,35 +470,73 @@ def determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
 
                 # rotate Wloc and Vloc to solver space
                 ish = sum_k.inequiv_to_corr[icrsh]
-                Wloc_rot = general_params['Wloc_dlr'][icrsh].copy()
-                Vloc_rot = {}
-                for block, gf in Wloc_rot:
-                    Vloc_rot[block] = util.transform_U_matrix(general_params['Vloc'][icrsh][block], sum_k.rot_mat[ish].T)
-                    for coeff in gf.mesh:
-                        # Transposes rotation matrix here because TRIQS has a slightly different definition
-                        Wloc_rot[block][coeff] = util.transform_U_matrix(general_params['Wloc_dlr'][icrsh][block][coeff], sum_k.rot_mat[ish].T)
+                # Wloc_rot = general_params['Wloc_dlr'][icrsh].copy()
+                # Vloc_rot = {}
+                Uloc_rot = {}
+                Uloc_0 = make_gf_imfreq(general_params['Uloc_dlr'][icrsh]['up_0'],1).data[0,:,:,:,:] + general_params['Vloc'][icrsh]['up_0']
+                for block, gf in Gloc_dlr_iw:
+                    # Vloc_rot[block] = util.transform_U_matrix(general_params['Vloc'][icrsh][block], sum_k.rot_mat[ish].T)
+                    Uloc_rot[block] = util.transform_U_matrix(Uloc_0, sum_k.rot_mat[ish].T).real
+                    # for coeff in gf.mesh:
+                    #     # Transposes rotation matrix here because TRIQS has a slightly different definition
+                    #     Wloc_rot[block][coeff] = util.transform_U_matrix(general_params['Wloc_dlr'][icrsh][block][coeff], sum_k.rot_mat[ish].T)
+                # there are two options here evaluate DC from Wloc_GW and Uloc
+                # or Wloc_GG and Uloc (here GG means Wloc calculated via Gloc*Gloc)
+                Wloc_dlr = calc_W_from_Gloc(Gloc_dlr, Uloc_rot)
+                Sig_DC_dlr, Sig_DC_hartree, Sig_DC_exchange = calc_Sigma_DC_gw(Wloc_dlr,
+                                                                               Gloc_dlr,
+                                                                               Uloc_rot)
+                Sig_DC_iw = make_gf_imfreq(Sig_DC_dlr, n_iw=len(sum_k.mesh)//2)
+                for block, gf in Sig_DC_iw:
+                    for iorb, jorb in itertools.product(range(gf.target_shape[0]), repeat=2):
+                    # create full freq dependent DC and ignore off-diag terms for now
+                        if iorb == jorb:
+                            gf[iorb, jorb] += Sig_DC_hartree[block][iorb, jorb].real + Sig_DC_exchange[block][iorb, jorb].real
+                        else:
+                            gf[iorb, jorb] << 0.0+0.0j
 
-                Sig_DC_dlr, Sig_DC_hartree = calc_Sigma_DC_gw(Wloc_rot,
-                                                              Gloc_dlr,
-                                                              Vloc_rot)
+
+                # dynamic interaction but static DC
                 if general_params['dc_type'] == 5:
+                    # for the static DC form we follow doi.org/10.1103/PhysRevB.95.155104 Eq 31
+                    # Sig_DC = Sig_DC_hartree + Sig_DC_iw(0)
+                    mesh_w = MeshReFreq(window=(-0.5,0.5), n_w=101)
+                    Sig_DC_w = sum_k.block_structure.create_gf(ish=icrsh, space='solver', mesh=mesh_w)
+                    for block, gf in Sig_DC_w:
+                        gf.set_from_pade(Sig_DC_iw[block], n_points=len(sum_k.mesh)//10, freq_offset=0.0001)
+                        # option 1 all DC terms
+                        Sig_DC_hartree[block] = Sig_DC_w[block](0.0).real
+                        # option 2 only static terms!
+                        # Sig_DC_hartree[block] += Sig_DC_exchange[block]
+
+                        mpi.report(f'DC for imp {icrsh} block {block}:')
+                        mpi.report(Sig_DC_hartree[block].real)
                     # transform dc to sumk blocks
                     sum_k.dc_imp[icrsh] = sum_k.block_structure.convert_matrix(Sig_DC_hartree,
                                                                                ish_from=sum_k.inequiv_to_corr[icrsh],
                                                                                space_from='solver', space_to='sumk')
                     for block, gf in start_sigma[icrsh]:
                         gf << Sig_DC_hartree[block]
+                # dynamic interaction and dynamic DC (dc_type==6)
                 else:
+                    for block, gf in Sig_DC_iw:
+                        mpi.report(f'DC for imp {icrsh} block {block} at iw_n=0:')
+                        mpi.report(gf(0).real)
+                    for block, gf in Sig_DC_iw:
+                        mpi.report(f'DC for imp {icrsh} block {block} at iw_n=n:')
+                        mpi.report(gf.data[-1,:,:].real)
+                        Sig_DC_hartree[block] = Sig_DC_hartree[block].real + Sig_DC_exchange[block].real
+                    # sum_k.dc_imp stores the sumk block structure version
                     sum_k.dc_imp[icrsh] = sum_k.block_structure.convert_matrix(Sig_DC_hartree,
-                                                                               ish_from=sum_k.inequiv_to_corr[icrsh],
-                                                                               space_from='solver', space_to='sumk')
-                    # TODO: this required some change in DFTTools
-                    # sum_k.dc_imp[icrsh] = sum_k.block_structure.convert_gf(make_gf_imfreq(Sig_DC_dlr,
-                    #                                                                       n_iw=sum_k.mesh_values.shape[0]//2), 
-                    #                                                        ish_from=sum_k.inequiv_to_corr[icrsh], 
+                                                                           ish_from=sum_k.inequiv_to_corr[icrsh],
+                                                                           space_from='solver', space_to='sumk')
+                    # sum_k.dc_imp[icrsh] = sum_k.block_structure.convert_gf(Sig_DC_iw,
+                    #                                                        ish_from=sum_k.inequiv_to_corr[icrsh],
                     #                                                        space_from='solver', space_to='sumk')
-                    # TODO: add n_iw as MeshImFreq attribute in TRIQS
-                    start_sigma[icrsh] = make_gf_imfreq(Sig_DC_dlr, n_iw=len(sum_k.mesh)//2)
+                    # start sigma is given in solver structure
+                    start_sigma[icrsh] = Sig_DC_iw
+                    # for block, gf in start_sigma[icrsh]:
+                    #     gf << Sig_DC_hartree[block] + Sig_DC_exchange[block]
 
         # Sets Sigma to zero because neither initial Sigma nor DC given
         elif (not general_params['dc'] and general_params['magnetic']):

@@ -62,7 +62,7 @@ def get_n_orbitals(sum_k):
 
     return n_orbitals
 
-def _gf_fit_tail_fraction(Gf, fraction=0.4, replace=None, known_moments=None):
+def _gf_fit_tail_fraction(Gf, fraction=0.4, replace=None, known_moments=[]):
     """
     fits the tail of Gf object by making a polynomial
     fit of the Gf on the given fraction of the Gf mesh
@@ -93,10 +93,10 @@ def _gf_fit_tail_fraction(Gf, fraction=0.4, replace=None, known_moments=None):
 
     for i, bl in enumerate(Gf_fit.indices):
         Gf_fit[bl].mesh.set_tail_fit_parameters(tail_fraction=fraction)
-        if known_moments:
-            tail = Gf_fit[bl].fit_hermitian_tail(known_moments[i])
-        else:
+        if known_moments == []:
             tail = Gf_fit[bl].fit_hermitian_tail()
+        else:
+            tail = Gf_fit[bl].fit_hermitian_tail(known_moments[i])
         nmax_frac = int(len(Gf_fit[bl].mesh)/2 * (1-replace))
         Gf_fit[bl].replace_by_tail(tail[0],n_min=nmax_frac)
 
@@ -616,13 +616,14 @@ class SolverStructure:
                 mpi.report('add dynamic interaction from bdft')
                 # convert 4 idx tensor to two index tensor
                 ish = self.sum_k.inequiv_to_corr[self.icrsh]
-                # rotate bare interaction and reduce to two index
-                Vloc_rot = util.transform_U_matrix(self.general_params['Vloc'][self.icrsh]['up_0'], self.sum_k.rot_mat[ish].T)
-                V, Vp = reduce_4index_to_2index(Vloc_rot)
                 # prepare dynamic 2 idx parts
                 Uloc_dlr = self.general_params['Uloc_dlr'][self.icrsh]['up_0']
                 Uloc_dlr_2idx = Gf(mesh=Uloc_dlr.mesh, target_shape=[Uloc_dlr.target_shape[0],Uloc_dlr.target_shape[1]])
                 Uloc_dlr_2idx_prime = Gf(mesh=Uloc_dlr.mesh, target_shape=[Uloc_dlr.target_shape[0],Uloc_dlr.target_shape[1]])
+
+                # Vloc_rot = util.transform_U_matrix(self.general_params['Vloc'][self.icrsh]['up_0'],
+                #                                    self.sum_k.rot_mat[ish].T)
+                # V, Vprime = reduce_4index_to_2index(Vloc_rot)
 
                 for coeff in Uloc_dlr.mesh:
                     # Transposes rotation matrix here because TRIQS has a slightly different definition
@@ -633,23 +634,23 @@ class SolverStructure:
                     Uloc_dlr_2idx_prime[coeff] = Uprime
 
                 # create full frequency objects
-                Uloc_iw_2idx = make_gf_imfreq(Uloc_dlr_2idx, n_iw=self.general_params['n_w_b_nn']) + V
-                Uloc_iw_2idx_prime = make_gf_imfreq(Uloc_dlr_2idx_prime, n_iw=self.general_params['n_w_b_nn']) + Vp
-                # subtract static part treated in hint
-                Uloc_iw_2idx = Uloc_iw_2idx - Uloc_iw_2idx(0)
-                Uloc_iw_2idx_prime = Uloc_iw_2idx_prime - Uloc_iw_2idx_prime(0)
-                mpi.report(Uloc_iw_2idx(Uloc_iw_2idx.mesh.last_index()).real)
+                Uloc_iw_2idx = make_gf_imfreq(Uloc_dlr_2idx, n_iw=self.general_params['n_w_b_nn'])
+                Uloc_iw_2idx_prime = make_gf_imfreq(Uloc_dlr_2idx_prime, n_iw=self.general_params['n_w_b_nn'])
+                mpi.report(f"High frequency limit of U'(iwn) (should be close to 0):")
                 mpi.report(Uloc_iw_2idx_prime(Uloc_iw_2idx_prime.mesh.last_index()).real)
 
                 for b1, b2 in product(self.sum_k.gf_struct_solver_dict[self.icrsh].keys(), repeat=2):
                     if b1 == b2:
                         # cast to real here for now
                         self.triqs_solver.D0_iw[b1+"|"+b2] << Uloc_iw_2idx.real
+                        # if same spin and same orb we have to add the Uloc_iw_2idx_prime value:
+                        for iorb in range(Uloc_iw_2idx.target_shape[0]):
+                            self.triqs_solver.D0_iw[b1+"|"+b2][iorb, iorb] += Uloc_iw_2idx_prime[iorb, iorb].real
                     else:
                         self.triqs_solver.D0_iw[b1+"|"+b2] << Uloc_iw_2idx_prime.real
 
                 # self.triqs_solver. Jperp_iw << make_gf_imfreq(Uloc_dlr_2idx, n_iw=self.general_params['n_w_b_nn']) + V
-
+            mpi.report('\nLocal interaction Hamiltonian is:',self.h_int)
             # Solve the impurity problem for icrsh shell
             # *************************************
             self.triqs_solver.solve(h_int=self.h_int, **{ **self.solver_params, **random_seed })
