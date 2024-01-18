@@ -77,7 +77,7 @@ def _load_crpa_interaction_matrix(sum_k, general_params, filename='UIJKL'):
     def _round_to_int(data):
         return (np.array(data) + .5).astype(int)
 
-    if general_params['crpa_code'] == 'vasp':
+    if general_params['crpa_code'] == 'Vasp':
     # Loads data from VASP cRPA file
         print('Loading Vasp cRPA matrix from file: '+str(filename))
         data = np.loadtxt(filename, unpack=True)
@@ -537,14 +537,12 @@ def construct(sum_k, general_params, advanced_params):
     # Extracts U and J
     mpi.report('*** interaction parameters ***')
 
-    if any(general_params['h_int_type']) in ('density_density', 'kanamori', 'full_slater', 'ntot'):
-        general_params = _extract_U_J_list('h_int_type', sum_k.n_inequiv_shells, general_params)
-        for param_name in ('U', 'J'):
-            general_params = _extract_U_J_list(param_name, sum_k.n_inequiv_shells, general_params)
-        if 'kanamori' in general_params['h_int_type']:
-            general_params = _extract_U_J_list('U_prime', sum_k.n_inequiv_shells, general_params)
-        for param_name in ('dc_U', 'dc_J'):
-            advanced_params = _extract_U_J_list(param_name, sum_k.n_inequiv_shells, advanced_params)
+    general_params = _extract_U_J_list('h_int_type', sum_k.n_inequiv_shells, general_params)
+
+    for param_name in ('U', 'J', 'U_prime'):
+        general_params = _extract_U_J_list(param_name, sum_k.n_inequiv_shells, general_params)
+    for param_name in ('dc_U', 'dc_J'):
+        advanced_params = _extract_U_J_list(param_name, sum_k.n_inequiv_shells, advanced_params)
 
     # Extracts ratio_F4_F2 if any shell uses a solver supporting it
     if 'density_density' in general_params['h_int_type'] or 'full_slater' in general_params['h_int_type']:

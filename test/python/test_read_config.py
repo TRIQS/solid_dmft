@@ -91,7 +91,7 @@ def test_config_file_1():
                                                         'csc': False, 'enforce_off_diag': True,
                                                         'dc_dmft': False, 'diag_delta': False,
                                                         'occ_conv_crit': -1,'g0_conv_crit': -1,'gimp_conv_crit': -1,'sigma_conv_crit': -1,
-                                                        'seedname': u'fancy_system',
+                                                        'seedname': u'fancy_system', 'crpa_code' : u'none',
                                                         'J': [2.0], 'h5_save_freq': 5, 'ratio_F4_F2' : [u'none'],
                                                         'dc': True, 'jobname': u'out_DMFT_fancy',
                                                         'n_iter_dmft': 4, 'U': [2.0], 'n_tau': 10001,
@@ -112,7 +112,7 @@ def test_config_file_1():
                                             'solver': {'move_double': True, 'measure_G_l': False,
                                                        'move_shift': False, 'store_solver': False,
                                                        'measure_pert_order': False,
-                                                       'measure_G_n_iw' : 20, 'measure_G_iw' : False,
+                                                       # 'measure_G_n_iw' : 20, 'measure_G_iw' : False,
                                                        'measure_density_matrix': False, 'perform_tail_fit': False,
                                                        'legendre_fit': False, 'delta_interface' : False,
                                                        'off_diag_threshold' : 0.0}}
@@ -214,7 +214,7 @@ def test_config_file_2():
                                                         'mu_update_freq': 1, 'solver_type': 'cthyb',
                                                         'seedname': u'orbital_model', 'dc_dmft': False,
                                                         'occ_conv_crit': -1,'g0_conv_crit': -1,'gimp_conv_crit': -1,'sigma_conv_crit': -1,
-                                                        'J': [1.0], 'h5_save_freq': 2,
+                                                        'J': [1.0], 'h5_save_freq': 2, 'crpa_code' : 'none',
                                                         'dc': True, 'jobname': u'out_60M_afm',
                                                         'beta': 40.0, 'U': [5.5], 'diag_delta': False,
                                                         'measure_chi_insertions': 100, 'h_field': 0.0, 'h_field_it': 0,
@@ -238,7 +238,7 @@ def test_config_file_2():
                                                        'n_cycles_tot': 60000000, 'store_solver': False,
                                                        'move_double': True, 'measure_pert_order': False,
                                                        'move_shift': False, 'legendre_fit' : False,
-                                                       'measure_G_n_iw' : 20, 'measure_G_iw' : False,
+                                                       # 'measure_G_n_iw' : 20, 'measure_G_iw' : False,
                                                        'measure_density_matrix': False, 'delta_interface': True,
                                                        'off_diag_threshold' : 0.1}}
 

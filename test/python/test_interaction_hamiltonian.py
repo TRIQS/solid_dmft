@@ -17,7 +17,8 @@ def test_load_crpa_interaction_matrix():
     sum_k.inequiv_to_corr = [0, 1]
     sum_k.gf_struct_solver = [{'down_0' : 5, 'up_0' : 5},{'down_0' : 5, 'up_0' : 5}]
 
-    crpa_matrix = _load_crpa_interaction_matrix(sum_k, 'UIJKL')
+    general_params = {'crpa_code' : 'Vasp'}
+    crpa_matrix = _load_crpa_interaction_matrix(sum_k, general_params, 'UIJKL')
 
     assert [c.shape for c in crpa_matrix] == [(5, 5, 5, 5), (5, 5, 5, 5)]
 

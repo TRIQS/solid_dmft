@@ -63,7 +63,7 @@ def test_add_dft_values_one_impurity_one_band():
     observables = _set_up_observables(sum_k.n_inequiv_shells)
 
     observables = add_dft_values_as_zeroth_iteration(observables, general_params, dft_mu, None, sum_k,
-                                                     G_loc_all_dft, density_mat_dft, shell_multiplicity)
+                                                     G_loc_all_dft, shell_multiplicity)
 
     expected_observables = {'E_bandcorr': ['none'], 'E_tot': ['none'], 'E_dft': ['none'],
                             'E_DC': [['none']], 'E_int': [['none']],
@@ -120,7 +120,7 @@ def test_add_dft_values_two_impurites_two_bands():
     observables = _set_up_observables(sum_k.n_inequiv_shells)
 
     observables = add_dft_values_as_zeroth_iteration(observables, general_params, dft_mu, dft_energy, sum_k,
-                                                     G_loc_all_dft, density_mat_dft, shell_multiplicity)
+                                                     G_loc_all_dft, shell_multiplicity)
     expected_observables = {'E_bandcorr': [0.0], 'E_tot': [-5.3], 'E_dft': [0.0],
                             'E_DC': [[0.3], [5.0]], 'E_int': [[0.0], [0.0]],
                             'orb_occ': [{'down': [[1., 1.]], 'up': [[0.8044, 0.8044]]}, {'down': [[0.5, 0.5]], 'up': [[0.5, 0.5]]}],
