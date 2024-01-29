@@ -31,6 +31,7 @@ initial self-energy.
 # system
 from copy import deepcopy
 import numpy as np
+import json
 
 # triqs
 from h5 import HDFArchive
@@ -155,32 +156,49 @@ def calculate_double_counting(sum_k, density_matrix, general_params, advanced_pa
                 mpi.report('DC for shell {} and block {} = {}'.format(icrsh, spin, dc_per_spin[0][0]))
             mpi.report('DC energy for shell {} = {}'.format(icrsh, energy_per_shell))
 
-    matrix = None
-    if advanced_params['quad_xz'] != 'none':
-        matrix = np.zeros((6, 6))
-        matrix[[0, 4], [4, 0]] = -np.sqrt(3)/2
-        matrix[1::2, 1::2] = matrix[::2, ::2]
-        matrix *= advanced_params['quad_xz']
-    elif advanced_params['quad_x2y2'] != 'none':
-        if matrix is None:
-            matrix = np.zeros((6, 6))
-        matrix[0, 0] = np.sqrt(3)/2
-        matrix[2, 2] = -np.sqrt(3)/2
-        matrix[1::2, 1::2] = matrix[::2, ::2]
-        matrix *= advanced_params['quad_x2y2']
+    # Adds multipole shifts to double counting
+    # Notes: DC per corr shell not imp. Mapping takes care of sign
+    # Initial sigma is set with DC[0, 0]. So if quadrupole modifies this, initial sigma also depends on shift
+    if advanced_params['mult_shifts'] != 'none':
+        # Reads in multipolar shift matrices from json file
+        with open('shift.json', 'r') as file:
+            mult_ops = json.load(file)
 
-    if matrix is not None:
-        rescaled_dc_imp = [{spin: dc_per_spin + matrix
-                            for spin, dc_per_spin in dc_per_shell.items()}
-                           for dc_per_shell in sum_k.dc_imp]
-        sum_k.set_dc(rescaled_dc_imp, sum_k.dc_energ)
+        # Brings matrices in proper format
+        for i in range(len(mult_ops)):
+            mult_ops[i]['matrix'] = (np.array(mult_ops[i]['matrix real'])
+                    + 1j*np.array(mult_ops[i]['matrix imag'])).reshape((3, 3, 2, 2)).transpose((0, 2, 1, 3)).reshape((6, 6))
+            del mult_ops[i]['matrix real']
+            del mult_ops[i]['matrix imag']
+
+        # TODO: properly implement as loop over impurities
+        # then, use the inverse transformation (global to local) as in SumkDFT.add_dc with correct treatment of shells etc
+        # also get the desired angular momentum from SumkDFT.corr_shells or so
+
+        # First sums up matrices of shifts in global (complex) frame
+        matrix = np.zeros((6, 6), dtype=complex)
+
+        for entry in mult_ops:
+            if entry['l'] == 2:
+                kprt = (entry['k'], entry['p'], entry['r'], entry['t'])
+                if kprt in advanced_params['mult_shifts']:
+                    matrix += advanced_params['mult_shifts'][kprt] * entry['matrix'].T
+
+        # Transforms to local (real) frame
+        matrix = np.einsum('ba,bc,cd->ad', sum_k.rot_mat[0].conj(), matrix, sum_k.rot_mat[0])
+        assert np.allclose(matrix.imag, 0)
+        matrix = matrix.real
+
+        # Prints some matrices for debugging
+        print(matrix)
+        sum_k.dc_imp = [{spin: dc_per_spin + matrix
+                         for spin, dc_per_spin in dc_per_shell.items()}
+                        for dc_per_shell in sum_k.dc_imp]
         dc = sum_k.add_dc()
         with np.printoptions(precision=3):
-            mpi.report(dc[0]['ud'].data[0].real)
-            mpi.report(dc[1]['ud'].data[0].real)
-
-    # Notes: DC per corr shell not imp. Mapping takes care of sign?
-    # Sigma is set with DC[0, 0]. So if quadrupole modifies this, problem
+            mpi.report(sum_k.dc_imp[0]['ud'].real)
+            mpi.report(dc[0]['ud'].data[0])
+            mpi.report(dc[1]['ud'].data[0])
 
     return sum_k
 

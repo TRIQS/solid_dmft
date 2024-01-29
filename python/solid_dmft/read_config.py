@@ -392,8 +392,11 @@ pick_solver_struct : list of dict, optional, default=no additional picking
 soc_make_real : list, optional, default=none
             Make impurity Hamiltonian with spin-orbit coupling purely real.
             List should be of the form of [1,1j,1j]. Currently only implemented with t2g.
-quad_xz : float
-quad_x2y2 : float
+mult_shifts : dict, optional, default=none
+            Dict should have tuples (k, p, r, t) as key and floats as value. The key is used
+            to read in the correct multipolar shift matrix from shift.json and the value is the
+            magnitude of the shift in eV. Multiple entries in the dict means that different multipolar
+            shifts are added together.
 
 ---XXX---end
 """
@@ -837,9 +840,7 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'converter': lambda s: s.replace('
                                                         and params['general']['set_rot'] in ['soc_real'],
                                                     'default': 'none'},
 
-                                  'quad_xz': {'converter': float, 'used': True, 'default': 'none'},
-
-                                  'quad_x2y2': {'converter': float, 'used': True, 'default': 'none'},
+                                  'mult_shifts': {'converter': eval, 'used': True, 'default': 'none'},
                                  }
                     }
 

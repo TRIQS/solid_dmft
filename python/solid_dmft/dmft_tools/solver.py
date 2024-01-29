@@ -772,14 +772,21 @@ class SolverStructure:
                 G_tr['ud_0'].data[:] = G_tr['ud_0'].data[:, :, [1, 0, 3, 2, 5, 4]]
                 return G_tr
 
-            if False:
+            # There are two versions for time-reversal symmetrization of the t2gs
+            # depending on the number of blocks in the BlockGf
+            # - Two 3x3 blocks with the orbitals/spins. One of the blocks is written out
+            #   on the RHS of Eq. (2) in doi.org/10.48550/arXiv.2312.09839
+            # - Only one 6x6 block with all t2gs and spins
+            if len(G) == 2:
                 swap_with_blocks()
                 G['ud_0'] = 0.5*(G['ud_0'] + G['ud_1'])
                 G['ud_1'] = G['ud_0']
                 swap_with_blocks()
-            else:
+            elif len(G) == 1:
                 G += time_reversal_without_blocks(G)
                 G /= 2
+            else:
+                raise NotImplementedError
             return G
 
         # get Delta_time from solver
