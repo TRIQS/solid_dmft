@@ -26,6 +26,7 @@
 converter from bdft output to edmft input for solid_dmft
 """
 
+from os import stat
 import numpy as np
 from scipy.constants import physical_constants
 
@@ -35,6 +36,36 @@ from triqs.utility import mpi
 from triqs.gf import Gf, BlockGf, make_gf_dlr_imtime, make_gf_dlr, make_gf_imfreq, make_gf_dlr_imfreq
 from triqs.gf.meshes import MeshDLRImFreq, MeshDLRImTime
 import itertools
+
+from solid_dmft.gw_embedding.iaft import IAFT
+
+HARTREE_EV = physical_constants['Hartree energy in eV'][0]
+
+def _get_dlr_from_IR(Gf_ir, ir_kernel, mesh_dlr_iw, dim=2):
+
+    n_orb = Gf_ir.shape[-1]
+    stats = 'f' if mesh_dlr_iw.statistic=='Fermion' else 'b'
+
+    if stats == 'b':
+        Gf_ir_pos = Gf_ir.copy()
+        Gf_ir = np.zeros( [Gf_ir_pos.shape[0]*2-1] + [n_orb] * dim , dtype=complex)
+        Gf_ir[:Gf_ir_pos.shape[0]] = Gf_ir_pos[::-1]
+        Gf_ir[Gf_ir_pos.shape[0]:] = Gf_ir_pos[1:]
+
+    Gf_dlr_iw = Gf(mesh=mesh_dlr_iw, target_shape=[n_orb]*dim)
+
+    # prepare idx array for spare ir
+    if stats == 'f':
+        # sparse IR idx are 2n+1
+        mesh_dlr_iw_idx = 2*np.array([iwn.index for iwn in mesh_dlr_iw])+1
+    else:
+        # for Bosons it wants 2n
+        mesh_dlr_iw_idx = 2*np.array([iwn.index for iwn in mesh_dlr_iw])
+
+    Gf_dlr_iw.data[:] = ir_kernel.w_interpolate(Gf_ir, mesh_dlr_iw_idx, stats=stats)
+
+    Gf_dlr = make_gf_dlr(Gf_dlr_iw)
+    return Gf_dlr
 
 
 def _get_dlr_Wloc_from_IR(Wloc_IR, IR_mesh_pos, beta, w_max, eps=1e-15):
@@ -214,6 +245,112 @@ def calc_W_from_Gloc(Gloc_dlr: Gf | BlockGf, U: np.ndarray | dict) -> Gf | Block
     W_dlr = make_gf_dlr(W_dlr_w)
 
     return W_dlr
+
+def convert_gw_output(seed, gw_h5, n_shells, iter=None):
+    """
+    read bdft output and convert to solid_dmft readable h5 input
+    """
+
+    Hartree_eV = physical_constants['Hartree energy in eV'][0]
+
+    mpi.report('reading output from bdft code')
+
+    with HDFArchive(gw_h5, 'r') as ar:
+        if iter is None:
+            iter = ar['scf/final_iter']
+
+        # auxilary quantities
+        mu_gw = ar[f'downfold_1e/iter{iter}']['mu'] * Hartree_eV
+        beta_au = ar['imaginary_fourier_transform']['beta']
+        beta = beta_au / Hartree_eV
+        lam = ar['imaginary_fourier_transform']['lambda']
+        w_max = lam/beta
+        prec = ar['imaginary_fourier_transform']['prec']
+        if prec == 'high':
+            prec = 1e-15
+        elif prec == 'mid':
+            prec = 1e-10
+        elif prec == 'low':
+            prec = 1e-6
+
+        # 1 particle properties
+        g_weiss_wsIab = ar[f'downfold_1e/iter{iter}']['g_weiss_wsIab'] / Hartree_eV
+        Sigma_wsIab = ar[f'downfold_1e/iter{iter}']['Sigma_wsIab'] * Hartree_eV
+        Sigma_dc_wsIab = ar[f'downfold_1e/iter{iter}']['Sigma_dc_wsIab'] * Hartree_eV
+        Gloc = ar[f'downfold_1e/iter{iter}']['G_wsIab'] / Hartree_eV
+
+        # 2 particle properties
+        # TODO: discuss how the site index is used right now in bDFT
+        Vloc_jk = ar[f'downfold_2e/iter{iter}']['Vloc'] * Hartree_eV
+        Uloc_ir_jk = ar[f'downfold_2e/iter{iter}']['uloc'][:, ...] * Hartree_eV
+        # switch inner two indices to match triqs notation
+        Vloc = np.zeros(Vloc_jk.shape, dtype=complex)
+        Uloc_ir = np.zeros(Uloc_ir_jk.shape, dtype=complex)
+        n_orb = Vloc.shape[0]
+        for or1, or2, or3, or4 in itertools.product(range(n_orb), repeat=4):
+            Vloc[or1,or2,or3,or4] = Vloc_jk[or1,or3,or2,or4]
+            for ir_w in range(Uloc_ir_jk.shape[0]):
+                Uloc_ir[ir_w,or1,or2,or3,or4] = Uloc_ir_jk[ir_w,or1,or3,or2,or4]
+
+    # get IR object
+    mpi.report('create IR kernel and convert to DLR')
+    # create IR kernel
+    ir_kernel = IAFT(beta=beta_au, lmbda=lam, prec=prec)
+
+    mesh_dlr_iw_b = MeshDLRImFreq(beta=beta, statistic='Boson', w_max=w_max/10, eps=prec)
+    mesh_dlr_iw_f = MeshDLRImFreq(beta=beta, statistic='Fermion', w_max=w_max/10, eps=prec)
+
+    # rotate to sumk structure can be multiple sites
+    U_dlr_list, G0_dlr_list, Gloc_dlr_list, Sigma_dlr_list, Sigma_DC_dlr_list, V_list = [], [], [], [], [], []
+    for ish in range(n_shells):
+        # fit IR Uloc on DLR iw mesh
+        temp = _get_dlr_from_IR(Uloc_ir, ir_kernel, mesh_dlr_iw_b, dim=4)
+        Uloc_dlr = BlockGf(name_list=['up_0','down_0'], block_list=[temp, temp], make_copies=True)
+
+        U_dlr_list.append(Uloc_dlr)
+        V_list.append({'up_0': Vloc.copy(), 'down_0': Vloc})
+
+        temp = _get_dlr_from_IR(g_weiss_wsIab[:,0,ish,:,:], ir_kernel, mesh_dlr_iw_f, dim=2)
+        G0_dlr = BlockGf(name_list=['up_0','down_0'], block_list=[temp, temp], make_copies=True)
+        G0_dlr_list.append(G0_dlr)
+
+        temp = _get_dlr_from_IR(Gloc[:,0,ish,:,:], ir_kernel, mesh_dlr_iw_f, dim=2)
+        Gloc_dlr = BlockGf(name_list=['up_0','down_0'], block_list=[temp, temp], make_copies=True)
+        Gloc_dlr_list.append(Gloc_dlr)
+
+        temp = _get_dlr_from_IR(Sigma_wsIab[:,0,ish,:,:], ir_kernel, mesh_dlr_iw_f, dim=2)
+        Sigma_dlr = BlockGf(name_list=['up_0','down_0'], block_list=[temp, temp], make_copies=True)
+        Sigma_dlr_list.append(Sigma_dlr)
+
+        temp = _get_dlr_from_IR(Sigma_dc_wsIab[:,0,ish,:,:], ir_kernel, mesh_dlr_iw_f, dim=2)
+        Sigma_DC_dlr = BlockGf(name_list=['up_0','down_0'], block_list=[temp, temp], make_copies=True)
+        Sigma_DC_dlr_list.append(Sigma_DC_dlr)
+
+    # write Uloc / Wloc back to h5 archive
+    mpi.report(f'writing results in {seed}.h5/DMFT_input')
+    if isinstance(seed, str):
+        ar = HDFArchive(seed+'.h5', 'a')
+    else:
+        ar = seed
+
+    if 'DMFT_results' in ar and 'iteration_count' in ar['DMFT_results']:
+        it = ar['DMFT_results']['iteration_count']+1
+    else:
+        it = 1
+    if 'DMFT_input' not in ar:
+        ar.create_group('DMFT_input')
+    if f'iter{it}' not in ar['DMFT_input']:
+        ar['DMFT_input'].create_group(f'iter{it}')
+
+    ar[f'DMFT_input/iter{it}']['mu_gw'] = mu_gw
+    ar[f'DMFT_input/iter{it}']['beta'] = beta
+    ar[f'DMFT_input/iter{it}']['G0_dlr'] = G0_dlr_list
+    ar[f'DMFT_input/iter{it}']['Gloc_dlr'] = Gloc_dlr_list
+    ar[f'DMFT_input/iter{it}']['Sigma_imp_dlr'] = Sigma_dlr_list
+    ar[f'DMFT_input/iter{it}']['Sigma_imp_DC_dlr'] = Sigma_DC_dlr_list
+    ar[f'DMFT_input/iter{it}']['Uloc_dlr'] = U_dlr_list
+    ar[f'DMFT_input/iter{it}']['Vloc'] = V_list
+    return G0_dlr_list, U_dlr_list, V_list, Gloc_dlr_list
 
 def convert_screened_int(seed, uloc_h5, wloc_h5, w_max, IR_h5, beta=None, iter=None, eps=1e-15):
     """

@@ -96,6 +96,7 @@ dc_type : int
             * 4: cpa
             * 5: crpa static
             * 6: crpa dynamic
+            * 7: from bdft precalc
 dc_dmft : bool
            Whether to use DMFT or DFT occupations:
 
@@ -493,13 +494,13 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                                  'used': True},
 
                                  'beta': {'converter': float, 'valid for': lambda x, _: x > 0,
-                                          'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint', 'inchworm', 'hubbardI','ctseg','hartree']},
+                                          'used': lambda params: (params['general']['solver_type'] in ['cthyb', 'ctint', 'inchworm', 'hubbardI','ctseg','hartree'] and params['general']['gw_code'] != 'bdft')},
 
                                  'n_iter_dmft': {'converter': int, 'valid for': lambda x, _: x >= 0, 'used': True},
 
                                  'dc': {'converter': BOOL_PARSER, 'used': True, 'default': True},
 
-                                 'dc_type': {'converter': int, 'valid for': lambda x, _: x in (0, 1, 2, 3, 4, 5, 6),
+                                 'dc_type': {'converter': int, 'valid for': lambda x, _: x in (0, 1, 2, 3, 4, 5, 6, 7),
                                              'used': lambda params: params['general']['dc']},
 
                                  'prec_mu': {'converter': float, 'valid for': lambda x, _: x > 0, 'used': True},
@@ -673,8 +674,10 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                 #
                                 # dynamic interaction / gw /etc
                                 #
-                                'crpa_code': {'valid for': lambda x, _: x in ('none', 'Vasp', 'bdft'),
+                                'gw_code': {'valid for': lambda x, _: x in ('none', 'Vasp', 'bdft'),
                                              'used': True, 'default': 'none'},
+
+                                'gw_h5' : {'used': True, 'default': 'none'},
 
 
                                 },
@@ -1313,7 +1316,7 @@ def read_config(config_file):
         # also required to measure the density matrix
         parameters['solver']['use_norm_as_weight'] = True
 
-    if parameters['general']['crpa_code'] == 'bdft':
+    if parameters['general']['gw_code'] == 'bdft':
         parameters['general']['enforce_off_diag'] = True
 
     if parameters['general']['solver_type'] in ['ftps'] and parameters['general']['calc_energies']:

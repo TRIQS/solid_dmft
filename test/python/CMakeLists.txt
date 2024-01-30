@@ -64,6 +64,7 @@ set (integration_tests
      svo_cthyb_basic_tf
      svo_cthyb_crpa
      svo_ctseg_dyn
+     svo_gw_emb_stat
      )
 
 # copy other test files
@@ -77,8 +78,9 @@ foreach(test ${integration_tests})
   endforeach()
 
   add_test(NAME ${test}
-           #COMMAND bash ${test}.sh
+           # COMMAND bash ${test}.sh
            COMMAND ${MPIEXEC_EXECUTABLE} ${MPIEXEC_PREFLAGS} ${TRIQS_PYTHON_EXECUTABLE} test.py
+           # COMMAND ${TRIQS_PYTHON_EXECUTABLE} test.py
            WORKING_DIRECTORY ${test_dir}
           )
 

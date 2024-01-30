@@ -31,6 +31,7 @@ import os
 from copy import deepcopy
 from timeit import default_timer as timer
 import numpy as np
+from scipy.constants import physical_constants
 
 # triqs
 from triqs.operators.util.observables import S_op, N_op
@@ -38,7 +39,7 @@ from triqs.version import git_hash as triqs_hash
 from triqs.version import version as triqs_version
 from h5 import HDFArchive
 import triqs.utility.mpi as mpi
-from triqs.gf import Gf, make_hermitian, MeshReFreq, MeshImFreq
+from triqs.gf import Gf, make_hermitian, MeshReFreq, MeshImFreq, make_gf_imfreq
 from triqs.gf.tools import inverse
 from triqs_dft_tools.sumk_dft import SumkDFT
 
@@ -56,6 +57,7 @@ from solid_dmft.dmft_tools import afm_mapping
 from solid_dmft.dmft_tools import manipulate_chemical_potential as manipulate_mu
 from solid_dmft.dmft_tools import initial_self_energies as initial_sigma
 from solid_dmft.dmft_tools import greens_functions_mixer as gf_mixer
+from solid_dmft.gw_embedding.bdft_converter import convert_gw_output
 
 
 def _determine_block_structure(sum_k, general_params, advanced_params):
@@ -269,6 +271,13 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
     # create Sumk object
     # TODO: use_dft_blocks=True yields inconsistent number of blocks!
 
+    # if gw+edmft is run beta is determined in GW code
+    if general_params['gw_code'] == 'bdft':
+        assert general_params['gw_h5'] != 'none', 'please speficy GW code h5 file'
+
+        with HDFArchive(general_params['gw_h5'],'r') as ar:
+            general_params['beta'] = ar['imaginary_fourier_transform']['beta'] / physical_constants['Hartree energy in eV'][0]
+
     # first we have to determine the mesh
     if general_params['solver_type'] in ['ftps']:
         sumk_mesh = MeshReFreq(window=general_params['w_range'],
@@ -448,24 +457,23 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
         if general_params['afm_order']:
             general_params = afm_mapping.determine(general_params, archive, sum_k.n_inequiv_shells)
 
-    # load gw / crpa input from disc here and store in general_params
-    if general_params['crpa_code'] == 'bdft':
+    # lo    ad gw / crpa input from disc here and store in general_params
+    if general_params['gw_code'] == 'bdft':
+        general_params['G0_dlr_gw'] = None
+        general_params['Gloc_dlr_gw'] = None
         general_params['Uloc_dlr'] = None
-        general_params['Wloc_dlr'] = None
         general_params['Vloc'] = None
         if mpi.is_master_node():
-            general_params['Uloc_dlr'] = archive['DMFT_input']['Uloc_dlr']
-            # TODO: in principle we have to transform to solver struct, however LGR is not able to convert 4d tensors!
-            # for now enforce off_diag terms and use default block structure
-            # for iineq in range(sum_k.n_inequiv_shells):
-            #     general_params['Uloc_dlr'][iineq] = sum_k.block_structure.convert_gf(Uloc_dlr[iineq], ish_from=sum_k.inequiv_to_corr[iineq], space_from='sumk')
-            general_params['Wloc_dlr'] = archive['DMFT_input']['Wloc_dlr']
-            general_params['Vloc'] = archive['DMFT_input']['Vloc']
-
+            general_params['G0_dlr_gw'], general_params['Uloc_dlr'], general_params['Vloc'], general_params['Gloc_dlr_gw'] = convert_gw_output(archive, general_params['gw_h5'], sum_k.n_shells)
         mpi.barrier()
         general_params['Uloc_dlr'] = mpi.bcast(general_params['Uloc_dlr'])
-        general_params['Wloc_dlr'] = mpi.bcast(general_params['Wloc_dlr'])
+        # TODO: in principle we have to transform to solver struct, however LGR is not able to convert 4d tensors!
+        # for now enforce off_diag terms and use default block structure
+        # for iineq in range(sum_k.n_inequiv_shells):
+        #     general_params['Uloc_dlr'][iineq] = sum_k.block_structure.convert_gf(Uloc_dlr[iineq], ish_from=sum_k.inequiv_to_corr[iineq], space_from='sumk')
         general_params['Vloc'] = mpi.bcast(general_params['Vloc'])
+        general_params['G0_dlr_gw'] = mpi.bcast(general_params['G0_dlr_gw'])
+        general_params['Gloc_dlr_gw'] = mpi.bcast(general_params['Gloc_dlr_gw'])
 
         # some basic consistency checks for the loaded objects
         for iineq in range(sum_k.n_inequiv_shells):
@@ -507,10 +515,14 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
         archive['DMFT_input']['version']['solver_version'] = solvers[0].version
 
     # Determines initial Sigma and DC
-    sum_k, solvers = initial_sigma.determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
-                                                                  archive, iteration_offset, G_loc_all_dft, solvers)
+    if general_params['gw_code'] == 'bdft':
+        for icrsh in range(sum_k.n_inequiv_shells):
+            solvers[icrsh].G0_freq << make_gf_imfreq(general_params['G0_dlr_gw'][icrsh], n_iw=general_params['n_iw'])
+    else:
+        sum_k, solvers = initial_sigma.determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
+                                                                      archive, iteration_offset, G_loc_all_dft, solvers)
 
-    sum_k = manipulate_mu.set_initial_mu(general_params, sum_k, iteration_offset, archive, shell_multiplicity)
+        sum_k = manipulate_mu.set_initial_mu(general_params, sum_k, iteration_offset, archive, shell_multiplicity)
 
 
     # setup of measurement of chi(SzSz(tau) if requested
@@ -619,7 +631,11 @@ def _dmft_step(sum_k, solvers, it, general_params,
         printed = ((np.real, 'real'), )
 
     # Extracts G local
-    if general_params['solver_type'] in ['ftps']:
+    if general_params['gw_code'] == 'bdft':
+        G_loc_all = []
+        for icrsh in range(sum_k.n_inequiv_shells):
+            G_loc_all.append(make_gf_imfreq(general_params['Gloc_dlr_gw'][icrsh], n_iw=general_params['n_iw']))
+    elif general_params['solver_type'] in ['ftps']:
         G_loc_all = sum_k.extract_G_loc(broadening=general_params['eta'])
     else:
         G_loc_all = sum_k.extract_G_loc()
@@ -647,7 +663,8 @@ def _dmft_step(sum_k, solvers, it, general_params,
                 mpi.report(func(value))
 
         # dyson equation to extract G0_freq, using Hermitian symmetry
-        solvers[icrsh].G0_freq << inverse(solvers[icrsh].Sigma_freq + inverse(solvers[icrsh].G_freq))
+        if not general_params['gw_code'] == 'bdft':
+            solvers[icrsh].G0_freq << inverse(solvers[icrsh].Sigma_freq + inverse(solvers[icrsh].G_freq))
 
         # dyson equation to extract cpa_G0_freq
         if general_params['dc'] and general_params['dc_type'] == 4:

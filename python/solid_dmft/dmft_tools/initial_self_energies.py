@@ -454,14 +454,14 @@ def determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
                     start_sigma[icrsh] << dc_value
         elif general_params['dc'] and general_params['dc_type'] in (5,6):
             mpi.report(f'\n*** Using dynamic interactions to calculate DC ***')
-            assert general_params['crpa_code'] == 'bdft'
+            assert general_params['gw_code'] == 'bdft'
             start_sigma = [sum_k.block_structure.create_gf(ish=iineq, space='solver', mesh=sum_k.mesh)
                 for iineq in range(sum_k.n_inequiv_shells)]
             for icrsh in range(sum_k.n_inequiv_shells):
-                mesh = MeshDLRImFreq(beta=general_params['Wloc_dlr'][icrsh].mesh.beta,
+                mesh = MeshDLRImFreq(beta=general_params['Uloc_dlr'][icrsh].mesh.beta,
                                      statistic='Fermion',
-                                     w_max=general_params['Wloc_dlr'][icrsh].mesh.w_max,
-                                     eps=general_params['Wloc_dlr'][icrsh].mesh.eps)
+                                     w_max=general_params['Uloc_dlr'][icrsh].mesh.w_max,
+                                     eps=general_params['Uloc_dlr'][icrsh].mesh.eps)
                 Gloc_dlr_iw = sum_k.block_structure.create_gf(ish=icrsh, space='solver', mesh=mesh)
                 for block, gf in Gloc_dlr_iw:
                     for iw in gf.mesh:
@@ -470,7 +470,6 @@ def determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
 
                 # rotate Wloc and Vloc to solver space
                 ish = sum_k.inequiv_to_corr[icrsh]
-                # Wloc_rot = general_params['Wloc_dlr'][icrsh].copy()
                 # Vloc_rot = {}
                 Uloc_rot = {}
                 Uloc_0 = make_gf_imfreq(general_params['Uloc_dlr'][icrsh]['up_0'],1).data[0,:,:,:,:] + general_params['Vloc'][icrsh]['up_0']

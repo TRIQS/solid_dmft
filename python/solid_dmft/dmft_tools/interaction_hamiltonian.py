@@ -77,7 +77,7 @@ def _load_crpa_interaction_matrix(sum_k, general_params, filename='UIJKL'):
     def _round_to_int(data):
         return (np.array(data) + .5).astype(int)
 
-    if general_params['crpa_code'] == 'Vasp':
+    if general_params['gw_code'] == 'Vasp':
     # Loads data from VASP cRPA file
         print('Loading Vasp cRPA matrix from file: '+str(filename))
         data = np.loadtxt(filename, unpack=True)
@@ -114,11 +114,11 @@ def _load_crpa_interaction_matrix(sum_k, general_params, filename='UIJKL'):
         if not np.allclose(u_matrix_four_indices.shape, first_index_shell):
             print('Warning: different number of orbitals in cRPA matrix than in calculation.')
 
-    if general_params['crpa_code'] == 'bdft':
+    if general_params['gw_code'] == 'bdft':
         u_matrix_four_indices_per_shell = []
         for icrsh in range(sum_k.n_inequiv_shells):
             # for now we assume that up / down are equal
-            if general_params['h_int_type'][icrsh] == 'crpa_density_density':
+            if general_params['h_int_type'][icrsh] in  ('crpa', 'crpa_density_density'):
                 Uloc_0 = make_gf_imfreq(general_params['Uloc_dlr'][icrsh]['up_0'],1)
                 u_matrix_four_indices_per_shell.append(Uloc_0.data[0,:,:,:,:] + general_params['Vloc'][icrsh]['up_0'])
             else:
