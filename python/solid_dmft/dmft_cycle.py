@@ -276,7 +276,8 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
         assert general_params['gw_h5'] != 'none', 'please speficy GW code h5 file'
 
         with HDFArchive(general_params['gw_h5'],'r') as ar:
-            general_params['beta'] = ar['imaginary_fourier_transform']['beta'] / physical_constants['Hartree energy in eV'][0]
+            # general_params['beta'] = ar['imaginary_fourier_transform']['beta'] / physical_constants['Hartree energy in eV'][0]
+            general_params['beta'] = ar['imaginary_fourier_transform']['beta']
 
     # first we have to determine the mesh
     if general_params['solver_type'] in ['ftps']:
@@ -463,8 +464,9 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
         general_params['Gloc_dlr_gw'] = None
         general_params['Uloc_dlr'] = None
         general_params['Vloc'] = None
+        general_params['Hloc0'] = None
         if mpi.is_master_node():
-            general_params['G0_dlr_gw'], general_params['Uloc_dlr'], general_params['Vloc'], general_params['Gloc_dlr_gw'] = convert_gw_output(archive, general_params['gw_h5'], sum_k.n_shells)
+            general_params['G0_dlr_gw'], general_params['Uloc_dlr'], general_params['Vloc'], general_params['Gloc_dlr_gw'], general_params['Hloc0'] = convert_gw_output(archive, general_params['gw_h5'], sum_k.n_shells)
         mpi.barrier()
         general_params['Uloc_dlr'] = mpi.bcast(general_params['Uloc_dlr'])
         # TODO: in principle we have to transform to solver struct, however LGR is not able to convert 4d tensors!
@@ -472,6 +474,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
         # for iineq in range(sum_k.n_inequiv_shells):
         #     general_params['Uloc_dlr'][iineq] = sum_k.block_structure.convert_gf(Uloc_dlr[iineq], ish_from=sum_k.inequiv_to_corr[iineq], space_from='sumk')
         general_params['Vloc'] = mpi.bcast(general_params['Vloc'])
+        general_params['Hloc0'] = mpi.bcast(general_params['Hloc0'])
         general_params['G0_dlr_gw'] = mpi.bcast(general_params['G0_dlr_gw'])
         general_params['Gloc_dlr_gw'] = mpi.bcast(general_params['Gloc_dlr_gw'])
 
@@ -518,6 +521,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
     if general_params['gw_code'] == 'bdft':
         for icrsh in range(sum_k.n_inequiv_shells):
             solvers[icrsh].G0_freq << make_gf_imfreq(general_params['G0_dlr_gw'][icrsh], n_iw=general_params['n_iw'])
+            # solvers[icrsh].G0_freq << make_gf_imfreq(general_params['Gloc_dlr_gw'][icrsh], n_iw=general_params['n_iw'])
     else:
         sum_k, solvers = initial_sigma.determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
                                                                       archive, iteration_offset, G_loc_all_dft, solvers)

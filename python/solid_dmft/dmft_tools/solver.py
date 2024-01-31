@@ -21,6 +21,7 @@
 # <http://www.gnu.org/licenses/>.
 #
 ################################################################################
+# pyright: reportUnusedExpression=false
 import numpy as np
 from itertools import product
 
@@ -359,8 +360,12 @@ class SolverStructure:
             if self.general_params['cthyb_delta_interface']:
                 mpi.report('\n Using the delta interface for cthyb passing Delta(tau) and Hloc0 directly.')
                  # prepare solver input
-                sumk_eal = self.sum_k.eff_atomic_levels()[self.icrsh]
-                solver_eal = self.sum_k.block_structure.convert_matrix(sumk_eal, space_from='sumk', ish_from=self.sum_k.inequiv_to_corr[self.icrsh])
+                if self.general_params['gw_code'] == 'bdft':
+                    solver_eal = self.general_params['Hloc0'][self.icrsh]
+                    mpi.report(solver_eal)
+                else:
+                    sumk_eal = self.sum_k.eff_atomic_levels()[self.icrsh]
+                    solver_eal = self.sum_k.block_structure.convert_matrix(sumk_eal, space_from='sumk', ish_from=self.sum_k.inequiv_to_corr[self.icrsh])
                 # fill Delta_time from Delta_freq sum_k to solver
                 for name, g0 in self.G0_freq:
                     self.Delta_freq[name] << iOmega_n - inverse(g0) - solver_eal[name]
@@ -369,6 +374,10 @@ class SolverStructure:
                     # without SOC delta_tau needs to be real
                     if not self.sum_k.SO == 1:
                         self.triqs_solver.Delta_tau[name] << make_gf_from_fourier(self.Delta_freq[name], self.triqs_solver.Delta_tau.mesh, tail).real
+                        for o1 in range(solver_eal[name].shape[0]):
+                            for o2 in range(solver_eal[name].shape[0]):
+                                if o1 != o2:
+                                    self.triqs_solver.Delta_tau[name].data[:,o1,o2] =0.0+0.0j
                     else:
                         self.triqs_solver.Delta_tau[name] << make_gf_from_fourier(self.Delta_freq[name], self.triqs_solver.Delta_tau.mesh, tail)
 
@@ -395,6 +404,8 @@ class SolverStructure:
                     if not 'it_-1' in archive['DMFT_input/solver']:
                         archive['DMFT_input/solver'].create_group('it_-1')
                     archive['DMFT_input/solver/it_-1'][f'S_{self.icrsh}'] = self.triqs_solver
+                    archive['DMFT_input/solver/it_-1'][f'Delta_tau_{self.icrsh}'] = self.triqs_solver.Delta_tau
+                    archive['DMFT_input/solver/it_-1'][f'Delta_freq_{self.icrsh}'] = self.Delta_freq
                     archive['DMFT_input/solver/it_-1'][f'solve_params_{self.icrsh}'] = self.solver_params
                     archive['DMFT_input/solver/it_-1']['mpi_size'] = mpi.size
 
