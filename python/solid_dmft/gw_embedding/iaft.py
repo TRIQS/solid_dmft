@@ -62,15 +62,15 @@ class IAFT(object):
         self.bases = sparse_ir.FiniteTempBasisSet(beta=beta, wmax=self.wmax, eps=prec)
         self.tau_mesh_f = self.bases.smpl_tau_f.sampling_points
         self.tau_mesh_b = self.bases.smpl_tau_b.sampling_points
-        self.wn_mesh_f = self.bases.smpl_wn_f.sampling_points
-        self.wn_mesh_b = self.bases.smpl_wn_b.sampling_points
-        self.nt_f, self.nw_f = self.tau_mesh_f.shape[0], self.wn_mesh_f.shape[0]
-        self.nt_b, self.nw_b = self.tau_mesh_b.shape[0], self.wn_mesh_b.shape[0]
+        self._wn_mesh_f = self.bases.smpl_wn_f.sampling_points
+        self._wn_mesh_b = self.bases.smpl_wn_b.sampling_points
+        self.nt_f, self.nw_f = self.tau_mesh_f.shape[0], self._wn_mesh_f.shape[0]
+        self.nt_b, self.nw_b = self.tau_mesh_b.shape[0], self._wn_mesh_b.shape[0]
 
         Ttl_ff = self.bases.basis_f.u(self.tau_mesh_f).T
-        Twl_ff = self.bases.basis_f.uhat(self.wn_mesh_f).T
+        Twl_ff = self.bases.basis_f.uhat(self._wn_mesh_f).T
         Ttl_bb = self.bases.basis_b.u(self.tau_mesh_b).T
-        Twl_bb = self.bases.basis_b.uhat(self.wn_mesh_b).T
+        Twl_bb = self.bases.basis_b.uhat(self._wn_mesh_b).T
 
         self.Tlt_ff = np.linalg.pinv(Ttl_ff)
         self.Tlt_bb = np.linalg.pinv(Ttl_bb)
@@ -97,6 +97,26 @@ class IAFT(object):
                "*******************************".format(self.prec, self.beta, self.lmbda, self.nt_f, self.nw_f,
                                                         self.nt_b, self.nw_b)
 
+    def wn_mesh(self, stats: str, ir_notation: bool = True):
+        """
+        Return Matsubara frequency indices.
+        :param stats: str
+            statistics: 'f' for fermions and 'b' for bosons
+        :param ir_notation: bool
+            Whether wn_mesh_interp is in sparse_ir notation where iwn = n*pi/beta for both fermions and bosons.
+            Otherwise, iwn = (2n+1)*pi/beta  for fermions and 2n*pi/beta for bosons.
+
+        :return: numpy.ndarray(dim=1)
+            Matsubara frequency indices
+        """
+        if stats not in self.statisics:
+            raise ValueError("Unknown statistics '{}'. "
+                             "Acceptable options are 'f' for fermion and 'b' for bosons.".format(stats))
+        wn_mesh = np.array(self._wn_mesh_f, dtype=int) if stats == 'f' else np.array(self._wn_mesh_b, dtype=int)
+        if not ir_notation:
+            wn_mesh = (wn_mesh-1)//2 if stats == 'f' else wn_mesh//2
+        return wn_mesh
+
     def tau_to_w(self, Ot, stats: str):
         """
         Fourier transform from imaginary-time axis to Matsubara-frequency axis
@@ -110,7 +130,7 @@ class IAFT(object):
         """
         if stats not in self.statisics:
             raise ValueError("Unknown statistics '{}'. "
-                             "Accepted options are 'f' for fermion and 'b' for bosons.".format(stats))
+                             "Acceptable options are 'f' for fermion and 'b' for bosons.".format(stats))
         Twt = self.Twt_ff if stats == 'f' else self.Twt_bb
         if Ot.shape[0] != Twt.shape[1]:
             raise ValueError(
@@ -138,7 +158,7 @@ class IAFT(object):
         """
         if stats not in self.statisics:
             raise ValueError("Unknown statistics '{}'. "
-                             "Accepted options are 'f' for fermion and 'b' for bosons.".format(stats))
+                             "Acceptable options are 'f' for fermion and 'b' for bosons.".format(stats))
         Ttw = self.Ttw_ff if stats == 'f' else self.Ttw_bb
         if Ow.shape[0] != Ttw.shape[1]:
             raise ValueError(
@@ -152,7 +172,7 @@ class IAFT(object):
         Ot = Ot.reshape((Ttw.shape[0],) + Ow_shape[1:])
         return Ot
 
-    def w_interpolate(self, Ow, wn_mesh_interp, stats: str):
+    def w_interpolate(self, Ow, wn_mesh_interp, stats: str, ir_notation: bool = True):
         """
         Interpolate a dynamic object to arbitrary points on the Matsubara axis.
 
@@ -160,22 +180,29 @@ class IAFT(object):
             Dynamic object on the Matsubara sampling points, self.wn_mesh.
         :param wn_mesh_interp: numpy.ndarray(dim=1, dtype=int)
             Target frequencies "INDICES".
-            The physical Matsubara frequencies are wn_mesh_interp * pi / beta
+            The physical Matsubara frequencies are wn_mesh_interp * pi/beta.
         :param stats: str
-            statistics, 'f' for fermions and 'b' for bosons
+            Statistics, 'f' for fermions and 'b' for bosons.
+        :param ir_notation: bool
+            Whether wn_mesh_interp is in sparse_ir notation where iwn = n*pi/beta for both fermions and bosons.
+            Otherwise, iwn = (2n+1)*pi/beta  for fermions and 2n*pi/beta for bosons.
 
         :return: numpy.ndarray
             Matsubara-frequency object with dimensions (nw_interp, ...)
         """
         if stats not in self.statisics:
             raise ValueError("Unknown statistics '{}'. "
-                             "Accepted options are 'f' for fermion and 'b' for bosons.".format(stats))
+                             "Acceptable options are 'f' for fermion and 'b' for bosons.".format(stats))
+        if ir_notation:
+            wn_indices = wn_mesh_interp
+        else:
+            wn_indices = np.array([2*n+1 if stats == 'f' else 2*n for n in wn_mesh_interp], dtype=int)
         Tlw = self.Tlw_ff if stats == 'f' else self.Tlw_bb
         if Ow.shape[0] != Tlw.shape[1]:
             raise ValueError(
                 "w_interpolate: Number of w points are inconsistent: {} and {}".format(Ow.shape[0], Tlw.shape[1]))
 
-        Twl_interp = self.bases.basis_f.uhat(wn_mesh_interp).T if stats == 'f' else self.bases.basis_b.uhat(wn_mesh_interp).T
+        Twl_interp = self.bases.basis_f.uhat(wn_indices).T if stats == 'f' else self.bases.basis_b.uhat(wn_indices).T
         Tww = np.dot(Twl_interp, Tlw)
 
         Ow_shape = Ow.shape
@@ -183,7 +210,7 @@ class IAFT(object):
         Ow_interp = np.dot(Tww, Ow)
 
         Ow = Ow.reshape(Ow_shape)
-        Ow_interp = Ow_interp.reshape((wn_mesh_interp.shape[0],) + Ow_shape[1:])
+        Ow_interp = Ow_interp.reshape((wn_indices.shape[0],) + Ow_shape[1:])
         return Ow_interp
 
     def tau_interpolate(self, Ot, tau_mesh_interp, stats: str):
@@ -195,14 +222,14 @@ class IAFT(object):
         :param tau_mesh_interp: numpy.ndarray(dim=1, dtype=float)
             Target tau points.
         :param stats: str
-            statistics, 'f' for fermions and 'b' for bosons
+            Statistics, 'f' for fermions and 'b' for bosons
 
         :return: numpy.ndarray
             Imaginary-time object with dimensions (nt_interp, ...)
         """
         if stats not in self.statisics:
             raise ValueError("Unknown statistics '{}'. "
-                             "Accepted options are 'f' for fermion and 'b' for bosons.".format(stats))
+                             "Acceptable options are 'f' for fermion and 'b' for bosons.".format(stats))
         Tlt = self.Tlt_ff if stats == 'f' else self.Tlt_bb
         if Ot.shape[0] != Tlt.shape[1]:
             raise ValueError(
@@ -224,6 +251,8 @@ if __name__ == '__main__':
     # Initialize IAFT object for given inverse temperature, lambda and precision
     ft = IAFT(1000, 1e4, 1e-6)
 
+    print(ft.wn_mesh('f', True))
+
     Gt = np.zeros((ft.nt_f, 2, 2, 2))
     Gw = ft.tau_to_w(Gt, 'f')
     print(Gw.shape)
@@ -232,6 +261,16 @@ if __name__ == '__main__':
     tau_interp = np.array([0.0, ft.beta])
     Gt_interp = ft.tau_interpolate(Gt, tau_interp, 'f')
     print(Gt_interp.shape)
+
+    # wn in spare_ir notation
+    w_interp = np.array([-1,1,3,5], dtype=int)
+    Gw_interp = ft.w_interpolate(Gw, w_interp, 'f', True)
+    print(Gw_interp.shape)
+
+    # wn in physical notation
+    w_interp = np.array([-1,0,1,2,3,4], dtype=int)
+    Gw_interp = ft.w_interpolate(Gw, w_interp, 'f', False)
+    print(Gw_interp.shape)
 
     Gt2 = ft.w_to_tau(Gw, 'f')
     print(Gt2.shape)

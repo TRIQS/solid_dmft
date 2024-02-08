@@ -69,17 +69,17 @@ def test_config_file_1():
     parameters = _convert_params(config)
 
     nonexistent_params = _find_nonexistent_params(config)
-    assert nonexistent_params == {'dft': [], 'general': [], 'advanced': ['nonexistent'], 'solver': []}
+    assert nonexistent_params == {'dft': [], 'general': [], 'advanced': ['nonexistent'], 'solver': [], 'gw': []}
 
     parameters, default_values_used = _apply_default_values(parameters)
 
     parameters, unnecessary_params, missing_required_params = _check_if_params_used(parameters, default_values_used)
-    assert unnecessary_params == {'dft': [], 'general': ['n_iter_dmft_per'], 'advanced': [], 'solver': []}
-    assert missing_required_params == {'dft': [], 'general': ['beta'], 'advanced': [],
+    assert unnecessary_params == {'dft': [], 'general': ['n_iter_dmft_per'], 'advanced': [], 'solver': [], 'gw': []}
+    assert missing_required_params == {'dft': [], 'general': ['beta'], 'advanced': [], 'gw' : [],
                                            'solver': ['length_cycle', 'n_warmup_cycles', 'n_cycles_tot']}
 
     invalid_params = _checks_validity_criterion(parameters)
-    assert invalid_params == {'dft': [], 'general': ['prec_mu'], 'advanced': [], 'solver': []}
+    assert invalid_params == {'dft': [], 'general': ['prec_mu'], 'advanced': [], 'solver': [], 'gw': []}
 
     assert are_iterables_equal(parameters, {'dft': {},
                                             'general': {'magnetic': False, 'fixed_mu_value': 'none',
@@ -91,7 +91,7 @@ def test_config_file_1():
                                                         'csc': False, 'enforce_off_diag': True,
                                                         'dc_dmft': False, 'diag_delta': False,
                                                         'occ_conv_crit': -1,'g0_conv_crit': -1,'gimp_conv_crit': -1,'sigma_conv_crit': -1,
-                                                        'seedname': u'fancy_system', 'gw_code' : u'none',
+                                                        'seedname': u'fancy_system', 'gw_embedding' : False,
                                                         'J': [2.0], 'h5_save_freq': 5, 'ratio_F4_F2' : [u'none'],
                                                         'dc': True, 'jobname': u'out_DMFT_fancy',
                                                         'n_iter_dmft': 4, 'U': [2.0], 'n_tau': 10001,
@@ -101,7 +101,7 @@ def test_config_file_1():
                                                         'dc_type': 0, 'load_sigma': False, 'n_iw': 1025,
                                                         'noise_level_initial_sigma': 0.,
                                                         'h_int_type': [u'density_density'],
-                                                        'h_int_basis': 'triqs', 'U_prime' : [u'U-2J'],
+                                                        'h_int_basis': 'triqs', 'U_prime' : [u'none'],
                                                         'mu_gap_gb2_threshold': 'none',
                                                         'calc_mu_method': 'dichotomy'},
                                             'advanced': {'dc_fixed_value': 'none', 'dc_fixed_occ': 'none',
@@ -115,7 +115,8 @@ def test_config_file_1():
                                                        # 'measure_G_n_iw' : 20, 'measure_G_iw' : False,
                                                        'measure_density_matrix': False, 'perform_tail_fit': False,
                                                        'legendre_fit': False, 'delta_interface' : False,
-                                                       'off_diag_threshold' : 0.0}}
+                                                       'off_diag_threshold' : 0.0},
+                                            'gw':     {}}
                               )
 
 
@@ -190,18 +191,18 @@ def test_config_file_2():
     parameters = _convert_params(config)
 
     nonexistent_params = _find_nonexistent_params(config)
-    assert nonexistent_params == {'dft': [], 'general': [], 'advanced': [], 'solver': []}
+    assert nonexistent_params == {'dft': [], 'general': [], 'advanced': [], 'solver': [], 'gw': []}
 
     parameters, default_values_used = _apply_default_values(parameters)
 
     parameters, unnecessary_params, missing_required_params = _check_if_params_used(parameters, default_values_used)
-    assert unnecessary_params == {'dft': [], 'general': ['path_to_sigma'],
+    assert unnecessary_params == {'dft': [], 'general': ['path_to_sigma'], 'gw': [],
                                       'advanced': [], 'solver': ['perform_tail_fit']}
-    assert missing_required_params == {'dft': [], 'general': [], 'advanced': [], 'solver': []}
+    assert missing_required_params == {'dft': [], 'general': [], 'advanced': [], 'solver': [],'gw': []}
 
 
     invalid_params = _checks_validity_criterion(parameters)
-    assert invalid_params == {'dft': [], 'general': [], 'advanced': [], 'solver': []}
+    assert invalid_params == {'dft': [], 'general': [], 'advanced': [], 'solver': [], 'gw': []}
 
     assert are_iterables_equal(parameters, {'dft': {},
                                             'general': {'afm_order': True, 'magnetic': True,
@@ -214,7 +215,7 @@ def test_config_file_2():
                                                         'mu_update_freq': 1, 'solver_type': 'cthyb',
                                                         'seedname': u'orbital_model', 'dc_dmft': False,
                                                         'occ_conv_crit': -1,'g0_conv_crit': -1,'gimp_conv_crit': -1,'sigma_conv_crit': -1,
-                                                        'J': [1.0], 'h5_save_freq': 2, 'gw_code' : 'none',
+                                                        'J': [1.0], 'h5_save_freq': 2, 'gw_embedding' : False,
                                                         'dc': True, 'jobname': u'out_60M_afm',
                                                         'beta': 40.0, 'U': [5.5], 'diag_delta': False,
                                                         'measure_chi_insertions': 100, 'h_field': 0.0, 'h_field_it': 0,
@@ -240,6 +241,7 @@ def test_config_file_2():
                                                        'move_shift': False, 'legendre_fit' : False,
                                                        # 'measure_G_n_iw' : 20, 'measure_G_iw' : False,
                                                        'measure_density_matrix': False, 'delta_interface': True,
-                                                       'off_diag_threshold' : 0.1}}
+                                                       'off_diag_threshold' : 0.1},
+                                            'gw': {}}
 
                              )

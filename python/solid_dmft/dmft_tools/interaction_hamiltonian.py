@@ -58,8 +58,9 @@ def _extract_U_J_list(param_name, n_inequiv_shells, general_params):
         formatted_param = general_params[param_name]
 
     if len(general_params[param_name]) == 1:
-        mpi.report('Assuming {} = '.format(param_name)
-                   + '{} for all correlated shells'.format(formatted_param[0]))
+        if formatted_param[0] != 'none':
+            mpi.report('Assuming {} = '.format(param_name)
+                       + '{} for all correlated shells'.format(formatted_param[0]))
         general_params[param_name] *= n_inequiv_shells
     elif len(general_params[param_name]) == n_inequiv_shells:
         mpi.report('{} list for correlated shells: {}'.format(param_name, formatted_param))
@@ -70,14 +71,14 @@ def _extract_U_J_list(param_name, n_inequiv_shells, general_params):
     return general_params
 
 
-def _load_crpa_interaction_matrix(sum_k, general_params, filename='UIJKL'):
+def _load_crpa_interaction_matrix(sum_k, general_params, gw_params, filename='UIJKL'):
     """
     Loads  dynamic interaction data to use as an interaction Hamiltonian.
     """
     def _round_to_int(data):
         return (np.array(data) + .5).astype(int)
 
-    if general_params['gw_code'] == 'Vasp':
+    if gw_params['code'] == 'Vasp':
     # Loads data from VASP cRPA file
         print('Loading Vasp cRPA matrix from file: '+str(filename))
         data = np.loadtxt(filename, unpack=True)
@@ -114,17 +115,15 @@ def _load_crpa_interaction_matrix(sum_k, general_params, filename='UIJKL'):
         if not np.allclose(u_matrix_four_indices.shape, first_index_shell):
             print('Warning: different number of orbitals in cRPA matrix than in calculation.')
 
-    if general_params['gw_code'] == 'bdft':
+    if gw_params['code'] == 'aimbes':
         u_matrix_four_indices_per_shell = []
         for icrsh in range(sum_k.n_inequiv_shells):
             # for now we assume that up / down are equal
             if general_params['h_int_type'][icrsh] in  ('crpa', 'crpa_density_density'):
-                Uloc_0 = make_gf_imfreq(general_params['Uloc_dlr'][icrsh]['up_0'],1)
-                u_matrix_four_indices_per_shell.append(Uloc_0.data[0,:,:,:,:] + general_params['Vloc'][icrsh]['up_0'])
+                Uloc_0 = make_gf_imfreq(gw_params['Uloc_dlr'][icrsh]['up_0'],1)
+                u_matrix_four_indices_per_shell.append(Uloc_0.data[0,:,:,:,:] + gw_params['Vloc'][icrsh]['up_0'])
             else:
-                # Uloc_0 = make_gf_imfreq(general_params['Uloc_dlr'][icrsh]['up_0'],1)
-                # u_matrix_four_indices_per_shell.append(Uloc_0.data[0,:,:,:,:] + general_params['Vloc'][icrsh]['up_0'])
-                u_matrix_four_indices_per_shell.append(general_params['Vloc'][icrsh]['up_0'])
+                u_matrix_four_indices_per_shell.append(gw_params['Vloc'][icrsh]['up_0'])
 
 
     return u_matrix_four_indices_per_shell
@@ -512,7 +511,7 @@ def h_int_simple_intra(spin_names,n_orb,U,off_diag=None,map_operator_structure=N
     return H
 
 
-def construct(sum_k, general_params, advanced_params):
+def construct(sum_k, general_params, advanced_params, gw_params=None):
     """
     Constructs the interaction Hamiltonian. Currently implemented are the
     Kanamori Hamiltonian (usually for 2 or 3 orbitals), the density-density and
@@ -609,19 +608,20 @@ def construct(sum_k, general_params, advanced_params):
 
         # read from file options
         if general_params['h_int_type'][icrsh] in ('crpa', 'crpa_density_density', 'dyn_density_density', 'dyn_full'):
-            Umat_full = _load_crpa_interaction_matrix(sum_k, general_params)[icrsh]
+            Umat_full = _load_crpa_interaction_matrix(sum_k, general_params, gw_params)[icrsh]
 
             if sum_k.SO == 1:
                 Umat_full = _adapt_U_4index_for_SO(Umat_full)
 
             # Rotates the interaction matrix
-            Umat_full_rotated = _rotate_four_index_matrix(sum_k, general_params, Umat_full, icrsh)
+            if sum_k.use_rotations:
+                Umat_full = _rotate_four_index_matrix(sum_k, general_params, Umat_full, icrsh)
 
             # construct slater / density density from U tensor
             if general_params['h_int_type'][icrsh] in ('crpa', 'dyn_full'):
-                h_int[icrsh] = _construct_slater(sum_k, general_params, Umat_full_rotated.real, icrsh)
+                h_int[icrsh] = _construct_slater(sum_k, general_params, Umat_full.real, icrsh)
             else:
-                h_int[icrsh] = _construct_density_density(sum_k, general_params, Umat_full_rotated.real, icrsh)
+                h_int[icrsh] = _construct_density_density(sum_k, general_params, Umat_full.real, icrsh)
             continue
 
         raise NotImplementedError('Error when constructing the interaction Hamiltonian.')

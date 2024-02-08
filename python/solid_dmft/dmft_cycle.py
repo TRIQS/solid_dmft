@@ -39,8 +39,9 @@ from triqs.version import git_hash as triqs_hash
 from triqs.version import version as triqs_version
 from h5 import HDFArchive
 import triqs.utility.mpi as mpi
-from triqs.gf import Gf, make_hermitian, MeshReFreq, MeshImFreq, make_gf_imfreq
-from triqs.gf.tools import inverse
+from triqs.operators import c_dag, c, Operator, util
+from triqs.gf import Gf, make_gf_dlr_imfreq, make_hermitian, fit_hermitian_tail, MeshReFreq, MeshImFreq, make_gf_imfreq, make_gf_from_fourier, iOmega_n, Omega
+from triqs.gf.tools import inverse, make_zero_tail
 from triqs_dft_tools.sumk_dft import SumkDFT
 
 # own modules
@@ -271,14 +272,6 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
     # create Sumk object
     # TODO: use_dft_blocks=True yields inconsistent number of blocks!
 
-    # if gw+edmft is run beta is determined in GW code
-    if general_params['gw_code'] == 'bdft':
-        assert general_params['gw_h5'] != 'none', 'please speficy GW code h5 file'
-
-        with HDFArchive(general_params['gw_h5'],'r') as ar:
-            # general_params['beta'] = ar['imaginary_fourier_transform']['beta'] / physical_constants['Hartree energy in eV'][0]
-            general_params['beta'] = ar['imaginary_fourier_transform']['beta']
-
     # first we have to determine the mesh
     if general_params['solver_type'] in ['ftps']:
         sumk_mesh = MeshReFreq(window=general_params['w_range'],
@@ -458,32 +451,6 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
         if general_params['afm_order']:
             general_params = afm_mapping.determine(general_params, archive, sum_k.n_inequiv_shells)
 
-    # lo    ad gw / crpa input from disc here and store in general_params
-    if general_params['gw_code'] == 'bdft':
-        general_params['G0_dlr_gw'] = None
-        general_params['Gloc_dlr_gw'] = None
-        general_params['Uloc_dlr'] = None
-        general_params['Vloc'] = None
-        general_params['Hloc0'] = None
-        if mpi.is_master_node():
-            general_params['G0_dlr_gw'], general_params['Uloc_dlr'], general_params['Vloc'], general_params['Gloc_dlr_gw'], general_params['Hloc0'] = convert_gw_output(archive, general_params['gw_h5'], sum_k.n_shells)
-        mpi.barrier()
-        general_params['Uloc_dlr'] = mpi.bcast(general_params['Uloc_dlr'])
-        # TODO: in principle we have to transform to solver struct, however LGR is not able to convert 4d tensors!
-        # for now enforce off_diag terms and use default block structure
-        # for iineq in range(sum_k.n_inequiv_shells):
-        #     general_params['Uloc_dlr'][iineq] = sum_k.block_structure.convert_gf(Uloc_dlr[iineq], ish_from=sum_k.inequiv_to_corr[iineq], space_from='sumk')
-        general_params['Vloc'] = mpi.bcast(general_params['Vloc'])
-        general_params['Hloc0'] = mpi.bcast(general_params['Hloc0'])
-        general_params['G0_dlr_gw'] = mpi.bcast(general_params['G0_dlr_gw'])
-        general_params['Gloc_dlr_gw'] = mpi.bcast(general_params['Gloc_dlr_gw'])
-
-        # some basic consistency checks for the loaded objects
-        for iineq in range(sum_k.n_inequiv_shells):
-            assert general_params['Uloc_dlr'][iineq].mesh.beta == sum_k.mesh.beta, f"Error: DMFT calculation has to be performed at the same temperature as GW! Loaded GW objects are β={general_params['Uloc_dlr'][0].mesh.beta} and Sumk is β={sum_k.mesh.beta}"
-            for block, gf in general_params['Uloc_dlr'][iineq]:
-                assert gf.target_shape[0] == sum_k.gf_struct_solver[iineq][block], "target shape of two-particle objects does not match impurity solver structure"
-
     # Constructs interaction Hamiltonian and writes it to the h5 archive
     h_int = interaction_hamiltonian.construct(sum_k, general_params, advanced_params)
     if mpi.is_master_node():
@@ -518,15 +485,10 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
         archive['DMFT_input']['version']['solver_version'] = solvers[0].version
 
     # Determines initial Sigma and DC
-    if general_params['gw_code'] == 'bdft':
-        for icrsh in range(sum_k.n_inequiv_shells):
-            solvers[icrsh].G0_freq << make_gf_imfreq(general_params['G0_dlr_gw'][icrsh], n_iw=general_params['n_iw'])
-            # solvers[icrsh].G0_freq << make_gf_imfreq(general_params['Gloc_dlr_gw'][icrsh], n_iw=general_params['n_iw'])
-    else:
-        sum_k, solvers = initial_sigma.determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
-                                                                      archive, iteration_offset, G_loc_all_dft, solvers)
+    sum_k, solvers = initial_sigma.determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
+                                                                  archive, iteration_offset, G_loc_all_dft, solvers)
 
-        sum_k = manipulate_mu.set_initial_mu(general_params, sum_k, iteration_offset, archive, shell_multiplicity)
+    sum_k = manipulate_mu.set_initial_mu(general_params, sum_k, iteration_offset, archive, shell_multiplicity)
 
 
     # setup of measurement of chi(SzSz(tau) if requested
@@ -635,11 +597,7 @@ def _dmft_step(sum_k, solvers, it, general_params,
         printed = ((np.real, 'real'), )
 
     # Extracts G local
-    if general_params['gw_code'] == 'bdft':
-        G_loc_all = []
-        for icrsh in range(sum_k.n_inequiv_shells):
-            G_loc_all.append(make_gf_imfreq(general_params['Gloc_dlr_gw'][icrsh], n_iw=general_params['n_iw']))
-    elif general_params['solver_type'] in ['ftps']:
+    if general_params['solver_type'] in ['ftps']:
         G_loc_all = sum_k.extract_G_loc(broadening=general_params['eta'])
     else:
         G_loc_all = sum_k.extract_G_loc()
@@ -667,8 +625,7 @@ def _dmft_step(sum_k, solvers, it, general_params,
                 mpi.report(func(value))
 
         # dyson equation to extract G0_freq, using Hermitian symmetry
-        if not general_params['gw_code'] == 'bdft':
-            solvers[icrsh].G0_freq << inverse(solvers[icrsh].Sigma_freq + inverse(solvers[icrsh].G_freq))
+        solvers[icrsh].G0_freq << inverse(solvers[icrsh].Sigma_freq + inverse(solvers[icrsh].G_freq))
 
         # dyson equation to extract cpa_G0_freq
         if general_params['dc'] and general_params['dc_type'] == 4:
@@ -683,6 +640,38 @@ def _dmft_step(sum_k, solvers, it, general_params,
             solvers[icrsh].G0_freq << make_hermitian(solvers[icrsh].G0_freq)
         sum_k.symm_deg_gf(solvers[icrsh].G0_freq, ish=icrsh)
 
+        if general_params['solver_type'] == 'cthyb' and general_params['cthyb_delta_interface']:
+            mpi.report('\n Using the delta interface for cthyb passing Delta(tau) and Hloc0 directly.')
+             # prepare solver input
+            sumk_eal = sum_k.eff_atomic_levels()[icrsh]
+            solver_eal = sum_k.block_structure.convert_matrix(sumk_eal, space_from='sumk', ish_from=sum_k.inequiv_to_corr[icrsh])
+            # fill Delta_time from Delta_freq sum_k to solver
+            # for name, g0 in self.G0_freq:
+            for name, g0 in solvers[icrsh].G0_freq:
+                solvers[icrsh].Delta_freq[name] << iOmega_n - inverse(g0) - solver_eal[name]
+                known_moments = make_zero_tail(solvers[icrsh].Delta_freq[name], 1)
+                tail, err = fit_hermitian_tail(solvers[icrsh].Delta_freq[name], known_moments)
+                # without SOC delta_tau needs to be real
+                if not sum_k.SO == 1:
+                    solvers[icrsh].Delta_time[name] << make_gf_from_fourier(solvers[icrsh].Delta_freq[name],
+                                                                            solvers[icrsh].Delta_time.mesh, tail).real
+                else:
+                    solvers[icrsh].Delta_tau[name] << make_gf_from_fourier(solvers[icrsh].Delta_freq[name],
+                                                                           solvers[icrsh].Delta_time.mesh, tail)
+
+                # Make non-interacting operator for Hloc0
+                Hloc_0 = Operator()
+                for spin, spin_block in solver_eal.items():
+                    for o1 in range(spin_block.shape[0]):
+                        for o2 in range(spin_block.shape[1]):
+                            # check if off-diag element is larger than threshold
+                            if o1 != o2 and abs(spin_block[o1,o2]) < solver_params['off_diag_threshold']:
+                                continue
+                            else:
+                                # TODO: adapt for SOC calculations, which should keep the imag part
+                                Hloc_0 += spin_block[o1,o2].real/2 * (c_dag(spin,o1) * c(spin,o2) + c_dag(spin,o2) * c(spin,o1))
+                solvers[icrsh].Hloc_0 = Hloc_0
+
          # store solver to h5 archive
         if general_params['store_solver'] and mpi.is_master_node():
             if not 'solver' in archive['DMFT_input']:
@@ -693,6 +682,8 @@ def _dmft_step(sum_k, solvers, it, general_params,
         # store DMFT input directly in last_iter
         if mpi.is_master_node():
             archive['DMFT_results/last_iter']['G0_freq_{}'.format(icrsh)] = solvers[icrsh].G0_freq
+            if general_params['solver_type'] == 'cthyb' and general_params['cthyb_delta_interface']:
+                archive['DMFT_results/last_iter']['Delta_time_{}'.format(icrsh)] = solvers[icrsh].Delta_time
 
         # setup of measurement of chi(SzSz(tau) if requested
         if general_params['measure_chi'] != 'none':
@@ -750,6 +741,9 @@ def _dmft_step(sum_k, solvers, it, general_params,
         for icrsh in range(sum_k.n_inequiv_shells):
             sum_k.dc_energ[icrsh] = solvers[icrsh].DC_energy
 
+    # symmetrize Sigma over degenerate blocks
+    for icrsh in range(sum_k.n_inequiv_shells):
+        sum_k.symm_deg_gf(solvers[icrsh].Sigma_freq, ish=icrsh)
     # doing the dmft loop and set new sigma into sumk
     sum_k.put_Sigma([solvers[icrsh].Sigma_freq for icrsh in range(sum_k.n_inequiv_shells)])
 

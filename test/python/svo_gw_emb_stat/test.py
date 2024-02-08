@@ -9,7 +9,7 @@ import triqs.utility.mpi as mpi
 import solid_dmft.main as solid
 
 try:
-    from triqs_ctseg import Solver
+    from triqs_cthyb import Solver
 except ImportError:
     print('ctseg solver not installed skipping')
     sys.exit()

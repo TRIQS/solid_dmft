@@ -25,7 +25,7 @@
 import numpy as np
 from itertools import product
 
-from triqs.gf import MeshImTime, MeshReTime, MeshReFreq, MeshLegendre, Gf, BlockGf, make_gf_imfreq, make_hermitian, Omega, iOmega_n, make_gf_from_fourier, fit_hermitian_tail
+from triqs.gf import MeshImTime, MeshReTime, MeshReFreq, MeshLegendre, Gf, BlockGf, make_gf_imfreq, make_hermitian, Omega, iOmega_n, make_gf_from_fourier, fit_hermitian_tail, make_gf_imtime, make_gf_dlr, make_gf_dlr_imfreq
 from triqs.gf.tools import inverse, make_zero_tail
 from triqs.gf import make_gf_imfreq
 from triqs.gf.descriptors import Fourier
@@ -117,7 +117,8 @@ class SolverStructure:
         solve impurity problem
     '''
 
-    def __init__(self, general_params, solver_params, advanced_params, sum_k, icrsh, h_int, iteration_offset, solver_struct_ftps):
+    def __init__(self, general_params, solver_params, advanced_params, sum_k,
+                 icrsh, h_int, iteration_offset=None, solver_struct_ftps=None):
         r'''
         Initialisation of the solver instance with h_int for impurity "icrsh" based on soliDMFT parameters.
 
@@ -257,7 +258,7 @@ class SolverStructure:
         # create all ImTime instances
         self.n_tau = self.general_params['n_tau']
         self.G_time = self.sum_k.block_structure.create_gf(ish=self.icrsh, gf_function=Gf, space='solver',
-                                                           mesh=MeshImTime(beta=self.general_params['beta'],
+                                                           mesh=MeshImTime(beta=self.sum_k.mesh.beta,
                                                                            S='Fermion', n_tau=self.n_tau)
                                                            )
         # copy
@@ -284,6 +285,9 @@ class SolverStructure:
 
         if self.general_params['solver_type'] in ['cthyb'] and self.general_params['measure_chi'] != 'none':
             self.O_time = None
+
+        if self.general_params['solver_type'] in ['cthyb'] and self.general_params['cthyb_delta_interface']:
+            self.Hloc_0 = Operator()
 
     def _init_ReFreq_objects(self):
         r'''
@@ -358,45 +362,11 @@ class SolverStructure:
         if self.general_params['solver_type'] == 'cthyb':
 
             if self.general_params['cthyb_delta_interface']:
-                mpi.report('\n Using the delta interface for cthyb passing Delta(tau) and Hloc0 directly.')
-                 # prepare solver input
-                if self.general_params['gw_code'] == 'bdft':
-                    solver_eal = self.general_params['Hloc0'][self.icrsh]
-                    mpi.report(solver_eal)
-                else:
-                    sumk_eal = self.sum_k.eff_atomic_levels()[self.icrsh]
-                    solver_eal = self.sum_k.block_structure.convert_matrix(sumk_eal, space_from='sumk', ish_from=self.sum_k.inequiv_to_corr[self.icrsh])
-                # fill Delta_time from Delta_freq sum_k to solver
-                for name, g0 in self.G0_freq:
-                    self.Delta_freq[name] << iOmega_n - inverse(g0) - solver_eal[name]
-                    known_moments = make_zero_tail(self.Delta_freq[name], 1)
-                    tail, err = fit_hermitian_tail(self.Delta_freq[name], known_moments)
-                    # without SOC delta_tau needs to be real
-                    if not self.sum_k.SO == 1:
-                        self.triqs_solver.Delta_tau[name] << make_gf_from_fourier(self.Delta_freq[name], self.triqs_solver.Delta_tau.mesh, tail).real
-                        for o1 in range(solver_eal[name].shape[0]):
-                            for o2 in range(solver_eal[name].shape[0]):
-                                if o1 != o2:
-                                    self.triqs_solver.Delta_tau[name].data[:,o1,o2] =0.0+0.0j
-                    else:
-                        self.triqs_solver.Delta_tau[name] << make_gf_from_fourier(self.Delta_freq[name], self.triqs_solver.Delta_tau.mesh, tail)
-
-
-                # Make non-interacting operator for Hloc0
-                Hloc_0 = Operator()
-                for spin, spin_block in solver_eal.items():
-                    for o1 in range(spin_block.shape[0]):
-                        for o2 in range(spin_block.shape[1]):
-                            # check if off-diag element is larger than threshold
-                            if o1 != o2 and abs(spin_block[o1,o2]) < self.solver_params['off_diag_threshold']:
-                                continue
-                            else:
-                                # TODO: adapt for SOC calculations, which should keep the imag part
-                                Hloc_0 += spin_block[o1,o2].real/2 * (c_dag(spin,o1) * c(spin,o2) + c_dag(spin,o2) * c(spin,o1))
-                self.solver_params['h_loc0'] = Hloc_0
+                self.triqs_solver.Delta_tau << self.Delta_time
+                self.solver_params['h_loc0'] = self.Hloc_0
             else:
                 # fill G0_freq from sum_k to solver
-                self.triqs_solver.G0_iw << self.G0_freq
+                self.triqs_solver.G0_iw << make_hermitian(self.G0_freq)
 
             # update solver in h5 archive one last time for debugging if solve command crashes
             if self.general_params['store_solver'] and mpi.is_master_node():
@@ -404,8 +374,11 @@ class SolverStructure:
                     if not 'it_-1' in archive['DMFT_input/solver']:
                         archive['DMFT_input/solver'].create_group('it_-1')
                     archive['DMFT_input/solver/it_-1'][f'S_{self.icrsh}'] = self.triqs_solver
-                    archive['DMFT_input/solver/it_-1'][f'Delta_tau_{self.icrsh}'] = self.triqs_solver.Delta_tau
-                    archive['DMFT_input/solver/it_-1'][f'Delta_freq_{self.icrsh}'] = self.Delta_freq
+                    if self.general_params['cthyb_delta_interface']:
+                        archive['DMFT_input/solver/it_-1'][f'Delta_time_{self.icrsh}'] = self.triqs_solver.Delta_tau
+                    else:
+                        archive['DMFT_input/solver/it_-1'][f'G0_freq_{self.icrsh}'] = self.triqs_solver.G0_iw
+                    # archive['DMFT_input/solver/it_-1'][f'Delta_freq_{self.icrsh}'] = self.Delta_freq
                     archive['DMFT_input/solver/it_-1'][f'solve_params_{self.icrsh}'] = self.solver_params
                     archive['DMFT_input/solver/it_-1']['mpi_size'] = mpi.size
 
@@ -950,7 +923,6 @@ class SolverStructure:
             elif self.solver_params['perform_tail_fit'] and not self.general_params['legendre_fit']:
                 # if tailfit has been used replace Sigma with the tail fitted Sigma from cthyb
                 self.Sigma_freq << self.triqs_solver.Sigma_iw
-                self.sum_k.symm_deg_gf(self.Sigma_freq, ish=self.icrsh)
             else:
                 # obtain Sigma via dyson from symmetrized G_freq
                 self.Sigma_freq << inverse(self.G0_freq) - inverse(self.G_freq)
@@ -959,6 +931,9 @@ class SolverStructure:
         if self.solver_params['measure_density_matrix']:
             self.density_matrix = self.triqs_solver.density_matrix
             self.h_loc_diagonalization = self.triqs_solver.h_loc_diagonalization
+            self.Sigma_moments = self.triqs_solver.Sigma_moments
+            self.Sigma_Hartree = self.triqs_solver.Sigma_Hartree
+            self.G_moments = self.triqs_solver.G_moments
 
         if self.solver_params['measure_pert_order']:
             self.perturbation_order = self.triqs_solver.perturbation_order

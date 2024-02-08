@@ -16,14 +16,13 @@
 # Authors: Alexander Hampel
 
 import numpy as np
-from itertools import product
 
 from h5 import HDFArchive
 import unittest
 
-from triqs.gf import MeshDLRImFreq, Gf, BlockGf, make_gf_dlr, make_gf_imfreq
+from triqs.gf import MeshDLRImFreq, Gf, BlockGf, make_gf_dlr, make_gf_imfreq, make_gf_dlr_imfreq
 
-from solid_dmft.gw_embedding.bdft_converter import convert_screened_int, calc_Sigma_DC_gw, calc_W_from_Gloc, _get_dlr_from_IR
+from solid_dmft.gw_embedding.bdft_converter import convert_gw_output, calc_Sigma_DC_gw, calc_W_from_Gloc
 
 
 class test_gw_embedding(unittest.TestCase):
@@ -35,55 +34,25 @@ class test_gw_embedding(unittest.TestCase):
 
     def test_bdft_converter(self):
 
-        convert_screened_int(seed=self.path+'/'+self.seed,
-                             uloc_h5=self.path+'/uloc.scf.h5',
-                             wloc_h5=self.path+'/wloc.scf.h5',
-                             w_max=100,
-                             IR_h5=self.path+'/IR_basis_1e4.1e-15.h5')
+        gw_data, ir_kernel = convert_gw_output(job_h5='emb_test.h5', gw_h5='svo_gw_emb_stat/inp.h5', wmax_dlr=10)
 
         return
 
 
-    def test_calc_Sigma_DC_gw(self):
+    def test_calc_W_DC(self):
+        with HDFArchive('emb_test.h5', 'r') as ar:
+            Uloc_dlr = ar['DMFT_input/iter1']['Uloc_dlr'][0]
+            Gloc_dlr = ar['DMFT_input/iter1']['Gloc_dlr'][0]
+            Vloc = ar['DMFT_input/iter1']['Vloc'][0]
 
-        with HDFArchive(self.path+'/'+self.seed+'.h5', 'r') as ar:
-            Wloc_dlr = ar['DMFT_input']['Wloc_dlr'][0]
-            Gloc_iw = ar['DMFT_input']['Gloc_iw'][0]
-            Vloc = ar['DMFT_input']['Vloc'][0]
-
-        mesh_dlr = MeshDLRImFreq(beta=Wloc_dlr.mesh.beta, statistic='Fermion', w_max=100, eps=1e-15)
+        mesh_dlr = MeshDLRImFreq(beta=Uloc_dlr.mesh.beta, statistic='Fermion', w_max=Gloc_dlr.mesh.w_max, eps=Gloc_dlr.mesh.eps)
         glist = []
+        Gloc_iw = make_gf_dlr_imfreq(Gloc_dlr)
         for block, gf in Gloc_iw:
             g_dlr_iw = Gf(mesh=mesh_dlr, target_shape=gf.target_shape)
 
             for iw in g_dlr_iw.mesh:
-                g_dlr_iw[iw] = gf(iw)
-
-            glist.append(make_gf_dlr(g_dlr_iw))
-
-        Gloc_dlr = BlockGf(name_list=['up_0','down_0'], block_list=glist)
-
-        Sig_DC_dlr, Sig_DC_hartree, Sig_DC_exchange = calc_Sigma_DC_gw(Wloc_dlr, Gloc_dlr, Vloc)
-
-        DC_ref = np.array([[ 15.0495310-0.0j , 0.0+0.0j, 0.0+0.0j],
-                           [0.0+0.0j,  15.0447285+0.0j      , 0.0+0.0j],
-                           [0.0+0.0j, 0.0+0.0j, 15.0455924+0.0j]])
-        for dc_mat in Sig_DC_hartree.values():
-            assert np.allclose(dc_mat, DC_ref, rtol=1e-3, atol=1e-3)
-
-    def test_calc_W(self):
-        with HDFArchive(self.path+'/'+self.seed+'.h5', 'r') as ar:
-            Uloc_dlr = ar['DMFT_input']['Uloc_dlr'][0]
-            Gloc_iw = ar['DMFT_input']['Gloc_iw'][0]
-            Vloc = ar['DMFT_input']['Vloc'][0]
-
-        mesh_dlr = MeshDLRImFreq(beta=Uloc_dlr.mesh.beta, statistic='Fermion', w_max=100, eps=1e-15)
-        glist = []
-        for block, gf in Gloc_iw:
-            g_dlr_iw = Gf(mesh=mesh_dlr, target_shape=gf.target_shape)
-
-            for iw in g_dlr_iw.mesh:
-                g_dlr_iw[iw] = gf(iw)
+                g_dlr_iw[iw] = gf[iw]
 
             glist.append(make_gf_dlr(g_dlr_iw))
 
@@ -101,12 +70,10 @@ class test_gw_embedding(unittest.TestCase):
         W_dlr = calc_W_from_Gloc(Gloc_dlr, U_dict)
 
         Sig_DC_dlr, Sig_DC_hartree, Sig_DC_exchange = calc_Sigma_DC_gw(W_dlr['up_0'], Gloc_dlr['up_0'], Uloc_0)
-        DC_ref = np.array([[ 2.74430989-0.0j , 0.0+0.0j, 0.0+0.0j],
-                           [0.0+0.0j,  2.74357053+0.0j      , 0.0+0.0j],
-                           [0.0+0.0j, 0.0+0.0j, 2.74322484+0.0j]])
+        DC_ref = np.array([[1.13031371e-01-0.0j , 0.0+0.0j, 0.0+0.0j],
+                           [0.0+0.0j,  1.13030001e-01+0.0j      , 0.0+0.0j],
+                           [0.0+0.0j, 0.0+0.0j, 1.13031969e-01+0.0j]])
         assert np.allclose(Sig_DC_hartree, DC_ref, rtol=1e-3, atol=1e-3)
-
-
 
 
 if __name__ == '__main__':

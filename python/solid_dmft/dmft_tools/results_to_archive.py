@@ -52,6 +52,10 @@ def _compile_information(sum_k, general_params, solver_params, solvers,
             if solver_params['measure_density_matrix']:
                 write_to_h5['full_dens_mat_{}'.format(icrsh)] = solvers[icrsh].density_matrix
                 write_to_h5['h_loc_diag_{}'.format(icrsh)] = solvers[icrsh].h_loc_diagonalization
+                if general_params['solver_type'] == 'cthyb':
+                    write_to_h5['Sigma_moments_{}'.format(icrsh)] = solvers[icrsh].Sigma_moments
+                    write_to_h5['G_moments_{}'.format(icrsh)] = solvers[icrsh].G_moments
+                    write_to_h5['Sigma_Hartree_{}'.format(icrsh)] = solvers[icrsh].Sigma_Hartree
 
         elif general_params['solver_type'] in ['ftps']:
             write_to_h5['Delta_freq_{}'.format(icrsh)] = solvers[icrsh].Delta_freq

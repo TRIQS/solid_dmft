@@ -43,6 +43,7 @@ import triqs.utility.mpi as mpi
 from solid_dmft.read_config import read_config
 from solid_dmft.dmft_cycle import dmft_cycle
 from solid_dmft.csc_flow import csc_flow_control
+from solid_dmft.gw_embedding.gw_flow import embedding_driver
 
 
 def main(argv=sys.argv):
@@ -56,6 +57,7 @@ def main(argv=sys.argv):
     solver_params = None
     dft_params = None
     advanced_params = None
+    gw_params = None
     if len(argv) > 1:
         config_file_name = str(argv[1])
     else:
@@ -65,7 +67,7 @@ def main(argv=sys.argv):
 
     if mpi.is_master_node():
         print('Reading the config file ' + config_file_name)
-        general_params, solver_params, dft_params, advanced_params = read_config(config_file_name)
+        general_params, solver_params, dft_params, advanced_params, gw_params = read_config(config_file_name)
         general_params['config_file'] = config_file_name
 
         print('-'*25 + '\nGeneral parameters:')
@@ -80,16 +82,28 @@ def main(argv=sys.argv):
         print('-'*25 + '\nAdvanced parameters, don\'t change them unless you know what you are doing:')
         for key, value in advanced_params.items():
             print('{0: <20} {1: <4}'.format(key, str(value)))
+        print('-'*25 + '\nGW embedding parameters:')
+        for key, value in gw_params.items():
+            print('{0: <20} {1: <4}'.format(key, str(value)))
 
     general_params = mpi.bcast(general_params)
     solver_params = mpi.bcast(solver_params)
     dft_params = mpi.bcast(dft_params)
+    gw_params = mpi.bcast(gw_params)
     advanced_params = mpi.bcast(advanced_params)
 
     if general_params['csc']:
         # Start CSC calculation, always in same folder as dmft_config
         general_params['jobname'] = '.'
         csc_flow_control(general_params, solver_params, dft_params, advanced_params)
+    elif general_params['gw_embedding']:
+        if mpi.is_master_node():
+            # Creates output directory if it does not exist
+            if not os.path.exists(general_params['jobname']):
+                os.makedirs(general_params['jobname'])
+        mpi.barrier()
+        # run GW embedding
+        embedding_driver(general_params, solver_params, gw_params, advanced_params)
     else:
         # Sets up one-shot calculation
         mpi.report('', '#'*80)

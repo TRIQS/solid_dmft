@@ -43,9 +43,6 @@ set(all_tests
   # copy reference data for respack test
   FILE(COPY respack_sfo_data DESTINATION ${test_dir})
 
-  # copy reference data for respack test
-  FILE(COPY gw_embedding DESTINATION ${test_dir})
-
 foreach(test ${all_tests})
   get_filename_component(test_name ${test} NAME_WE)
   get_filename_component(test_dir ${test} DIRECTORY)

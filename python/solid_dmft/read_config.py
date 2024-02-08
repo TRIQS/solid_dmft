@@ -96,7 +96,7 @@ dc_type : int
             * 4: cpa
             * 5: crpa static
             * 6: crpa dynamic
-            * 7: from bdft precalc
+            * 7: from aimbes precalc
 dc_dmft : bool
            Whether to use DMFT or DFT occupations:
 
@@ -478,9 +478,7 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                        'used': True},
 
                                  'U_prime': {'converter': lambda s: list(map(float, s.split(','))),
-                                             'default': ['U-2J'],
-                                             'valid for': lambda x, params: all(r == 'U-2J' or hint in ('kanamori')
-                                                                                    for r, hint in zip(x, params['general']['h_int_type'])),
+                                             'default': lambda params: ['U-2J'] if any(hint == 'kanamori' for hint in params['general']['h_int_type']) else ['none'],
                                              'used': True},
 
                                  'J': {'converter': lambda s: list(map(float, s.split(','))),
@@ -494,16 +492,16 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                                  'used': True},
 
                                  'beta': {'converter': float, 'valid for': lambda x, _: x > 0,
-                                          'used': lambda params: (params['general']['solver_type'] in ['cthyb', 'ctint', 'inchworm', 'hubbardI','ctseg','hartree'] and params['general']['gw_code'] != 'bdft')},
+                                          'used': lambda params: (params['general']['solver_type'] in ['cthyb', 'ctint', 'inchworm', 'hubbardI','ctseg','hartree'] and not params['general']['gw_embedding'])},
 
-                                 'n_iter_dmft': {'converter': int, 'valid for': lambda x, _: x >= 0, 'used': True},
+                                 'n_iter_dmft': {'converter': int, 'valid for': lambda x, _: x >= 0, 'used': lambda params: not params['general']['gw_embedding']},
 
-                                 'dc': {'converter': BOOL_PARSER, 'used': True, 'default': True},
+                                 'dc': {'converter': BOOL_PARSER, 'used': True, 'default': lambda params: not params['general']['gw_embedding']},
 
                                  'dc_type': {'converter': int, 'valid for': lambda x, _: x in (0, 1, 2, 3, 4, 5, 6, 7),
                                              'used': lambda params: params['general']['dc']},
 
-                                 'prec_mu': {'converter': float, 'valid for': lambda x, _: x > 0, 'used': True},
+                                 'prec_mu': {'converter': float, 'valid for': lambda x, _: x > 0, 'used': lambda params: not params['general']['gw_embedding']},
 
                                  'dc_dmft': {'converter': BOOL_PARSER,
                                              'default': False,
@@ -526,6 +524,9 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                  'n_iw': {'converter': int, 'valid for': lambda x, _: x > 0,
                                           'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint', 'inchworm', 'hubbardI','ctseg','hartree'], 'default': 1025},
 
+                                 'w_max': {'converter': float, 'valid for': lambda x, _: x >= 0,
+                                           'used': lambda params: params['general']['gw_embedding']},
+
                                  'n_tau': {'converter': int, 'valid for': lambda x, _: x > 0,
                                            'used': lambda params: params['general']['solver_type'] in ['cthyb', 'ctint', 'inchworm', 'hubbardI','ctseg','hartree'], 'default': 10001},
 
@@ -544,6 +545,9 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                  'csc': {'converter': BOOL_PARSER,
                                          'used': True, 'default': False},
 
+                                 'gw_embedding': {'converter': BOOL_PARSER,
+                                                   'used': True, 'default': False},
+
                                  'n_iter_dmft_first': {'converter': int, 'valid for': lambda x, _: x > 0,
                                                        'used': lambda params: params['general']['csc'], 'default': 10},
 
@@ -557,7 +561,7 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                  'jobname': {'used': lambda params: not params['general']['csc'], 'default': lambda params: 'dmft_dir'},
 
                                  'h5_save_freq': {'converter': int, 'valid for': lambda x, _: x > 0,
-                                                  'used': True, 'default': 5},
+                                                  'used': True, 'default': lambda params: 1 if params['general']['gw_embedding'] else 5},
 
                                  'magnetic': {'converter': BOOL_PARSER,
                                               'used': True, 'default': False},
@@ -671,16 +675,20 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                  'h_int_basis' : {'valid for': lambda x, _: x in ('triqs', 'wien2k', 'wannier90', 'qe', 'vasp'),
                                             'used': True, 'default' : 'triqs'},
 
-                                #
-                                # dynamic interaction / gw /etc
-                                #
-                                'gw_code': {'valid for': lambda x, _: x in ('none', 'Vasp', 'bdft'),
-                                             'used': True, 'default': 'none'},
+                            },
+                    'gw':
+                            {'code': {'valid for': lambda x, _: x in ('none', 'Vasp', 'aimbes'),
+                                      'used': lambda params: params['general']['gw_embedding'] or any('crpa' in hint for hint in params['general']['h_int_type']),
+                                      'default': 'none'},
 
-                                'gw_h5' : {'used': True, 'default': 'none'},
+                             'h5_file' : {'used': lambda params: params['general']['gw_embedding'] or any('crpa' in hint for hint in params['general']['h_int_type']),
+                                       'default': 'none'},
 
+                             'use_rot' : {'converter': BOOL_PARSER,
+                                          'used' : lambda params: params['general']['gw_embedding'],
+                                          'default': False},
 
-                                },
+                            },
                      'dft': {'dft_code': {'used': lambda params: params['general']['csc'],
                                           'valid for': lambda x, _: x in ('vasp', 'qe')},
 
@@ -761,7 +769,8 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                                 'measure_G_l': {'converter': BOOL_PARSER, 'default': False,
                                                 'used': lambda params: params['general']['solver_type'] in ['cthyb', 'hubbardI', 'ctseg']},
 
-                                'measure_density_matrix': {'converter': BOOL_PARSER, 'default': False,
+                                'measure_density_matrix': {'converter': BOOL_PARSER,
+                                                           'default': lambda params: True if params['general']['gw_embedding'] else False ,
                                                            'used': lambda params: params['general']['solver_type'] in ['cthyb', 'hubbardI']},
 
                                 'move_double': {'converter': BOOL_PARSER, 'default': True,
@@ -1205,6 +1214,8 @@ def read_config(config_file):
     dft_params : dict
 
     advanced_params : dict
+
+    gw_params : dict
     """
     config = ConfigParser()
     config.read(config_file)
@@ -1316,9 +1327,6 @@ def read_config(config_file):
         # also required to measure the density matrix
         parameters['solver']['use_norm_as_weight'] = True
 
-    if parameters['general']['gw_code'] == 'bdft':
-        parameters['general']['enforce_off_diag'] = True
-
     if parameters['general']['solver_type'] in ['ftps'] and parameters['general']['calc_energies']:
         raise ValueError('"calc_energies" is not valid for solver_type = "ftps"')
 
@@ -1333,4 +1341,4 @@ def read_config(config_file):
     parameters['general']['store_solver'] = parameters['solver']['store_solver']
     del parameters['solver']['store_solver']
 
-    return parameters['general'], parameters['solver'], parameters['dft'], parameters['advanced']
+    return parameters['general'], parameters['solver'], parameters['dft'], parameters['advanced'], parameters['gw']
