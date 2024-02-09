@@ -35,6 +35,7 @@ from triqs.utility import mpi
 from triqs.gf.tools import inverse
 from triqs.gf import (
     Gf,
+    make_hermitian,
     make_gf_dlr,
     make_gf_imfreq,
     make_gf_imtime,
@@ -42,8 +43,8 @@ from triqs.gf import (
 )
 from triqs.version import git_hash as triqs_hash
 from triqs.version import version as triqs_version
-from triqs.gf.meshes import MeshDLRImFreq, MeshDLRImTime, MeshImFreq
-from triqs.operators import c_dag, c, Operator, util
+from triqs.gf.meshes import MeshImFreq
+from triqs.operators import c_dag, c, Operator
 from triqs_dft_tools.block_structure import BlockStructure
 
 from solid_dmft.version import solid_dmft_hash
@@ -265,7 +266,7 @@ def embedding_driver(general_params, solver_params, gw_params, advanced_params):
                 mpi.report('{}, {} part'.format(key, name))
                 mpi.report(func(value))
 
-        if general_params['cthyb_delta_interface']:
+        if general_params['solver_type'] == 'cthyb' and general_params['cthyb_delta_interface']:
             mpi.report('\n Using the delta interface for cthyb passing Delta(tau) and Hloc0 directly.\n')
             # prepare solver input
             imp_eal = gw_params['Hloc0'][ish]
@@ -313,7 +314,7 @@ def embedding_driver(general_params, solver_params, gw_params, advanced_params):
             solvers[ish].Hloc_0 = Hloc_0
         else:
             # dyson equation to extract G0_freq, using Hermitian symmetry
-            solvers[ish].G0_freq << make_gf_imfreq(gw_params['G0_dlr'][ish], n_iw=general_params['n_iw'])
+            solvers[ish].G0_freq << make_hermitian(make_gf_imfreq(gw_params['G0_dlr'][ish], n_iw=general_params['n_iw']))
 
         mpi.report('\nSolving the impurity problem for shell {} ...'.format(ish))
         mpi.barrier()

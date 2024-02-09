@@ -421,6 +421,20 @@ class SolverStructure:
             if self.solver_params['measure_density_matrix']:
                 self.density_matrix = self.triqs_solver.dm
                 self.h_loc_diagonalization = self.triqs_solver.ad
+                # get moments
+                from triqs_cthyb.tail_fit import sigma_high_frequency_moments, green_high_frequency_moments
+                self.Sigma_moments = sigma_high_frequency_moments(self.density_matrix,
+                                                 self.h_loc_diagonalization,
+                                                 self.sum_k.gf_struct_solver_list[self.icrsh],
+                                                 self.h_int
+                                                 )
+                self.Sigma_Hartree = {bl: sigma_bl[0] for bl, sigma_bl in self.Sigma_moments.items()}
+                self.G_moments = green_high_frequency_moments(self.density_matrix,
+                                                 self.h_loc_diagonalization,
+                                                 self.sum_k.gf_struct_solver_list[self.icrsh],
+                                                 self.h_int
+                                                 )
+
             # *************************************
 
             # call postprocessing
