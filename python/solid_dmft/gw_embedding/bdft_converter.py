@@ -293,7 +293,6 @@ def convert_gw_output(job_h5: str, gw_h5: str, wmax_dlr: float, iter: int = 0) -
 
         # 1 particle properties
         g_weiss_wsIab = ar[f'downfold_1e/iter{iter_1e}']['g_weiss_wsIab']
-        Sigma_wsIab = ar[f'downfold_1e/iter{iter_1e}']['Sigma_gw_wsIab']
         Sigma_dc_wsIab = ar[f'downfold_1e/iter{iter_1e}']['Sigma_dc_wsIab']
         Gloc = ar[f'downfold_1e/iter{iter_1e}']['Gloc_wsIab']
         gw_data['n_inequiv_shells'] = Gloc.shape[1]
@@ -316,7 +315,17 @@ def convert_gw_output(job_h5: str, gw_h5: str, wmax_dlr: float, iter: int = 0) -
         Vhf_sIab = ar[f'downfold_1e/iter{iter_1e}']['Vhf_gw_sIab'][0, 0]
         H0_loc = ar[f'downfold_1e/iter{iter_1e}']['H0_sIab']
 
-        Hloc0 = -1 * (np.eye(n_orb) * gw_data['mu_emb'] - H0_loc[0, 0, :, :] - (Vhf_sIab - Vhf_dc_sIab))
+        if 'Vcorr_gw_sIab' in ar[f'downfold_1e/iter{iter_1e}']:
+            mpi.report('Found Vcorr_sIab in the bdft checkpoint file, '
+                       'i.e. Embedding on top of an effective QP Hamiltonian.')
+            Vcorr_sIab = ar[f'downfold_1e/iter{iter_1e}/Vcorr_gw_sIab']
+            Vcorr_dc_sIab = ar[f'downfold_1e/iter{iter_1e}/Vcorr_dc_sIab']
+            Hloc0 = -1*(np.eye(n_orb) * gw_data['mu_emb'] - H0_loc[0,0] - Vhf_sIab - Vcorr_sIab + Vhf_dc_sIab + Vcorr_dc_sIab)
+            qp_emb = True
+        else:
+            Sigma_wsIab = ar[f'downfold_1e/iter{iter_1e}']['Sigma_gw_wsIab']
+            qp_emb = False
+            Hloc0 = -1*(np.eye(n_orb) * gw_data['mu_emb'] - H0_loc[0,0] - (Vhf_sIab-Vhf_dc_sIab))
 
     # get IR object
     mpi.report('create IR kernel and convert to DLR')
@@ -369,9 +378,10 @@ def convert_gw_output(job_h5: str, gw_h5: str, wmax_dlr: float, iter: int = 0) -
         Gloc_dlr_list.append(Gloc_dlr)
 
         # since Sigma can have a static shift we return DLR Imfreq mesh
-        temp = _get_dlr_from_IR(Sigma_wsIab[:, 0, ish, :, :], ir_kernel, gw_data['mesh_dlr_iw_f'], dim=2)
-        Sigma_dlr = BlockGf(name_list=['up_0', 'down_0'], block_list=[temp, temp], make_copies=True)
-        Sigma_dlr_list.append(Sigma_dlr)
+        if not qp_emb:
+            temp = _get_dlr_from_IR(Sigma_wsIab[:, 0, ish, :, :], ir_kernel, gw_data['mesh_dlr_iw_f'], dim=2)
+            Sigma_dlr = BlockGf(name_list=['up_0', 'down_0'], block_list=[temp, temp], make_copies=True)
+            Sigma_dlr_list.append(Sigma_dlr)
 
         temp = _get_dlr_from_IR(Sigma_dc_wsIab[:, 0, ish, :, :], ir_kernel, gw_data['mesh_dlr_iw_f'], dim=2)
         Sigma_DC_dlr = BlockGf(name_list=['up_0', 'down_0'], block_list=[temp, temp], make_copies=True)
