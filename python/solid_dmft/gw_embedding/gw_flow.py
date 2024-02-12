@@ -216,6 +216,10 @@ def embedding_driver(general_params, solver_params, gw_params, advanced_params):
     mpi.barrier()
     gw_params = mpi.bcast(gw_params)
 
+    # if GW calculation was performed with spin never average spin channels
+    if gw_params['number_of_spins'] == 2:
+        general_params['magnetic'] = True
+
     # dummy helper class for sumk
     sumk = dummy_sumk(gw_params['n_inequiv_shells'], gw_params['n_orb'], gw_params['use_rot'], general_params['magnetic'])
     sumk.mesh = MeshImFreq(beta=gw_params['beta'], statistic='Fermion', n_iw=general_params['n_iw'])
@@ -233,9 +237,13 @@ def embedding_driver(general_params, solver_params, gw_params, advanced_params):
         Sigma_dlr_iw = [None] * sumk.n_inequiv_shells
         ir_mesh_idx = ir_kernel.wn_mesh(stats='f',ir_notation=False)
         ir_mesh = (2*ir_mesh_idx+1)*np.pi/gw_params['beta']
-        Sigma_ir = np.zeros((len(ir_mesh_idx),2,sumk.n_inequiv_shells,max(gw_params['n_orb']),max(gw_params['n_orb'])),
-                                             dtype=complex)
-        Vhf_imp_sIab = np.zeros((2,sumk.n_inequiv_shells,max(gw_params['n_orb']),max(gw_params['n_orb'])),dtype=complex)
+        Sigma_ir = np.zeros((len(ir_mesh_idx),
+                             gw_params['number_of_spins'],
+                             sumk.n_inequiv_shells,max(gw_params['n_orb']),max(gw_params['n_orb'])),
+                            dtype=complex)
+        Vhf_imp_sIab = np.zeros((gw_params['number_of_spins'],
+                                 sumk.n_inequiv_shells,
+                                 max(gw_params['n_orb']),max(gw_params['n_orb'])),dtype=complex)
     for ish in range(sumk.n_inequiv_shells):
         # Construct the Solver instances
         solvers[ish] = SolverStructure(general_params, solver_params, advanced_params, sumk, ish, h_int[ish])
@@ -345,17 +353,23 @@ def embedding_driver(general_params, solver_params, gw_params, advanced_params):
             Sigma_dlr[ish] = make_gf_dlr(Sigma_dlr_iw[ish])
 
             iw_mesh = solvers[ish].Sigma_freq.mesh
-            for i, (block, gf) in enumerate(Sigma_dlr[ish]):
-                print(block)
-                Vhf_imp_sIab[i,ish] = solvers[ish].Sigma_Hartree[block]
-                for iw in range(len(ir_mesh_idx)):
-                    Sigma_ir[iw,i,ish] = gf(iw_mesh(ir_mesh_idx[iw]))
-
+            for block, gf in Sigma_dlr[ish]:
                 # print Hartree shift
                 print('Σ_HF {}'.format(block))
                 fmt = '{:11.7f}' * solvers[ish].Sigma_Hartree[block].shape[0]
                 for vhf in solvers[ish].Sigma_Hartree[block]:
                     print((' '*11 + fmt).format(*vhf.real))
+
+                # if GW is performed without spin we just write one spin channel back (averaged)
+                if 'up' in block:
+                    i = 0
+                elif 'down' in block and gw_params['number_of_spins'] == 2:
+                    i = 1
+
+                Vhf_imp_sIab[i,ish] = solvers[ish].Sigma_Hartree[block]
+                for iw in range(len(ir_mesh_idx)):
+                    Sigma_ir[iw,i,ish] = gf(iw_mesh(ir_mesh_idx[iw]))
+
 
             # average hartree shift for storing to be in line with averaged Sigma imp
             Vhf_imp_sIab[:,ish] = np.mean(Vhf_imp_sIab[:,ish],axis=0)

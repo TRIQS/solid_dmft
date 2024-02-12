@@ -282,6 +282,8 @@ def convert_gw_output(job_h5: str, gw_h5: str, wmax_dlr: float, iter: int = 0) -
         gw_data['beta'] = ar['imaginary_fourier_transform']['beta']
         gw_data['lam'] = ar['imaginary_fourier_transform']['lambda']
         gw_data['w_max'] = gw_data['lam'] / gw_data['beta']
+        gw_data['number_of_spins'] = ar['system/number_of_spins']
+        assert gw_data['number_of_spins'] == 1, 'spin calculations not yet supported in converter'
 
         prec = ar['imaginary_fourier_transform']['prec']
         if prec == 'high':
