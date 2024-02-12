@@ -352,28 +352,27 @@ def embedding_driver(general_params, solver_params, gw_params, advanced_params):
             sumk.symm_deg_gf(Sigma_dlr_iw[ish],ish=ish)
             Sigma_dlr[ish] = make_gf_dlr(Sigma_dlr_iw[ish])
 
-            iw_mesh = solvers[ish].Sigma_freq.mesh
-            for block, gf in Sigma_dlr[ish]:
+            for i, (block, gf) in enumerate(Sigma_dlr[ish]):
                 # print Hartree shift
                 print('Σ_HF {}'.format(block))
                 fmt = '{:11.7f}' * solvers[ish].Sigma_Hartree[block].shape[0]
                 for vhf in solvers[ish].Sigma_Hartree[block]:
                     print((' '*11 + fmt).format(*vhf.real))
 
-                # if GW is performed without spin we just write one spin channel back (averaged)
-                if 'up' in block:
-                    i = 0
-                elif 'down' in block and gw_params['number_of_spins'] == 2:
-                    i = 1
+            # average Hartree shift if not magnetic
+            if not general_params['magnetic']:
+                solvers[ish].Sigma_Hartree['up_0'] = 0.5*(solvers[ish].Sigma_Hartree['up_0']+
+                                                          solvers[ish].Sigma_Hartree['down_0'])
+                solvers[ish].Sigma_Hartree['down_0'] = solvers[ish].Sigma_Hartree['up_0']
 
+            iw_mesh = solvers[ish].Sigma_freq.mesh
+            for i, (block, gf) in enumerate(Sigma_dlr[ish]):
                 Vhf_imp_sIab[i,ish] = solvers[ish].Sigma_Hartree[block]
                 for iw in range(len(ir_mesh_idx)):
                     Sigma_ir[iw,i,ish] = gf(iw_mesh(ir_mesh_idx[iw]))
 
-
-            # average hartree shift for storing to be in line with averaged Sigma imp
-            Vhf_imp_sIab[:,ish] = np.mean(Vhf_imp_sIab[:,ish],axis=0)
-
+                if not general_params['magnetic']:
+                    break
 
     # Writes results to h5 archive
     if mpi.is_master_node():
