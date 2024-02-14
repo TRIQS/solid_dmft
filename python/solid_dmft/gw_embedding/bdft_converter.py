@@ -298,7 +298,7 @@ def convert_gw_output(job_h5: str, gw_h5: str, wmax_dlr: float, it_1e: int = 0, 
         g_weiss_wsIab = ar[f'downfold_1e/iter{it_1e}']['g_weiss_wsIab']
         Sigma_dc_wsIab = ar[f'downfold_1e/iter{it_1e}']['Sigma_dc_wsIab']
         Gloc = ar[f'downfold_1e/iter{it_1e}']['Gloc_wsIab']
-        gw_data['n_inequiv_shells'] = Gloc.shape[1]
+        gw_data['n_inequiv_shells'] = Gloc.shape[2]
 
         # 2 particle properties
         # TODO: discuss how the site index is used right now in bDFT
@@ -321,8 +321,8 @@ def convert_gw_output(job_h5: str, gw_h5: str, wmax_dlr: float, it_1e: int = 0, 
         if 'Vcorr_gw_sIab' in ar[f'downfold_1e/iter{it_1e}']:
             mpi.report('Found Vcorr_sIab in the bdft checkpoint file, '
                        'i.e. Embedding on top of an effective QP Hamiltonian.')
-            Vcorr_sIab = ar[f'downfold_1e/iter{it_1e}/Vcorr_gw_sIab']
-            Vcorr_dc_sIab = ar[f'downfold_1e/iter{it_1e}/Vcorr_dc_sIab']
+            Vcorr_sIab = ar[f'downfold_1e/iter{it_1e}/Vcorr_gw_sIab'][0, 0]
+            Vcorr_dc_sIab = ar[f'downfold_1e/iter{it_1e}/Vcorr_dc_sIab'][0, 0]
             Hloc0 = -1*(np.eye(n_orb) * gw_data['mu_emb'] - H0_loc[0,0] - Vhf_sIab - Vcorr_sIab + Vhf_dc_sIab + Vcorr_dc_sIab)
             qp_emb = True
         else:
