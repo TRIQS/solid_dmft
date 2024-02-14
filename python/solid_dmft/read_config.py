@@ -687,6 +687,15 @@ PROPERTIES_PARAMS = {'general': {'seedname': {'used': True},
                              'use_rot' : {'converter': BOOL_PARSER,
                                           'used' : lambda params: params['general']['gw_embedding'],
                                           'default': False},
+                             'it_1e'   : {'converter': int,
+                                          'valid for': lambda x, _: x >= 0,
+                                          'used': lambda params: params['general']['gw_embedding'],
+                                          'default': 0},
+
+                             'it_2e'   : {'converter': int,
+                                          'valid for': lambda x, _: x >= 0,
+                                          'used': lambda params: params['general']['gw_embedding'],
+                                          'default': 0}
 
                             },
                      'dft': {'dft_code': {'used': lambda params: params['general']['csc'],

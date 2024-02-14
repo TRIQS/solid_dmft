@@ -211,6 +211,8 @@ def embedding_driver(general_params, solver_params, gw_params, advanced_params):
             general_params['jobname'] + '/' + general_params['seedname'] + '.h5',
             gw_params['h5_file'],
             wmax_dlr=general_params['w_max'],
+            it_1e = gw_params['it_1e'],
+            it_2e = gw_params['it_2e'],
         )
         gw_params.update(gw_data)
     mpi.barrier()

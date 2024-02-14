@@ -240,7 +240,7 @@ def calc_W_from_Gloc(Gloc_dlr: Gf | BlockGf, U: np.ndarray | dict) -> Gf | Block
     return W_dlr
 
 
-def convert_gw_output(job_h5: str, gw_h5: str, wmax_dlr: float, iter: int = 0) -> tuple[dict, IAFT]:
+def convert_gw_output(job_h5: str, gw_h5: str, wmax_dlr: float, it_1e: int = 0, it_2e: int = 0) -> tuple[dict, IAFT]:
     """
     read bdft output and convert to triqs Gf DLR objects
 
@@ -252,8 +252,10 @@ def convert_gw_output(job_h5: str, gw_h5: str, wmax_dlr: float, iter: int = 0) -
         path to GW checkpoint file for AIMBES code
     wmax_dlr: float
         DLR energy cutoff, same as Lambda / beta for the impurity problem
-    iter: int, optional
-        iteration to read from gw_h5 calculation, defaults to last iteration
+    it_1e: int, optional
+        iteration to read from gw_h5 calculation for 1e downfolding, defaults to last iteration
+    it_2e: int, optional
+        iteration to read from gw_h5 calculation for 2e downfolding, defaults to last iteration
 
     Returns
     -------
@@ -270,15 +272,14 @@ def convert_gw_output(job_h5: str, gw_h5: str, wmax_dlr: float, iter: int = 0) -
     gw_data = {'wmax_dlr': wmax_dlr}
 
     with HDFArchive(gw_h5, 'r') as ar:
-        if not iter:
-            iter_1e = ar['downfold_1e/final_iter']
-            iter_2e = ar['downfold_2e/final_iter']
-        else:
-            iter_1e = iter
-            iter_2e = iter
+        if not it_1e or not it_2e:
+            it_1e = ar['downfold_1e/final_iter']
+            it_2e = ar['downfold_2e/final_iter']
+
+        mpi.report(f'Reading results from downfold_1e iter {it_1e} and downfold_2e iter {it_2e} from given AIMBES chkpt file.')
 
         # auxilary quantities
-        gw_data['mu_emb'] = ar[f'downfold_1e/iter{iter_1e}']['mu']
+        gw_data['mu_emb'] = ar[f'downfold_1e/iter{it_1e}']['mu']
         gw_data['beta'] = ar['imaginary_fourier_transform']['beta']
         gw_data['lam'] = ar['imaginary_fourier_transform']['lambda']
         gw_data['w_max'] = gw_data['lam'] / gw_data['beta']
@@ -294,15 +295,15 @@ def convert_gw_output(job_h5: str, gw_h5: str, wmax_dlr: float, iter: int = 0) -
             gw_data['prec'] = 1e-6
 
         # 1 particle properties
-        g_weiss_wsIab = ar[f'downfold_1e/iter{iter_1e}']['g_weiss_wsIab']
-        Sigma_dc_wsIab = ar[f'downfold_1e/iter{iter_1e}']['Sigma_dc_wsIab']
-        Gloc = ar[f'downfold_1e/iter{iter_1e}']['Gloc_wsIab']
+        g_weiss_wsIab = ar[f'downfold_1e/iter{it_1e}']['g_weiss_wsIab']
+        Sigma_dc_wsIab = ar[f'downfold_1e/iter{it_1e}']['Sigma_dc_wsIab']
+        Gloc = ar[f'downfold_1e/iter{it_1e}']['Gloc_wsIab']
         gw_data['n_inequiv_shells'] = Gloc.shape[1]
 
         # 2 particle properties
         # TODO: discuss how the site index is used right now in bDFT
-        Vloc_jk = ar[f'downfold_2e/iter{iter_2e}']['Vloc_abcd']
-        Uloc_ir_jk = ar[f'downfold_2e/iter{iter_2e}']['Uloc_wabcd'][:, ...]
+        Vloc_jk = ar[f'downfold_2e/iter{it_2e}']['Vloc_abcd']
+        Uloc_ir_jk = ar[f'downfold_2e/iter{it_2e}']['Uloc_wabcd'][:, ...]
         # switch inner two indices to match triqs notation
         Vloc = np.zeros(Vloc_jk.shape, dtype=complex)
         Uloc_ir = np.zeros(Uloc_ir_jk.shape, dtype=complex)
@@ -313,19 +314,19 @@ def convert_gw_output(job_h5: str, gw_h5: str, wmax_dlr: float, iter: int = 0) -
                 Uloc_ir[ir_w, or1, or2, or3, or4] = Uloc_ir_jk[ir_w, or1, or3, or2, or4]
 
         # get Hloc_0
-        Vhf_dc_sIab = ar[f'downfold_1e/iter{iter_1e}']['Vhf_dc_sIab'][0, 0]
-        Vhf_sIab = ar[f'downfold_1e/iter{iter_1e}']['Vhf_gw_sIab'][0, 0]
-        H0_loc = ar[f'downfold_1e/iter{iter_1e}']['H0_sIab']
+        Vhf_dc_sIab = ar[f'downfold_1e/iter{it_1e}']['Vhf_dc_sIab'][0, 0]
+        Vhf_sIab = ar[f'downfold_1e/iter{it_1e}']['Vhf_gw_sIab'][0, 0]
+        H0_loc = ar[f'downfold_1e/iter{it_1e}']['H0_sIab']
 
-        if 'Vcorr_gw_sIab' in ar[f'downfold_1e/iter{iter_1e}']:
+        if 'Vcorr_gw_sIab' in ar[f'downfold_1e/iter{it_1e}']:
             mpi.report('Found Vcorr_sIab in the bdft checkpoint file, '
                        'i.e. Embedding on top of an effective QP Hamiltonian.')
-            Vcorr_sIab = ar[f'downfold_1e/iter{iter_1e}/Vcorr_gw_sIab']
-            Vcorr_dc_sIab = ar[f'downfold_1e/iter{iter_1e}/Vcorr_dc_sIab']
+            Vcorr_sIab = ar[f'downfold_1e/iter{it_1e}/Vcorr_gw_sIab']
+            Vcorr_dc_sIab = ar[f'downfold_1e/iter{it_1e}/Vcorr_dc_sIab']
             Hloc0 = -1*(np.eye(n_orb) * gw_data['mu_emb'] - H0_loc[0,0] - Vhf_sIab - Vcorr_sIab + Vhf_dc_sIab + Vcorr_dc_sIab)
             qp_emb = True
         else:
-            Sigma_wsIab = ar[f'downfold_1e/iter{iter_1e}']['Sigma_gw_wsIab']
+            Sigma_wsIab = ar[f'downfold_1e/iter{it_1e}']['Sigma_gw_wsIab']
             qp_emb = False
             Hloc0 = -1*(np.eye(n_orb) * gw_data['mu_emb'] - H0_loc[0,0] - (Vhf_sIab-Vhf_dc_sIab))
 
