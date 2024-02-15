@@ -231,6 +231,16 @@ class SolverStructure:
             self.git_hash = triqs_ctseg_hash
             self.version = version
 
+        elif self.general_params['solver_type'] == 'w2dyn_cthyb':
+            from w2dyn_cthyb.version import w2dyn_cthyb_hash, version
+
+            # sets up necessary GF objects on ImFreq
+            self._init_ImFreq_objects()
+            # sets up solver
+            self.triqs_solver = self._create_w2dyn_cthyb_solver()
+            self.git_hash = w2dyn_cthyb_hash
+            self.version = version
+
     # ********************************************************************
     # initialize Freq and Time objects
     # ********************************************************************
@@ -264,7 +274,8 @@ class SolverStructure:
             or self.general_params['solver_type'] == 'cthyb' and  self.general_params['legendre_fit']
             or self.general_params['solver_type'] == 'ctseg' and self.solver_params['measure_gl']
             or self.general_params['solver_type'] == 'ctseg' and  self.general_params['legendre_fit']
-            or self.general_params['solver_type'] == 'hubbardI' and self.solver_params['measure_G_l']):
+            or self.general_params['solver_type'] == 'hubbardI' and self.solver_params['measure_G_l']
+            or self.general_params['solver_type'] == 'w2dyn_cthyb' and self.solver_params['measure_G_l']):
 
             self.n_l = self.general_params['n_l']
             self.G_l = self.sum_k.block_structure.create_gf(ish=self.icrsh, gf_function=Gf, space='solver',
@@ -610,6 +621,50 @@ class SolverStructure:
             # call postprocessing
             self._ctseg_postprocessing()
 
+        if self.general_params['solver_type'] == 'w2dyn_cthyb':
+
+            # TODO: factor this block out of cthyb and w2dyn_cthyb
+            if self.general_params['cthyb_delta_interface']:
+                mpi.report('\n Using the delta interface for cthyb passing Delta(tau) and Hloc0 directly.')
+                 # prepare solver input
+                sumk_eal = self.sum_k.eff_atomic_levels()[self.icrsh]
+                solver_eal = self.sum_k.block_structure.convert_matrix(sumk_eal, space_from='sumk', ish_from=self.sum_k.inequiv_to_corr[self.icrsh])
+                # fill Delta_time from Delta_freq sum_k to solver
+                for name, g0 in self.G0_freq:
+                    self.Delta_freq[name] << iOmega_n - inverse(g0) - solver_eal[name]
+                    known_moments = make_zero_tail(self.Delta_freq[name], 1)
+                    tail, err = fit_hermitian_tail(self.Delta_freq[name], known_moments)
+                    # without SOC delta_tau needs to be real
+                    if not self.sum_k.SO == 1:
+                        self.triqs_solver.Delta_tau[name] << make_gf_from_fourier(self.Delta_freq[name], self.triqs_solver.Delta_tau.mesh, tail).real
+                    else:
+                        self.triqs_solver.Delta_tau[name] << make_gf_from_fourier(self.Delta_freq[name], self.triqs_solver.Delta_tau.mesh, tail)
+
+
+                # Make non-interacting operator for Hloc0
+                Hloc_0 = Operator()
+                for spin, spin_block in solver_eal.items():
+                    for o1 in range(spin_block.shape[0]):
+                        for o2 in range(spin_block.shape[1]):
+                            # check if off-diag element is larger than threshold
+                            if o1 != o2 and abs(spin_block[o1,o2]) < self.solver_params['off_diag_threshold']:
+                                continue
+                            else:
+                                # TODO: adapt for SOC calculations, which should keep the imag part
+                                Hloc_0 += spin_block[o1,o2].real/2 * (c_dag(spin,o1) * c(spin,o2) + c_dag(spin,o2) * c(spin,o1))
+                self.solver_params['h_loc0'] = Hloc_0
+            else:
+                # fill G0_freq from sum_k to solver
+                self.triqs_solver.G0_iw << self.G0_freq
+
+            # Solve the impurity problem for icrsh shell
+            # *************************************
+            self.triqs_solver.solve(h_int=self.h_int, **{ **self.solver_params, **random_seed })
+            # *************************************
+
+            # call postprocessing
+            self._w2dyn_cthyb_postprocessing()
+
         return
 
     # ********************************************************************
@@ -795,6 +850,24 @@ class SolverStructure:
             triqs_solver = ctseg_solver(beta=self.general_params['beta'], gf_struct=gf_struct,
                             n_iw=self.general_params['n_iw'], n_tau=self.general_params['n_tau'],
                             n_w_b_nn = n_w_b_nn, n_tau_k=int(n_w_b_nn*2.5), n_tau_jperp=int(n_w_b_nn*2.5))
+
+        return triqs_solver
+
+    def _create_w2dyn_cthyb_solver(self):
+        r'''
+        Initialize w2dyn_cthyb solver instance
+        '''
+        from triqs_w2dyn_cthyb import Solver as w2dyn_cthyb_solver
+
+        gf_struct = self.sum_k.gf_struct_solver_list[self.icrsh]
+        # Construct the triqs_solver instances
+        if self.solver_params['measure_G_l']:
+            triqs_solver = w2dyn_cthyb_solver(beta=self.general_params['beta'], gf_struct=gf_struct,
+                            n_iw=self.general_params['n_iw'], n_tau=self.general_params['n_tau'],
+                            n_l=self.general_params['n_l'])
+        else:
+            triqs_solver = w2dyn_cthyb_solver(beta=self.general_params['beta'], gf_struct=gf_struct,
+                            n_iw=self.general_params['n_iw'], n_tau=self.general_params['n_tau'])
 
         return triqs_solver
 
@@ -1171,5 +1244,76 @@ class SolverStructure:
 
         if self.solver_params['measure_hist']:
             self.perturbation_order = self.triqs_solver.histogram
+
+        return
+
+    def _w2dyn_cthyb_postprocessing(self):
+        r'''
+        Organize G_freq, G_time, Sigma_freq and G_l from w2dyn_cthyb solver
+        '''
+
+        def set_Gs_from_G_l():
+
+            # create new G_freq and G_time
+            for i, g in self.G_l:
+                g.enforce_discontinuity(np.identity(g.target_shape[0]))
+                # set G_freq from Legendre and Fouriertransform to get G_time
+                self.G_freq[i].set_from_legendre(g)
+                self.G_time[i].set_from_legendre(g)
+
+            # Symmetrize
+            self.G_freq << make_hermitian(self.G_freq)
+            self.G_freq_unsym << self.G_freq
+            self.sum_k.symm_deg_gf(self.G_freq, ish=self.icrsh)
+            self.sum_k.symm_deg_gf(self.G_time, ish=self.icrsh)
+            # Dyson equation to get Sigma_freq
+            self.Sigma_freq << inverse(self.G0_freq) - inverse(self.G_freq)
+
+            return
+
+        # get Delta_time from solver
+        self.Delta_time << self.triqs_solver.Delta_tau
+
+        # if measured in Legendre basis, get G_l from solver too
+        if self.solver_params['measure_G_l']:
+            # store original G_time into G_time_orig
+            self.G_time_orig << self.triqs_solver.G_tau
+            self.G_l << self.triqs_solver.G_l
+            # get G_time, G_freq, Sigma_freq from G_l
+            set_Gs_from_G_l()
+
+        else:
+            self.G_freq << make_hermitian(self.triqs_solver.G_iw)
+            self.G_freq_unsym << self.G_freq
+            self.sum_k.symm_deg_gf(self.G_freq, ish=self.icrsh)
+            # set G_time
+            self.G_time << self.triqs_solver.G_tau
+            self.sum_k.symm_deg_gf(self.G_time, ish=self.icrsh)
+
+            if self.general_params['legendre_fit']:
+                self.G_time_orig << self.triqs_solver.G_tau
+                # run the filter
+                self.G_l << legendre_filter.apply(self.G_time, self.general_params['n_l'])
+                # get G_time, G_freq, Sigma_freq from G_l
+                set_Gs_from_G_l()
+            elif self.solver_params['perform_tail_fit'] and not self.general_params['legendre_fit']:
+                # if tailfit has been used replace Sigma with the tail fitted Sigma from cthyb
+                self.Sigma_freq << self.triqs_solver.Sigma_iw
+                self.sum_k.symm_deg_gf(self.Sigma_freq, ish=self.icrsh)
+            else:
+                # obtain Sigma via dyson from symmetrized G_freq
+                self.Sigma_freq << inverse(self.G0_freq) - inverse(self.G_freq)
+
+        # if density matrix is measured, get this too
+        if self.solver_params['measure_density_matrix']:
+            self.density_matrix = self.triqs_solver.density_matrix
+            self.h_loc_diagonalization = self.triqs_solver.h_loc_diagonalization
+
+        if self.solver_params['measure_pert_order']:
+            self.perturbation_order = self.triqs_solver.perturbation_order
+            self.perturbation_order_total = self.triqs_solver.perturbation_order_total
+
+        if self.general_params['measure_G2_iw_ph']:
+            pass # TODO
 
         return
