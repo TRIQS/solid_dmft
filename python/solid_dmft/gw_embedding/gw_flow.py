@@ -199,12 +199,6 @@ def embedding_driver(general_params, solver_params, gw_params, advanced_params):
                 ar['DMFT_input']['version']['solid_dmft_hash'] = solid_dmft_hash
                 ar['DMFT_input']['version']['solid_dmft_version'] = solid_dmft_version
 
-            if 'iteration_count' in ar['DMFT_results']:
-                iteration = ar['DMFT_results/iteration_count'] + 1
-            else:
-                iteration = 1
-    iteration = mpi.bcast(iteration)
-
     # lad GW input from h5 file
     if mpi.is_master_node():
         gw_data, ir_kernel = convert_gw_output(
@@ -217,6 +211,7 @@ def embedding_driver(general_params, solver_params, gw_params, advanced_params):
         gw_params.update(gw_data)
     mpi.barrier()
     gw_params = mpi.bcast(gw_params)
+    iteration = gw_params['it_1e']
 
     # if GW calculation was performed with spin never average spin channels
     if gw_params['number_of_spins'] == 2:
@@ -392,7 +387,7 @@ def embedding_driver(general_params, solver_params, gw_params, advanced_params):
         # write results to GW h5_file
         with HDFArchive(gw_params['h5_file'],'a') as ar:
             ar[f'downfold_1e/iter{iteration}']['Sigma_imp_wsIab'] = Sigma_ir
-            ar[f'downfold_1e/iter{iteration}']['Vhf_imp_wsIab'] = Vhf_imp_sIab
+            ar[f'downfold_1e/iter{iteration}']['Vhf_imp_sIab'] = Vhf_imp_sIab
 
 
     mpi.report('*** iteration finished ***')

@@ -279,6 +279,8 @@ def convert_gw_output(job_h5: str, gw_h5: str, wmax_dlr: float, it_1e: int = 0, 
         mpi.report(f'Reading results from downfold_1e iter {it_1e} and downfold_2e iter {it_2e} from given AIMBES chkpt file.')
 
         # auxilary quantities
+        gw_data['it_1e'] = it_1e
+        gw_data['it_2e'] = it_2e
         gw_data['mu_emb'] = ar[f'downfold_1e/iter{it_1e}']['mu']
         gw_data['beta'] = ar['imaginary_fourier_transform']['beta']
         gw_data['lam'] = ar['imaginary_fourier_transform']['lambda']
