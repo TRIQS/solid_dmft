@@ -4,6 +4,8 @@ set (all_pytests
      test_interaction_hamiltonian
      test_manipulate_chemical_potential.py
      test_observables.py
+     test_postproc_toml_dict.py
+     test_postproc_toml_dict_integration.py
      test_read_config.py
      test_update_dmft_config.py
      test_update_results_h5.py
