@@ -1,10 +1,10 @@
 import pytest
-from solid_dmft.io_tools.postproc_toml_dict import _apply_default_values, _verify_restrictions_on_default_and_config, _resolve_references
+from solid_dmft.io_tools.postproc_toml_dict import merge_config_with_default, _apply_default_values, _verify_restrictions_on_default_and_config, _resolve_references
 
-def test_verify_restrictions_invalid_key():
+def test_verify_restrictions_invalid_section():
     config = {
         'section1': {'key1': 'newval11', 'key2': 'newval12'},
-        'section4': {'key1': 'newval31'},
+        'section4': {'key1': 'newval41'},
     }
     default = {
         'section1': {'key1': 'defval11', 'key2': 'defval12', 'key3': 'defval13'},
@@ -17,7 +17,7 @@ def test_verify_restrictions_invalid_key():
 def test_verify_restrictions_key_outside_section_default():
     config = {
         'section1': {'key1': 'newval11', 'key2': 'newval12'},
-        'section4': {'key1': 'newval31'},
+        'section2': {'key1': 'newval31'},
     }
     default = {
         'section1': {'key1': 'defval11', 'key2': 'defval12', 'key3': 'defval13'},
@@ -52,7 +52,7 @@ def test_verify_restriction_missing_listed_section():
     with pytest.raises(ValueError):
         _verify_restrictions_on_default_and_config(default, config, {'section1': 'match'})
 
-def test_verify_restrictions_nonexistent_listed_section():
+def test_merge_config_nonexistent_listed_section():
     config = {
         'section1': {'key1': 'newval11', 'key2': 'newval12'},
         'section2': [{'key1': 'newval31'}],
@@ -63,7 +63,7 @@ def test_verify_restrictions_nonexistent_listed_section():
         'section3': {'key1': 'defval31', 'key2': 'defval32', 'key3': 'defval33'},
     }
     with pytest.raises(ValueError):
-        _verify_restrictions_on_default_and_config(config, default, {})
+        merge_config_with_default(config, default, {})
 
 def test_resolve_references_simple():
     config = {
@@ -137,3 +137,29 @@ def test_apply_default_values_partial_listed_config():
         'section3': {'key1': 'newval31', 'key2': 'defval32', 'key3': 'defval33'},
     }
     assert _apply_default_values(config, default, {'section2': 'match'}) == expected_output
+
+def test_apply_default_values_invalid_key():
+    config = {
+        'section1': {'key1': 'newval11', 'key2': 'newval12'},
+        'section2': {'key4': 'newval24'},
+    }
+    default = {
+        'section1': {'key1': 'defval11', 'key2': 'defval12', 'key3': 'defval13'},
+        'section2': {'key1': 'defval21', 'key2': 'defval22', 'key3': 'defval23'},
+        'section3': {'key1': 'defval31', 'key2': 'defval32', 'key3': 'defval33'},
+    }
+    with pytest.raises(ValueError):
+        _apply_default_values(config, default, {})
+
+def test_apply_default_values_invalid_listed_key():
+    config = {
+        'section1': {'key1': 'newval11', 'key2': 'newval12'},
+        'section2': [{'match': 'matchval', 'key4': 'newval24'}],
+    }
+    default = {
+        'section1': {'key1': 'defval11', 'key2': 'defval12', 'key3': 'defval13'},
+        'section2': [{'match': 'matchval', 'key2': 'defval22', 'key3': 'defval23'}],
+        'section3': {'key1': 'defval31', 'key2': 'defval32', 'key3': 'defval33'},
+    }
+    with pytest.raises(ValueError):
+        _apply_default_values(config, default, {'section2': 'match'})

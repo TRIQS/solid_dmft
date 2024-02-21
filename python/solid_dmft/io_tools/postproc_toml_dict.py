@@ -27,7 +27,7 @@ def _verify_dict_is_full_config(d: Dict[str, Any]) -> None:
         else:
             _verify_dict_is_param_dict(section)
 
-def _verify_restrictions_on_default_and_config(cfg_def: Dict[str, Any], cfg_inp: Dict[str, Any], match_key: Dict[str, str]) -> None:
+def _verify_restrictions_on_default_and_config(cfg_inp: Dict[str, Any], cfg_def: Dict[str, Any], match_key: Dict[str, str]) -> None:
     """ Checks that the restrictions described in the docstring of merge_config_with_default are met. """
     # Checks that type of cfg_def dict is FullConfig
     _verify_dict_is_full_config(cfg_def)
@@ -74,10 +74,19 @@ def _apply_default_values(cfg_inp: FullConfig, cfg_def: FullConfig, match_key: D
                 else:
                     raise ValueError(f'No matching section with same "{section_name}.{key}"="{entry[key]}" found in defaults.')
                 # Updates config values in output
+                unknown_keys = set(entry.keys()) - set(output[section_name][-1].keys())
+                if unknown_keys:
+                    raise ValueError(f'Unknown keys {unknown_keys} found in section "{section_name}". '
+                                     'All valid keys have to be in the default config.')
                 output[section_name][-1].update(entry)
         else:
+            entry = cfg_inp.get(section_name, {})
             output[section_name] = copy.deepcopy(section)
-            output[section_name].update(cfg_inp.get(section_name, {}))
+            unknown_keys = set(entry.keys()) - set(output[section_name].keys())
+            if unknown_keys:
+                raise ValueError(f'Unknown keys {unknown_keys} found in section "{section_name}". '
+                                 'All valid keys have to be in the default config.')
+            output[section_name].update(entry)
 
     return output
 
@@ -124,7 +133,7 @@ def merge_config_with_default(cfg_inp: Dict[str, Any], cfg_def: Dict[str, Any],
     """
 
     # Check restrictions and makes sure that config and default are of type FullConfig
-    _verify_restrictions_on_default_and_config(cfg_def, cfg_inp, match_key)
+    _verify_restrictions_on_default_and_config(cfg_inp, cfg_def, match_key)
 
     # Checks that keys not listed in match_key are dicts
     # The others can be lists or dicts. This differs from cfg_def

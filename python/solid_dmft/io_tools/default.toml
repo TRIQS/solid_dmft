@@ -12,6 +12,7 @@ csc = false
 dc = true
 dc_dmft = "<none>"
 dc_type = "<none>"
+dft_mu = "<none>"
 diag_delta = false
 enforce_off_diag = false
 fixed_mu_value = "<none>"
