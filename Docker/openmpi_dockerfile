@@ -7,6 +7,10 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
       ca-certificates \
       clang-${LLVM} \
       cmake \
+      sudo \
+      less \
+      vim \
+      nano \
       curl \
       cython3 \
       debhelper \
