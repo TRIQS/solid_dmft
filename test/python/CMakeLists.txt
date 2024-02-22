@@ -68,7 +68,7 @@ FILE(COPY UIJKL DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 foreach(test ${integration_tests})
   set (test_dir ${CMAKE_CURRENT_BINARY_DIR}/${test})
 
-  foreach(file dmft_config.ini inp.h5 ref.h5 test.py)
+  foreach(file dmft_config.toml inp.h5 ref.h5 test.py)
     FILE(COPY ${test}/${file} DESTINATION ${test_dir})
   endforeach()
 

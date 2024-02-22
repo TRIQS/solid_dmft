@@ -1,6 +1,6 @@
 [general]
 afm_order = false
-beta = "<no default>"
+beta = "<none>"
 block_suppress_orbital_symm = false
 block_threshold = 1.0e-5
 broy_max_it = -1
@@ -12,9 +12,9 @@ csc = false
 dc = true
 dc_dmft = "<none>"
 dc_type = "<none>"
-dft_mu = "<none>"
 diag_delta = false
 enforce_off_diag = false
+eta = "<none>"
 fixed_mu_value = "<none>"
 g0_conv_crit = -1.0
 g0_mix = 1.0
@@ -34,7 +34,7 @@ loc_n_max = "<none>"
 magmom = "<none>"
 magnetic = false
 measure_chi_insertions = 100
-measure_chi_SzSz = false
+measure_chi = "<none>"
 mu_gap_gb2_threshold = "<none>"
 mu_gap_occ_deviation = "<none>"
 mu_initial_guess = "<none>"
@@ -46,6 +46,7 @@ n_iter_dmft_first = 10
 n_iter_dmft_per = 2
 n_iw = 1025
 n_tau = 10001
+n_w = 5001
 noise_level_initial_sigma = 0.0
 occ_conv_crit = -1.0
 path_to_sigma = "<none>"
@@ -58,13 +59,14 @@ seedname = "<no default>"
 set_rot = "<none>"
 sigma_conv_crit = -1.0
 sigma_mix = 1.0
+store_solver = false
 U = "<no default>"
 U_prime = "U-2J"
+w_range = [-10, 10]
 
 [[solver]]
 type = "cthyb"
 idx_impurities = "<none>"
-store_solver = false
 delta_interface = false
 fit_max_moment = "<none>"
 fit_max_n = "<none>"
@@ -90,7 +92,6 @@ random_seed = "<none>"
 [[solver]]
 type = "ctint"
 idx_impurities = "<none>"
-store_solver = false
 length_cycle = "<no default>"
 max_time = "<none>"
 measure_pert_order = false
@@ -102,7 +103,6 @@ random_seed = "<none>"
 [[solver]]
 type = "ctseg"
 idx_impurities = "<none>"
-store_solver = false
 improved_estimator = false
 legendre_fit = false
 length_cycle = "<no default>"
@@ -119,20 +119,16 @@ random_seed = "<none>"
 [[solver]]
 type = "hubbardI"
 idx_impurities = "<none>"
-store_solver = false
-eta = "<no default>"
+eta = "<none>"
 legendre_fit = false
 measure_density_matrix = false
 measure_G_l = false
 measure_G_tau = true
 n_l = "<none>"
-n_w = 5001
-w_range = [-10, 10]
 
 [[solver]]
 type = "ftps"
 idx_impurities = "<none>"
-store_solver = false
 bath_fit = "<no default>"
 calc_me = true
 dmrg_maxm = 100
@@ -142,34 +138,27 @@ dmrg_maxmIB = 100
 dmrg_tw = 1.0e-9
 dt = "<no default>"
 enforce_gap = "<none>"
-eta = "<no default>"
 ignore_weight = 0.0
 maxm = 100
 maxmB = 100
 maxmI = 100
 maxmIB = 100
 n_bath = 0
-n_w = 5001
 path_to_gs = "<none>"
 ph_symm = false
 refine_factor = 1
 state_storage = "./"
 sweeps = 10
 tw = 1.0e-9
-w_range = [-10, 10]
 
 [[solver]]
 type = "hartree"
 idx_impurities = "<none>"
-store_solver = false
-eta = "<no default>"
 force_real = true
 method = "krylov"
-n_w = 5001
 one_shot = false
 tol = 1e-5
 with_fock = false
-w_range = [-10, 10]
 
 [dft]
 dft_code = "<none>"
@@ -188,6 +177,7 @@ dc_factor = "<none>"
 dc_fixed_occ = "<none>"
 dc_fixed_value = "<none>"
 dc_nominal = false
+dc_orb_shift = "<none>"
 dc_J = "<general.J>"
 dc_U = "<general.U>"
 map_solver_struct = "<none>"

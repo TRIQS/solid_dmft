@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 ################################################################################
 #
 # solid_dmft - A versatile python wrapper to perform DFT+DMFT calculations
@@ -38,7 +37,7 @@ import triqs.utility.mpi as mpi
 from triqs.gf import BlockGf, Gf
 
 
-def calculate_double_counting(sum_k, density_matrix, general_params, advanced_params):
+def calculate_double_counting(sum_k, density_matrix, general_params, advanced_params, solver_type_per_imp):
     """
     Calculates the double counting, including all manipulations from advanced_params.
 
@@ -63,16 +62,22 @@ def calculate_double_counting(sum_k, density_matrix, general_params, advanced_pa
     # copy the density matrix to not change it
     density_matrix_DC = deepcopy(density_matrix)
 
-    if general_params['solver_type'] == 'hartree':
-        mpi.report('\nSOLID_DMFT: Hartree solver detected, zeroing out the DC correction. This gets computed at the solver level')
-        for icrsh in range(sum_k.n_inequiv_shells):
-            sum_k.calc_dc(density_matrix_DC[icrsh], orb=icrsh,
-                          use_dc_value=0.0)
-        return sum_k
+    def iterate_except_hartree():
+        for iineq, type in enumerate(solver_type_per_imp):
+            if type == 'hartree':
+                mpi.report('\nSOLID_DMFT: Hartree solver for impurity {iineq} detected. '
+                           'Zeroing out the DC correction. This gets computed at the solver level')
+            else:
+                yield iineq
+
+    # TODO: suppress print when reseting DC to zero
+    for icrsh in range(sum_k.n_inequiv_shells):
+        sum_k.calc_dc(density_matrix_DC[icrsh], orb=icrsh,
+                      use_dc_value=0.0)
 
     # Sets the DC and exits the function if advanced_params['dc_fixed_value'] is specified
-    if advanced_params['dc_fixed_value'] != 'none':
-        for icrsh in range(sum_k.n_inequiv_shells):
+    if advanced_params['dc_fixed_value'] is not None:
+        for icrsh in iterate_except_hartree():
             sum_k.calc_dc(density_matrix_DC[icrsh], orb=icrsh,
                           use_dc_value=advanced_params['dc_fixed_value'])
         return sum_k
@@ -80,17 +85,16 @@ def calculate_double_counting(sum_k, density_matrix, general_params, advanced_pa
     # use DC for CPA
     if general_params['dc'] and general_params['dc_type'] == 4:
         zetas = general_params['cpa_zeta']
-        for icrsh in range(sum_k.n_inequiv_shells):
+        for icrsh in iterate_except_hartree():
             sum_k.calc_dc(density_matrix_DC[icrsh], orb=icrsh, use_dc_value=zetas[icrsh])
 
         return sum_k
 
-
-    if advanced_params['dc_fixed_occ'] != 'none':
+    if advanced_params['dc_fixed_occ'] is not None:
         mpi.report('Fixing occupation for DC potential to provided value')
 
         assert sum_k.n_inequiv_shells == len(advanced_params['dc_fixed_occ']), "give exactly one occupation per correlated shell"
-        for icrsh in range(sum_k.n_inequiv_shells):
+        for icrsh in iterate_except_hartree():
             mpi.report('fixing occupation for impurity '+str(icrsh)+' to n='+str(advanced_params['dc_fixed_occ'][icrsh]))
             n_orb = sum_k.corr_shells[icrsh]['dim']
             # we need to handover a matrix to calc_dc so calc occ per orb per spin channel
@@ -100,7 +104,7 @@ def calculate_double_counting(sum_k, density_matrix, general_params, advanced_pa
                 np.fill_diagonal(inner, orb_occ+0.0j)
 
     # The regular way: calculates the DC based on U, J and the dc_type
-    for icrsh in range(sum_k.n_inequiv_shells):
+    for icrsh in iterate_except_hartree():
         if general_params['dc_type'] == 3:
             # this is FLL for eg orbitals only as done in Seth PRB 96 205139 2017 eq 10
             # this setting for U and J is reasonable as it is in the spirit of F0 and Javg
@@ -118,6 +122,8 @@ def calculate_double_counting(sum_k, density_matrix, general_params, advanced_pa
     # for the fixed DC according to https://doi.org/10.1103/PhysRevB.90.075136
     # dc_imp is calculated with fixed occ but dc_energ is calculated with given n
     if advanced_params['dc_nominal']:
+        if 'Hartree' in solver_type_per_imp:
+            raise NotImplementedError('dc_nominal not implemented in presence of Hartree solver')
         mpi.report('\ncalculating DC energy with fixed DC potential from above\n'
                    + ' for the original density matrix doi.org/10.1103/PhysRevB.90.075136\n'
                    + ' aka nominal DC')
@@ -147,7 +153,9 @@ def calculate_double_counting(sum_k, density_matrix, general_params, advanced_pa
             mpi.report('DC energy for shell {} = {}'.format(icrsh, energy_per_shell))
 
     # Rescales DC if advanced_params['dc_factor'] is given
-    if advanced_params['dc_factor'] != 'none':
+    if advanced_params['dc_factor'] is not None:
+        if 'Hartree' in solver_type_per_imp:
+            raise NotImplementedError('dc_factor not implemented in presence of Hartree solver')
         rescaled_dc_imp = [{spin: advanced_params['dc_factor'] * dc_per_spin
                             for spin, dc_per_spin in dc_per_shell.items()}
                           for dc_per_shell in sum_k.dc_imp]
@@ -162,7 +170,9 @@ def calculate_double_counting(sum_k, density_matrix, general_params, advanced_pa
                 mpi.report('DC for shell {} and block {} = {}'.format(icrsh, spin, dc_per_spin[0][0]))
             mpi.report('DC energy for shell {} = {}'.format(icrsh, energy_per_shell))
 
-    if advanced_params['dc_orb_shift'] != 'none':
+    if advanced_params['dc_orb_shift'] is not None:
+        if 'Hartree' in solver_type_per_imp:
+            raise NotImplementedError('dc_orb_shift not implemented in presence of Hartree solver')
         mpi.report('adding an extra orbital dependent shift per impurity')
         tot_norb = 0
         dc_orb_shift = []
@@ -350,7 +360,8 @@ def _set_loaded_sigma(sum_k, loaded_sigma, loaded_dc_imp, general_params):
 
 
 def determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
-                                   archive, iteration_offset, density_mat_dft, solvers):
+                                   archive, iteration_offset, density_mat_dft, solvers,
+                                   solver_type_per_imp):
     """
     Determines the double counting (DC) and the initial Sigma. This can happen
     in five different ways:
@@ -399,7 +410,7 @@ def determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
             print('\nFrom previous calculation:', end=' ')
             start_sigma, sum_k.dc_imp, sum_k.dc_energ, last_g0,  _ = _load_sigma_from_h5(archive, -1)
             if general_params['csc'] and not general_params['dc_dmft']:
-                sum_k = calculate_double_counting(sum_k, density_mat_dft, general_params, advanced_params)
+                sum_k = calculate_double_counting(sum_k, density_mat_dft, general_params, advanced_params, solver_type_per_imp)
         # Loads Sigma from different calculation
         elif general_params['load_sigma']:
             print('\nFrom {}:'.format(general_params['path_to_sigma']), end=' ')
@@ -411,25 +422,24 @@ def determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
             if general_params['dc']:
                 if general_params['dc_dmft']:
                     sum_k = calculate_double_counting(sum_k, loaded_density_matrix,
-                                                       general_params, advanced_params)
+                                                      general_params, advanced_params,
+                                                      solver_type_per_imp)
                 else:
                     sum_k = calculate_double_counting(sum_k, density_mat_dft,
-                                                       general_params, advanced_params)
+                                                      general_params, advanced_params,
+                                                      solver_type_per_imp)
 
             start_sigma = _set_loaded_sigma(sum_k, loaded_sigma, loaded_dc_imp, general_params)
 
         # Sets DC as Sigma because no initial Sigma given
         elif general_params['dc']:
-            sum_k = calculate_double_counting(sum_k, density_mat_dft, general_params, advanced_params)
+            sum_k = calculate_double_counting(sum_k, density_mat_dft, general_params, advanced_params,
+                                              solver_type_per_imp)
 
             # initialize Sigma from sum_k
-            if general_params['solver_type'] in ['ftps']:
-                start_sigma = [sum_k.block_structure.create_gf(ish=iineq, gf_function=Gf, space='solver',
-                                                               mesh=sum_k.mesh)
-                               for iineq in range(sum_k.n_inequiv_shells)]
-            else:
-                start_sigma = [sum_k.block_structure.create_gf(ish=iineq, space='solver', mesh=sum_k.mesh)
-                               for iineq in range(sum_k.n_inequiv_shells)]
+            start_sigma = [sum_k.block_structure.create_gf(ish=iineq, gf_function=Gf, space='solver',
+                                                           mesh=sum_k.mesh)
+                           for iineq in range(sum_k.n_inequiv_shells)]
             for icrsh in range(sum_k.n_inequiv_shells):
                 dc_value = sum_k.dc_imp[sum_k.inequiv_to_corr[icrsh]][sum_k.spin_block_names[sum_k.SO][0]][0, 0]
 
@@ -466,13 +476,8 @@ def determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
                         else:
                             start_sigma[icrsh][spin_channel] << fac
         else:
-            if general_params['solver_type'] in ['ftps']:
-                start_sigma = [sum_k.block_structure.create_gf(ish=iineq, gf_function=Gf, space='solver',
-                                                               mesh=sum_k.mesh)
-                               for iineq in range(sum_k.n_inequiv_shells)]
-            else:
-                start_sigma = [sum_k.block_structure.create_gf(ish=iineq, space='solver', mesh=sum_k.mesh)
-                               for iineq in range(sum_k.n_inequiv_shells)]
+            start_sigma = [sum_k.block_structure.create_gf(ish=iineq, gf_function=Gf, space='solver', mesh=sum_k.mesh)
+                           for iineq in range(sum_k.n_inequiv_shells)]
 
     # Adds random, frequency-independent noise in zeroth iteration to break symmetries
     if not np.isclose(general_params['noise_level_initial_sigma'], 0) and iteration_offset == 0:
@@ -500,11 +505,11 @@ def determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
     sum_k.put_Sigma([solvers[icrsh].Sigma_freq for icrsh in range(sum_k.n_inequiv_shells)])
 
     # load sigma as first guess in the hartree solver if applicable
-    if general_params['solver_type'] == 'hartree':
+    for icrsh in range(sum_k.n_inequiv_shells):
         # TODO:
         # should this be moved to before the solve() call? Having it only here means there is a mismatch
         # between the mixing at the level of the solver and the sumk (solver mixes always 100%)
-        for icrsh in range(sum_k.n_inequiv_shells):
+        if solver_type_per_imp[icrsh] == 'hartree':
             mpi.report(f"SOLID_DMFT: setting first guess hartree solver for impurity {icrsh}")
             solvers[icrsh].triqs_solver.reinitialize_sigma(start_sigma[icrsh])
 

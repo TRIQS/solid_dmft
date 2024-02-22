@@ -95,6 +95,10 @@ def _replace_none(d: ParamDict) -> None:
     for key, value in d.items():
         if value == '<none>':
             d[key] = None
+        elif isinstance(value, list):
+            for i, v in enumerate(value):
+                if v == '<none>':
+                    value[i] = None
 
 def _verify_all_mandatory_fields_present(d: ParamDict, section_name: str) -> None:
     """ Verifies that all fields with "<no default>" have been replaced after reading in the config. """
@@ -128,7 +132,7 @@ def merge_config_with_default(cfg_inp: Dict[str, Any], cfg_def: Dict[str, Any],
 
     The dicts allows for the following extensions:
     - Mandatory inputs for all calculations indicated by "<no default>"
-    - None indicated by "<none>"
+    - None indicated by "<none>". Also works in lists
     - Self-referencing fields indicated by "<section.key>"
     """
 

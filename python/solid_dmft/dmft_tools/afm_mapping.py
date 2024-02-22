@@ -120,7 +120,7 @@ def apply(general_params, solver_params, icrsh, gf_struct_solver, solvers):
         solvers[icrsh].density_matrix = solvers[imp_source].density_matrix
         solvers[icrsh].h_loc_diagonalization = solvers[imp_source].h_loc_diagonalization
 
-    if general_params['measure_chi'] != 'none':
+    if general_params['measure_chi'] is not None:
         solvers[icrsh].O_time = solvers[imp_source].O_time
 
     return solvers

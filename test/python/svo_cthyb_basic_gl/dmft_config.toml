@@ -1,17 +1,14 @@
 [general]
-seedname = inp
-jobname = out
-enforce_off_diag = False
+seedname = "inp"
+jobname = "out"
+enforce_off_diag = false
 block_threshold= 0.001
 mu_initial_guess = -0.027041
-solver_type = cthyb
-n_l = 35
 
 prec_mu = 0.001
 n_iw = 501
-t_tau = 2001
 
-h_int_type = kanamori
+h_int_type = "kanamori"
 U = 8.0
 J = 0.65
 
@@ -20,21 +17,23 @@ beta = 10
 n_iter_dmft = 1
 
 dc_type = 1
-dc = True
-dc_dmft = False
+dc = true
+dc_dmft = false
 
-calc_energies = True
+calc_energies = true
 sigma_mix = 0.9
 
 h5_save_freq = 5
-load_sigma = False
+load_sigma = false
 
 [solver]
-store_solver = True
+type = "cthyb"
+store_solver = true
+n_l = 35
+n_tau = 10001
 length_cycle = 120
 n_warmup_cycles = 8000
 n_cycles_tot = 1e+4
 imag_threshold = 1e-5
-measure_G_l = True
-measure_density_matrix = True
-
+measure_G_l = true
+measure_density_matrix = true

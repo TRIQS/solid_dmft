@@ -147,7 +147,7 @@ class SolverStructure:
             self.random_seed_generator = MathExpr(solver_params["random_seed"])
 
         # initialize solver object, options are cthyb
-        if self.general_params['solver_type'] == 'cthyb':
+        if self.solver_params['type'] == 'cthyb':
             from triqs_cthyb.version import triqs_cthyb_hash, version
 
             # sets up necessary GF objects on ImFreq
@@ -157,7 +157,7 @@ class SolverStructure:
             self.git_hash = triqs_cthyb_hash
             self.version = version
 
-        elif self.general_params['solver_type'] == 'ctint':
+        elif self.solver_params['type'] == 'ctint':
             from triqs_ctint.version import triqs_ctint_hash, version
 
             # sets up necessary GF objects on ImFreq
@@ -169,7 +169,7 @@ class SolverStructure:
             self.git_hash = triqs_ctint_hash
             self.version = version
 
-        elif self.general_params['solver_type'] == 'hubbardI':
+        elif self.solver_params['type'] == 'hubbardI':
             from triqs_hubbardI.version import triqs_hubbardI_hash, version
 
             # sets up necessary GF objects on ImFreq
@@ -180,7 +180,7 @@ class SolverStructure:
             self.git_hash = triqs_hubbardI_hash
             self.version = version
 
-        elif self.general_params['solver_type'] == 'hartree':
+        elif self.solver_params['type'] == 'hartree':
             from triqs_hartree_fock.version import triqs_hartree_fock_hash, version
 
             # sets up necessary GF objects on ImFreq
@@ -191,7 +191,7 @@ class SolverStructure:
             self.git_hash = triqs_hartree_fock_hash
             self.version = version
 
-        elif self.general_params['solver_type'] == 'ftps':
+        elif self.solver_params['type'] == 'ftps':
             from forktps.version import forktps_hash, version
 
             # additional parameters
@@ -213,7 +213,7 @@ class SolverStructure:
             self.git_hash = forktps_hash
             self.version = version
 
-        elif self.general_params['solver_type'] == 'inchworm':
+        elif self.solver_params['type'] == 'inchworm':
 
             # sets up necessary GF objects on ImFreq
             self._init_ImFreq_objects()
@@ -221,7 +221,7 @@ class SolverStructure:
             self.triqs_solver = self._create_inchworm_solver()
             # self.git_hash = inchworm_hash
 
-        elif self.general_params['solver_type'] == 'ctseg':
+        elif self.solver_params['type'] == 'ctseg':
             from triqs_ctseg.version import triqs_ctseg_hash, version
 
             # sets up necessary GF objects on ImFreq
@@ -260,13 +260,13 @@ class SolverStructure:
         self.Delta_time = self.G_time.copy()
 
         # create all Legendre instances
-        if (self.general_params['solver_type'] == 'cthyb' and self.solver_params['measure_G_l']
-            or self.general_params['solver_type'] == 'cthyb' and  self.general_params['legendre_fit']
-            or self.general_params['solver_type'] == 'ctseg' and self.solver_params['measure_gl']
-            or self.general_params['solver_type'] == 'ctseg' and  self.general_params['legendre_fit']
-            or self.general_params['solver_type'] == 'hubbardI' and self.solver_params['measure_G_l']):
+        if (self.solver_params['type'] == 'cthyb' and self.solver_params['measure_G_l']
+            or self.solver_params['type'] == 'cthyb' and  self.general_params['legendre_fit']
+            or self.solver_params['type'] == 'ctseg' and self.solver_params['measure_gl']
+            or self.solver_params['type'] == 'ctseg' and  self.general_params['legendre_fit']
+            or self.solver_params['type'] == 'hubbardI' and self.solver_params['measure_G_l']):
 
-            self.n_l = self.general_params['n_l']
+            self.n_l = self.solver_params['n_l']
             self.G_l = self.sum_k.block_structure.create_gf(ish=self.icrsh, gf_function=Gf, space='solver',
                                                             mesh=MeshLegendre(beta=self.general_params['beta'],
                                                                               max_n=self.n_l, S='Fermion')
@@ -274,11 +274,11 @@ class SolverStructure:
             # move original G_freq to G_freq_orig
             self.G_time_orig = self.G_time.copy()
 
-        if self.general_params['solver_type'] in ['cthyb', 'hubbardI'] and self.solver_params['measure_density_matrix']:
+        if self.solver_params['type'] in ['cthyb', 'hubbardI'] and self.solver_params['measure_density_matrix']:
             self.density_matrix = None
             self.h_loc_diagonalization = None
 
-        if self.general_params['solver_type'] in ['cthyb'] and self.general_params['measure_chi'] != 'none':
+        if self.solver_params['type'] in ['cthyb'] and self.general_params['measure_chi'] is not None:
             self.O_time = None
 
     def _init_ReFreq_objects(self):
@@ -351,7 +351,7 @@ class SolverStructure:
         else:
             random_seed = { "random_seed": int(self.random_seed_generator(it=kwargs["it"], rank=mpi.rank)) }
 
-        if self.general_params['solver_type'] == 'cthyb':
+        if self.solver_params['type'] == 'cthyb':
 
             if self.general_params['cthyb_delta_interface']:
                 mpi.report('\n Using the delta interface for cthyb passing Delta(tau) and Hloc0 directly.')
@@ -403,7 +403,7 @@ class SolverStructure:
             # call postprocessing
             self._cthyb_postprocessing()
 
-        elif self.general_params['solver_type'] == 'ctint':
+        elif self.solver_params['type'] == 'ctint':
             # fill G0_freq from sum_k to solver
             self.triqs_solver.G0_iw << self.G0_freq
 
@@ -419,9 +419,11 @@ class SolverStructure:
             # call postprocessing
             self._ctint_postprocessing()
 
-        elif self.general_params['solver_type'] == 'hubbardI':
+        elif self.solver_params['type'] == 'hubbardI':
             # fill G0_freq from sum_k to solver
             self.triqs_solver.G0_iw << self.G0_freq
+
+            print()
 
             # Solve the impurity problem for icrsh shell
             # *************************************
@@ -439,7 +441,7 @@ class SolverStructure:
             # call postprocessing
             self._hubbardI_postprocessing()
 
-        elif self.general_params['solver_type'] == 'hartree':
+        elif self.solver_params['type'] == 'hartree':
             # fill G0_freq from sum_k to solver
             self.triqs_solver.G0_iw << self.G0_freq
 
@@ -453,7 +455,7 @@ class SolverStructure:
             # call postprocessing
             self._hartree_postprocessing()
 
-        elif self.general_params['solver_type'] == 'ftps':
+        elif self.solver_params['type'] == 'ftps':
             import forktps as ftps
             from forktps.DiscreteBath import DiscretizeBath, TimeStepEstimation
             from forktps.BathFitting import BathFitter
@@ -511,7 +513,7 @@ class SolverStructure:
                     Delta_discrete = fitter.FitBath(Delta=self.Delta_freq_solver, eta=self.general_params['eta'], ignoreWeight=self.solver_params['ignore_weight'])
             else:
                 # discretizebath
-                gap_interval = self.solver_params['enforce_gap'] if self.solver_params['enforce_gap'] != 'none' else None
+                gap_interval = self.solver_params['enforce_gap'] if self.solver_params['enforce_gap'] is not None else None
                 Delta_discrete = DiscretizeBath(Delta=self.Delta_freq_solver, Nb=self.solver_params['n_bath'], gap=gap_interval,
                                                 SO=bool(self.sum_k.corr_shells[self.icrsh]['SO']))
 
@@ -564,7 +566,7 @@ class SolverStructure:
 
             # Solve the impurity problem for icrsh shell
             # *************************************
-            path_to_gs = self.solver_params['path_to_gs'] if self.solver_params['path_to_gs'] != 'none' and self.path_to_gs_accepted else None
+            path_to_gs = self.solver_params['path_to_gs'] if self.solver_params['path_to_gs'] is not None and self.path_to_gs_accepted else None
             # fix to make sure this is only done in iteration 1
             if self.path_to_gs_accepted:
                 self.path_to_gs_accepted = False
@@ -581,7 +583,7 @@ class SolverStructure:
             # call postprocessing
             self._ftps_postprocessing()
 
-        elif self.general_params['solver_type'] == 'inchworm':
+        elif self.solver_params['type'] == 'inchworm':
             # fill Delta_time from Delta_freq sum_k to solver
             self.triqs_solver.Delta_tau << make_gf_from_fourier(self.Delta_freq).real
 
@@ -593,7 +595,7 @@ class SolverStructure:
             # call postprocessing
             self._inchworm_postprocessing()
 
-        if self.general_params['solver_type'] == 'ctseg':
+        if self.solver_params['type'] == 'ctseg':
             # fill G0_freq from sum_k to solver
             self.triqs_solver.G0_iw << self.G0_freq
 
@@ -627,11 +629,11 @@ class SolverStructure:
         if self.solver_params['measure_G_l']:
             triqs_solver = cthyb_solver(beta=self.general_params['beta'], gf_struct=gf_struct,
                             n_iw=self.general_params['n_iw'], n_tau=self.general_params['n_tau'],
-                            n_l=self.general_params['n_l'], delta_interface=self.general_params['cthyb_delta_interface'])
+                            n_l=self.solver_params['n_l'], delta_interface=self.solver_params['delta_interface'])
         else:
             triqs_solver = cthyb_solver(beta=self.general_params['beta'], gf_struct=gf_struct,
                             n_iw=self.general_params['n_iw'], n_tau=self.general_params['n_tau'],
-                            delta_interface=self.general_params['cthyb_delta_interface'])
+                            delta_interface=self.solver_params['delta_interface'])
 
         return triqs_solver
 
@@ -643,6 +645,7 @@ class SolverStructure:
 
         gf_struct = self.sum_k.gf_struct_solver_list[self.icrsh]
 
+        # TODO: isn't h_int_type a list?
         if self.general_params['h_int_type'] == 'dynamic':
             self.U_iw = None
             if  mpi.is_master_node():
@@ -672,13 +675,13 @@ class SolverStructure:
         if self.solver_params['measure_G_l']:
             triqs_solver = hubbardI_solver(beta=self.general_params['beta'], gf_struct=gf_struct,
                                            n_iw=self.general_params['n_iw'], n_tau=self.general_params['n_tau'],
-                                           n_l=self.general_params['n_l'], n_w=self.general_params['n_w'],
+                                           n_l=self.solver_params['n_l'], n_w=self.general_params['n_w'],
                                            w_min=self.general_params['w_range'][0], w_max=self.general_params['w_range'][1],
-                                           idelta=self.general_params['eta'])
+                                           idelta=self.solver_params['eta'])
         else:
             triqs_solver = hubbardI_solver(beta=self.general_params['beta'], gf_struct=gf_struct,
                                            n_iw=self.general_params['n_iw'], n_tau=self.general_params['n_tau'],
-                                           n_w=self.general_params['n_w'], idelta=self.general_params['eta'],
+                                           n_w=self.general_params['n_w'], idelta=self.solver_params['eta'],
                                            w_min=self.general_params['w_range'][0], w_max=self.general_params['w_range'][1])
 
         return triqs_solver
@@ -724,16 +727,16 @@ class SolverStructure:
                     correlated shell number
             """
             for key in ['dc', 'dc_type']:
-                if key in general_params and general_params[key] != 'none':
+                if key in general_params and general_params[key] is not None:
                     setattr(hartree_instance, key, general_params[key])
 
             for key in ['dc_factor', 'dc_fixed_value']:
-                if key in advanced_params and advanced_params[key] != 'none':
+                if key in advanced_params and advanced_params[key] is not None:
                     setattr(hartree_instance, key, advanced_params[key])
 
             #list valued keys
             for key in ['dc_U', 'dc_J', 'dc_fixed_occ']:
-                if key in advanced_params and advanced_params[key] != 'none':
+                if key in advanced_params and advanced_params[key] is not None:
                     setattr(hartree_instance, key, advanced_params[key][icrsh])
 
             # Handle special cases
@@ -790,7 +793,7 @@ class SolverStructure:
         if self.solver_params['measure_gl']:
             triqs_solver = ctseg_solver(beta=self.general_params['beta'], gf_struct=gf_struct,
                             n_iw=self.general_params['n_iw'], n_tau=self.general_params['n_tau'],
-                            n_legendre_g=self.general_params['n_l'], n_w_b_nn = n_w_b_nn, n_tau_k=int(n_w_b_nn*2.5), n_tau_jperp=int(n_w_b_nn*2.5))
+                            n_legendre_g=self.solver_params['n_l'], n_w_b_nn = n_w_b_nn, n_tau_k=int(n_w_b_nn*2.5), n_tau_jperp=int(n_w_b_nn*2.5))
         else:
             triqs_solver = ctseg_solver(beta=self.general_params['beta'], gf_struct=gf_struct,
                             n_iw=self.general_params['n_iw'], n_tau=self.general_params['n_tau'],
@@ -892,7 +895,7 @@ class SolverStructure:
             if self.general_params['legendre_fit']:
                 self.G_time_orig << self.triqs_solver.G_tau
                 # run the filter
-                self.G_l << legendre_filter.apply(self.G_time, self.general_params['n_l'])
+                self.G_l << legendre_filter.apply(self.G_time, self.solver_params['n_l'])
                 # get G_time, G_freq, Sigma_freq from G_l
                 set_Gs_from_G_l()
             elif self.solver_params['perform_tail_fit'] and not self.general_params['legendre_fit']:
@@ -912,7 +915,7 @@ class SolverStructure:
             self.perturbation_order = self.triqs_solver.perturbation_order
             self.perturbation_order_total = self.triqs_solver.perturbation_order_total
 
-        if self.general_params['measure_chi'] != 'none':
+        if self.general_params['measure_chi'] is not None:
             self.O_time = self.triqs_solver.O_tau
 
         return
@@ -948,7 +951,7 @@ class SolverStructure:
         # if self.general_params['legendre_fit']:
         #     self.G_freq_orig << self.triqs_solver.G_iw
         #     # run the filter
-        #     self.G_l << legendre_filter.apply(self.G_time, self.general_params['n_l'])
+        #     self.G_l << legendre_filter.apply(self.G_time, self.solver_params['n_l'])
         #     # get G_time, G_freq, Sigma_freq from G_l
         #     set_Gs_from_G_l()
 
@@ -1141,7 +1144,7 @@ class SolverStructure:
             set_Gs_from_G_l()
         elif self.general_params['legendre_fit']:
             self.G_time_orig << self.triqs_solver.G_tau
-            self.G_l << legendre_filter.apply(self.G_time, self.general_params['n_l'])
+            self.G_l << legendre_filter.apply(self.G_time, self.solver_params['n_l'])
             # get G_time, G_freq, Sigma_freq from G_l
             set_Gs_from_G_l()
         # if improved estimators are turned on calc Sigma from F_tau, otherwise:

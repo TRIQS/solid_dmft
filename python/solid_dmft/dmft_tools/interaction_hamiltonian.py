@@ -42,33 +42,6 @@ try:
 except ImportError:
     pass
 
-
-def _extract_U_J_list(param_name, n_inequiv_shells, general_params):
-    """
-    Checks if param_name ('U', 'U_prime', or 'J') are a single value or
-    different per inequivalent shell. If just a single value is given,
-    this value is applied to each shell.
-    """
-
-    if not isinstance(param_name, str):
-        formatted_param = ['none' if p == 'none' else '{:.2f}'.format(p)
-                           for p in general_params[param_name]]
-    else:
-        formatted_param = general_params[param_name]
-
-    if len(general_params[param_name]) == 1:
-        mpi.report('Assuming {} = '.format(param_name)
-                   + '{} for all correlated shells'.format(formatted_param[0]))
-        general_params[param_name] *= n_inequiv_shells
-    elif len(general_params[param_name]) == n_inequiv_shells:
-        mpi.report('{} list for correlated shells: {}'.format(param_name, formatted_param))
-    else:
-        raise IndexError('Property list {} '.format(general_params[param_name])
-                         + 'must have length 1 or n_inequiv_shells')
-
-    return general_params
-
-
 def _load_crpa_interaction_matrix(sum_k, filename='UIJKL'):
     """
     Loads VASP cRPA data to use as an interaction Hamiltonian.
@@ -173,7 +146,7 @@ def _adapt_U_4index_for_SO(Umat_full):
     return Umat_full_SO
 
 
-def _construct_kanamori(sum_k, general_params, icrsh):
+def _construct_kanamori(sum_k, general_params, solver_type_per_imp, icrsh):
     """
     Constructs the Kanamori interaction Hamiltonian. Only Kanamori does not
     need the full four-index matrix. Therefore, we can construct it directly
@@ -195,7 +168,7 @@ def _construct_kanamori(sum_k, general_params, icrsh):
     else:
         U_prime = general_params['U_prime'][icrsh]
 
-    if general_params['solver_type'] == 'ftps':
+    if solver_type_per_imp[icrsh] == 'ftps':
         # 1-band modell requires J and U' equals zero
         if n_orb == 1:
             up, j = 0.0, 0.0
@@ -355,7 +328,7 @@ def _generate_four_index_u_matrix(sum_k, general_params, icrsh):
         U = general_params['U'][icrsh]
         J = general_params['J'][icrsh]
         R = general_params['ratio_F4_F2'][icrsh]
-        R = 0.63 if R == 'none' else R
+        R = 0.63 if R is None else R
         slater_integrals = np.array([U, 14*J/(1+R), 14*J*R/(1+R)])
 
     mpi.report('\nImpurity {}: The corresponding slater integrals are'.format(icrsh))
@@ -497,7 +470,7 @@ def h_int_simple_intra(spin_names,n_orb,U,off_diag=None,map_operator_structure=N
     return H
 
 
-def construct(sum_k, general_params, advanced_params):
+def construct(sum_k, general_params, solver_type_per_imp):
     """
     Constructs the interaction Hamiltonian. Currently implemented are the
     Kanamori Hamiltonian (usually for 2 or 3 orbitals), the density-density and
@@ -522,18 +495,6 @@ def construct(sum_k, general_params, advanced_params):
     # Extracts U and J
     mpi.report('*** interaction parameters ***')
 
-    general_params = _extract_U_J_list('h_int_type', sum_k.n_inequiv_shells, general_params)
-    for param_name in ('U', 'J'):
-        general_params = _extract_U_J_list(param_name, sum_k.n_inequiv_shells, general_params)
-    if 'kanamori' in general_params['h_int_type']:
-        general_params = _extract_U_J_list('U_prime', sum_k.n_inequiv_shells, general_params)
-    for param_name in ('dc_U', 'dc_J'):
-        advanced_params = _extract_U_J_list(param_name, sum_k.n_inequiv_shells, advanced_params)
-
-    # Extracts ratio_F4_F2 if any shell uses a solver supporting it
-    if 'density_density' in general_params['h_int_type'] or 'full_slater' in general_params['h_int_type']:
-        general_params = _extract_U_J_list('ratio_F4_F2', sum_k.n_inequiv_shells, general_params)
-
     # Constructs the interaction Hamiltonian. Needs to come after setting sum_k.rot_mat
     mpi.report('\nConstructing the interaction Hamiltonians')
     h_int = [None] * sum_k.n_inequiv_shells
@@ -542,22 +503,22 @@ def construct(sum_k, general_params, advanced_params):
 
         # Kanamori
         if general_params['h_int_type'][icrsh] == 'kanamori':
-            h_int[icrsh] = _construct_kanamori(sum_k, general_params, icrsh)
+            h_int[icrsh] = _construct_kanamori(sum_k, general_params, solver_type_per_imp, icrsh)
             continue
 
         # for density density or full slater get full four-index U matrix
         if general_params['h_int_type'][icrsh] in ('density_density', 'full_slater'):
             mpi.report('\nNote: The input parameters U and J here are orbital-averaged parameters.')
             mpi.report('Note: The order of the orbitals is important. See also the doc string of this method.')
-            # Checks that all entries are l == 2 or R == 'none'
+            # Checks that all entries are l == 2 or R is None
             if (sum_k.corr_shells[sum_k.inequiv_to_corr[icrsh]]['l'] != 2
-                    and general_params['ratio_F4_F2'][icrsh] != 'none'):
+                    and general_params['ratio_F4_F2'][icrsh] is not None):
                 raise ValueError('Ratio F4/F2 only implemented for d-shells '
                                  + 'but set in impurity {}'.format(icrsh))
 
-            if general_params['h_int_type'][icrsh] == 'density_density' and general_params['solver_type'] == 'ftps':
+            if general_params['h_int_type'][icrsh] == 'density_density' and solver_type_per_imp[icrsh] == 'ftps':
                 # TODO: implement
-                raise NotImplementedError('\nNote: Density-density not implemented for ftps.')
+                raise NotImplementedError('Note: Density-density not implemented for ftps.')
 
             Umat_full = _generate_four_index_u_matrix(sum_k, general_params, icrsh)
 
