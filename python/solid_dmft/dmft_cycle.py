@@ -56,6 +56,7 @@ from solid_dmft.dmft_tools import afm_mapping
 from solid_dmft.dmft_tools import manipulate_chemical_potential as manipulate_mu
 from solid_dmft.dmft_tools import initial_self_energies as initial_sigma
 from solid_dmft.dmft_tools import greens_functions_mixer as gf_mixer
+from collections import deque
 
 
 def _determine_block_structure(sum_k, general_params, advanced_params):
@@ -342,10 +343,27 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
         E_kin_dft = None
 
     # check for previous broyden data oterhwise initialize it:
-    if mpi.is_master_node() and  general_params['g0_mix_type'] == 'broyden':
+    #if mpi.is_master_node() and  general_params['g0_mix_type'] == 'broyden':
+    #    if not 'broyler' in archive['DMFT_results']:
+    #        archive['DMFT_results']['broyler'] = [{'mu' : [],'V': [], 'dV': [], 'F': [], 'dF': []}
+    #                                              for _ in range(sum_k.n_inequiv_shells)]
+    if mpi.is_master_node() and general_params['mix_type']=='broyden':
         if not 'broyler' in archive['DMFT_results']:
-            archive['DMFT_results']['broyler'] = [{'mu' : [],'V': [], 'dV': [], 'F': [], 'dF': []}
-                                                  for _ in range(sum_k.n_inequiv_shells)]
+            #archive['DMFT_results']['broyler'] = [{'mu' : [],'V': [], 'dV': [], 'F': [], 'dF': []}
+            #                                      for _ in range(sum_k.n_inequiv_shells)]
+
+            broyler_list = [{'mu' : [],'V': [], 'dV': [], 'F': [], 'dF': [],
+                'broy_max_it': general_params['broy_max_it'],
+                'deg_shell':sum_k.deg_shells[_icrsh1] }
+                for _icrsh1 in range(sum_k.n_inequiv_shells)]
+            archive['DMFT_results']['broyler'] = broyler_list
+
+            mpi.report("Testing mixing data initialization")
+            broyler_obj = gf_mixer.BroylerClass(broyler_list)
+            mpi.report(broyler_obj.__dict__)
+            mpi.report("Comparing with broyler list")
+            mpi.report(broyler_list)
+
 
     # Generates a rotation matrix to change the basis
     if general_params['set_rot'] != 'none':
@@ -610,6 +628,11 @@ def _dmft_step(sum_k, solvers, it, general_params,
     for icrsh in range(sum_k.n_inequiv_shells):
         # copy the block of G_loc into the corresponding instance of the impurity solver
         # TODO: why do we set solvers.G_freq? Isn't that simply an output of the solver?
+        ###
+        
+        if general_params['update_mu_each_imp']:
+          G_loc_all = sum_k.extract_G_loc(iw_or_w='iw')
+        
         solvers[icrsh].G_freq << G_loc_all[icrsh]
 
         density_shell_pre[icrsh] = np.real(solvers[icrsh].G_freq.total_density())
@@ -631,8 +654,12 @@ def _dmft_step(sum_k, solvers, it, general_params,
 
         # mixing of G0 if wanted from the second iteration on
         if it > 1:
-            solvers[icrsh] = gf_mixer.mix_g0(solvers[icrsh], general_params, icrsh, archive,
-                                             G0_freq_previous[icrsh], it, sum_k.deg_shells[icrsh])
+            if 'G0'in general_params['mix_quantity']:
+               mpi.report(f"XXXXXXX Calling {general_params['mix_type']} mixing on {general_params['mix_quantity']}")
+               solvers[icrsh] = gf_mixer.mix_general(general_params, icrsh, solvers[icrsh], G0_freq_previous[icrsh], it = it, F_type='G0',
+                        deg_shell=sum_k.deg_shells[icrsh], archive=archive)
+            # solvers[icrsh] = gf_mixer.mix_g0(solvers[icrsh], general_params, icrsh, archive,
+            #                                  G0_freq_previous[icrsh], it, sum_k.deg_shells[icrsh])
 
         if general_params['solver_type'] in ['cthyb', 'ctint', 'hubbardI', 'inchworm']:
             solvers[icrsh].G0_freq << make_hermitian(solvers[icrsh].G0_freq)
@@ -665,6 +692,14 @@ def _dmft_step(sum_k, solvers, it, general_params,
             mpi.report('Actual time for solver: {:.2f} s'.format(timer() - start_time))
 
         # some printout of the obtained density matrices and some basic checks from the unsymmetrized solver output
+        
+        ###new
+        if general_params['update_mu_each_imp']:
+          sum_k.put_Sigma([solvers[i].Sigma_freq for i in range(sum_k.n_inequiv_shells)])
+          sum_k = manipulate_mu.update_mu(general_params, sum_k, it, archive)
+        
+        
+        
         density_shell[icrsh] = np.real(solvers[icrsh].G_freq_unsym.total_density())
         density_tot += density_shell[icrsh]*shell_multiplicity[icrsh]
         density_mat_unsym[icrsh] = solvers[icrsh].G_freq_unsym.density()
@@ -690,7 +725,16 @@ def _dmft_step(sum_k, solvers, it, general_params,
     # if CPA average Sigma over impurities before mixing
     if general_params['dc'] and general_params['dc_type'] == 4:
         solvers = gf_mixer.mix_cpa(cpa_G0_freq, sum_k.n_inequiv_shells, solvers)
-    solvers = gf_mixer.mix_sigma(general_params, sum_k.n_inequiv_shells, solvers, Sigma_freq_previous)
+    #solvers = gf_mixer.mix_sigma(general_params, sum_k.n_inequiv_shells, solvers, Sigma_freq_previous)
+    
+    if 'Sigma'in general_params['mix_quantity']:
+        if it > 0:
+            mpi.report(f"XXXXXXX Calling {general_params['mix_type']} mixing on {general_params['mix_quantity']}")
+            for icrsh in range(sum_k.n_inequiv_shells):
+                solvers[icrsh] = gf_mixer.mix_general(general_params, icrsh, solvers[icrsh], Sigma_freq_previous[icrsh], F_type='Sigma', it=it+1,
+                            deg_shell=sum_k.deg_shells[icrsh], archive=archive)
+
+
 
     # calculate new DC
     # for the hartree solver the DC potential will be formally set to zero as it is already present in the Sigma
