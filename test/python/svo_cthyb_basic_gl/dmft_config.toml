@@ -7,10 +7,13 @@ mu_initial_guess = -0.027041
 
 prec_mu = 0.001
 n_iw = 501
+n_tau = 10001
 
 h_int_type = "kanamori"
 U = 8.0
 J = 0.65
+
+store_solver = true
 
 beta = 10
 
@@ -28,9 +31,7 @@ load_sigma = false
 
 [solver]
 type = "cthyb"
-store_solver = true
 n_l = 35
-n_tau = 10001
 length_cycle = 120
 n_warmup_cycles = 8000
 n_cycles_tot = 1e+4

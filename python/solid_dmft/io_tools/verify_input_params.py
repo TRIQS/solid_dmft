@@ -6,17 +6,14 @@ ParamDict = Dict[str, Any]
 FullConfig = Dict[str, Union[ParamDict, List[ParamDict]]]
 
 def _verify_input_params_general(params: FullConfig) -> None:
-    # Checks that parameters for either real-frequency or imaginary-frequency grid specified
-    if (params['general']['eta'] is not None) == (params['general']['beta'] is not None):
-        raise ValueError('Specify either "eta" for real- or "beta" for imaginary-frequency grid.')
-
     # Checks that grid parameters are specified completely
-    if params['general']['eta'] is not None and (params['general']['n_w'] is None
-                                                 or params['general']['w_range'] is None):
-        raise ValueError('Real-frequency grid chosen, specify "n_w" and "w_range".')
     if params['general']['beta'] is not None and (params['general']['n_iw'] is None
                                                   or params['general']['n_tau'] is None):
         raise ValueError('Imaginary-frequency grid chosen, specify "n_iw" and "n_tau".')
+
+    if params['general']['beta'] is None and (params['general']['eta'] is None or params['general']['n_w'] is None
+                                              or params['general']['w_range'] is None):
+        raise ValueError('Real-frequency grid chosen, specify "eta", "n_w", and "w_range".')
 
     # warning if sigma mixing is used, remove in future versions
     if params['general']['sigma_mix'] < 1.0 and params['general']['g0_mix'] < 1.0:
@@ -49,13 +46,13 @@ def _verify_input_params_solver(params: FullConfig) -> None:
     # TODO: add real-frequency support for solvers that do both (e.g., hartree)
     supported_grids = {'real': ['ftps'],
                        'imag': ['cthyb', 'ctint', 'ctseg', 'hubbardI', 'hartree']}
-    if params['general']['eta'] is not None:
+    if params['general']['beta'] is not None:
         for entry in solver_params:
-            if entry['type'] not in supported_grids['real']:
+            if entry['type'] not in supported_grids['imag']:
                 raise ValueError(f'Solver {entry["type"]} does not support real-frequency grid.')
     else:
         for entry in solver_params:
-            if entry['type'] not in supported_grids['imag']:
+            if entry['type'] not in supported_grids['real']:
                 raise ValueError(f'Solver {entry["type"]} does not support imaginary-frequency grid.')
 
 def _verify_input_params_advanced(params: FullConfig) -> None:
@@ -123,3 +120,6 @@ def manual_changes_input_params(params: FullConfig) -> None:
 
     params['general']['store_solver'] = params['solver']['store_solver']
     del params['solver']['store_solver']
+
+    # Copied from dmft_cycle.py
+    solver_params['measure_O_tau_min_ins'] = general_params['measure_chi_insertions']

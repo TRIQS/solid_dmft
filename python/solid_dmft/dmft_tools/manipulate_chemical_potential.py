@@ -257,7 +257,7 @@ def _set_mu_to_gap_middle_with_maxent(general_params, sum_k, gf_lattice_iw, arch
 
     return sum_k.chemical_potential + (valence_edge + conduction_edge) / 2
 
-def set_initial_mu(general_params, sum_k, iteration_offset, archive, shell_multiplicity):
+def set_initial_mu(general_params, sum_k, iteration_offset, archive, broadening):
     """
     Handles the different ways of setting the initial chemical potential mu:
     * Chemical potential set to fixed value: uses this value
@@ -282,8 +282,6 @@ def set_initial_mu(general_params, sum_k, iteration_offset, archive, shell_multi
         the number of iterations executed in previous calculations.
     archive : HDFArchive
         needed to potentially load previous results and write MaxEnt results to.
-    shell_multiplicity : iterable of ints
-        number of equivalent shells per impurity.
 
     Returns
     -------
@@ -301,7 +299,8 @@ def set_initial_mu(general_params, sum_k, iteration_offset, archive, shell_multi
     if iteration_offset == 0:
         if general_params['dc'] and general_params['dc_type'] == 4:
             return sum_k
-        sum_k.calc_mu(precision=general_params['prec_mu'], method=general_params['calc_mu_method'], broadening=general_params['eta'])
+        sum_k.calc_mu(precision=general_params['prec_mu'], method=general_params['calc_mu_method'],
+                      broadening=broadening)
         return sum_k
 
     # If continuing calculation and not updating mu, loads sold value
@@ -342,7 +341,7 @@ def set_initial_mu(general_params, sum_k, iteration_offset, archive, shell_multi
 
     # If system not gapped, gets chemical potential from dichotomy method
     sum_k.calc_mu(precision=general_params['prec_mu'], method=general_params['calc_mu_method'],
-                  broadening=general_params['eta'])
+                  broadening=broadening)
 
     # Applies mu mixing to dichotomy result
     sum_k.chemical_potential = _mix_chemical_potential(general_params, occupation,
@@ -351,7 +350,7 @@ def set_initial_mu(general_params, sum_k, iteration_offset, archive, shell_multi
 
     return sum_k
 
-def update_mu(general_params, sum_k, it, archive):
+def update_mu(general_params, sum_k, it, archive, broadening):
     """
     Handles the different ways of updating the chemical potential mu:
     * Chemical potential set to fixed value: uses this value
@@ -414,7 +413,7 @@ def update_mu(general_params, sum_k, it, archive):
     # If system not gapped, gets chemical potential from dichotomy method
     previous_mu = sum_k.chemical_potential
     sum_k.calc_mu(precision=general_params['prec_mu'], method=general_params['calc_mu_method'],
-                  broadening=general_params['eta'])
+                  broadening=broadening)
 
     # Applies mu mixing to dichotomy result
     sum_k.chemical_potential = _mix_chemical_potential(general_params, occupation,

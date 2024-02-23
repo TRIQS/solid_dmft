@@ -233,47 +233,40 @@ def _calculate_rotation_matrix(general_params, sum_k):
     return sum_k
 
 
-def _chi_setup(sum_k, general_params, solver_params):
+def _chi_setup(sum_k, solver_params, map_imp_solver):
     """
 
     Parameters
     ----------
     sum_k : SumkDFT object
         Sumk object with the information about the correct block structure
-    general_paramters: general params dict
     solver_params: solver params dict
 
     Returns
     -------
-    solver_params :  dict
-        solver_paramters for the QMC solver
-    Op_list : list of one-particle operators to measure per impurity
+    ops_chi_measurement : list of one-particle operators to measure per impurity
     """
 
-    if general_params['measure_chi'] == 'SzSz':
-        mpi.report('\nSetting up Chi(S_z(tau),S_z(0)) measurement')
-    elif general_params['measure_chi'] == 'NN':
-        mpi.report('\nSetting up Chi(n(tau),n(0)) measurement')
-
-    Op_list = [None] * sum_k.n_inequiv_shells
+    ops_chi_measure = [None] * sum_k.n_inequiv_shells
 
     for icrsh in range(sum_k.n_inequiv_shells):
+        isolv = map_imp_solver[icrsh]
+        if 'measure_chi' not in solver_params[isolv] or solver_params[isolv]['measure_chi'] is None:
+            continue
+
         n_orb = sum_k.corr_shells[icrsh]['dim']
-        orb_names = list(range(n_orb))
+        if solver_params[isolv]['measure_chi'] == 'SzSz':
+            mpi.report(f'\nImp {icrsh} with solver #{isolv}: Setting up Chi(S_z(tau),S_z(0)) measurement')
 
-        if general_params['measure_chi'] == 'SzSz':
-            Op_list[icrsh] = S_op('z',
-                                  spin_names=sum_k.spin_block_names[sum_k.SO],
-                                  n_orb=n_orb,
-                                  map_operator_structure=sum_k.sumk_to_solver[icrsh])
-        elif general_params['measure_chi'] == 'NN':
-            Op_list[icrsh] = N_op(spin_names=sum_k.spin_block_names[sum_k.SO],
-                                  n_orb=n_orb,
-                                  map_operator_structure=sum_k.sumk_to_solver[icrsh])
+            ops_chi_measure[icrsh] = S_op('z', spin_names=sum_k.spin_block_names[sum_k.SO],
+                                          n_orb=n_orb, map_operator_structure=sum_k.sumk_to_solver[icrsh])
+        elif solver_params[isolv]['measure_chi'] == 'NN':
+            mpi.report(f'\nImp {icrsh} with solver #{isolv}: Setting up Chi(n(tau),n(0)) measurement')
 
-    solver_params['measure_O_tau_min_ins'] = general_params['measure_chi_insertions']
+            ops_chi_measure[icrsh] = N_op(spin_names=sum_k.spin_block_names[sum_k.SO],
+                                          n_orb=n_orb, map_operator_structure=sum_k.sumk_to_solver[icrsh])
 
-    return solver_params, Op_list
+    return ops_chi_measure
 
 
 def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
@@ -307,13 +300,16 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
     # TODO: use_dft_blocks=True yields inconsistent number of blocks!
 
     # Creates real- or imaginary-frequency mesh to store Green functions on
-    if general_params['eta'] is not None:
-        sumk_mesh = MeshReFreq(window=general_params['w_range'],
-                               n_w=general_params['n_w'])
-    else:
+    if general_params['beta'] is not None:
         sumk_mesh = MeshImFreq(beta=general_params['beta'],
                                S='Fermion',
                                n_iw=general_params['n_iw'])
+        broadening = None
+    else:
+        sumk_mesh = MeshReFreq(window=general_params['w_range'],
+                               n_w=general_params['n_w'])
+        broadening = general_params['eta']
+
 
     sum_k = SumkDFT(hdf_file=general_params['jobname']+'/'+general_params['seedname']+'.h5',
                     mesh=sumk_mesh, use_dft_blocks=False, h_field=general_params['h_field'])
@@ -364,7 +360,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
         keys.append('ratio_F4_F2')
     for key in keys:
         general_params = _extract_quantity_per_inequiv(key, sum_k.n_inequiv_shells, general_params)
-    keys = ['dc_U', 'dc_J']
+    keys = ['dc_U', 'dc_J', 'dc_fixed_occ']
     for key in keys:
         advanced_params = _extract_quantity_per_inequiv(key, sum_k.n_inequiv_shells, advanced_params)
 
@@ -399,7 +395,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
         mpi.report('\nInitial chemical potential set to {:.3f} eV\n'.format(sum_k.chemical_potential))
 
     dft_mu = sum_k.calc_mu(precision=general_params['prec_mu'],
-                           broadening=general_params['eta'])
+                           broadening=broadening)
 
     # calculate E_kin_dft for one shot calculations
     if not general_params['csc'] and general_params['calc_energies']:
@@ -429,7 +425,6 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
         det_blocks = 'block_structure' not in archive['DMFT_input']
     det_blocks = mpi.bcast(det_blocks)
 
-    # TODO: continue here
     # Previous rot_mat only not None if the rot_mat changed from load_sigma or previous run
     previous_rot_mat = None
     solver_struct_ftps = None
@@ -444,6 +439,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
                 sum_k.block_structure = old_calc['DMFT_input/block_structure']
                 sum_k.deg_shells = old_calc['DMFT_input/deg_shells']
                 previous_rot_mat = old_calc['DMFT_input/rot_mat']
+                # FIXME: how to handle different block structure from ftps?
                 if solver_params[0]['type'] == 'ftps':
                     solver_struct_ftps = old_calc['DMFT_input/solver_struct_ftps']
 
@@ -471,6 +467,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
                 archive['DMFT_input']['rot_mat'] = sum_k.rot_mat
             else:
                 previous_rot_mat = None
+            # FIXME: how to handle different block structure from ftps?
             if solver_params[0]['type'] == 'ftps':
                 solver_struct_ftps = archive['DMFT_input/solver_struct_ftps']
 
@@ -495,12 +492,12 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
     sum_k.put_Sigma(zero_Sigma)
 
     # print block structure and DFT input quantitites!
-    local_gf_dft_corr = sum_k.extract_G_loc(broadening=general_params['eta'], transform_to_solver_blocks=False)
+    local_gf_dft_corr = sum_k.extract_G_loc(broadening=broadening, transform_to_solver_blocks=False)
     dm = [gf.density() for gf in local_gf_dft_corr]
     formatter.print_block_sym(sum_k, dm, general_params)
 
     # Extracts local GF per *inequivalent* shell
-    local_gf_dft = sum_k.extract_G_loc(broadening=general_params['eta'], with_Sigma=False, mu=dft_mu)
+    local_gf_dft = sum_k.extract_G_loc(broadening=broadening, with_Sigma=False, mu=dft_mu)
     density_mat_dft = [gf.density() for gf in local_gf_dft]
 
     for iineq, gf in enumerate(local_gf_dft):
@@ -521,7 +518,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
     # If new calculation, writes input parameters and sum_k <-> solver mapping to archive
     if iteration_offset == 0:
         if mpi.is_master_node():
-            # TODO: writing to archive crashes because of parameters that are None
+            # FIXME: writing to archive crashes because of parameters that are None
             # archive['DMFT_input']['general_params'] = general_params
             # archive['DMFT_input']['solver_params'] = solver_params
             # archive['DMFT_input']['advanced_params'] = advanced_params
@@ -529,6 +526,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
             archive['DMFT_input']['block_structure'] = sum_k.block_structure
             archive['DMFT_input']['deg_shells'] = sum_k.deg_shells
             archive['DMFT_input']['shell_multiplicity'] = shell_multiplicity
+            # FIXME: how to handle different block structure from ftps?
             if solver_params[0]['type'] == 'ftps':
                 archive['DMFT_input']['solver_struct_ftps'] = solver_struct_ftps
     mpi.barrier()
@@ -556,14 +554,11 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
                                                                   archive, iteration_offset, density_mat_dft, solvers,
                                                                   solver_type_per_imp)
 
-    sum_k = manipulate_mu.set_initial_mu(general_params, sum_k, iteration_offset, archive, shell_multiplicity)
+    sum_k = manipulate_mu.set_initial_mu(general_params, sum_k, iteration_offset, archive, broadening)
 
 
     # setup of measurement of chi(SzSz(tau) if requested
-    if general_params['measure_chi'] is not None:
-        solver_params, Op_list = _chi_setup(sum_k, general_params, solver_params)
-    else:
-        Op_list = None
+    ops_chi_measure = _chi_setup(sum_k, solver_params, map_imp_solver)
 
     mpi.report('\n {} DMFT cycles requested. Starting with iteration  {}.\n'.format(n_iter, iteration_offset+1))
 
@@ -601,7 +596,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
          observables, is_converged) = _dmft_step(sum_k, solvers, it, general_params,
                                                  solver_params, advanced_params, dft_params, map_imp_solver, solver_type_per_imp,
                                                  h_int, archive, shell_multiplicity, E_kin_dft,
-                                                 observables, conv_obs, Op_list, dft_irred_kpt_indices, dft_energy,
+                                                 observables, conv_obs, ops_chi_measure, dft_irred_kpt_indices, dft_energy, broadening,
                                                  is_converged, is_sampling=False)
 
         if is_converged:
@@ -625,7 +620,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
             sum_k, solvers, observables, _ = _dmft_step(sum_k, solvers, it, general_params,
                                                         solver_params, advanced_params, dft_params, map_imp_solver, solver_type_per_imp,
                                                         h_int, archive, shell_multiplicity, E_kin_dft,
-                                                        observables, conv_obs, Op_list, dft_irred_kpt_indices, dft_energy,
+                                                        observables, conv_obs, ops_chi_measure, dft_irred_kpt_indices, dft_energy, broadening,
                                                         is_converged=True, is_sampling=True)
 
         mpi.report('** Sampling finished ***')
@@ -643,7 +638,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
 def _dmft_step(sum_k, solvers, it, general_params,
                solver_params, advanced_params, dft_params, map_imp_solver, solver_type_per_imp,
                h_int, archive, shell_multiplicity, E_kin_dft,
-               observables, conv_obs, Op_list, dft_irred_kpt_indices, dft_energy,
+               observables, conv_obs, ops_chi_measure, dft_irred_kpt_indices, dft_energy, broadening,
                is_converged, is_sampling):
     """
     Contains the actual dmft steps when all the preparation is done
@@ -665,7 +660,7 @@ def _dmft_step(sum_k, solvers, it, general_params,
         printed = ((np.real, 'real'), )
 
     # Extracts G local
-    G_loc_all = sum_k.extract_G_loc(broadening=general_params['eta'])
+    G_loc_all = sum_k.extract_G_loc(broadening=broadening)
 
     # Copies Sigma and G0 before Solver run for mixing later
     Sigma_freq_previous = [solvers[iineq].Sigma_freq.copy() for iineq in range(sum_k.n_inequiv_shells)]
@@ -715,13 +710,14 @@ def _dmft_step(sum_k, solvers, it, general_params,
             archive['DMFT_results/last_iter']['G0_freq_{}'.format(icrsh)] = solvers[icrsh].G0_freq
 
         # setup of measurement of chi(SzSz(tau) if requested
-        if general_params['measure_chi'] is not None:
-            solvers[icrsh].solver_params['measure_O_tau'] = (Op_list[icrsh], Op_list[icrsh])
+        # TODO: move this into solver class?
+        if ops_chi_measure[icrsh] is not None:
+            solvers[icrsh].solver_params['measure_O_tau'] = (ops_chi_measure[icrsh], ops_chi_measure[icrsh])
 
         if (general_params['magnetic'] and general_params['afm_order'] and general_params['afm_mapping'][icrsh][0]):
             # If we do a AFM calculation we can use the init magnetic moments to
             # copy the self energy instead of solving it explicitly
-            solvers = afm_mapping.apply(general_params, solver_params, icrsh, sum_k.gf_struct_solver[icrsh], solvers)
+            solvers = afm_mapping.apply(general_params, icrsh, sum_k.gf_struct_solver[icrsh], solvers)
         else:
             # Solve the impurity problem for this shell
             mpi.report('\nSolving the impurity problem for shell {} ...'.format(icrsh))
@@ -777,7 +773,7 @@ def _dmft_step(sum_k, solvers, it, general_params,
 
     # saving previous mu for writing to observables file
     previous_mu = sum_k.chemical_potential
-    sum_k = manipulate_mu.update_mu(general_params, sum_k, it, archive)
+    sum_k = manipulate_mu.update_mu(general_params, sum_k, it, archive, broadening)
 
     # if we do a CSC calculation we need always an updated GAMMA file
     E_bandcorr = 0.0
@@ -804,6 +800,7 @@ def _dmft_step(sum_k, solvers, it, general_params,
         observables = add_dmft_observables(observables,
                                            general_params,
                                            solver_params,
+                                           map_imp_solver,
                                            solver_type_per_imp,
                                            dft_energy,
                                            it,

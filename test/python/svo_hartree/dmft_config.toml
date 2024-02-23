@@ -2,7 +2,7 @@
 seedname = "inp"
 jobname = "out"
 
-mu_initial_guess = 0.006120
+#mu_initial_guess = 0.006120
 
 h_field = 0.01
 h_field_it = 1

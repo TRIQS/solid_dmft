@@ -65,7 +65,7 @@ def calculate_double_counting(sum_k, density_matrix, general_params, advanced_pa
     def iterate_except_hartree():
         for iineq, type in enumerate(solver_type_per_imp):
             if type == 'hartree':
-                mpi.report('\nSOLID_DMFT: Hartree solver for impurity {iineq} detected. '
+                mpi.report(f'\nSOLID_DMFT: Hartree solver for impurity {iineq} detected. '
                            'Zeroing out the DC correction. This gets computed at the solver level')
             else:
                 yield iineq
@@ -90,12 +90,9 @@ def calculate_double_counting(sum_k, density_matrix, general_params, advanced_pa
 
         return sum_k
 
-    if advanced_params['dc_fixed_occ'] is not None:
-        mpi.report('Fixing occupation for DC potential to provided value')
-
-        assert sum_k.n_inequiv_shells == len(advanced_params['dc_fixed_occ']), "give exactly one occupation per correlated shell"
-        for icrsh in iterate_except_hartree():
-            mpi.report('fixing occupation for impurity '+str(icrsh)+' to n='+str(advanced_params['dc_fixed_occ'][icrsh]))
+    for icrsh in iterate_except_hartree():
+        if advanced_params['dc_fixed_occ'][icrsh] is not None:
+            mpi.report(f'Fixing occupation for DC for imp {icrsh} to n={advanced_params["dc_fixed_occ"][icrsh]:.4f}')
             n_orb = sum_k.corr_shells[icrsh]['dim']
             # we need to handover a matrix to calc_dc so calc occ per orb per spin channel
             orb_occ = advanced_params['dc_fixed_occ'][icrsh]/(n_orb*2)
@@ -154,8 +151,7 @@ def calculate_double_counting(sum_k, density_matrix, general_params, advanced_pa
 
     # Rescales DC if advanced_params['dc_factor'] is given
     if advanced_params['dc_factor'] is not None:
-        if 'Hartree' in solver_type_per_imp:
-            raise NotImplementedError('dc_factor not implemented in presence of Hartree solver')
+        # Here, no check for Hartree since its DC is 0 and the scaling doesn't change that
         rescaled_dc_imp = [{spin: advanced_params['dc_factor'] * dc_per_spin
                             for spin, dc_per_spin in dc_per_shell.items()}
                           for dc_per_shell in sum_k.dc_imp]

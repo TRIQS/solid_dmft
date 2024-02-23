@@ -278,7 +278,7 @@ class SolverStructure:
             self.density_matrix = None
             self.h_loc_diagonalization = None
 
-        if self.solver_params['type'] in ['cthyb'] and self.general_params['measure_chi'] is not None:
+        if self.solver_params['type'] in ['cthyb'] and self.solver_params['measure_chi'] is not None:
             self.O_time = None
 
     def _init_ReFreq_objects(self):
@@ -392,6 +392,7 @@ class SolverStructure:
                     if not 'it_-1' in archive['DMFT_input/solver']:
                         archive['DMFT_input/solver'].create_group('it_-1')
                     archive['DMFT_input/solver/it_-1'][f'S_{self.icrsh}'] = self.triqs_solver
+                    # FIXME: write only params that the solver can use
                     archive['DMFT_input/solver/it_-1'][f'solve_params_{self.icrsh}'] = self.solver_params
                     archive['DMFT_input/solver/it_-1']['mpi_size'] = mpi.size
 
@@ -677,11 +678,11 @@ class SolverStructure:
                                            n_iw=self.general_params['n_iw'], n_tau=self.general_params['n_tau'],
                                            n_l=self.solver_params['n_l'], n_w=self.general_params['n_w'],
                                            w_min=self.general_params['w_range'][0], w_max=self.general_params['w_range'][1],
-                                           idelta=self.solver_params['eta'])
+                                           idelta=self.general_params['eta'])
         else:
             triqs_solver = hubbardI_solver(beta=self.general_params['beta'], gf_struct=gf_struct,
                                            n_iw=self.general_params['n_iw'], n_tau=self.general_params['n_tau'],
-                                           n_w=self.general_params['n_w'], idelta=self.solver_params['eta'],
+                                           n_w=self.general_params['n_w'], idelta=self.general_params['eta'],
                                            w_min=self.general_params['w_range'][0], w_max=self.general_params['w_range'][1])
 
         return triqs_solver
@@ -736,7 +737,7 @@ class SolverStructure:
 
             #list valued keys
             for key in ['dc_U', 'dc_J', 'dc_fixed_occ']:
-                if key in advanced_params and advanced_params[key] is not None:
+                if key in advanced_params and advanced_params[key][icrsh] is not None:
                     setattr(hartree_instance, key, advanced_params[key][icrsh])
 
             # Handle special cases
@@ -915,7 +916,7 @@ class SolverStructure:
             self.perturbation_order = self.triqs_solver.perturbation_order
             self.perturbation_order_total = self.triqs_solver.perturbation_order_total
 
-        if self.general_params['measure_chi'] is not None:
+        if self.solver_params['measure_chi'] is not None:
             self.O_time = self.triqs_solver.O_tau
 
         return

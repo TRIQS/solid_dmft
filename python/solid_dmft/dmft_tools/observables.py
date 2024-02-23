@@ -257,7 +257,7 @@ def add_dft_values_as_zeroth_iteration(observables, general_params, solver_type_
     return observables
 
 
-def add_dmft_observables(observables, general_params, solver_params, solver_type_per_imp, dft_energy, it, solvers, h_int,
+def add_dmft_observables(observables, general_params, solver_params, map_imp_solver, solver_type_per_imp, dft_energy, it, solvers, h_int,
                          previous_mu, sum_k, density_mat, shell_multiplicity, E_bandcorr):
     """
     calculates the observables for given Input, I decided to calculate the observables
@@ -307,7 +307,7 @@ def add_dmft_observables(observables, general_params, solver_params, solver_type
         mpi.report('\nCalculating interaction energies')
         for icrsh in range(sum_k.n_inequiv_shells):
             if (solver_type_per_imp[icrsh] in ['cthyb', 'hubbardI']
-                    and solver_params["measure_density_matrix"]):
+                    and solver_params[map_imp_solver[icrsh]]["measure_density_matrix"]):
                 mpi.report(f'    Imp {icrsh}: from impurity density matrix')
                 # Extract accumulated density matrix
                 density_matrix = solvers[icrsh].density_matrix

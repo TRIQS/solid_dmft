@@ -8,6 +8,7 @@ n_iw = 501
 beta = 40
 n_w = 501
 w_range = [-5, 5]
+eta = 0.05
 n_tau = 10001
 
 prec_mu = 0.001
@@ -28,6 +29,5 @@ dc_dmft = false
 [solver]
 type = "hubbardI"
 idx_impurities = [0, 1]
-eta = 0.05
 measure_G_tau = true
 measure_density_matrix = true
