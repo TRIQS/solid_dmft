@@ -106,7 +106,7 @@ set (restart_integration_test
 foreach(test ${restart_integration_test})
   set (test_dir ${CMAKE_CURRENT_BINARY_DIR}/${test})
 
-  foreach(file test_restart.py)
+  foreach(file ref_restart.h5 test_restart.py)
     FILE(COPY ${test}/${file} DESTINATION ${test_dir})
   endforeach()
 
