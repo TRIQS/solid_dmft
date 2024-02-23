@@ -1,6 +1,5 @@
 from typing import Any, Dict, List, Union
 import numpy as np
-import triqs.utility.mpi as mpi
 
 ParamDict = Dict[str, Any]
 FullConfig = Dict[str, Union[ParamDict, List[ParamDict]]]
@@ -58,13 +57,8 @@ def _verify_input_params_solver(params: FullConfig) -> None:
 def _verify_input_params_advanced(params: FullConfig) -> None:
     pass
 
-def verify_input_params(params: FullConfig) -> None:
+def verify_all(params: FullConfig) -> None:
     _verify_input_params_general(params)
     _verify_input_params_dft(params)
     _verify_input_params_solver(params)
     _verify_input_params_advanced(params)
-
-def manual_changes_input_params(params: FullConfig) -> None:
-    """ Necessary workarounds for some of the parameters. """
-
-    return

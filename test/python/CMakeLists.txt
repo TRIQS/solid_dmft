@@ -95,3 +95,24 @@ add_test(NAME maxent_${test}
         )
 
 set_property(TEST maxent_${test} APPEND PROPERTY ENVIRONMENT PYTHONPATH=${PROJECT_BINARY_DIR}/python:$ENV{PYTHONPATH})
+
+# ------------------------------#
+
+# integration test for restarting svo_hartree
+set (restart_integration_test
+     svo_hubbardI_basic)
+
+foreach(test ${restart_integration_test})
+  set (test_dir ${CMAKE_CURRENT_BINARY_DIR}/${test})
+
+  foreach(file test_restart.py)
+    FILE(COPY ${test}/${file} DESTINATION ${test_dir})
+  endforeach()
+
+  add_test(NAME restart_${test}
+           COMMAND ${MPIEXEC_EXECUTABLE} ${MPIEXEC_PREFLAGS} ${TRIQS_PYTHON_EXECUTABLE} test_restart.py
+           WORKING_DIRECTORY ${test_dir}
+          )
+
+  set_property(TEST restart_${test} APPEND PROPERTY ENVIRONMENT PYTHONPATH=${PROJECT_BINARY_DIR}/python:$ENV{PYTHONPATH})
+endforeach()
