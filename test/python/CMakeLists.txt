@@ -59,6 +59,7 @@ set (integration_tests
      lno_hubbardI_mag
      svo_cthyb_basic_gl
      svo_cthyb_basic_tf
+     lco_ftps
      )
 
 # copy other test files
