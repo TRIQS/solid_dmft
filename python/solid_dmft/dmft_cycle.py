@@ -66,7 +66,7 @@ def _extract_quantity_per_inequiv(param_name, n_inequiv_shells, general_params):
     """
 
     def formatter(value):
-        if value is None or isinstance(value, str):
+        if value is None or isinstance(value, str) or isinstance(value, dict):
             return str(value)
         return '{:.2f}'.format(value)
 
@@ -85,7 +85,7 @@ def _extract_quantity_per_inequiv(param_name, n_inequiv_shells, general_params):
 
     return general_params
 
-def _determine_block_structure(sum_k, general_params, solver_params, advanced_params):
+def _determine_block_structure(sum_k, general_params, advanced_params, solver_type_per_imp, dens_mat):
     """
     Determines block structrure and degenerate deg_shells
     computes first DFT density matrix to determine block structure and changes
@@ -101,76 +101,66 @@ def _determine_block_structure(sum_k, general_params, solver_params, advanced_pa
     sum_k : SumK Object instances
         updated sum_k Object
     """
-    mpi.report('\n *** determination of block structure ***')
-
-    # this returns a list of dicts (one entry for each corr shell)
-    # the dict contains one entry for up and one for down
-    # each entry is a square complex numpy matrix with dim=corr_shell['dim']
-    zero_Sigma = [sum_k.block_structure.create_gf(ish=iineq, gf_function=Gf, mesh=sum_k.mesh)
-                  for iineq in range(sum_k.n_inequiv_shells)]
-    sum_k.put_Sigma(zero_Sigma)
+    mpi.report('\n *** Determination of block structure ***')
 
     # Changes keys of solver blocks to standard defined by sum_k.analyse_block_structure
-    b_struct = sum_k.block_structure
-    b_struct.gf_struct_solver = [{f'{key}_0': dim for key, dim in struct_per_imp.items()}
-                                 for struct_per_imp in b_struct.gf_struct_solver]
-    b_struct.solver_to_sumk_block = [{f'{key1}_0': key2 for key1, key2 in map_per_imp.items()}
-                                     for map_per_imp in b_struct.solver_to_sumk_block]
-    b_struct.solver_to_sumk = [{(f'{t1[0]}_0', t1[1]): t2 for t1, t2 in map_per_imp.items()}
-                               for map_per_imp in b_struct.sumk_to_solver]
-    b_struct.sumk_to_solver = [{t1: (f'{t2[0]}_0', t2[1]) for t1, t2 in map_per_imp.items()}
-                               for map_per_imp in b_struct.sumk_to_solver]
-    # FIXME: add deg shell
-    mpi.report(sum_k.block_structure)
-    mpi.report('='*80)
+    bstruct = sum_k.block_structure
+    bstruct.gf_struct_solver = [{f'{key}_0': dim for key, dim in struct_per_imp.items()}
+                                for struct_per_imp in bstruct.gf_struct_solver]
+    bstruct.solver_to_sumk_block = [{f'{key1}_0': key2 for key1, key2 in map_per_imp.items()}
+                                    for map_per_imp in bstruct.solver_to_sumk_block]
+    bstruct.solver_to_sumk = [{(f'{t1[0]}_0', t1[1]): t2 for t1, t2 in map_per_imp.items()}
+                              for map_per_imp in bstruct.sumk_to_solver]
+    bstruct.sumk_to_solver = [{t1: (f'{t2[0]}_0', t2[1]) for t1, t2 in map_per_imp.items()}
+                              for map_per_imp in bstruct.sumk_to_solver]
+    # Adds spin degeneracies if not spin-orbit coupled
+    if sum_k.SO == 0:
+        bstruct.deg_shells = [[['up_0', 'down_0']] for _ in range(sum_k.n_inequiv_shells)]
 
-    # FIXME: add rest of block structure determination
-    return sum_k, None
+    # Evaluates degeneracies for ftps
+    imp_ftps = [i for i, s in enumerate(solver_type_per_imp) if s == 'ftps']
+    if imp_ftps:
+        mock_sumk = deepcopy(sum_k)
+        mock_sumk.analyse_block_structure(dm=dens_mat, threshold=general_params['block_threshold'], include_shells=imp_ftps)
+        deg_orbs_ftps = [mock_sumk.deg_shells[icrsh] if icrsh in imp_ftps else None
+                         for icrsh in range(sum_k.n_inequiv_shells)]
+        mpi.report('Block structure written to "deg_orbs_ftps":')
+        mpi.report(deg_orbs_ftps)
+    else:
+        deg_orbs_ftps = None
 
-    # for certain systems it is needed to keep off diag elements
-    # this enforces to use the full corr subspace matrix
-    solver_struct_ftps = None
-    if general_params['enforce_off_diag'] or general_params['solver_type'] in ['ftps', 'hartree']:
-        if general_params['solver_type'] in ['ftps']:
-            # first round to determine real blockstructure
-            mock_sumk = deepcopy(sum_k)
-            mock_sumk.analyse_block_structure(dm=dens_mat, threshold=general_params['block_threshold'])
-            solver_struct_ftps = [None] * sum_k.n_inequiv_shells
-            for icrsh in range(sum_k.n_inequiv_shells):
-                solver_struct_ftps[icrsh] = mock_sumk.deg_shells[icrsh]
-            mpi.report('Block structure written to "solver_struct_ftps":')
-            mpi.report(solver_struct_ftps)
+    # Only removes the off-diagonal terms for the selected impurities
+    imp_to_analyze = [i for i, offdiag in enumerate(general_params['enforce_off_diag']) if not offdiag]
+    mpi.report('using 1-particle density matrix and Hloc (atomic levels) to determine the block structure')
+    old_bstruct = deepcopy(sum_k.block_structure)
+    sum_k.analyse_block_structure(dm=dens_mat, threshold=general_params['block_threshold'], include_shells=imp_to_analyze)
 
-        mpi.report('enforcing off-diagonal elements in block structure finder')
-        for dens_mat_per_imp in dens_mat:
-            for dens_mat_per_block in dens_mat_per_imp.values():
-                dens_mat_per_block += 2 * general_params['block_threshold']
+    # This is a workaround because sum_k empties the block structure for the unanalyzed shells
+    # TODO: fix this behavior in sum_k.analyse_block_structure(_from_gf)?
+    bstruct = sum_k.block_structure
+    for icrsh in range(sum_k.n_inequiv_shells):
+        if general_params['enforce_off_diag'][icrsh]:
+            bstruct.gf_struct_solver[icrsh] = old_bstruct.gf_struct_solver[icrsh]
+            bstruct.solver_to_sumk_block[icrsh] = old_bstruct.solver_to_sumk_block[icrsh]
+            bstruct.solver_to_sumk[icrsh] = old_bstruct.solver_to_sumk[icrsh]
+            bstruct.sumk_to_solver[icrsh] = old_bstruct.sumk_to_solver[icrsh]
+            bstruct.deg_shells[icrsh] = old_bstruct.deg_shells[icrsh]
 
-    if not general_params['enforce_off_diag'] and general_params['block_suppress_orbital_symm']:
-        mpi.report('removing orbital symmetries in block structure finder')
-        for dens_mat_per_imp in dens_mat:
-            for dens_mat_per_block in dens_mat_per_imp.values():
-                dens_mat_per_block += 2*np.diag(np.arange(dens_mat_per_block.shape[0]))
-
-    mpi.report('using 1-particle density matrix and Hloc (atomic levels) to '
-               'determine the block structure')
-    sum_k.analyse_block_structure(dm=dens_mat, threshold=general_params['block_threshold'])
-
-    if advanced_params['pick_solver_struct'] is not None:
+    # Applies manual selection of the solver struct
+    if any(s is not None for s in advanced_params['pick_solver_struct']):
         mpi.report('selecting subset of orbital space for gf_struct_solver from input:')
-        mpi.report(advanced_params['pick_solver_struct'])
+        mpi.report(advanced_params['pick_solver_struct'][icrsh])
         sum_k.block_structure.pick_gf_struct_solver(advanced_params['pick_solver_struct'])
 
     # Applies the manual mapping to each inequivalent shell
-    if advanced_params['map_solver_struct'] is not None:
+    if any(s is not None for s in advanced_params['map_solver_struct']):
         sum_k.block_structure.map_gf_struct_solver(advanced_params['map_solver_struct'])
-        if advanced_params['mapped_solver_struct_degeneracies'] is not None:
+        if any(s is not None for s in advanced_params['mapped_solver_struct_degeneracies']):
             sum_k.block_structure.deg_shells = advanced_params['mapped_solver_struct_degeneracies']
 
     # if we want to do a magnetic calculation we need to lift up/down degeneracy
     if general_params['magnetic'] and sum_k.SO == 0:
-        mpi.report('magnetic calculation: removing the spin degeneracy from the block structure')
-
+        mpi.report('Magnetic calculation: removing the spin degeneracy from the block structure')
         for icrsh, deg_shells_site in enumerate(sum_k.block_structure.deg_shells):
             deg_shell_mag = []
             # find degenerate orbitals that do not simply connect different spin channels
@@ -182,12 +172,11 @@ def _determine_block_structure(sum_k, general_params, solver_params, advanced_pa
                     if len(deg) > 1:
                         deg_shell_mag.append(deg)
             sum_k.block_structure.deg_shells[icrsh] = deg_shell_mag
-
     # for SOC we remove all degeneracies
-    elif general_params['magnetic'] and sum_k.SO == 1:
-        sum_k.block_structure.deg_shells = [[] for icrsh in range(len(sum_k.block_structure.deg_shells))]
+    elif sum_k.SO == 1:
+        sum_k.block_structure.deg_shells = [[] for _ in range(sum_k.n_inequiv_shells)]
 
-    return sum_k, original_dens_mat, solver_struct_ftps
+    return sum_k, deg_orbs_ftps
 
 
 def _calculate_rotation_matrix(general_params, sum_k):
@@ -360,7 +349,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
         keys.append('ratio_F4_F2')
     for key in keys:
         general_params = _extract_quantity_per_inequiv(key, sum_k.n_inequiv_shells, general_params)
-    keys = ['dc_U', 'dc_J', 'dc_fixed_occ']
+    keys = ['dc_U', 'dc_J', 'dc_fixed_occ', 'map_solver_struct', 'pick_solver_struct', 'mapped_solver_struct_degeneracies']
     for key in keys:
         advanced_params = _extract_quantity_per_inequiv(key, sum_k.n_inequiv_shells, advanced_params)
 
@@ -381,7 +370,11 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
                     map_imp_solver.append(isolver)
                     break
     solver_type_per_imp = [solver_params[map_imp_solver[iineq]]['type'] for iineq in range(sum_k.n_inequiv_shells)]
-    mpi.report(solver_type_per_imp)
+    mpi.report('DEBUG', solver_type_per_imp)
+
+    # Checks that enforce_off_diag true for ftps and hartree
+    if any(s in ['ftps', 'hartree'] and not e for s, e in zip(solver_type_per_imp, general_params['enforce_off_diag'])):
+        raise ValueError('enforce_off_diag must be True for a impurities solver by ftps or hartree solvers')
 
     # need to set sigma immediately here, otherwise mesh in unclear for sumK
     # Initializes empty Sigma for calculation of DFT density even if block structure changes later
@@ -418,6 +411,14 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
         archive['DMFT_input']['rot_mat'] = sum_k.rot_mat
     mpi.barrier()
 
+    # Calculates density in default block structure
+    local_gf_dft_corr = sum_k.extract_G_loc(broadening=broadening, transform_to_solver_blocks=False, with_Sigma=False)
+    dens_mat_dft = [gf.density() for gf in local_gf_dft_corr]
+
+    for iineq, gf in enumerate(local_gf_dft_corr):
+        mpi.report(f'Total density for imp {iineq} from DFT: '
+                   '{:10.6f}'.format(np.real(gf.total_density())))
+
     # determine block structure for solver
     det_blocks = None
     # load previous block_structure if possible
@@ -427,10 +428,10 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
 
     # Previous rot_mat only not None if the rot_mat changed from load_sigma or previous run
     previous_rot_mat = None
-    solver_struct_ftps = None
+    deg_orbs_ftps = None
     # determine block structure for GF and Hyb function
     if det_blocks and not general_params['load_sigma']:
-        sum_k, solver_struct_ftps = _determine_block_structure(sum_k, general_params, solver_params, advanced_params)
+        sum_k, deg_orbs_ftps = _determine_block_structure(sum_k, general_params, advanced_params, solver_type_per_imp, dens_mat_dft)
     # if load sigma we need to load everything from this h5 archive
     elif general_params['load_sigma']:
         #loading block_struc and rot_mat and deg_shells
@@ -439,9 +440,8 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
                 sum_k.block_structure = old_calc['DMFT_input/block_structure']
                 sum_k.deg_shells = old_calc['DMFT_input/deg_shells']
                 previous_rot_mat = old_calc['DMFT_input/rot_mat']
-                # FIXME: how to handle different block structure from ftps?
-                if solver_params[0]['type'] == 'ftps':
-                    solver_struct_ftps = old_calc['DMFT_input/solver_struct_ftps']
+                if deg_orbs_ftps is not None:
+                    deg_orbs_ftps = old_calc['DMFT_input/solver_struct_ftps']
 
             if not all(np.allclose(x, y) for x, y in zip(sum_k.rot_mat, previous_rot_mat)):
                 print('WARNING: rot_mat in current run is different from loaded_sigma run.')
@@ -451,7 +451,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
         sum_k.block_structure = mpi.bcast(sum_k.block_structure)
         sum_k.deg_shells = mpi.bcast(sum_k.deg_shells)
         previous_rot_mat = mpi.bcast(previous_rot_mat)
-        solver_struct_ftps = mpi.bcast(solver_struct_ftps)
+        deg_orbs_ftps = mpi.bcast(deg_orbs_ftps)
 
         # In a magnetic calculation, no shells are degenerate
         if general_params['magnetic'] and sum_k.SO == 0:
@@ -467,14 +467,13 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
                 archive['DMFT_input']['rot_mat'] = sum_k.rot_mat
             else:
                 previous_rot_mat = None
-            # FIXME: how to handle different block structure from ftps?
-            if solver_params[0]['type'] == 'ftps':
-                solver_struct_ftps = archive['DMFT_input/solver_struct_ftps']
+            if deg_orbs_ftps is not None:
+                deg_orbs_ftps = archive['DMFT_input/solver_struct_ftps']
 
         sum_k.block_structure = mpi.bcast(sum_k.block_structure)
         sum_k.deg_shells = mpi.bcast(sum_k.deg_shells)
         previous_rot_mat = mpi.bcast(previous_rot_mat)
-        solver_struct_ftps = mpi.bcast(solver_struct_ftps)
+        deg_orbs_ftps = mpi.bcast(deg_orbs_ftps)
 
     # Compatibility with h5 archives from the triqs2 version
     # Sumk doesn't hold corr_to_inequiv anymore, which is in block_structure now
@@ -487,22 +486,12 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
     shell_multiplicity = [sum_k.corr_to_inequiv.count(icrsh) for icrsh in range(sum_k.n_inequiv_shells)]
 
     # Initializes new empty Sigma with new blockstructure for calculation of DFT density
-    zero_Sigma = [sum_k.block_structure.create_gf(ish=iineq, gf_function=Gf, mesh=sum_k.mesh)
-                  for iineq in range(sum_k.n_inequiv_shells)]
-    sum_k.put_Sigma(zero_Sigma)
+    # zero_Sigma = [sum_k.block_structure.create_gf(ish=iineq, gf_function=Gf, mesh=sum_k.mesh)
+    #               for iineq in range(sum_k.n_inequiv_shells)]
+    # sum_k.put_Sigma(zero_Sigma)
 
     # print block structure and DFT input quantitites!
-    local_gf_dft_corr = sum_k.extract_G_loc(broadening=broadening, transform_to_solver_blocks=False)
-    dm = [gf.density() for gf in local_gf_dft_corr]
-    formatter.print_block_sym(sum_k, dm, general_params)
-
-    # Extracts local GF per *inequivalent* shell
-    local_gf_dft = sum_k.extract_G_loc(broadening=broadening, with_Sigma=False, mu=dft_mu)
-    density_mat_dft = [gf.density() for gf in local_gf_dft]
-
-    for iineq, gf in enumerate(local_gf_dft):
-        mpi.report(f'total density for imp {iineq} from DFT: '
-                   '{:10.6f}'.format(np.real(gf.total_density())))
+    formatter.print_block_sym(sum_k, dens_mat_dft, general_params)
 
     if general_params['magnetic']:
         sum_k.SP = 1
@@ -526,9 +515,8 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
             archive['DMFT_input']['block_structure'] = sum_k.block_structure
             archive['DMFT_input']['deg_shells'] = sum_k.deg_shells
             archive['DMFT_input']['shell_multiplicity'] = shell_multiplicity
-            # FIXME: how to handle different block structure from ftps?
-            if solver_params[0]['type'] == 'ftps':
-                archive['DMFT_input']['solver_struct_ftps'] = solver_struct_ftps
+            if deg_orbs_ftps is not None:
+                archive['DMFT_input']['solver_struct_ftps'] = deg_orbs_ftps
     mpi.barrier()
 
     solvers = [None] * sum_k.n_inequiv_shells
@@ -536,7 +524,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
         # Construct the Solver instances
         solvers[icrsh] = SolverStructure(general_params, solver_params[map_imp_solver[icrsh]],
                                          advanced_params, sum_k, icrsh, h_int[icrsh],
-                                         iteration_offset, solver_struct_ftps)
+                                         iteration_offset, deg_orbs_ftps)
 
     # store solver hash to archive
     if mpi.is_master_node():
@@ -548,6 +536,10 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
             archive['DMFT_input']['version'][f'solver {iineq}']['name'] = solver.solver_params['type']
             archive['DMFT_input']['version'][f'solver {iineq}']['hash'] = solver.git_hash
             archive['DMFT_input']['version'][f'solver {iineq}']['version'] = solver.version
+
+    # Extracts local GF per *inequivalent* shell
+    local_gf_dft = sum_k.extract_G_loc(broadening=broadening, with_Sigma=False, mu=dft_mu)
+    density_mat_dft = [gf.density() for gf in local_gf_dft]
 
     # Determines initial Sigma and DC
     sum_k, solvers = initial_sigma.determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,

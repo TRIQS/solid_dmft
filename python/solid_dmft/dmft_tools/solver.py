@@ -23,6 +23,7 @@
 ################################################################################
 import numpy as np
 from itertools import product
+from copy import deepcopy
 
 from triqs.gf import MeshImTime, MeshReTime, MeshReFreq, MeshLegendre, Gf, BlockGf, make_hermitian, Omega, iOmega_n, make_gf_from_fourier, fit_hermitian_tail
 from triqs.gf.tools import inverse, make_zero_tail
@@ -113,7 +114,7 @@ class SolverStructure:
         solve impurity problem
     '''
 
-    def __init__(self, general_params, solver_params, advanced_params, sum_k, icrsh, h_int, iteration_offset, solver_struct_ftps):
+    def __init__(self, general_params, solver_params, advanced_params, sum_k, icrsh, h_int, iteration_offset, deg_orbs_ftps):
         r'''
         Initialisation of the solver instance with h_int for impurity "icrsh" based on soliDMFT parameters.
 
@@ -140,7 +141,7 @@ class SolverStructure:
         self.icrsh = icrsh
         self.h_int = h_int
         self.iteration_offset = iteration_offset
-        self.solver_struct_ftps = solver_struct_ftps
+        self.deg_orbs_ftps = deg_orbs_ftps
         if solver_params.get("random_seed") is None:
             self.random_seed_generator = None
         else:
@@ -278,7 +279,7 @@ class SolverStructure:
             self.density_matrix = None
             self.h_loc_diagonalization = None
 
-        if self.solver_params['type'] in ['cthyb'] and self.solver_params['measure_chi'] is not None:
+        if self.solver_params['type'] == 'cthyb' and self.solver_params['measure_chi'] is not None:
             self.O_time = None
 
     def _init_ReFreq_objects(self):
@@ -349,11 +350,11 @@ class SolverStructure:
         if self.random_seed_generator is None:
             random_seed = {}
         else:
-            random_seed = { "random_seed": int(self.random_seed_generator(it=kwargs["it"], rank=mpi.rank)) }
+            random_seed = {"random_seed": int(self.random_seed_generator(it=kwargs["it"], rank=mpi.rank))}
 
         if self.solver_params['type'] == 'cthyb':
 
-            if self.general_params['cthyb_delta_interface']:
+            if self.solver_params['delta_interface']:
                 mpi.report('\n Using the delta interface for cthyb passing Delta(tau) and Hloc0 directly.')
                  # prepare solver input
                 sumk_eal = self.sum_k.eff_atomic_levels()[self.icrsh]
@@ -381,7 +382,7 @@ class SolverStructure:
                             else:
                                 # TODO: adapt for SOC calculations, which should keep the imag part
                                 Hloc_0 += spin_block[o1,o2].real/2 * (c_dag(spin,o1) * c(spin,o2) + c_dag(spin,o2) * c(spin,o1))
-                self.solver_params['h_loc0'] = Hloc_0
+                self.triqs_solver_params['h_loc0'] = Hloc_0
             else:
                 # fill G0_freq from sum_k to solver
                 self.triqs_solver.G0_iw << self.G0_freq
@@ -392,13 +393,13 @@ class SolverStructure:
                     if not 'it_-1' in archive['DMFT_input/solver']:
                         archive['DMFT_input/solver'].create_group('it_-1')
                     archive['DMFT_input/solver/it_-1'][f'S_{self.icrsh}'] = self.triqs_solver
-                    # FIXME: write only params that the solver can use
-                    archive['DMFT_input/solver/it_-1'][f'solve_params_{self.icrsh}'] = self.solver_params
+                    # TODO: write only params that the solver can use
+                    archive['DMFT_input/solver/it_-1'][f'triqs_solver_params_{self.icrsh}'] = self.triqs_solver_params
                     archive['DMFT_input/solver/it_-1']['mpi_size'] = mpi.size
 
             # Solve the impurity problem for icrsh shell
             # *************************************
-            self.triqs_solver.solve(h_int=self.h_int, **{ **self.solver_params, **random_seed })
+            self.triqs_solver.solve(h_int=self.h_int, **{ **self.triqs_solver_params, **random_seed })
             # *************************************
 
             # call postprocessing
@@ -625,6 +626,25 @@ class SolverStructure:
         '''
         from triqs_cthyb.solver import Solver as cthyb_solver
 
+        # Calculates number of sweeps per rank
+        self.solver_params['n_cycles'] = int(self.solver_params['n_cycles_tot'] / mpi.size)
+
+        # Renames measure chi param
+        self.solver_params['measure_O_tau_min_ins'] = self.solver_params['measure_chi_insertions']
+
+        # use_norm_as_weight also required to measure the density matrix
+        if self.solver_params['measure_density_matrix']:
+            self.solver_params['use_norm_as_weight'] = True
+
+        # Separately store all params that go into solve() call of solver
+        self.triqs_solver_params = deepcopy(self.solver_params)
+        for key in ('type', 'idx_impurities', 'delta_interface', 'fit_max_moment',
+                    'fit_max_n', 'fit_max_w', 'fit_min_n', 'fit_min_w', 'legendre_fit',
+                    'measure_chi', 'n_l', 'n_cycles_tot', 'measure_chi_insertions'):
+            del self.triqs_solver_params[key]
+        mpi.report(f'Imp {self.icrsh}: passing parameters {self.triqs_solver_params.keys()} '
+                   'directly into cthyb_solver.solve()')
+
         gf_struct = self.sum_k.gf_struct_solver_list[self.icrsh]
         # Construct the triqs_solver instances
         if self.solver_params['measure_G_l']:
@@ -636,6 +656,8 @@ class SolverStructure:
                             n_iw=self.general_params['n_iw'], n_tau=self.general_params['n_tau'],
                             delta_interface=self.solver_params['delta_interface'])
 
+
+
         return triqs_solver
 
     def _create_ctint_solver(self):
@@ -643,6 +665,9 @@ class SolverStructure:
         Initialize ctint solver instance
         '''
         from triqs_ctint import Solver as ctint_solver
+
+        # Calculates number of sweeps per rank
+        self.solver_params['n_cycles'] = int(self.solver_params['n_cycles_tot'] / mpi.size)
 
         gf_struct = self.sum_k.gf_struct_solver_list[self.icrsh]
 
@@ -779,6 +804,9 @@ class SolverStructure:
         '''
         from triqs_ctseg import Solver as ctseg_solver
 
+        # Calculates number of sweeps per rank
+        self.solver_params['n_cycles'] = int(self.solver_params['n_cycles_tot'] / mpi.size)
+
         if self.general_params['h_int_type'] == 'dynamic':
             self.U_iw = None
             if  mpi.is_master_node():
@@ -808,11 +836,11 @@ class SolverStructure:
         '''
         import forktps as ftps
 
-        # convert self.solver_struct_ftps to mapping and solver-friendly list
+        # convert self.deg_orbs_ftps to mapping and solver-friendly list
         if not self.sum_k.corr_shells[self.icrsh]['SO']:
             # mapping dictionary
-            calc_mapping = {self.solver_struct_ftps[self.icrsh][deg_shell][0]:
-                    self.solver_struct_ftps[self.icrsh][deg_shell][1:] for deg_shell in range(len(self.solver_struct_ftps[self.icrsh]))}
+            calc_mapping = {self.deg_orbs_ftps[self.icrsh][deg_shell][0]:
+                    self.deg_orbs_ftps[self.icrsh][deg_shell][1:] for deg_shell in range(len(self.deg_orbs_ftps[self.icrsh]))}
             # make solver-friendly list from mapping keys
             calc_me = [[item.split('_')[0], int(item.split('_')[1])] for item in calc_mapping.keys()]
             # replace 'down' with 'dn'

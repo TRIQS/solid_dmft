@@ -1,7 +1,6 @@
 [general]
 afm_order = false
 beta = "<none>"
-block_suppress_orbital_symm = false
 block_threshold = 1.0e-5
 broy_max_it = -1
 calc_energies = false
@@ -13,7 +12,7 @@ dc = true
 dc_dmft = "<none>"
 dc_type = "<none>"
 diag_delta = false
-enforce_off_diag = false
+enforce_off_diag = true
 eta = "<none>"
 fixed_mu_value = "<none>"
 g0_conv_crit = -1.0

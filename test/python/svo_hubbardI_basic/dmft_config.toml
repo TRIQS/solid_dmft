@@ -10,6 +10,7 @@ beta = 40
 n_w = 501
 w_range = [-10, 10]
 eta = 0.05
+enforce_off_diag = false
 
 prec_mu = 0.001
 

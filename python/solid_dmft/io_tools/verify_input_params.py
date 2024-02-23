@@ -67,17 +67,11 @@ def verify_input_params(params: FullConfig) -> None:
 def manual_changes_input_params(params: FullConfig) -> None:
     """ Necessary workarounds for some of the parameters. """
 
-    # Makes sure that pick_solver_struct and map_solver_struct are a list of dict
-    if isinstance(params['advanced']['pick_solver_struct'], dict):
-        params['advanced']['pick_solver_struct'] = [params['advanced']['pick_solver_struct']]
-    if isinstance(params['advanced']['map_solver_struct'], dict):
-        params['advanced']['map_solver_struct'] = [params['advanced']['map_solver_struct']]
-
     for entry in params['solver']:
         # Calculates the number of solver cycles per rank
-        if entry['type'] in ('cthyb', 'ctint', 'ctseg'):
-            entry['n_cycles'] = entry['n_cycles_tot'] // mpi.size
-            del entry['n_cycles_tot']
+        # if entry['type'] in ('cthyb', 'ctint', 'ctseg'):
+        #     entry['n_cycles'] = entry['n_cycles_tot'] // mpi.size
+        #     del entry['n_cycles_tot']
 
         # Some parameters have different names for ctseg
         if entry['type'] == 'ctseg':
@@ -101,25 +95,4 @@ def manual_changes_input_params(params: FullConfig) -> None:
             entry['measure_hist'] = entry['measure_pert_order']
             del entry['measure_pert_order']
 
-        # use_norm_as_weight also required to measure the density matrix
-        if entry['type'] == 'cthyb' and entry['measure_density_matrix']:
-            entry['use_norm_as_weight'] = True
-
-
     return
-
-    # FIXME: treat the following parameters in the solver.py class?
-    if params['general']['solver_type'] in ['cthyb']:
-        params['general']['cthyb_delta_interface'] = params['solver']['delta_interface']
-        del params['solver']['delta_interface']
-
-    # little workaround since #leg coefficients is not directly a solver parameter
-    if 'legendre_fit' in params['solver']:
-        params['general']['legendre_fit'] = params['solver']['legendre_fit']
-        del params['solver']['legendre_fit']
-
-    params['general']['store_solver'] = params['solver']['store_solver']
-    del params['solver']['store_solver']
-
-    # Copied from dmft_cycle.py
-    solver_params['measure_O_tau_min_ins'] = general_params['measure_chi_insertions']
