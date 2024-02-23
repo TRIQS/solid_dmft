@@ -67,32 +67,4 @@ def verify_input_params(params: FullConfig) -> None:
 def manual_changes_input_params(params: FullConfig) -> None:
     """ Necessary workarounds for some of the parameters. """
 
-    for entry in params['solver']:
-        # Calculates the number of solver cycles per rank
-        # if entry['type'] in ('cthyb', 'ctint', 'ctseg'):
-        #     entry['n_cycles'] = entry['n_cycles_tot'] // mpi.size
-        #     del entry['n_cycles_tot']
-
-        # Some parameters have different names for ctseg
-        if entry['type'] == 'ctseg':
-            entry['measure_gt'] = entry['measure_G_tau']
-            del entry['measure_G_tau']
-
-            entry['measure_gw'] = entry['measure_G_iw']
-            del entry['measure_G_iw']
-
-            # Makes sure measure_gw is true if improved estimators are used
-            if entry['improved_estimator']:
-                entry['measure_gt'] = True
-                entry['measure_ft'] = True
-            else:
-                entry['measure_ft'] = False
-            del entry['improved_estimator']
-
-            entry['measure_gl'] = entry['measure_G_l']
-            del entry['measure_G_l']
-
-            entry['measure_hist'] = entry['measure_pert_order']
-            del entry['measure_pert_order']
-
     return

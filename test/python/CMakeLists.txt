@@ -1,6 +1,7 @@
 # all pytest unittests
 set (all_pytests
      test_afm_mapping
+     test_dict_to_h5
      test_interaction_hamiltonian
      test_manipulate_chemical_potential.py
      test_observables.py

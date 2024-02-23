@@ -32,6 +32,8 @@ from triqs.operators import c_dag, c, Operator
 import triqs.utility.mpi as mpi
 from h5 import HDFArchive
 
+from solid_dmft.io_tools.dict_to_h5 import prep_params_for_h5
+
 from . import legendre_filter
 from .matheval import MathExpr
 
@@ -142,10 +144,12 @@ class SolverStructure:
         self.h_int = h_int
         self.iteration_offset = iteration_offset
         self.deg_orbs_ftps = deg_orbs_ftps
-        if solver_params.get("random_seed") is None:
+
+        # Stores random_seed as MathExpr object to evaluate it at runtime
+        if self.solver_params.get('random_seed') is None:
             self.random_seed_generator = None
         else:
-            self.random_seed_generator = MathExpr(solver_params["random_seed"])
+            self.random_seed_generator = MathExpr(self.solver_params['random_seed'])
 
         # initialize solver object, options are cthyb
         if self.solver_params['type'] == 'cthyb':
@@ -261,11 +265,9 @@ class SolverStructure:
         self.Delta_time = self.G_time.copy()
 
         # create all Legendre instances
-        if (self.solver_params['type'] == 'cthyb' and self.solver_params['measure_G_l']
-            or self.solver_params['type'] == 'cthyb' and  self.general_params['legendre_fit']
-            or self.solver_params['type'] == 'ctseg' and self.solver_params['measure_gl']
-            or self.solver_params['type'] == 'ctseg' and  self.general_params['legendre_fit']
-            or self.solver_params['type'] == 'hubbardI' and self.solver_params['measure_G_l']):
+        if (self.solver_params['type'] in ['cthyb', 'ctseg']
+                and (self.solver_params['measure_G_l'] or self.solver_params['legendre_fit'])
+                or self.solver_params['type'] == 'hubbardI' and self.solver_params['measure_G_l']):
 
             self.n_l = self.solver_params['n_l']
             self.G_l = self.sum_k.block_structure.create_gf(ish=self.icrsh, gf_function=Gf, space='solver',
@@ -347,13 +349,12 @@ class SolverStructure:
         solve impurity problem with current solver
         '''
 
-        if self.random_seed_generator is None:
-            random_seed = {}
+        if self.random_seed_generator is not None:
+            self.triqs_solver_params['random_seed'] = int(self.random_seed_generator(it=kwargs["it"], rank=mpi.rank))
         else:
-            random_seed = {"random_seed": int(self.random_seed_generator(it=kwargs["it"], rank=mpi.rank))}
+            assert 'random_seed' not in self.triqs_solver_params
 
         if self.solver_params['type'] == 'cthyb':
-
             if self.solver_params['delta_interface']:
                 mpi.report('\n Using the delta interface for cthyb passing Delta(tau) and Hloc0 directly.')
                  # prepare solver input
@@ -369,7 +370,6 @@ class SolverStructure:
                         self.triqs_solver.Delta_tau[name] << make_gf_from_fourier(self.Delta_freq[name], self.triqs_solver.Delta_tau.mesh, tail).real
                     else:
                         self.triqs_solver.Delta_tau[name] << make_gf_from_fourier(self.Delta_freq[name], self.triqs_solver.Delta_tau.mesh, tail)
-
 
                 # Make non-interacting operator for Hloc0
                 Hloc_0 = Operator()
@@ -393,13 +393,12 @@ class SolverStructure:
                     if not 'it_-1' in archive['DMFT_input/solver']:
                         archive['DMFT_input/solver'].create_group('it_-1')
                     archive['DMFT_input/solver/it_-1'][f'S_{self.icrsh}'] = self.triqs_solver
-                    # TODO: write only params that the solver can use
-                    archive['DMFT_input/solver/it_-1'][f'triqs_solver_params_{self.icrsh}'] = self.triqs_solver_params
+                    archive['DMFT_input/solver/it_-1'][f'triqs_solver_params_{self.icrsh}'] = prep_params_for_h5(self.triqs_solver_params)
                     archive['DMFT_input/solver/it_-1']['mpi_size'] = mpi.size
 
             # Solve the impurity problem for icrsh shell
             # *************************************
-            self.triqs_solver.solve(h_int=self.h_int, **{ **self.triqs_solver_params, **random_seed })
+            self.triqs_solver.solve(h_int=self.h_int, **self.triqs_solver_params)
             # *************************************
 
             # call postprocessing
@@ -409,13 +408,13 @@ class SolverStructure:
             # fill G0_freq from sum_k to solver
             self.triqs_solver.G0_iw << self.G0_freq
 
-            if self.general_params['h_int_type'] == 'dynamic':
+            if self.general_params['h_int_type'][self.icrsh] == 'dynamic':
                 for b1, b2 in product(self.sum_k.gf_struct_solver_dict[self.icrsh].keys(), repeat=2):
                     self.triqs_solver.D0_iw[b1,b2] << self.U_iw[self.icrsh]
 
             # Solve the impurity problem for icrsh shell
             # *************************************
-            self.triqs_solver.solve(h_int=self.h_int, **{ **self.solver_params, **random_seed })
+            self.triqs_solver.solve(h_int=self.h_int, **self.triqs_solver_params)
             # *************************************
 
             # call postprocessing
@@ -425,14 +424,10 @@ class SolverStructure:
             # fill G0_freq from sum_k to solver
             self.triqs_solver.G0_iw << self.G0_freq
 
-            print()
-
             # Solve the impurity problem for icrsh shell
             # *************************************
             # this is done on every node due to very slow bcast of the AtomDiag object as of now
-            self.triqs_solver.solve(h_int=self.h_int, calc_gtau=self.solver_params['measure_G_tau'],
-                                    calc_gw=True, calc_gl=self.solver_params['measure_G_l'],
-                                    calc_dm=self.solver_params['measure_density_matrix'])
+            self.triqs_solver.solve(h_int=self.h_int, **self.triqs_solver_params)
             # if density matrix is measured, get this too. Needs to be done here,
             # because solver property 'dm' is not initialized/broadcastable
             if self.solver_params['measure_density_matrix']:
@@ -450,9 +445,7 @@ class SolverStructure:
             # Solve the impurity problem for icrsh shell
             # *************************************
             # this is done on every node due to very slow bcast of the AtomDiag object as of now
-            self.triqs_solver.solve(h_int=self.h_int, with_fock=self.solver_params['with_fock'],
-                                    one_shot=self.solver_params['one_shot'],
-                                    method=self.solver_params['method'], tol=self.solver_params['tol'])
+            self.triqs_solver.solve(h_int=self.h_int, **self.triqs_solver_params)
 
             # call postprocessing
             self._hartree_postprocessing()
@@ -490,7 +483,7 @@ class SolverStructure:
             self.Delta_freq_solver = make_positive_definite(self.Delta_freq_solver)
 
             # remove off-diagonal terms
-            if self.general_params['diag_delta']:
+            if self.solver_params['diag_delta']:
                 for name, delta in self.Delta_freq_solver:
                     for i_orb, j_orb in product(range(delta.target_shape[0]),range(delta.target_shape[1])):
                         if i_orb != j_orb:
@@ -550,7 +543,7 @@ class SolverStructure:
                     name = self.convert_ftps[name.split('_')[0]]
                     solver_eal = solver_eal.real
                     # remove off-diagonal terms
-                    if self.general_params['diag_delta']:
+                    if self.solver_params['diag_delta']:
                         solver_eal = np.diag(np.diag(solver_eal))
                 h_loc.Fill(name, solver_eal)
 
@@ -561,10 +554,10 @@ class SolverStructure:
             # so for debugging it is done here again
             # store solver to h5 archive
             if self.general_params['store_solver'] and mpi.is_master_node():
-                archive = HDFArchive(self.general_params['jobname']+'/'+self.general_params['seedname']+'.h5', 'a')
-                archive['DMFT_input/solver'].create_group('it_-1')
-                archive['DMFT_input/solver/it_-1']['Delta'] = self.Delta_freq_solver
-                archive['DMFT_input/solver/it_-1']['S_'+str(self.icrsh)] = self.triqs_solver
+                with HDFArchive(self.general_params['jobname']+'/'+self.general_params['seedname']+'.h5', 'a') as archive:
+                    archive['DMFT_input/solver'].create_group('it_-1')
+                    archive['DMFT_input/solver/it_-1']['Delta'] = self.Delta_freq_solver
+                    archive['DMFT_input/solver/it_-1']['S_'+str(self.icrsh)] = self.triqs_solver
 
             # Solve the impurity problem for icrsh shell
             # *************************************
@@ -591,7 +584,7 @@ class SolverStructure:
 
             # Solve the impurity problem for icrsh shell
             # *************************************
-            self.triqs_solver.solve(h_int=self.h_int, **{ **self.solver_params, **random_seed })
+            self.triqs_solver.solve(h_int=self.h_int, **self.triqs_solver_params)
             # *************************************
 
             # call postprocessing
@@ -601,14 +594,13 @@ class SolverStructure:
             # fill G0_freq from sum_k to solver
             self.triqs_solver.G0_iw << self.G0_freq
 
-
             if self.general_params['h_int_type'] == 'dynamic':
                 for b1, b2 in product(self.sum_k.gf_struct_solver_dict[self.icrsh].keys(), repeat=2):
                     self.triqs_solver.D0_iw[b1+"|"+b2] << self.U_iw[self.icrsh]
 
             # Solve the impurity problem for icrsh shell
             # *************************************
-            self.triqs_solver.solve(h_int=self.h_int, **{ **self.solver_params, **random_seed })
+            self.triqs_solver.solve(h_int=self.h_int, **self.triqs_solver_params)
             # *************************************
 
             # call postprocessing
@@ -626,24 +618,32 @@ class SolverStructure:
         '''
         from triqs_cthyb.solver import Solver as cthyb_solver
 
+        # Separately stores all params that go into solve() call of solver
+        self.triqs_solver_params = {}
+        keys_to_pass = ('imag_threshold', 'length_cycle', 'max_time', 'measure_density_matrix',
+                        'measure_G_l', 'measure_pert_order', 'move_double', 'move_shift',
+                        'n_warmup_cycles', 'loc_n_max', 'loc_n_min', 'off_diag_threshold', 'perform_tail_fit')
+        for key in keys_to_pass:
+            self.triqs_solver_params[key] = self.solver_params[key]
+
         # Calculates number of sweeps per rank
-        self.solver_params['n_cycles'] = int(self.solver_params['n_cycles_tot'] / mpi.size)
+        self.triqs_solver_params['n_cycles'] = int(self.solver_params['n_cycles_tot'] / mpi.size)
 
         # Renames measure chi param
-        self.solver_params['measure_O_tau_min_ins'] = self.solver_params['measure_chi_insertions']
+        self.triqs_solver_params['measure_O_tau_min_ins'] = self.solver_params['measure_chi_insertions']
 
         # use_norm_as_weight also required to measure the density matrix
-        if self.solver_params['measure_density_matrix']:
-            self.solver_params['use_norm_as_weight'] = True
+        self.triqs_solver_params['use_norm_as_weight'] = self.triqs_solver_params['measure_density_matrix']
 
-        # Separately store all params that go into solve() call of solver
-        self.triqs_solver_params = deepcopy(self.solver_params)
-        for key in ('type', 'idx_impurities', 'delta_interface', 'fit_max_moment',
-                    'fit_max_n', 'fit_max_w', 'fit_min_n', 'fit_min_w', 'legendre_fit',
-                    'measure_chi', 'n_l', 'n_cycles_tot', 'measure_chi_insertions'):
-            del self.triqs_solver_params[key]
-        mpi.report(f'Imp {self.icrsh}: passing parameters {self.triqs_solver_params.keys()} '
-                   'directly into cthyb_solver.solve()')
+        if self.triqs_solver_params['perform_tail_fit']:
+            for key in ('fit_max_moment', 'fit_max_n', 'fit_max_w', 'fit_min_n', 'fit_min_w'):
+                self.triqs_solver_params[key] = self.solver_params[key]
+
+        # Resolve defaults for n_loc_min and n_loc_max
+        if self.triqs_solver_params['loc_n_min'] is None:
+            self.triqs_solver_params['loc_n_min'] = 0
+        if self.triqs_solver_params['loc_n_max'] is None:
+            self.triqs_solver_params['loc_n_max'] = 100000 # large number
 
         gf_struct = self.sum_k.gf_struct_solver_list[self.icrsh]
         # Construct the triqs_solver instances
@@ -656,8 +656,6 @@ class SolverStructure:
                             n_iw=self.general_params['n_iw'], n_tau=self.general_params['n_tau'],
                             delta_interface=self.solver_params['delta_interface'])
 
-
-
         return triqs_solver
 
     def _create_ctint_solver(self):
@@ -666,13 +664,18 @@ class SolverStructure:
         '''
         from triqs_ctint import Solver as ctint_solver
 
+        # Separately stores all params that go into solve() call of solver
+        self.triqs_solver_params = {}
+        keys_to_pass = ('length_cycle', 'max_time', 'measure_pert_order', 'move_double', 'n_warmup_cycles')
+        for key in keys_to_pass:
+            self.triqs_solver_params[key] = self.solver_params[key]
+
         # Calculates number of sweeps per rank
-        self.solver_params['n_cycles'] = int(self.solver_params['n_cycles_tot'] / mpi.size)
+        self.triqs_solver_params['n_cycles'] = int(self.solver_params['n_cycles_tot'] / mpi.size)
 
         gf_struct = self.sum_k.gf_struct_solver_list[self.icrsh]
 
-        # TODO: isn't h_int_type a list?
-        if self.general_params['h_int_type'] == 'dynamic':
+        if self.general_params['h_int_type'][self.icrsh] == 'dynamic':
             self.U_iw = None
             if  mpi.is_master_node():
                 with HDFArchive(self.general_params['jobname']+'/'+self.general_params['seedname']+'.h5', 'r') as archive:
@@ -695,6 +698,14 @@ class SolverStructure:
         Initialize hubbardI solver instance
         '''
         from triqs_hubbardI import Solver as hubbardI_solver
+
+        # Separately stores all params that go into solve() call of solver
+        # All params need to be renamed
+        self.triqs_solver_params = {}
+        self.triqs_solver_params['calc_gtau'] = self.solver_params['measure_G_tau']
+        self.triqs_solver_params['calc_gw'] = True
+        self.triqs_solver_params['calc_gl'] = self.solver_params['measure_G_l']
+        self.triqs_solver_params['calc_dm'] = self.solver_params['measure_density_matrix']
 
         gf_struct =  self.sum_k.gf_struct_solver_list[self.icrsh]
         # Construct the triqs_solver instances
@@ -727,8 +738,13 @@ class SolverStructure:
         '''
         from triqs_hartree_fock import ImpuritySolver as hartree_solver
 
-        gf_struct = self.sum_k.gf_struct_solver_list[self.icrsh]
+        # Separately stores all params that go into solve() call of solver
+        self.triqs_solver_params = {}
+        keys_to_pass = ('method', 'one_shot', 'tol', 'with_fock')
+        for key in keys_to_pass:
+            self.triqs_solver_params[key] = self.solver_params[key]
 
+        gf_struct = self.sum_k.gf_struct_solver_list[self.icrsh]
         # Construct the triqs_solver instances
         # Always initialize the solver with dc_U and dc_J equal to U and J and let the _interface_hartree_dc function
         # take care of changing the parameters
@@ -804,10 +820,29 @@ class SolverStructure:
         '''
         from triqs_ctseg import Solver as ctseg_solver
 
-        # Calculates number of sweeps per rank
-        self.solver_params['n_cycles'] = int(self.solver_params['n_cycles_tot'] / mpi.size)
+        # Separately stores all params that go into solve() call of solver
+        self.triqs_solver_params = {}
+        keys_to_pass = ('improved_estimator', 'length_cycle', 'max_time', 'measure_pert_order', 'n_warmup_cycles')
+        for key in keys_to_pass:
+            self.triqs_solver_params[key] = self.solver_params[key]
 
-        if self.general_params['h_int_type'] == 'dynamic':
+        # Calculates number of sweeps per rank
+        self.triqs_solver_params['n_cycles'] = int(self.solver_params['n_cycles_tot'] / mpi.size)
+
+        # Rename parameters that are differentin ctseg than cthyb
+        self.triqs_solver_params['measure_gt'] = self.solver_params['measure_G_tau']
+        self.triqs_solver_params['measure_gw'] = self.solver_params['measure_G_iw']
+        self.triqs_solver_params['measure_gl'] = self.solver_params['measure_G_l']
+        self.triqs_solver_params['measure_hist'] = self.solver_params['measure_pert_order']
+
+        # Makes sure measure_gw is true if improved estimators are used
+        if self.triqs_solver_params['improved_estimator']:
+            self.triqs_solver_params['measure_gt'] = True
+            self.triqs_solver_params['measure_ft'] = True
+        else:
+            self.triqs_solver_params['measure_ft'] = False
+
+        if self.general_params['h_int_type'][self.icrsh] == 'dynamic':
             self.U_iw = None
             if  mpi.is_master_node():
                 with HDFArchive(self.general_params['jobname']+'/'+self.general_params['seedname']+'.h5', 'r') as archive:
@@ -835,6 +870,10 @@ class SolverStructure:
         Initialize ftps solver instance
         '''
         import forktps as ftps
+
+        # TODO: add triqs_solver_params for ftps as well to make it analogous to other similars
+        # Not necessary but nicer. For now, just keep an empty dummy dict
+        self.triqs_solver_params = {}
 
         # convert self.deg_orbs_ftps to mapping and solver-friendly list
         if not self.sum_k.corr_shells[self.icrsh]['SO']:
@@ -921,13 +960,13 @@ class SolverStructure:
             self.G_time << self.triqs_solver.G_tau
             self.sum_k.symm_deg_gf(self.G_time, ish=self.icrsh)
 
-            if self.general_params['legendre_fit']:
+            if self.solver_params['legendre_fit']:
                 self.G_time_orig << self.triqs_solver.G_tau
                 # run the filter
                 self.G_l << legendre_filter.apply(self.G_time, self.solver_params['n_l'])
                 # get G_time, G_freq, Sigma_freq from G_l
                 set_Gs_from_G_l()
-            elif self.solver_params['perform_tail_fit'] and not self.general_params['legendre_fit']:
+            elif self.solver_params['perform_tail_fit'] and not self.solver_params['legendre_fit']:
                 # if tailfit has been used replace Sigma with the tail fitted Sigma from cthyb
                 self.Sigma_freq << self.triqs_solver.Sigma_iw
                 self.sum_k.symm_deg_gf(self.Sigma_freq, ish=self.icrsh)
@@ -977,7 +1016,7 @@ class SolverStructure:
         self.G_time << Fourier(self.G_freq)
 
         # TODO: probably not needed/sensible
-        # if self.general_params['legendre_fit']:
+        # if self.solver_params['legendre_fit']:
         #     self.G_freq_orig << self.triqs_solver.G_iw
         #     # run the filter
         #     self.G_l << legendre_filter.apply(self.G_time, self.solver_params['n_l'])
@@ -1171,7 +1210,7 @@ class SolverStructure:
             self.G_l << self.triqs_solver.G_l
             # get G_time, G_freq, Sigma_freq from G_l
             set_Gs_from_G_l()
-        elif self.general_params['legendre_fit']:
+        elif self.solver_params['legendre_fit']:
             self.G_time_orig << self.triqs_solver.G_tau
             self.G_l << legendre_filter.apply(self.G_time, self.solver_params['n_l'])
             # get G_time, G_freq, Sigma_freq from G_l

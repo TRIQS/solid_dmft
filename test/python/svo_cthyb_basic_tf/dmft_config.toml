@@ -2,7 +2,7 @@
 seedname = "inp"
 jobname = "out"
 enforce_off_diag = false
-block_threshold= 0.001
+block_threshold = 0.001
 mu_initial_guess = -0.027041
 
 prec_mu = 0.001

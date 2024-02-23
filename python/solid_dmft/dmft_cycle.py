@@ -57,6 +57,7 @@ from solid_dmft.dmft_tools import afm_mapping
 from solid_dmft.dmft_tools import manipulate_chemical_potential as manipulate_mu
 from solid_dmft.dmft_tools import initial_self_energies as initial_sigma
 from solid_dmft.dmft_tools import greens_functions_mixer as gf_mixer
+from solid_dmft.io_tools.dict_to_h5 import prep_params_for_h5
 
 def _extract_quantity_per_inequiv(param_name, n_inequiv_shells, general_params):
     """
@@ -370,7 +371,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
                     map_imp_solver.append(isolver)
                     break
     solver_type_per_imp = [solver_params[map_imp_solver[iineq]]['type'] for iineq in range(sum_k.n_inequiv_shells)]
-    mpi.report('DEBUG', solver_type_per_imp)
+    mpi.report(f'Solver type per impurity: {solver_type_per_imp}')
 
     # Checks that enforce_off_diag true for ftps and hartree
     if any(s in ['ftps', 'hartree'] and not e for s, e in zip(solver_type_per_imp, general_params['enforce_off_diag'])):
@@ -467,7 +468,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
                 archive['DMFT_input']['rot_mat'] = sum_k.rot_mat
             else:
                 previous_rot_mat = None
-            if deg_orbs_ftps is not None:
+            if 'solver_struct_ftps' in archive['DMFT_input']:
                 deg_orbs_ftps = archive['DMFT_input/solver_struct_ftps']
 
         sum_k.block_structure = mpi.bcast(sum_k.block_structure)
@@ -507,10 +508,10 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
     # If new calculation, writes input parameters and sum_k <-> solver mapping to archive
     if iteration_offset == 0:
         if mpi.is_master_node():
-            # FIXME: writing to archive crashes because of parameters that are None
-            # archive['DMFT_input']['general_params'] = general_params
-            # archive['DMFT_input']['solver_params'] = solver_params
-            # archive['DMFT_input']['advanced_params'] = advanced_params
+            archive['DMFT_input']['general_params'] = prep_params_for_h5(general_params)
+            archive['DMFT_input']['solver_params'] = prep_params_for_h5(solver_params)
+            archive['DMFT_input']['dft_params'] = prep_params_for_h5(dft_params)
+            archive['DMFT_input']['advanced_params'] = prep_params_for_h5(advanced_params)
 
             archive['DMFT_input']['block_structure'] = sum_k.block_structure
             archive['DMFT_input']['deg_shells'] = sum_k.deg_shells
