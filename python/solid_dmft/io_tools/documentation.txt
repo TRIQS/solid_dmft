@@ -42,8 +42,10 @@ ratio_F4_F2 : float or comma separated list of floats, optional, default='none'
             Ratio between the Slater integrals  F_4 and F_2. Only used for the
             interaction Hamiltonians 'density_density' and 'full_slater' and
             only for d-shell impurities, where the default is 0.63.
-beta : float, only used if solver ImFreq
-            inverse temperature for Greens function etc
+beta : float
+            inverse temperature. If set, solid_dmft stores all Greens functions etc on an imaginary-frequency grid
+            and also n_iw and n_tau have to be specified.
+            If not set, it uses a real-frequency grid and eta, n_w and w_range have to be set
 n_iter_dmft_first : int, optional, default= 10
             number of iterations in first dmft cycle to converge dmft solution
 n_iter_dmft_per : int, optional, default= 2
