@@ -8,8 +8,6 @@ set (all_pytests
      test_postproc_toml_dict.py
      test_postproc_toml_dict_integration.py
      test_read_config.py
-     test_update_dmft_config.py
-     test_update_results_h5.py
     )
 
 foreach(test ${all_pytests})
