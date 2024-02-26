@@ -111,7 +111,9 @@ cat > solver.rst << EOF
 [solver]: solver specific parameters
 ------------------------------------
 
-Here are the parameters that are uniquely dependent on the solver chosen. Below a list of the supported solvers:
+Here are the parameters that are uniquely dependent on the solver chosen. Some parameters are used within solid_dmft and some are passed directly into the triqs solver.
+To see which parameters were passed to the solver for a given calculation, look at the triqs_solver_params in DMFT_input/solver in the h5 archive.
+Below a list of the supported solvers:
 
 
 

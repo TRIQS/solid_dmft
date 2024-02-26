@@ -60,6 +60,7 @@ set (integration_tests
      svo_cthyb_basic_gl
      svo_cthyb_basic_tf
      lco_ftps
+     nio_cthyb_hartree
      )
 
 # copy other test files

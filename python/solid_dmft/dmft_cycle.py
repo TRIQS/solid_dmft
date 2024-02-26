@@ -67,9 +67,9 @@ def _extract_quantity_per_inequiv(param_name, n_inequiv_shells, general_params):
     """
 
     def formatter(value):
-        if value is None or isinstance(value, str) or isinstance(value, dict):
-            return str(value)
-        return '{:.2f}'.format(value)
+        if isinstance(value, float):
+            return '{:.2f}'.format(value)
+        return str(value)
 
     param = general_params[param_name]
     if not isinstance(param, list):
@@ -78,7 +78,7 @@ def _extract_quantity_per_inequiv(param_name, n_inequiv_shells, general_params):
         general_params[param_name] = [param] * n_inequiv_shells
     elif len(param) == n_inequiv_shells:
         mpi.report(f'{param_name} list for correlated shells: '
-                   + ' ,'.join([formatter(p) for p in param]))
+                   + ', '.join([formatter(p) for p in param]))
     else:
         raise IndexError(f'{param_name} must be list of length '
                          f'n_inequiv_shells={n_inequiv_shells} '
@@ -388,7 +388,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
         sum_k.chemical_potential = general_params['mu_initial_guess']
         mpi.report('\nInitial chemical potential set to {:.3f} eV\n'.format(sum_k.chemical_potential))
 
-    dft_mu = sum_k.calc_mu(precision=general_params['prec_mu'],
+    dft_mu = sum_k.calc_mu(precision=general_params['prec_mu'], method=general_params['calc_mu_method'],
                            broadening=broadening)
 
     # calculate E_kin_dft for one shot calculations

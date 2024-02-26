@@ -167,6 +167,7 @@ def _construct_kanamori(sum_k, general_params, solver_type_per_imp, icrsh):
         U_prime = general_params['U'][icrsh] - 2.0 * general_params['J'][icrsh]
     else:
         U_prime = general_params['U_prime'][icrsh]
+    mpi.report('U = {:.2f}, U\' = {:.2f}, J = {:.2f}\n'.format(general_params['U'][icrsh], U_prime, general_params['J'][icrsh]))
 
     if solver_type_per_imp[icrsh] == 'ftps':
         # 1-band modell requires J and U' equals zero
@@ -185,11 +186,11 @@ def _construct_kanamori(sum_k, general_params, solver_type_per_imp, icrsh):
         h_int = util.h_int_kanamori(sum_k.spin_block_names[sum_k.SO], n_orb,
                                     map_operator_structure=sum_k.sumk_to_solver[icrsh],
                                     U=Umat, Uprime=Upmat, J_hund=general_params['J'][icrsh],
-                                    H_dump=os.path.join(general_params['jobname'], 'H.txt'))
+                                    H_dump=os.path.join(general_params['jobname'], f'H_imp{icrsh}.txt'))
     else:
         h_int = _construct_kanamori_soc(general_params['U'][icrsh], general_params['J'][icrsh],
                                         n_orb, sum_k.sumk_to_solver[icrsh],
-                                        os.path.join(general_params['jobname'], 'H.txt'))
+                                        os.path.join(general_params['jobname'], f'H_imp{icrsh}.txt'))
     return h_int
 
 
@@ -301,7 +302,7 @@ def _construct_dynamic(sum_k, general_params, icrsh):
     mpi.report('onsite interaction value for imp {}: {:.3f}'.format(icrsh, U_onsite[icrsh]))
     h_int = util.h_int_density(sum_k.spin_block_names[sum_k.SO], n_orb,
                                map_operator_structure=sum_k.sumk_to_solver[icrsh],
-                               U=np.array([[0]]), Uprime=np.array([[U_onsite[icrsh]]]), H_dump=os.path.join(general_params['jobname'], 'H.txt'))
+                               U=np.array([[0]]), Uprime=np.array([[U_onsite[icrsh]]]), H_dump=os.path.join(general_params['jobname'], f'H_imp{icrsh}.txt'))
 
     return h_int
 
@@ -319,9 +320,9 @@ def _generate_four_index_u_matrix(sum_k, general_params, icrsh):
         assert n_orb % 2 == 0
         n_orb = n_orb // 2
 
-    if sum_k.corr_shells[ish]['l'] != 2:
-        slater_integrals = util.U_J_to_radial_integrals(l=sum_k.corr_shells[ish]['l'],
-                                                        U_int=general_params['U'][icrsh],
+    l = sum_k.corr_shells[ish]['l']
+    if l != 2:
+        slater_integrals = util.U_J_to_radial_integrals(l=l, U_int=general_params['U'][icrsh],
                                                         J_hund=general_params['J'][icrsh])
     else:
         # Implements parameter R=F4/F2. For R=0.63 equivalent to util.U_J_to_radial_integrals
@@ -342,22 +343,21 @@ def _generate_four_index_u_matrix(sum_k, general_params, icrsh):
     # this is consistent with the order of orbitals in the VASP interface
     # but not necessarily with wannier90, qe, and wien2k!
     # This is also true for the f-shell.
-    Umat_full = util.U_matrix_slater(l=sum_k.corr_shells[ish]['l'],
+    Umat_full = util.U_matrix_slater(l=l,
                               radial_integrals=slater_integrals, basis='spherical')
     Umat_full = util.transform_U_matrix(Umat_full,
-                                        util.spherical_to_cubic(l=sum_k.corr_shells[ish]['l'],
-                                                                convention=general_params['h_int_basis'])
-                                        )
+                                        util.spherical_to_cubic(l=l, convention=general_params['h_int_basis']))
 
-    if n_orb == 2:
+    if l == 2 and n_orb == 2:
         Umat_full = util.eg_submatrix(Umat_full)
         mpi.report('Using eg subspace of interaction Hamiltonian')
-    elif n_orb == 3:
+    elif l == 2 and n_orb == 3:
         Umat_full = util.t2g_submatrix(Umat_full)
         mpi.report('Using t2g subspace of interaction Hamiltonian')
-    elif n_orb not in (5, 7):
-        raise ValueError('Calculations for d shell only support 2, 3 or 5 orbitals'
-                         + 'and for the f shell only 7 orbitals')
+    elif n_orb != 2*l+1:
+        raise ValueError(f'Imp {icrsh}: for the Slater Hamiltonian, please use either '
+                         f'the full shell with 2l+1={2*l+1} orbitals '
+                         'or the t2g or eg subspace of the d shell with 3 or 2 orbitals.')
 
     return Umat_full
 
@@ -393,7 +393,7 @@ def _construct_density_density(sum_k, general_params, Umat_full_rotated, icrsh):
     Umat, Upmat = util.reduce_4index_to_2index(Umat_full_rotated)
     h_int = util.h_int_density(sum_k.spin_block_names[sum_k.SO], n_orb,
                                map_operator_structure=sum_k.sumk_to_solver[icrsh],
-                               U=Umat, Uprime=Upmat, H_dump=os.path.join(general_params['jobname'], 'H.txt'))
+                               U=Umat, Uprime=Upmat, H_dump=os.path.join(general_params['jobname'], f'H_imp{icrsh}.txt'))
 
     return h_int
 
@@ -409,7 +409,7 @@ def _construct_slater(sum_k, general_params, Umat_full_rotated, icrsh):
     h_int = util.h_int_slater(sum_k.spin_block_names[sum_k.SO], n_orb,
                               map_operator_structure=sum_k.sumk_to_solver[icrsh],
                               U_matrix=Umat_full_rotated,
-                              H_dump=os.path.join(general_params['jobname'], 'H.txt'))
+                              H_dump=os.path.join(general_params['jobname'], f'H_imp{icrsh}.txt'))
 
     return h_int
 
@@ -550,7 +550,7 @@ def construct(sum_k, general_params, solver_type_per_imp):
                                               solver.get_n_orbitals(sum_k)[icrsh]['up'],
                                               map_operator_structure=sum_k.sumk_to_solver[icrsh],
                                               U=general_params['U'][icrsh],
-                                              H_dump=os.path.join(general_params['jobname'], 'H.txt'))
+                                              H_dump=os.path.join(general_params['jobname'], f'H_imp{icrsh}.txt'))
             continue
 
 
