@@ -79,18 +79,12 @@ solver_type : str
 
 n_iw : int, optional, default=1025
             number of Matsubara frequencies
-n_tau : int, optional, default=10001
-            number of imaginary time points
-n_l : int, needed if measure_G_l=True or legendre_fit=True
-            number of Legendre coefficients
 n_w : int, optional, default=5001
             number of real frequency points
 w_range : tuple, optional, default=(-10, 10)
             w_min and w_max, example: w_range = -10, 10
 eta : float, only used if solver ReFreq
             broadening of Green's function
-diag_delta : bool, optional, default=False
-            option to remove off-diagonal terms in the hybridization function
 
 
 h5_save_freq : int, optional, default=5
@@ -104,7 +98,7 @@ magmom : list of float seperated by comma, optional default=[]
             This will initialize the spin blocks of the sigma with a diagonal shift
             With -shift for the up block, and +shift for the down block
             (positive shift favours the up spin component, not compatible with spin-orbit coupling)
-enforce_off_diag : bool, optional, default=False
+enforce_off_diag : bool, optional, default=True
             enforce off diagonal elements in block structure finder
 h_field : float, optional, default=0.0
             magnetic field
@@ -203,6 +197,15 @@ mu_gap_occ_deviation : float, optional, default=none
 ------------
 store_solver : bool, optional default= False
             store the whole solver object under DMFT_input in h5 archive
+diag_delta : bool, optional, default=False
+            option to remove off-diagonal terms in the hybridization function
+            available for ftps
+n_tau : int, optional, default=10001
+            number of imaginary time points
+n_l : int, needed if measure_G_l=True or legendre_fit=True
+            number of Legendre coefficients
+idx_impurities : list of int, optional, default= 'none'
+            list of impurities this solver is supposed to solve
 
 cthyb parameters
 ================
