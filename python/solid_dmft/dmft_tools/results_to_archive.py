@@ -71,7 +71,7 @@ def _compile_information(sum_k, general_params, solver_params, solvers, map_imp_
 
             # if legendre was set, that we have both now!
             if (solver_params[isolvsec]['measure_G_l']
-                or not solver_params[isolvsec]['perform_tail_fit'] and general_params['legendre_fit']):
+                or not solver_params[isolvsec]['perform_tail_fit'] and solver_params[isolvsec]['legendre_fit']):
                 write_to_h5['G_time_orig_{}'.format(icrsh)] = solvers[icrsh].G_time_orig
                 write_to_h5['Gimp_l_{}'.format(icrsh)] = solvers[icrsh].G_l
 
@@ -91,7 +91,7 @@ def _compile_information(sum_k, general_params, solver_params, solvers, map_imp_
 
         if solver_type_per_imp[icrsh] == 'ctseg':
             # if legendre was set, that we have both now!
-            if (solver_params[isolvsec]['measure_gl'] or general_params['legendre_fit']):
+            if (solver_params[isolvsec]['measure_gl'] or solver_params[isolvsec]['legendre_fit']):
                 write_to_h5['G_time_orig_{}'.format(icrsh)] = solvers[icrsh].G_time_orig
                 write_to_h5['Gimp_l_{}'.format(icrsh)] = solvers[icrsh].G_l
             if solver_params[isolvsec]['measure_ft']:

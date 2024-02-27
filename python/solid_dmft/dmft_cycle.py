@@ -64,7 +64,23 @@ def _extract_quantity_per_inequiv(param_name, n_inequiv_shells, general_params):
     For quantities that can be different for each inequivalent shell, this
     function checks if the quantity is a single value or a list of the correct
     length. If just a single value is given, this value is applied to each shell.
+
+    Parameters
+    ----------
+    param_name : str
+        name of the parameter to be checked
+    n_inequiv_shells : int
+        number of inequivalent shells
+    general_params : dict
+        general parameters as a dict
+
+    Returns
+    -------
+    general_params : dict
+        updated general parameters as a dict
+
     """
+
 
     def formatter(value):
         if isinstance(value, float):
@@ -338,7 +354,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
                     map_imp_solver.append(isolver)
                     break
     solver_type_per_imp = [solver_params[map_imp_solver[iineq]]['type'] for iineq in range(sum_k.n_inequiv_shells)]
-    mpi.report(f'Solver type per impurity: {solver_type_per_imp}')
+    mpi.report(f'\nSolver type per impurity: {solver_type_per_imp}')
 
     # Checks all parameters that need to be checked against info in SumkDFT object
     verify_input_params.verify_h5_dependent(sum_k, solver_type_per_imp, general_params)

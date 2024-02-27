@@ -623,12 +623,14 @@ class SolverStructure:
         self.triqs_solver_params = {}
         keys_to_pass = ('imag_threshold', 'length_cycle', 'max_time', 'measure_density_matrix',
                         'measure_G_l', 'measure_pert_order', 'move_double', 'move_shift',
-                        'n_warmup_cycles', 'loc_n_max', 'loc_n_min', 'off_diag_threshold', 'perform_tail_fit')
+                        'off_diag_threshold', 'perform_tail_fit')
         for key in keys_to_pass:
             self.triqs_solver_params[key] = self.solver_params[key]
 
         # Calculates number of sweeps per rank
         self.triqs_solver_params['n_cycles'] = int(self.solver_params['n_cycles_tot'] / mpi.size)
+        # cast warmup cycles to int in case given in scientific notation
+        self.triqs_solver_params['n_warmup_cycles'] = int(self.solver_params['n_warmup_cycles'])
 
         # Renames measure chi param
         self.triqs_solver_params['measure_O_tau_min_ins'] = self.solver_params['measure_chi_insertions']
@@ -640,11 +642,11 @@ class SolverStructure:
             for key in ('fit_max_moment', 'fit_max_n', 'fit_max_w', 'fit_min_n', 'fit_min_w'):
                 self.triqs_solver_params[key] = self.solver_params[key]
 
-        # Resolve defaults for n_loc_min and n_loc_max
-        if self.triqs_solver_params['loc_n_min'] is None:
-            self.triqs_solver_params['loc_n_min'] = 0
-        if self.triqs_solver_params['loc_n_max'] is None:
-            self.triqs_solver_params['loc_n_max'] = 100000 # large number
+        # set loc_n_min and loc_n_max
+        if self.solver_params['loc_n_min'] is not None:
+            self.triqs_solver_params['loc_n_min'] = self.solver_params['loc_n_min']
+        if self.solver_params['loc_n_max'] is not None:
+            self.triqs_solver_params['loc_n_max'] = self.solver_params['loc_n_max']
 
         gf_struct = self.sum_k.gf_struct_solver_list[self.icrsh]
         # Construct the triqs_solver instances

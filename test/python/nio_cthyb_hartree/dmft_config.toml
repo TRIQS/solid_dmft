@@ -2,21 +2,22 @@
 seedname = "inp"
 jobname = "out"
 
-mu_initial_guess = 13.724188
+mu_initial_guess = 13.751
+enforce_off_diag = [false, true]
 
 n_iw = 501
-beta = 40
+beta = 20
 w_range = [-10, 10]
 eta = 0.05
 n_w = 501
 
-prec_mu = 0.001
 calc_mu_method = "brent"
 
 h_int_type = ["density_density", "kanamori"]
-U = [10, 15]
+U = [8.32, 6.8]
 U_prime = ["<none>", 0]
-J = [1, 0]
+J = [1.19, 0.8]
+ratio_F4_F2 = [0.68, "<none>"]
 
 calc_energies = true
 
@@ -29,12 +30,12 @@ dc_dmft = false
 [[solver]]
 type = "cthyb"
 idx_impurities = [0]
-n_l = 35
-length_cycle = 120
-n_warmup_cycles = 8000
+n_l = 25
+length_cycle = 1000
+n_warmup_cycles = 1e+3
 n_cycles_tot = 1e+4
 imag_threshold = 1e-5
-measure_G_l = true
+legendre_fit = true
 measure_density_matrix = true
 
 [[solver]]
