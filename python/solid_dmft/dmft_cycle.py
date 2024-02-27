@@ -40,6 +40,7 @@ from h5 import HDFArchive
 import triqs.utility.mpi as mpi
 from triqs.gf import Gf, make_hermitian, MeshReFreq, MeshImFreq
 from triqs.gf.tools import inverse
+from triqs_dft_tools import BlockStructure
 from triqs_dft_tools.sumk_dft import SumkDFT
 
 # own modules
@@ -56,9 +57,52 @@ from solid_dmft.dmft_tools import afm_mapping
 from solid_dmft.dmft_tools import manipulate_chemical_potential as manipulate_mu
 from solid_dmft.dmft_tools import initial_self_energies as initial_sigma
 from solid_dmft.dmft_tools import greens_functions_mixer as gf_mixer
+from solid_dmft.io_tools import verify_input_params, dict_to_h5
+
+def _extract_quantity_per_inequiv(param_name, n_inequiv_shells, general_params):
+    """
+    For quantities that can be different for each inequivalent shell, this
+    function checks if the quantity is a single value or a list of the correct
+    length. If just a single value is given, this value is applied to each shell.
+
+    Parameters
+    ----------
+    param_name : str
+        name of the parameter to be checked
+    n_inequiv_shells : int
+        number of inequivalent shells
+    general_params : dict
+        general parameters as a dict
+
+    Returns
+    -------
+    general_params : dict
+        updated general parameters as a dict
+
+    """
 
 
-def _determine_block_structure(sum_k, general_params, advanced_params):
+    def formatter(value):
+        if isinstance(value, float):
+            return '{:.2f}'.format(value)
+        return str(value)
+
+    param = general_params[param_name]
+    if not isinstance(param, list):
+        mpi.report('Assuming {} = '.format(param_name)
+                + '{} for all correlated shells'.format(formatter(param)))
+        general_params[param_name] = [param] * n_inequiv_shells
+    elif len(param) == n_inequiv_shells:
+        mpi.report(f'{param_name} list for correlated shells: '
+                   + ', '.join([formatter(p) for p in param]))
+    else:
+        raise IndexError(f'{param_name} must be list of length '
+                         f'n_inequiv_shells={n_inequiv_shells} '
+                         'or single value but is ' + str(general_params[param_name]))
+
+    return general_params
+
+def _determine_block_structure(sum_k, general_params, advanced_params, solver_type_per_imp, dens_mat):
     """
     Determines block structrure and degenerate deg_shells
     computes first DFT density matrix to determine block structure and changes
@@ -74,66 +118,44 @@ def _determine_block_structure(sum_k, general_params, advanced_params):
     sum_k : SumK Object instances
         updated sum_k Object
     """
-    mpi.report('\n *** determination of block structure ***')
+    mpi.report('\n *** Determination of block structure ***')
 
-    # this returns a list of dicts (one entry for each corr shell)
-    # the dict contains one entry for up and one for down
-    # each entry is a square complex numpy matrix with dim=corr_shell['dim']
-    zero_Sigma = [sum_k.block_structure.create_gf(ish=iineq, gf_function=Gf, mesh=sum_k.mesh)
-                  for iineq in range(sum_k.n_inequiv_shells)]
-    sum_k.put_Sigma(zero_Sigma)
-    if general_params['solver_type'] in ['ftps']:
-        G_loc_all = sum_k.extract_G_loc(broadening=general_params['eta'], transform_to_solver_blocks=False)
-        dens_mat = [G_loc_all[iineq].density() for iineq in range(sum_k.n_inequiv_shells)]
+    # Adds spin degeneracies if not spin-orbit coupled
+    if sum_k.SO == 0:
+        sum_k.block_structure.deg_shells = [[['up_0', 'down_0']] for _ in range(sum_k.n_inequiv_shells)]
+
+    # Evaluates degeneracies for ftps
+    imp_ftps = [i for i, s in enumerate(solver_type_per_imp) if s == 'ftps']
+    if imp_ftps:
+        mock_sumk = deepcopy(sum_k)
+        mock_sumk.analyse_block_structure(dm=dens_mat, threshold=general_params['block_threshold'], include_shells=imp_ftps)
+        deg_orbs_ftps = [mock_sumk.deg_shells[icrsh] if icrsh in imp_ftps else None
+                         for icrsh in range(sum_k.n_inequiv_shells)]
+        mpi.report('Block structure written to "deg_orbs_ftps":')
+        mpi.report(deg_orbs_ftps)
     else:
-        dens_mat = sum_k.density_matrix(method='using_gf')
+        deg_orbs_ftps = None
 
-    original_dens_mat = deepcopy(dens_mat)
+    # Only removes the off-diagonal terms for the selected impurities
+    imp_to_analyze = [i for i, offdiag in enumerate(general_params['enforce_off_diag']) if not offdiag]
+    mpi.report('using 1-particle density matrix and Hloc (atomic levels) to determine the block structure')
+    sum_k.analyse_block_structure(dm=dens_mat, threshold=general_params['block_threshold'], include_shells=imp_to_analyze)
 
-    # for certain systems it is needed to keep off diag elements
-    # this enforces to use the full corr subspace matrix
-    solver_struct_ftps = None
-    if general_params['enforce_off_diag'] or general_params['solver_type'] in ['ftps', 'hartree']:
-        if general_params['solver_type'] in ['ftps']:
-            # first round to determine real blockstructure
-            mock_sumk = deepcopy(sum_k)
-            mock_sumk.analyse_block_structure(dm=dens_mat, threshold=general_params['block_threshold'])
-            solver_struct_ftps = [None] * sum_k.n_inequiv_shells
-            for icrsh in range(sum_k.n_inequiv_shells):
-                solver_struct_ftps[icrsh] = mock_sumk.deg_shells[icrsh]
-            mpi.report('Block structure written to "solver_struct_ftps":')
-            mpi.report(solver_struct_ftps)
-
-        mpi.report('enforcing off-diagonal elements in block structure finder')
-        for dens_mat_per_imp in dens_mat:
-            for dens_mat_per_block in dens_mat_per_imp.values():
-                dens_mat_per_block += 2 * general_params['block_threshold']
-
-    if not general_params['enforce_off_diag'] and general_params['block_suppress_orbital_symm']:
-        mpi.report('removing orbital symmetries in block structure finder')
-        for dens_mat_per_imp in dens_mat:
-            for dens_mat_per_block in dens_mat_per_imp.values():
-                dens_mat_per_block += 2*np.diag(np.arange(dens_mat_per_block.shape[0]))
-
-    mpi.report('using 1-particle density matrix and Hloc (atomic levels) to '
-               'determine the block structure')
-    sum_k.analyse_block_structure(dm=dens_mat, threshold=general_params['block_threshold'])
-
-    if advanced_params['pick_solver_struct'] != 'none':
+    # Applies manual selection of the solver struct
+    if any(s is not None for s in advanced_params['pick_solver_struct']):
         mpi.report('selecting subset of orbital space for gf_struct_solver from input:')
-        mpi.report(advanced_params['pick_solver_struct'])
+        mpi.report(advanced_params['pick_solver_struct'][icrsh])
         sum_k.block_structure.pick_gf_struct_solver(advanced_params['pick_solver_struct'])
 
     # Applies the manual mapping to each inequivalent shell
-    if advanced_params['map_solver_struct'] != 'none':
+    if any(s is not None for s in advanced_params['map_solver_struct']):
         sum_k.block_structure.map_gf_struct_solver(advanced_params['map_solver_struct'])
-        if advanced_params['mapped_solver_struct_degeneracies'] != 'none':
+        if any(s is not None for s in advanced_params['mapped_solver_struct_degeneracies']):
             sum_k.block_structure.deg_shells = advanced_params['mapped_solver_struct_degeneracies']
 
     # if we want to do a magnetic calculation we need to lift up/down degeneracy
     if general_params['magnetic'] and sum_k.SO == 0:
-        mpi.report('magnetic calculation: removing the spin degeneracy from the block structure')
-
+        mpi.report('Magnetic calculation: removing the spin degeneracy from the block structure')
         for icrsh, deg_shells_site in enumerate(sum_k.block_structure.deg_shells):
             deg_shell_mag = []
             # find degenerate orbitals that do not simply connect different spin channels
@@ -145,12 +167,11 @@ def _determine_block_structure(sum_k, general_params, advanced_params):
                     if len(deg) > 1:
                         deg_shell_mag.append(deg)
             sum_k.block_structure.deg_shells[icrsh] = deg_shell_mag
-
     # for SOC we remove all degeneracies
-    elif general_params['magnetic'] and sum_k.SO == 1:
-        sum_k.block_structure.deg_shells = [[] for icrsh in range(len(sum_k.block_structure.deg_shells))]
+    elif sum_k.SO == 1:
+        sum_k.block_structure.deg_shells = [[] for _ in range(sum_k.n_inequiv_shells)]
 
-    return sum_k, original_dens_mat, solver_struct_ftps
+    return sum_k, deg_orbs_ftps
 
 
 def _calculate_rotation_matrix(general_params, sum_k):
@@ -161,6 +182,18 @@ def _calculate_rotation_matrix(general_params, sum_k):
     diagonalizing the local Hamiltonian has.
     Note that the interaction Hamiltonian has to be rotated if it is not fully
     orbital-gauge invariant (only the Kanamori fulfills that).
+
+    Parameters
+    ----------
+    general_params : dict
+        general parameters as a dict
+    sum_k : SumkDFT object
+        Sumk Object
+
+    Returns
+    -------
+    sum_k : SumkDFT Object
+        updated Sumk object with the new rotation matrices
     """
 
     # Extracts new rotation matrices from density_mat or local Hamiltonian
@@ -196,47 +229,40 @@ def _calculate_rotation_matrix(general_params, sum_k):
     return sum_k
 
 
-def _chi_setup(sum_k, general_params, solver_params):
+def _chi_setup(sum_k, solver_params, map_imp_solver):
     """
 
     Parameters
     ----------
     sum_k : SumkDFT object
         Sumk object with the information about the correct block structure
-    general_paramters: general params dict
     solver_params: solver params dict
 
     Returns
     -------
-    solver_params :  dict
-        solver_paramters for the QMC solver
-    Op_list : list of one-particle operators to measure per impurity
+    ops_chi_measurement : list of one-particle operators to measure per impurity
     """
 
-    if general_params['measure_chi'] == 'SzSz':
-        mpi.report('\nSetting up Chi(S_z(tau),S_z(0)) measurement')
-    elif general_params['measure_chi'] == 'NN':
-        mpi.report('\nSetting up Chi(n(tau),n(0)) measurement')
-
-    Op_list = [None] * sum_k.n_inequiv_shells
+    ops_chi_measure = [None] * sum_k.n_inequiv_shells
 
     for icrsh in range(sum_k.n_inequiv_shells):
+        isolv = map_imp_solver[icrsh]
+        if 'measure_chi' not in solver_params[isolv] or solver_params[isolv]['measure_chi'] is None:
+            continue
+
         n_orb = sum_k.corr_shells[icrsh]['dim']
-        orb_names = list(range(n_orb))
+        if solver_params[isolv]['measure_chi'] == 'SzSz':
+            mpi.report(f'\nImp {icrsh} with solver #{isolv}: Setting up Chi(S_z(tau),S_z(0)) measurement')
 
-        if general_params['measure_chi'] == 'SzSz':
-            Op_list[icrsh] = S_op('z',
-                                  spin_names=sum_k.spin_block_names[sum_k.SO],
-                                  n_orb=n_orb,
-                                  map_operator_structure=sum_k.sumk_to_solver[icrsh])
-        elif general_params['measure_chi'] == 'NN':
-            Op_list[icrsh] = N_op(spin_names=sum_k.spin_block_names[sum_k.SO],
-                                  n_orb=n_orb,
-                                  map_operator_structure=sum_k.sumk_to_solver[icrsh])
+            ops_chi_measure[icrsh] = S_op('z', spin_names=sum_k.spin_block_names[sum_k.SO],
+                                          n_orb=n_orb, map_operator_structure=sum_k.sumk_to_solver[icrsh])
+        elif solver_params[isolv]['measure_chi'] == 'NN':
+            mpi.report(f'\nImp {icrsh} with solver #{isolv}: Setting up Chi(n(tau),n(0)) measurement')
 
-    solver_params['measure_O_tau_min_ins'] = general_params['measure_chi_insertions']
+            ops_chi_measure[icrsh] = N_op(spin_names=sum_k.spin_block_names[sum_k.SO],
+                                          n_orb=n_orb, map_operator_structure=sum_k.sumk_to_solver[icrsh])
 
-    return solver_params, Op_list
+    return ops_chi_measure
 
 
 def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
@@ -266,18 +292,20 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
         updated observable array for calculation
     """
 
-    # create Sumk object
-    # TODO: use_dft_blocks=True yields inconsistent number of blocks!
-
-    # first we have to determine the mesh
-    if general_params['solver_type'] in ['ftps']:
-        sumk_mesh = MeshReFreq(window=general_params['w_range'],
-                               n_w=general_params['n_w'])
-    else:
+    # Creates real- or imaginary-frequency mesh to store Green functions on
+    if general_params['beta'] is not None:
+        mpi.report('Running solid_dmft on imag-freq grid because "general.beta" specified')
         sumk_mesh = MeshImFreq(beta=general_params['beta'],
                                S='Fermion',
                                n_iw=general_params['n_iw'])
+        broadening = None
+    else:
+        mpi.report('Running solid_dmft on real-freq grid because "general.beta" not specified')
+        sumk_mesh = MeshReFreq(window=general_params['w_range'],
+                               n_w=general_params['n_w'])
+        broadening = general_params['eta']
 
+    # Creates SumkDFT object
     sum_k = SumkDFT(hdf_file=general_params['jobname']+'/'+general_params['seedname']+'.h5',
                     mesh=sumk_mesh, use_dft_blocks=False, h_field=general_params['h_field'])
 
@@ -313,27 +341,43 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
     iteration_offset = mpi.bcast(iteration_offset)
     sum_k.chemical_potential = mpi.bcast(sum_k.chemical_potential)
 
-    # Incompatabilities for SO coupling
-    if sum_k.SO == 1:
-        if not general_params['csc'] and general_params['magnetic'] and general_params['afm_order']:
-            raise ValueError('AFM order not supported with SO coupling')
+    # Checks the general parameters that are impurity-dependent and ensures they are a list
+    mpi.report('Checking parameters that are impurity-dependent')
+    for key in ['U', 'J', 'U_prime', 'ratio_F4_F2', 'h_int_type', 'enforce_off_diag', 'dc_type']:
+        general_params = _extract_quantity_per_inequiv(key, sum_k.n_inequiv_shells, general_params)
+    # Same for advanced params
+    for key in ['dc_U', 'dc_J', 'dc_fixed_occ', 'map_solver_struct', 'pick_solver_struct', 'mapped_solver_struct_degeneracies']:
+        advanced_params = _extract_quantity_per_inequiv(key, sum_k.n_inequiv_shells, advanced_params)
 
-    # need to set sigma immediately here, otherwise mesh in unclear for sumK
-    # Initializes empty Sigma for calculation of DFT density even if block structure changes later
-    zero_Sigma = [sum_k.block_structure.create_gf(ish=iineq, gf_function=Gf, mesh=sum_k.mesh)
-                  for iineq in range(sum_k.n_inequiv_shells)]
-    sum_k.put_Sigma(zero_Sigma)
+    # Checks that all impurities have an associated solver
+    # and creates a map between impurity index and solver index
+    if len(solver_params) == 1 and solver_params[0]['idx_impurities'] is None:
+        map_imp_solver = [0] * sum_k.n_inequiv_shells
+    else:
+        all_idx_imp = [i for entry in solver_params for i in entry['idx_impurities']]
+        if sorted(all_idx_imp) != list(range(sum_k.n_inequiv_shells)):
+            raise ValueError('All impurities must be listed exactly once in solver.idx_impurities'
+                             f'but instead got {all_idx_imp}')
+
+        map_imp_solver = []
+        for iineq in range(sum_k.n_inequiv_shells):
+            for isolver, entry in enumerate(solver_params):
+                if iineq in entry['idx_impurities']:
+                    map_imp_solver.append(isolver)
+                    break
+    solver_type_per_imp = [solver_params[map_imp_solver[iineq]]['type'] for iineq in range(sum_k.n_inequiv_shells)]
+    mpi.report(f'\nSolver type per impurity: {solver_type_per_imp}')
+
+    # Checks all parameters that need to be checked against info in SumkDFT object
+    verify_input_params.verify_h5_dependent(sum_k, solver_type_per_imp, general_params)
 
     # Initializes chemical potential with mu_initial_guess if this is the first iteration
-    if general_params['mu_initial_guess'] != 'none' and iteration_offset == 0:
-            sum_k.chemical_potential = general_params['mu_initial_guess']
-            mpi.report('\ninitial chemical potential set to {:.3f} eV\n'.format(sum_k.chemical_potential))
+    if general_params['mu_initial_guess'] is not None and iteration_offset == 0:
+        sum_k.chemical_potential = general_params['mu_initial_guess']
+        mpi.report('\nInitial chemical potential set to {:.3f} eV\n'.format(sum_k.chemical_potential))
 
-    if general_params['solver_type'] in ['ftps']:
-        dft_mu = sum_k.calc_mu(precision=general_params['prec_mu'],
-                               broadening=general_params['eta'])
-    else:
-        dft_mu = sum_k.calc_mu(precision=general_params['prec_mu'], method=general_params['calc_mu_method'])
+    dft_mu = sum_k.calc_mu(precision=general_params['prec_mu'], method=general_params['calc_mu_method'],
+                           broadening=broadening)
 
     # calculate E_kin_dft for one shot calculations
     if not general_params['csc'] and general_params['calc_energies']:
@@ -348,13 +392,21 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
                                                   for _ in range(sum_k.n_inequiv_shells)]
 
     # Generates a rotation matrix to change the basis
-    if general_params['set_rot'] != 'none':
+    if general_params['set_rot'] is not None:
         # calculate new rotation matrices
         sum_k = _calculate_rotation_matrix(general_params, sum_k)
     # Saves rotation matrix to h5 archive:
     if mpi.is_master_node() and iteration_offset == 0:
         archive['DMFT_input']['rot_mat'] = sum_k.rot_mat
     mpi.barrier()
+
+    # Calculates density in default block structure
+    local_gf_dft_corr = sum_k.extract_G_loc(broadening=broadening, transform_to_solver_blocks=False, with_Sigma=False)
+    dens_mat_dft = [gf.density() for gf in local_gf_dft_corr]
+
+    for iineq, gf in enumerate(local_gf_dft_corr):
+        mpi.report(f'Total density for imp {iineq} from DFT: '
+                   '{:10.6f}'.format(np.real(gf.total_density())))
 
     # determine block structure for solver
     det_blocks = None
@@ -365,10 +417,10 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
 
     # Previous rot_mat only not None if the rot_mat changed from load_sigma or previous run
     previous_rot_mat = None
-    solver_struct_ftps = None
+    deg_orbs_ftps = None
     # determine block structure for GF and Hyb function
     if det_blocks and not general_params['load_sigma']:
-        sum_k, dm, solver_struct_ftps = _determine_block_structure(sum_k, general_params, advanced_params)
+        sum_k, deg_orbs_ftps = _determine_block_structure(sum_k, general_params, advanced_params, solver_type_per_imp, dens_mat_dft)
     # if load sigma we need to load everything from this h5 archive
     elif general_params['load_sigma']:
         #loading block_struc and rot_mat and deg_shells
@@ -377,8 +429,8 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
                 sum_k.block_structure = old_calc['DMFT_input/block_structure']
                 sum_k.deg_shells = old_calc['DMFT_input/deg_shells']
                 previous_rot_mat = old_calc['DMFT_input/rot_mat']
-                if general_params['solver_type'] in ['ftps']:
-                    solver_struct_ftps = old_calc['DMFT_input/solver_struct_ftps']
+                if deg_orbs_ftps is not None:
+                    deg_orbs_ftps = old_calc['DMFT_input/solver_struct_ftps']
 
             if not all(np.allclose(x, y) for x, y in zip(sum_k.rot_mat, previous_rot_mat)):
                 print('WARNING: rot_mat in current run is different from loaded_sigma run.')
@@ -388,12 +440,11 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
         sum_k.block_structure = mpi.bcast(sum_k.block_structure)
         sum_k.deg_shells = mpi.bcast(sum_k.deg_shells)
         previous_rot_mat = mpi.bcast(previous_rot_mat)
-        solver_struct_ftps = mpi.bcast(solver_struct_ftps)
+        deg_orbs_ftps = mpi.bcast(deg_orbs_ftps)
 
         # In a magnetic calculation, no shells are degenerate
         if general_params['magnetic'] and sum_k.SO == 0:
             sum_k.deg_shells = [[] for _ in range(sum_k.n_inequiv_shells)]
-        dm = None
     else:
         # Master node checks if rot_mat stayed the same
         if mpi.is_master_node():
@@ -405,14 +456,13 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
                 archive['DMFT_input']['rot_mat'] = sum_k.rot_mat
             else:
                 previous_rot_mat = None
-            if general_params['solver_type'] in ['ftps']:
-                solver_struct_ftps = archive['DMFT_input/solver_struct_ftps']
+            if 'solver_struct_ftps' in archive['DMFT_input']:
+                deg_orbs_ftps = archive['DMFT_input/solver_struct_ftps']
 
         sum_k.block_structure = mpi.bcast(sum_k.block_structure)
         sum_k.deg_shells = mpi.bcast(sum_k.deg_shells)
         previous_rot_mat = mpi.bcast(previous_rot_mat)
-        solver_struct_ftps = mpi.bcast(solver_struct_ftps)
-        dm = None
+        deg_orbs_ftps = mpi.bcast(deg_orbs_ftps)
 
     # Compatibility with h5 archives from the triqs2 version
     # Sumk doesn't hold corr_to_inequiv anymore, which is in block_structure now
@@ -424,76 +474,66 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
     # Determination of shell_multiplicity
     shell_multiplicity = [sum_k.corr_to_inequiv.count(icrsh) for icrsh in range(sum_k.n_inequiv_shells)]
 
-    # Initializes new empty Sigma with new blockstructure for calculation of DFT density
-    zero_Sigma = [sum_k.block_structure.create_gf(ish=iineq, gf_function=Gf, mesh=sum_k.mesh)
-                  for iineq in range(sum_k.n_inequiv_shells)]
-    sum_k.put_Sigma(zero_Sigma)
-
     # print block structure and DFT input quantitites!
-    formatter.print_block_sym(sum_k, dm, general_params)
-
-    # extract free lattice greens function
-    if general_params['solver_type'] in ['ftps']:
-        G_loc_all_dft = sum_k.extract_G_loc(broadening=general_params['eta'], with_Sigma=False, mu=dft_mu)
-    else:
-        G_loc_all_dft = sum_k.extract_G_loc(with_Sigma=False, mu=dft_mu)
-    density_mat_dft = [G_loc_all_dft[iineq].density() for iineq in range(sum_k.n_inequiv_shells)]
-
-    for iineq in range(sum_k.n_inequiv_shells):
-        density_shell_dft = G_loc_all_dft[iineq].total_density()
-        mpi.report('total density for imp {} from DFT: {:10.6f}'.format(iineq, np.real(density_shell_dft)))
+    formatter.print_block_sym(sum_k, dens_mat_dft, general_params)
 
     if general_params['magnetic']:
         sum_k.SP = 1
-
         if general_params['afm_order']:
             general_params = afm_mapping.determine(general_params, archive, sum_k.n_inequiv_shells)
 
     # Constructs interaction Hamiltonian and writes it to the h5 archive
-    h_int = interaction_hamiltonian.construct(sum_k, general_params, advanced_params)
+    h_int = interaction_hamiltonian.construct(sum_k, general_params, solver_type_per_imp)
     if mpi.is_master_node():
         archive['DMFT_input']['h_int'] = h_int
 
     # If new calculation, writes input parameters and sum_k <-> solver mapping to archive
     if iteration_offset == 0:
         if mpi.is_master_node():
-            archive['DMFT_input']['general_params'] = general_params
-            archive['DMFT_input']['solver_params'] = solver_params
-            archive['DMFT_input']['advanced_params'] = advanced_params
+            archive['DMFT_input']['general_params'] = dict_to_h5.prep_params_for_h5(general_params)
+            archive['DMFT_input']['solver_params'] = dict_to_h5.prep_params_for_h5(solver_params)
+            archive['DMFT_input']['dft_params'] = dict_to_h5.prep_params_for_h5(dft_params)
+            archive['DMFT_input']['advanced_params'] = dict_to_h5.prep_params_for_h5(advanced_params)
 
             archive['DMFT_input']['block_structure'] = sum_k.block_structure
             archive['DMFT_input']['deg_shells'] = sum_k.deg_shells
             archive['DMFT_input']['shell_multiplicity'] = shell_multiplicity
-            if general_params['solver_type'] in ['ftps']:
-                archive['DMFT_input']['solver_struct_ftps'] = solver_struct_ftps
+            if deg_orbs_ftps is not None:
+                archive['DMFT_input']['solver_struct_ftps'] = deg_orbs_ftps
+    mpi.barrier()
 
     solvers = [None] * sum_k.n_inequiv_shells
     for icrsh in range(sum_k.n_inequiv_shells):
         # Construct the Solver instances
-        solvers[icrsh] = SolverStructure(general_params, solver_params, advanced_params,
-                                         sum_k, icrsh, h_int[icrsh],
-                                         iteration_offset, solver_struct_ftps)
+        solvers[icrsh] = SolverStructure(general_params, solver_params[map_imp_solver[icrsh]],
+                                         advanced_params, sum_k, icrsh, h_int[icrsh],
+                                         iteration_offset, deg_orbs_ftps)
 
     # store solver hash to archive
     if mpi.is_master_node():
         if 'version' not in archive['DMFT_input']:
             archive['DMFT_input'].create_group('version')
-        archive['DMFT_input']['version']['solver_name'] = general_params['solver_type']
-        archive['DMFT_input']['version']['solver_hash'] = solvers[0].git_hash
-        archive['DMFT_input']['version']['solver_version'] = solvers[0].version
+        for iineq, solver in enumerate(solvers):
+            if f'solver {iineq}' not in archive['DMFT_input']['version']:
+                archive['DMFT_input']['version'].create_group(f'solver {iineq}')
+            archive['DMFT_input']['version'][f'solver {iineq}']['name'] = solver.solver_params['type']
+            archive['DMFT_input']['version'][f'solver {iineq}']['hash'] = solver.git_hash
+            archive['DMFT_input']['version'][f'solver {iineq}']['version'] = solver.version
+
+    # Extracts local GF per *inequivalent* shell
+    local_gf_dft = sum_k.extract_G_loc(broadening=broadening, with_Sigma=False, mu=dft_mu)
+    density_mat_dft = [gf.density() for gf in local_gf_dft]
 
     # Determines initial Sigma and DC
     sum_k, solvers = initial_sigma.determine_dc_and_initial_sigma(general_params, advanced_params, sum_k,
-                                                                  archive, iteration_offset, density_mat_dft, solvers)
+                                                                  archive, iteration_offset, density_mat_dft, solvers,
+                                                                  solver_type_per_imp)
 
-    sum_k = manipulate_mu.set_initial_mu(general_params, sum_k, iteration_offset, archive, shell_multiplicity)
+    sum_k = manipulate_mu.set_initial_mu(general_params, sum_k, iteration_offset, archive, broadening)
 
 
     # setup of measurement of chi(SzSz(tau) if requested
-    if general_params['measure_chi'] != 'none':
-        solver_params, Op_list = _chi_setup(sum_k, general_params, solver_params)
-    else:
-        Op_list = None
+    ops_chi_measure = _chi_setup(sum_k, solver_params, map_imp_solver)
 
     mpi.report('\n {} DMFT cycles requested. Starting with iteration  {}.\n'.format(n_iter, iteration_offset+1))
 
@@ -502,14 +542,14 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
     conv_obs = None
     if mpi.is_master_node():
         observables = prep_observables(archive, sum_k)
-        conv_obs = convergence.prep_conv_obs(archive, sum_k)
+        conv_obs = convergence.prep_conv_obs(archive)
     observables = mpi.bcast(observables)
     conv_obs = mpi.bcast(conv_obs)
 
     if mpi.is_master_node() and iteration_offset == 0:
         write_header_to_file(general_params, sum_k)
-        observables = add_dft_values_as_zeroth_iteration(observables, general_params, dft_mu, dft_energy, sum_k,
-                                                         G_loc_all_dft, density_mat_dft, shell_multiplicity)
+        observables = add_dft_values_as_zeroth_iteration(observables, general_params, solver_type_per_imp, dft_mu, dft_energy, sum_k,
+                                                         local_gf_dft, density_mat_dft, shell_multiplicity)
         write_obs(observables, sum_k, general_params)
         # write convergence file
         convergence.prep_conv_file(general_params, sum_k)
@@ -529,9 +569,9 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
         mpi.report('Running iteration: {} / {}'.format(it, iteration_offset + n_iter))
         (sum_k, solvers,
          observables, is_converged) = _dmft_step(sum_k, solvers, it, general_params,
-                                                 solver_params, advanced_params, dft_params,
+                                                 solver_params, advanced_params, dft_params, map_imp_solver, solver_type_per_imp,
                                                  h_int, archive, shell_multiplicity, E_kin_dft,
-                                                 observables, conv_obs, Op_list, dft_irred_kpt_indices, dft_energy,
+                                                 observables, conv_obs, ops_chi_measure, dft_irred_kpt_indices, dft_energy, broadening,
                                                  is_converged, is_sampling=False)
 
         if is_converged:
@@ -553,9 +593,9 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
             mpi.report('#'*80)
             mpi.report('Running iteration: {} / {}'.format(it, iteration_offset+general_params['sampling_iterations']))
             sum_k, solvers, observables, _ = _dmft_step(sum_k, solvers, it, general_params,
-                                                        solver_params, advanced_params, dft_params,
+                                                        solver_params, advanced_params, dft_params, map_imp_solver, solver_type_per_imp,
                                                         h_int, archive, shell_multiplicity, E_kin_dft,
-                                                        observables, conv_obs, Op_list, dft_irred_kpt_indices, dft_energy,
+                                                        observables, conv_obs, ops_chi_measure, dft_irred_kpt_indices, dft_energy, broadening,
                                                         is_converged=True, is_sampling=True)
 
         mpi.report('** Sampling finished ***')
@@ -571,9 +611,9 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
 
 
 def _dmft_step(sum_k, solvers, it, general_params,
-               solver_params, advanced_params, dft_params,
+               solver_params, advanced_params, dft_params, map_imp_solver, solver_type_per_imp,
                h_int, archive, shell_multiplicity, E_kin_dft,
-               observables, conv_obs, Op_list, dft_irred_kpt_indices, dft_energy,
+               observables, conv_obs, ops_chi_measure, dft_irred_kpt_indices, dft_energy, broadening,
                is_converged, is_sampling):
     """
     Contains the actual dmft steps when all the preparation is done
@@ -595,16 +635,11 @@ def _dmft_step(sum_k, solvers, it, general_params,
         printed = ((np.real, 'real'), )
 
     # Extracts G local
-    if general_params['solver_type'] in ['ftps']:
-        G_loc_all = sum_k.extract_G_loc(broadening=general_params['eta'])
-    else:
-        G_loc_all = sum_k.extract_G_loc()
+    G_loc_all = sum_k.extract_G_loc(broadening=broadening)
 
     # Copies Sigma and G0 before Solver run for mixing later
     Sigma_freq_previous = [solvers[iineq].Sigma_freq.copy() for iineq in range(sum_k.n_inequiv_shells)]
     G0_freq_previous = [solvers[iineq].G0_freq.copy() for iineq in range(sum_k.n_inequiv_shells)]
-    if general_params['dc'] and general_params['dc_type'] == 4:
-        cpa_G_loc = gf_mixer.init_cpa(sum_k, solvers, general_params)
 
     # looping over inequiv shells and solving for each site seperately
     for icrsh in range(sum_k.n_inequiv_shells):
@@ -625,16 +660,12 @@ def _dmft_step(sum_k, solvers, it, general_params,
         # dyson equation to extract G0_freq, using Hermitian symmetry
         solvers[icrsh].G0_freq << inverse(solvers[icrsh].Sigma_freq + inverse(solvers[icrsh].G_freq))
 
-        # dyson equation to extract cpa_G0_freq
-        if general_params['dc'] and general_params['dc_type'] == 4:
-            cpa_G0_freq[icrsh] << inverse(solvers[icrsh].Sigma_freq + inverse(cpa_G_loc[icrsh]))
-
         # mixing of G0 if wanted from the second iteration on
         if it > 1:
             solvers[icrsh] = gf_mixer.mix_g0(solvers[icrsh], general_params, icrsh, archive,
                                              G0_freq_previous[icrsh], it, sum_k.deg_shells[icrsh])
 
-        if general_params['solver_type'] in ['cthyb', 'ctint', 'hubbardI', 'inchworm']:
+        if isinstance(sum_k.mesh, MeshImFreq):
             solvers[icrsh].G0_freq << make_hermitian(solvers[icrsh].G0_freq)
         sum_k.symm_deg_gf(solvers[icrsh].G0_freq, ish=icrsh)
 
@@ -648,13 +679,14 @@ def _dmft_step(sum_k, solvers, it, general_params,
             archive['DMFT_results/last_iter']['G0_freq_{}'.format(icrsh)] = solvers[icrsh].G0_freq
 
         # setup of measurement of chi(SzSz(tau) if requested
-        if general_params['measure_chi'] != 'none':
-            solvers[icrsh].solver_params['measure_O_tau'] = (Op_list[icrsh], Op_list[icrsh])
+        # TODO: move this into solver class?
+        if ops_chi_measure[icrsh] is not None:
+            solvers[icrsh].solver_params['measure_O_tau'] = (ops_chi_measure[icrsh], ops_chi_measure[icrsh])
 
         if (general_params['magnetic'] and general_params['afm_order'] and general_params['afm_mapping'][icrsh][0]):
             # If we do a AFM calculation we can use the init magnetic moments to
             # copy the self energy instead of solving it explicitly
-            solvers = afm_mapping.apply(general_params, solver_params, icrsh, sum_k.gf_struct_solver[icrsh], solvers)
+            solvers = afm_mapping.apply(general_params, icrsh, sum_k.gf_struct_solver[icrsh], solvers)
         else:
             # Solve the impurity problem for this shell
             mpi.report('\nSolving the impurity problem for shell {} ...'.format(icrsh))
@@ -676,10 +708,6 @@ def _dmft_step(sum_k, solvers, it, general_params,
         if general_params['store_solver'] and mpi.is_master_node():
             archive['DMFT_input/solver/it_'+str(it)]['S_'+str(icrsh)] = solvers[icrsh].triqs_solver
 
-        # add to cpa_G_time
-        if general_params['dc'] and general_params['dc_type'] == 4:
-            cpa_G_time << cpa_G_time + general_params['cpa_x'][icrsh] * solvers[icrsh].G_time
-
     # Done with loop over impurities
 
     if mpi.is_master_node():
@@ -687,28 +715,27 @@ def _dmft_step(sum_k, solvers, it, general_params,
         print('\n *** Post-processing the solver output ***')
         print('Total charge of all correlated shells : {:.6f}\n'.format(density_tot))
 
-    # if CPA average Sigma over impurities before mixing
-    if general_params['dc'] and general_params['dc_type'] == 4:
-        solvers = gf_mixer.mix_cpa(cpa_G0_freq, sum_k.n_inequiv_shells, solvers)
     solvers = gf_mixer.mix_sigma(general_params, sum_k.n_inequiv_shells, solvers, Sigma_freq_previous)
 
     # calculate new DC
     # for the hartree solver the DC potential will be formally set to zero as it is already present in the Sigma
     if general_params['dc'] and general_params['dc_dmft']:
         sum_k = initial_sigma.calculate_double_counting(sum_k, density_mat,
-                                                        general_params, advanced_params)
-    
+                                                        general_params, advanced_params,
+                                                        solver_type_per_imp)
+
     #The hartree solver computes the DC energy internally, set it in sum_k
-    if general_params['solver_type'] == 'hartree':
-        for icrsh in range(sum_k.n_inequiv_shells):
-            sum_k.dc_energ[icrsh] = solvers[icrsh].DC_energy
+    for icrsh in range(sum_k.n_corr_shells):
+        iineq = sum_k.corr_to_inequiv[icrsh]
+        if solver_type_per_imp[iineq] == 'hartree':
+            sum_k.dc_energ[icrsh] = solvers[iineq].DC_energy
 
     # doing the dmft loop and set new sigma into sumk
     sum_k.put_Sigma([solvers[icrsh].Sigma_freq for icrsh in range(sum_k.n_inequiv_shells)])
 
     # saving previous mu for writing to observables file
     previous_mu = sum_k.chemical_potential
-    sum_k = manipulate_mu.update_mu(general_params, sum_k, it, archive)
+    sum_k = manipulate_mu.update_mu(general_params, sum_k, it, archive, broadening)
 
     # if we do a CSC calculation we need always an updated GAMMA file
     E_bandcorr = 0.0
@@ -724,7 +751,7 @@ def _dmft_step(sum_k, solvers, it, general_params,
         E_bandcorr = calc_bandcorr_man(general_params, sum_k, E_kin_dft)
 
     # Writes results to h5 archive
-    results_to_archive.write(archive, sum_k, general_params, solver_params, solvers, it,
+    results_to_archive.write(archive, sum_k, general_params, solver_params, solvers, map_imp_solver, solver_type_per_imp, it,
                              is_sampling, previous_mu, density_mat_pre, density_mat, deltaN, dens)
 
     mpi.barrier()
@@ -735,6 +762,8 @@ def _dmft_step(sum_k, solvers, it, general_params,
         observables = add_dmft_observables(observables,
                                            general_params,
                                            solver_params,
+                                           map_imp_solver,
+                                           solver_type_per_imp,
                                            dft_energy,
                                            it,
                                            solvers,

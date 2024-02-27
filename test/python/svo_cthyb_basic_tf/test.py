@@ -14,6 +14,4 @@ if mpi.is_master_node():
 
 mpi.barrier()
 
-solid.main([None, 'dmft_config.ini'])
-
-
+solid.main([None, 'dmft_config.toml'])

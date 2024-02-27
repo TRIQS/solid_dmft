@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 ################################################################################
 #
 # solid_dmft - A versatile python wrapper to perform DFT+DMFT calculations
@@ -90,13 +89,10 @@ def print_block_sym(sum_k, dm, general_params):
     if dm:
         # Prints dft density matrix
         print('\nDFT density matrix')
+        # Double loop to sort by impurities
         for icrsh in range(sum_k.n_inequiv_shells):
             spins = sum_k.spin_block_names[sum_k.SO]
-            # ftps dens_mat only knows inequiv_shells
-            if general_params['solver_type'] in ['ftps']:
-                shlst = [icrsh]
-            else:
-                shlst = [ish for ish, ineq_shell in enumerate(sum_k.corr_to_inequiv) if ineq_shell == icrsh]
+            shlst = [ish for ish, ineq_shell in enumerate(sum_k.corr_to_inequiv) if ineq_shell == icrsh]
             for sh in shlst:
                 n_orb = sum_k.corr_shells[sh]['dim']
                 if sum_k.SO == 0:

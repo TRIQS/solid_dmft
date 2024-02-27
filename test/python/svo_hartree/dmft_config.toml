@@ -1,0 +1,38 @@
+[general]
+seedname = "inp"
+jobname = "out"
+
+#mu_initial_guess = 0.006120
+
+h_field = 0.01
+h_field_it = 1
+
+n_iw = 501
+beta = 40
+w_range = [-10, 10]
+eta = 0.05
+n_w = 501
+
+prec_mu = 0.001
+magnetic = true
+
+h_int_type = "density_density"
+U = 5.0
+J = 1.0
+
+calc_energies = true
+
+n_iter_dmft = 1
+
+dc_type = 0
+dc = true
+dc_dmft = false
+
+[solver]
+type = "hartree"
+with_fock = false
+force_real = true
+one_shot = true
+
+[advanced]
+dc_fixed_occ = 1.0

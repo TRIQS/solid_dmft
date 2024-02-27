@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 ################################################################################
 #
 # solid_dmft - A versatile python wrapper to perform DFT+DMFT calculations
@@ -27,7 +26,7 @@ import os
 import triqs.utility.mpi as mpi
 
 
-def _compile_information(sum_k, general_params, solver_params, solvers,
+def _compile_information(sum_k, general_params, solver_params, solvers, map_imp_solver, solver_type_per_imp,
                          previous_mu, density_mat_pre, density_mat, deltaN, dens):
     """ Collects all results in a dictonary. """
 
@@ -45,15 +44,16 @@ def _compile_information(sum_k, general_params, solver_params, solvers,
         write_to_h5['deltaN_trace'] = dens
 
     for icrsh in range(sum_k.n_inequiv_shells):
-        if general_params['solver_type'] in ['cthyb', 'hubbardI']:
+        isolvsec = map_imp_solver[icrsh]
+        if solver_type_per_imp[icrsh] in ['cthyb', 'hubbardI']:
             write_to_h5['Delta_time_{}'.format(icrsh)] = solvers[icrsh].Delta_time
 
             # Write the full density matrix to last_iter only - it is large
-            if solver_params['measure_density_matrix']:
+            if solver_params[isolvsec]['measure_density_matrix']:
                 write_to_h5['full_dens_mat_{}'.format(icrsh)] = solvers[icrsh].density_matrix
                 write_to_h5['h_loc_diag_{}'.format(icrsh)] = solvers[icrsh].h_loc_diagonalization
 
-        elif general_params['solver_type'] in ['ftps']:
+        elif solver_type_per_imp[icrsh] == 'ftps':
             write_to_h5['Delta_freq_{}'.format(icrsh)] = solvers[icrsh].Delta_freq
 
         write_to_h5['Gimp_time_{}'.format(icrsh)] = solvers[icrsh].G_time
@@ -61,46 +61,46 @@ def _compile_information(sum_k, general_params, solver_params, solvers,
         write_to_h5['Gimp_freq_{}'.format(icrsh)] = solvers[icrsh].G_freq
         write_to_h5['Sigma_freq_{}'.format(icrsh)] = solvers[icrsh].Sigma_freq
 
-        if general_params['solver_type'] == 'cthyb':
-            if solver_params['measure_pert_order']:
+        if solver_type_per_imp[icrsh] == 'cthyb':
+            if solver_params[isolvsec]['measure_pert_order']:
                 write_to_h5['pert_order_imp_{}'.format(icrsh)] = solvers[icrsh].perturbation_order
                 write_to_h5['pert_order_total_imp_{}'.format(icrsh)] = solvers[icrsh].perturbation_order_total
 
-            if general_params['measure_chi'] != 'none':
-                write_to_h5['O_{}_time_{}'.format(general_params['measure_chi'], icrsh)] = solvers[icrsh].O_time
+            if solver_params[isolvsec]['measure_chi'] is not None:
+                write_to_h5['O_{}_time_{}'.format(solver_params[isolvsec]['measure_chi'], icrsh)] = solvers[icrsh].O_time
 
             # if legendre was set, that we have both now!
-            if (solver_params['measure_G_l']
-                or not solver_params['perform_tail_fit'] and general_params['legendre_fit']):
+            if (solver_params[isolvsec]['measure_G_l']
+                or not solver_params[isolvsec]['perform_tail_fit'] and solver_params[isolvsec]['legendre_fit']):
                 write_to_h5['G_time_orig_{}'.format(icrsh)] = solvers[icrsh].G_time_orig
                 write_to_h5['Gimp_l_{}'.format(icrsh)] = solvers[icrsh].G_l
 
-        if general_params['solver_type'] == 'ctint' and solver_params['measure_histogram']:
+        if solver_type_per_imp[icrsh] == 'ctint' and solver_params[isolvsec]['measure_histogram']:
             write_to_h5['pert_order_imp_{}'.format(icrsh)] = solvers[icrsh].perturbation_order
 
-        if general_params['solver_type'] == 'hubbardI':
+        if solver_type_per_imp[icrsh] == 'hubbardI':
             write_to_h5['G0_Refreq_{}'.format(icrsh)] = solvers[icrsh].G0_Refreq
             write_to_h5['Gimp_Refreq_{}'.format(icrsh)] = solvers[icrsh].G_Refreq
             write_to_h5['Sigma_Refreq_{}'.format(icrsh)] = solvers[icrsh].Sigma_Refreq
 
-            if solver_params['measure_G_l']:
+            if solver_params[isolvsec]['measure_G_l']:
                 write_to_h5['Gimp_l_{}'.format(icrsh)] = solvers[icrsh].G_l
 
-        if general_params['solver_type'] == 'hartree':
+        if solver_type_per_imp[icrsh] == 'hartree':
             write_to_h5['Sigma_Refreq_{}'.format(icrsh)] = solvers[icrsh].Sigma_Refreq
 
-        if general_params['solver_type'] == 'ctseg':
+        if solver_type_per_imp[icrsh] == 'ctseg':
             # if legendre was set, that we have both now!
-            if (solver_params['measure_gl'] or general_params['legendre_fit']):
+            if (solver_params[isolvsec]['measure_gl'] or solver_params[isolvsec]['legendre_fit']):
                 write_to_h5['G_time_orig_{}'.format(icrsh)] = solvers[icrsh].G_time_orig
                 write_to_h5['Gimp_l_{}'.format(icrsh)] = solvers[icrsh].G_l
-            if solver_params['measure_ft']:
+            if solver_params[isolvsec]['measure_ft']:
                 write_to_h5['F_freq_{}'.format(icrsh)] = solvers[icrsh].F_freq
                 write_to_h5['F_time_{}'.format(icrsh)] = solvers[icrsh].F_time
 
     return write_to_h5
 
-def write(archive, sum_k, general_params, solver_params, solvers, it, is_sampling,
+def write(archive, sum_k, general_params, solver_params, solvers, map_imp_solver, solver_type_per_imp, it, is_sampling,
           previous_mu, density_mat_pre, density_mat, deltaN=None, dens=None):
     """
     Collects and writes results to archive.
@@ -109,7 +109,7 @@ def write(archive, sum_k, general_params, solver_params, solvers, it, is_samplin
     if not mpi.is_master_node():
         return
 
-    write_to_h5 = _compile_information(sum_k, general_params, solver_params, solvers,
+    write_to_h5 = _compile_information(sum_k, general_params, solver_params, solvers, map_imp_solver, solver_type_per_imp,
                                        previous_mu, density_mat_pre, density_mat, deltaN, dens)
 
     # Saves the results to last_iter

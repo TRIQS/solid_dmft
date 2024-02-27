@@ -1,0 +1,49 @@
+[general]
+seedname = "inp"
+jobname = "out"
+enforce_off_diag = false
+block_threshold = 0.001
+mu_initial_guess = -0.027041
+
+prec_mu = 0.001
+n_iw = 501
+
+h_int_type = "kanamori"
+U = 8.0
+J = 0.65
+U_prime = 6.5
+
+beta = 10
+
+n_iter_dmft = 2
+store_solver = true
+
+magnetic = true
+h_field = 0.01
+h_field_it = 1
+
+dc_type = 1
+dc = true
+dc_dmft = false
+
+calc_energies = true
+sigma_mix = 0.9
+
+h5_save_freq = 5
+load_sigma = false
+
+[solver]
+type = "cthyb"
+length_cycle = 120
+n_warmup_cycles = 8000
+n_cycles_tot = 1e+4
+imag_threshold = 1e-5
+delta_interface = true
+measure_density_matrix = true
+perform_tail_fit = true
+fit_max_moment = 4
+fit_min_w = 4
+fit_max_w = 10
+
+[advanced]
+dc_orb_shift = [-0.1, 0.2, 0.1]

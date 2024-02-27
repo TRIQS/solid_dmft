@@ -37,10 +37,10 @@ Input/Output
 
 Further details for running
 ===========================
-   
+
 .. toctree::
     :maxdepth: 1
-    
+
     md_notes/docker.md
     md_notes/run_locally.md
     md_notes/run_cluster.md
@@ -57,10 +57,10 @@ Module reference manual
     dft_managers
     dmft_cycle
     dmft_tools
+    io_tools
     postprocessing
-    read_config
     util
-    
 
-   
+
+
 

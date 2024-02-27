@@ -42,33 +42,6 @@ try:
 except ImportError:
     pass
 
-
-def _extract_U_J_list(param_name, n_inequiv_shells, general_params):
-    """
-    Checks if param_name ('U', 'U_prime', or 'J') are a single value or
-    different per inequivalent shell. If just a single value is given,
-    this value is applied to each shell.
-    """
-
-    if not isinstance(param_name, str):
-        formatted_param = ['none' if p == 'none' else '{:.2f}'.format(p)
-                           for p in general_params[param_name]]
-    else:
-        formatted_param = general_params[param_name]
-
-    if len(general_params[param_name]) == 1:
-        mpi.report('Assuming {} = '.format(param_name)
-                   + '{} for all correlated shells'.format(formatted_param[0]))
-        general_params[param_name] *= n_inequiv_shells
-    elif len(general_params[param_name]) == n_inequiv_shells:
-        mpi.report('{} list for correlated shells: {}'.format(param_name, formatted_param))
-    else:
-        raise IndexError('Property list {} '.format(general_params[param_name])
-                         + 'must have length 1 or n_inequiv_shells')
-
-    return general_params
-
-
 def _load_crpa_interaction_matrix(sum_k, filename='UIJKL'):
     """
     Loads VASP cRPA data to use as an interaction Hamiltonian.
@@ -173,7 +146,7 @@ def _adapt_U_4index_for_SO(Umat_full):
     return Umat_full_SO
 
 
-def _construct_kanamori(sum_k, general_params, icrsh):
+def _construct_kanamori(sum_k, general_params, solver_type_per_imp, icrsh):
     """
     Constructs the Kanamori interaction Hamiltonian. Only Kanamori does not
     need the full four-index matrix. Therefore, we can construct it directly
@@ -190,12 +163,13 @@ def _construct_kanamori(sum_k, general_params, icrsh):
                    + 'outside the t2g or eg manifold?')
 
     # check if Uprime has been specified manually
-    if general_params['U_prime'][icrsh] == 'U-2J':
+    if general_params['U_prime'][icrsh] is None:
         U_prime = general_params['U'][icrsh] - 2.0 * general_params['J'][icrsh]
     else:
         U_prime = general_params['U_prime'][icrsh]
+    mpi.report('U = {:.2f}, U\' = {:.2f}, J = {:.2f}\n'.format(general_params['U'][icrsh], U_prime, general_params['J'][icrsh]))
 
-    if general_params['solver_type'] == 'ftps':
+    if solver_type_per_imp[icrsh] == 'ftps':
         # 1-band modell requires J and U' equals zero
         if n_orb == 1:
             up, j = 0.0, 0.0
@@ -212,11 +186,11 @@ def _construct_kanamori(sum_k, general_params, icrsh):
         h_int = util.h_int_kanamori(sum_k.spin_block_names[sum_k.SO], n_orb,
                                     map_operator_structure=sum_k.sumk_to_solver[icrsh],
                                     U=Umat, Uprime=Upmat, J_hund=general_params['J'][icrsh],
-                                    H_dump=os.path.join(general_params['jobname'], 'H.txt'))
+                                    H_dump=os.path.join(general_params['jobname'], f'H_imp{icrsh}.txt'))
     else:
         h_int = _construct_kanamori_soc(general_params['U'][icrsh], general_params['J'][icrsh],
                                         n_orb, sum_k.sumk_to_solver[icrsh],
-                                        os.path.join(general_params['jobname'], 'H.txt'))
+                                        os.path.join(general_params['jobname'], f'H_imp{icrsh}.txt'))
     return h_int
 
 
@@ -328,7 +302,7 @@ def _construct_dynamic(sum_k, general_params, icrsh):
     mpi.report('onsite interaction value for imp {}: {:.3f}'.format(icrsh, U_onsite[icrsh]))
     h_int = util.h_int_density(sum_k.spin_block_names[sum_k.SO], n_orb,
                                map_operator_structure=sum_k.sumk_to_solver[icrsh],
-                               U=np.array([[0]]), Uprime=np.array([[U_onsite[icrsh]]]), H_dump=os.path.join(general_params['jobname'], 'H.txt'))
+                               U=np.array([[0]]), Uprime=np.array([[U_onsite[icrsh]]]), H_dump=os.path.join(general_params['jobname'], f'H_imp{icrsh}.txt'))
 
     return h_int
 
@@ -346,16 +320,16 @@ def _generate_four_index_u_matrix(sum_k, general_params, icrsh):
         assert n_orb % 2 == 0
         n_orb = n_orb // 2
 
-    if sum_k.corr_shells[ish]['l'] != 2:
-        slater_integrals = util.U_J_to_radial_integrals(l=sum_k.corr_shells[ish]['l'],
-                                                        U_int=general_params['U'][icrsh],
+    l = sum_k.corr_shells[ish]['l']
+    if l != 2:
+        slater_integrals = util.U_J_to_radial_integrals(l=l, U_int=general_params['U'][icrsh],
                                                         J_hund=general_params['J'][icrsh])
     else:
         # Implements parameter R=F4/F2. For R=0.63 equivalent to util.U_J_to_radial_integrals
         U = general_params['U'][icrsh]
         J = general_params['J'][icrsh]
         R = general_params['ratio_F4_F2'][icrsh]
-        R = 0.63 if R == 'none' else R
+        R = 0.63 if R is None else R
         slater_integrals = np.array([U, 14*J/(1+R), 14*J*R/(1+R)])
 
     mpi.report('\nImpurity {}: The corresponding slater integrals are'.format(icrsh))
@@ -369,22 +343,21 @@ def _generate_four_index_u_matrix(sum_k, general_params, icrsh):
     # this is consistent with the order of orbitals in the VASP interface
     # but not necessarily with wannier90, qe, and wien2k!
     # This is also true for the f-shell.
-    Umat_full = util.U_matrix_slater(l=sum_k.corr_shells[ish]['l'],
+    Umat_full = util.U_matrix_slater(l=l,
                               radial_integrals=slater_integrals, basis='spherical')
     Umat_full = util.transform_U_matrix(Umat_full,
-                                        util.spherical_to_cubic(l=sum_k.corr_shells[ish]['l'],
-                                                                convention=general_params['h_int_basis'])
-                                        )
+                                        util.spherical_to_cubic(l=l, convention=general_params['h_int_basis']))
 
-    if n_orb == 2:
+    if l == 2 and n_orb == 2:
         Umat_full = util.eg_submatrix(Umat_full)
         mpi.report('Using eg subspace of interaction Hamiltonian')
-    elif n_orb == 3:
+    elif l == 2 and n_orb == 3:
         Umat_full = util.t2g_submatrix(Umat_full)
         mpi.report('Using t2g subspace of interaction Hamiltonian')
-    elif n_orb not in (5, 7):
-        raise ValueError('Calculations for d shell only support 2, 3 or 5 orbitals'
-                         + 'and for the f shell only 7 orbitals')
+    elif n_orb != 2*l+1:
+        raise ValueError(f'Imp {icrsh}: for the Slater Hamiltonian, please use either '
+                         f'the full shell with 2l+1={2*l+1} orbitals '
+                         'or the t2g or eg subspace of the d shell with 3 or 2 orbitals.')
 
     return Umat_full
 
@@ -420,7 +393,7 @@ def _construct_density_density(sum_k, general_params, Umat_full_rotated, icrsh):
     Umat, Upmat = util.reduce_4index_to_2index(Umat_full_rotated)
     h_int = util.h_int_density(sum_k.spin_block_names[sum_k.SO], n_orb,
                                map_operator_structure=sum_k.sumk_to_solver[icrsh],
-                               U=Umat, Uprime=Upmat, H_dump=os.path.join(general_params['jobname'], 'H.txt'))
+                               U=Umat, Uprime=Upmat, H_dump=os.path.join(general_params['jobname'], f'H_imp{icrsh}.txt'))
 
     return h_int
 
@@ -436,7 +409,7 @@ def _construct_slater(sum_k, general_params, Umat_full_rotated, icrsh):
     h_int = util.h_int_slater(sum_k.spin_block_names[sum_k.SO], n_orb,
                               map_operator_structure=sum_k.sumk_to_solver[icrsh],
                               U_matrix=Umat_full_rotated,
-                              H_dump=os.path.join(general_params['jobname'], 'H.txt'))
+                              H_dump=os.path.join(general_params['jobname'], f'H_imp{icrsh}.txt'))
 
     return h_int
 
@@ -497,7 +470,7 @@ def h_int_simple_intra(spin_names,n_orb,U,off_diag=None,map_operator_structure=N
     return H
 
 
-def construct(sum_k, general_params, advanced_params):
+def construct(sum_k, general_params, solver_type_per_imp):
     """
     Constructs the interaction Hamiltonian. Currently implemented are the
     Kanamori Hamiltonian (usually for 2 or 3 orbitals), the density-density and
@@ -522,18 +495,6 @@ def construct(sum_k, general_params, advanced_params):
     # Extracts U and J
     mpi.report('*** interaction parameters ***')
 
-    general_params = _extract_U_J_list('h_int_type', sum_k.n_inequiv_shells, general_params)
-    for param_name in ('U', 'J'):
-        general_params = _extract_U_J_list(param_name, sum_k.n_inequiv_shells, general_params)
-    if 'kanamori' in general_params['h_int_type']:
-        general_params = _extract_U_J_list('U_prime', sum_k.n_inequiv_shells, general_params)
-    for param_name in ('dc_U', 'dc_J'):
-        advanced_params = _extract_U_J_list(param_name, sum_k.n_inequiv_shells, advanced_params)
-
-    # Extracts ratio_F4_F2 if any shell uses a solver supporting it
-    if 'density_density' in general_params['h_int_type'] or 'full_slater' in general_params['h_int_type']:
-        general_params = _extract_U_J_list('ratio_F4_F2', sum_k.n_inequiv_shells, general_params)
-
     # Constructs the interaction Hamiltonian. Needs to come after setting sum_k.rot_mat
     mpi.report('\nConstructing the interaction Hamiltonians')
     h_int = [None] * sum_k.n_inequiv_shells
@@ -542,22 +503,22 @@ def construct(sum_k, general_params, advanced_params):
 
         # Kanamori
         if general_params['h_int_type'][icrsh] == 'kanamori':
-            h_int[icrsh] = _construct_kanamori(sum_k, general_params, icrsh)
+            h_int[icrsh] = _construct_kanamori(sum_k, general_params, solver_type_per_imp, icrsh)
             continue
 
         # for density density or full slater get full four-index U matrix
         if general_params['h_int_type'][icrsh] in ('density_density', 'full_slater'):
             mpi.report('\nNote: The input parameters U and J here are orbital-averaged parameters.')
             mpi.report('Note: The order of the orbitals is important. See also the doc string of this method.')
-            # Checks that all entries are l == 2 or R == 'none'
+            # Checks that all entries are l == 2 or R is None
             if (sum_k.corr_shells[sum_k.inequiv_to_corr[icrsh]]['l'] != 2
-                    and general_params['ratio_F4_F2'][icrsh] != 'none'):
+                    and general_params['ratio_F4_F2'][icrsh] is not None):
                 raise ValueError('Ratio F4/F2 only implemented for d-shells '
                                  + 'but set in impurity {}'.format(icrsh))
 
-            if general_params['h_int_type'][icrsh] == 'density_density' and general_params['solver_type'] == 'ftps':
+            if general_params['h_int_type'][icrsh] == 'density_density' and solver_type_per_imp[icrsh] == 'ftps':
                 # TODO: implement
-                raise NotImplementedError('\nNote: Density-density not implemented for ftps.')
+                raise NotImplementedError('Note: Density-density not implemented for ftps.')
 
             Umat_full = _generate_four_index_u_matrix(sum_k, general_params, icrsh)
 
@@ -589,7 +550,7 @@ def construct(sum_k, general_params, advanced_params):
                                               solver.get_n_orbitals(sum_k)[icrsh]['up'],
                                               map_operator_structure=sum_k.sumk_to_solver[icrsh],
                                               U=general_params['U'][icrsh],
-                                              H_dump=os.path.join(general_params['jobname'], 'H.txt'))
+                                              H_dump=os.path.join(general_params['jobname'], f'H_imp{icrsh}.txt'))
             continue
 
 

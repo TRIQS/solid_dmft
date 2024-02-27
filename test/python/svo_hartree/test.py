@@ -11,7 +11,7 @@ if mpi.is_master_node():
 
 mpi.barrier()
 
-solid.main([None, 'dmft_config.ini'])
+solid.main([None, 'dmft_config.toml'])
 
 mpi.barrier()
 
@@ -25,4 +25,3 @@ if mpi.is_master_node():
         for key in ['chemical_potential_pre', 'chemical_potential_post']:
             print(key)
             assert abs(out[key]-ref[key]) < 0.001, "chemical potential mismatch"
-
