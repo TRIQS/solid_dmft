@@ -21,12 +21,39 @@ def _verify_input_params_general(params: FullConfig) -> None:
     if params['general']['calc_energies'] and any(entry['type'] == 'ftps' for entry in params['solver']):
         raise ValueError('"calc_energies" is not valid for solver of type = "ftps"')
 
-    if (params['general']['dc'] and params['general']['dc_type'] == 4
-            and not np.isclose(sum(params['general']['cpa_x']), 1)):
-        raise ValueError('Probability distribution for CPA must equal 1.')
+    # Checks validity of other general params
+    h_int_type_options = ('density_density', 'kanamori', 'full_slater', 'crpa',
+                          'crpa_density_density', 'dynamic', 'ntot', 'simple_intra')
+    if isinstance(params['general']['h_int_type'], str):
+        if not params['general']['h_int_type'] in h_int_type_options:
+            raise ValueError(f'Invalid "h_int_type" = {params["general"]["h_int_type"]}.')
+    elif isinstance(params['general']['h_int_type'], list):
+        if any(entry not in h_int_type_options for entry in params['general']['h_int_type']):
+            raise ValueError('Invalid "h_int_type" in input list.')
+    else:
+        raise ValueError('Invalid "h_int_type" input type. String or list expected.')
+
+    if params['general']['g0_mix_type'] not in ('linear', 'broyden'):
+        raise ValueError(f'Invalid "g0_mix_type" = {params["general"]["g0_mix_type"]}.')
+
+    if params['general']['calc_mu_method'] not in ('dichotomy', 'newton', 'brent'):
+        raise ValueError(f'Invalid "calc_mu_method" = {params["general"]["calc_mu_method"]}.')
+
+    if params['general']['set_rot'] not in (None, 'den', 'hloc'):
+        raise ValueError(f'Invalid "set_rot" = {params["general"]["set_rot"]}.')
+
+    if params['general']['h_int_basis'] not in ('triqs', 'wien2k', 'wannier90', 'qe', 'vasp'):
+        raise ValueError(f'Invalid "h_int_basis" = {params["general"]["h_int_basis"]}.')
 
 def _verify_input_params_dft(params: FullConfig) -> None:
-    pass
+    if params['dft']['dft_code'] not in ('vasp', 'qe', None):
+        raise ValueError(f'Invalid "dft.dft_code" = {params["dft"]["dft_code"]}.')
+
+    if params['dft']['mpi_env'] not in ('default', 'openmpi', 'openmpi-intra', 'mpich'):
+        raise ValueError(f'Invalid "dft.mpi_env" = {params["dft"]["mpi_env"]}.')
+
+    if params['dft']['projector_type'] not in ('w90', 'plo'):
+        raise ValueError(f'Invalid "dft.projector_type" = {params["dft"]["projector_type"]}.')
 
 def _verify_input_params_solver(params: FullConfig) -> None:
     solver_params = params['solver']
@@ -57,8 +84,26 @@ def _verify_input_params_solver(params: FullConfig) -> None:
 def _verify_input_params_advanced(params: FullConfig) -> None:
     pass
 
-def verify_all(params: FullConfig) -> None:
+def verify_before_dmft_cycle(params: FullConfig) -> None:
     _verify_input_params_general(params)
     _verify_input_params_dft(params)
     _verify_input_params_solver(params)
     _verify_input_params_advanced(params)
+
+def verify_h5_dependent(sum_k, solver_type_per_imp, general_params):
+    # Incompatabilities for SO coupling
+    if sum_k.SO == 1 and general_params['magnetic'] and general_params['afm_order']:
+        raise ValueError('AFM order not supported with SO coupling')
+
+    # Checks that enforce_off_diag true for ftps and hartree
+    if any(s in ['ftps', 'hartree'] and not e for s, e in zip(solver_type_per_imp, general_params['enforce_off_diag'])):
+        raise ValueError('enforce_off_diag must be True for a impurities solver by ftps or hartree solvers')
+
+    # Checks that the interaction Hamiltonian and the parameters match
+    if any(h not in ['density_density', 'slater'] and r is not None
+        for h, r in zip(general_params['h_int_type'], general_params['ratio_F4_F2'])):
+        raise ValueError('"ratio_F4_F2" only considered for interaction Hamiltonians "density_density" and "slater". '
+                        'Please set to None for all other Hamiltonians.')
+    if any(h != 'kanamori' and up is not None for h, up in zip(general_params['h_int_type'], general_params['U_prime'])):
+        raise ValueError('"U_prime" only considered for interaction Hamiltonian "kanamori". '
+                         'Please set to None for all other Hamiltonians.')

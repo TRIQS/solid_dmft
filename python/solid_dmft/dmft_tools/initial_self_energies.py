@@ -62,35 +62,25 @@ def calculate_double_counting(sum_k, density_matrix, general_params, advanced_pa
     # copy the density matrix to not change it
     density_matrix_DC = deepcopy(density_matrix)
 
-    def iterate_except_hartree():
-        for iineq, type in enumerate(solver_type_per_imp):
-            if type == 'hartree':
-                mpi.report(f'\nSOLID_DMFT: Hartree solver for impurity {iineq} detected. '
-                           'Zeroing out the DC correction. This gets computed at the solver level')
-            else:
-                yield iineq
-
     # TODO: suppress print when reseting DC to zero
-    for icrsh in range(sum_k.n_inequiv_shells):
-        sum_k.calc_dc(density_matrix_DC[icrsh], orb=icrsh,
-                      use_dc_value=0.0)
+    #       and add a final print of the DC pot/energy at the end of the whole function
+    icrsh_hartree = [icrsh for icrsh, type in enumerate(solver_type_per_imp) if type == 'hartree']
+    icrsh_not_hartree = [icrsh for icrsh, type in enumerate(solver_type_per_imp) if type != 'hartree']
+    if icrsh_hartree:
+        mpi.report(f'\nSOLID_DMFT: Hartree solver for impurities {icrsh_hartree} detected. '
+                   'Zeroing out the DC correction there, which gets computed at the solver level.')
+        for icrsh in icrsh_hartree:
+            sum_k.calc_dc(density_matrix_DC[icrsh], orb=icrsh,
+                          use_dc_value=0.0)
 
     # Sets the DC and exits the function if advanced_params['dc_fixed_value'] is specified
     if advanced_params['dc_fixed_value'] is not None:
-        for icrsh in iterate_except_hartree():
+        for icrsh in icrsh_not_hartree:
             sum_k.calc_dc(density_matrix_DC[icrsh], orb=icrsh,
                           use_dc_value=advanced_params['dc_fixed_value'])
         return sum_k
 
-    # use DC for CPA
-    if general_params['dc'] and general_params['dc_type'] == 4:
-        zetas = general_params['cpa_zeta']
-        for icrsh in iterate_except_hartree():
-            sum_k.calc_dc(density_matrix_DC[icrsh], orb=icrsh, use_dc_value=zetas[icrsh])
-
-        return sum_k
-
-    for icrsh in iterate_except_hartree():
+    for icrsh in icrsh_not_hartree:
         if advanced_params['dc_fixed_occ'][icrsh] is not None:
             mpi.report(f'Fixing occupation for DC for imp {icrsh} to n={advanced_params["dc_fixed_occ"][icrsh]:.4f}')
             n_orb = sum_k.corr_shells[icrsh]['dim']
@@ -101,8 +91,8 @@ def calculate_double_counting(sum_k, density_matrix, general_params, advanced_pa
                 np.fill_diagonal(inner, orb_occ+0.0j)
 
     # The regular way: calculates the DC based on U, J and the dc_type
-    for icrsh in iterate_except_hartree():
-        if general_params['dc_type'] == 3:
+    for icrsh in icrsh_not_hartree:
+        if general_params['dc_type'][icrsh] == 3:
             # this is FLL for eg orbitals only as done in Seth PRB 96 205139 2017 eq 10
             # this setting for U and J is reasonable as it is in the spirit of F0 and Javg
             # for the 5 orb case
@@ -114,7 +104,7 @@ def calculate_double_counting(sum_k, density_matrix, general_params, advanced_pa
         else:
             sum_k.calc_dc(density_matrix_DC[icrsh], U_interact=advanced_params['dc_U'][icrsh],
                           J_hund=advanced_params['dc_J'][icrsh], orb=icrsh,
-                          use_dc_formula=general_params['dc_type'])
+                          use_dc_formula=general_params['dc_type'][icrsh])
 
     # for the fixed DC according to https://doi.org/10.1103/PhysRevB.90.075136
     # dc_imp is calculated with fixed occ but dc_energ is calculated with given n

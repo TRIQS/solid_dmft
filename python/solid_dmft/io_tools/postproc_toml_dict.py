@@ -5,6 +5,7 @@ ParamDict = Dict[str, Any]
 FullConfig = Dict[str, Union[ParamDict, List[ParamDict]]]
 
 def _verify_dict_is_param_dict(d: Any) -> None:
+    """ Checks that the input is of type ParamDict. """
     if not isinstance(d, dict):
         raise ValueError(f'Expected a dict, but got {d} of type {type(d)}.')
     for key in d:
@@ -60,6 +61,7 @@ def _verify_restrictions_on_default_and_config(cfg_inp: Dict[str, Any], cfg_def:
     _verify_dict_is_full_config(cfg_inp)
 
 def _apply_default_values(cfg_inp: FullConfig, cfg_def: FullConfig, match_key: Dict[str, str]) -> FullConfig:
+    """ Fills in the default values where the input config does not specify a value. """
     output: FullConfig = {}
     for section_name, section in cfg_def.items():
         if isinstance(section, list):
@@ -91,7 +93,7 @@ def _apply_default_values(cfg_inp: FullConfig, cfg_def: FullConfig, match_key: D
     return output
 
 def _replace_none(d: ParamDict) -> None:
-    """ Replace '<none>' by None in a ParamDict. """
+    """ Replace '<none>' by None in a ParamDict. This also works inside lists. """
     for key, value in d.items():
         if value == '<none>':
             d[key] = None
@@ -127,13 +129,13 @@ def merge_config_with_default(cfg_inp: Dict[str, Any], cfg_def: Dict[str, Any],
     Merge a TOML config dict with a default TOML dict.
     The default dict dictates the structure of the input:
     - Only sections and keys in the default are allowed in the input
-    - All sections listed in match_keys must be lists of dicts in the default
+    - All sections listed in match_key must be lists of dicts in the default
       and can be lists of dicts or dicts in the config
 
     The dicts allows for the following extensions:
     - Mandatory inputs for all calculations indicated by "<no default>"
-    - None indicated by "<none>". Also works in lists
-    - Self-referencing fields indicated by "<section.key>"
+    - None indicated by "<none>". Also works inside lists
+    - References within the dictionary indicated by "<section.key>"
     """
 
     # Check restrictions and makes sure that config and default are of type FullConfig

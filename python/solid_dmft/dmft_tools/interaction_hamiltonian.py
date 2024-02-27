@@ -163,7 +163,7 @@ def _construct_kanamori(sum_k, general_params, solver_type_per_imp, icrsh):
                    + 'outside the t2g or eg manifold?')
 
     # check if Uprime has been specified manually
-    if general_params['U_prime'][icrsh] == 'U-2J':
+    if general_params['U_prime'][icrsh] is None:
         U_prime = general_params['U'][icrsh] - 2.0 * general_params['J'][icrsh]
     else:
         U_prime = general_params['U_prime'][icrsh]

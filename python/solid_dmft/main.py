@@ -63,7 +63,7 @@ def run_dmft(params, config_file_name=None):
             default_params = tomllib.load(file)
         full_params = postproc_toml_dict.merge_config_with_default(params, default_params,
                                                                    {'solver': 'type'})
-        verify_input_params.verify_all(full_params)
+        verify_input_params.verify_before_dmft_cycle(full_params)
     full_params = mpi.bcast(full_params)
 
     # Prints parameters

@@ -219,25 +219,3 @@ def mix_sigma(general_params, n_inequiv_shells, solvers, Sigma_freq_previous):
         solvers[icrsh].Sigma_freq << mpi.bcast(solvers[icrsh].Sigma_freq)
 
     return solvers
-
-
-def init_cpa(sum_k, solvers, general_params):
-    # initialize cpa_G_time, cpa_G0_freq; extract cpa_G_loc
-    cpa_G_time = sum_k.block_structure.create_gf(ish=0, gf_function=Gf, space='solver',
-                                                 mesh=MeshImTime(beta=general_params['beta'],
-                                                                 S='Fermion', n_tau=general_params['n_tau'])
-                                                 )
-    cpa_G0_freq = [solvers[iineq].G0_freq.copy() for iineq in range(sum_k.n_inequiv_shells)]
-    cpa_G_loc = sum_k.extract_G_loc(with_Sigma=True, with_dc=False)
-
-    return cpa_G_loc
-
-
-def mix_cpa(cpa_G0_freq, n_inequiv_shells, solvers):
-    cpa_G_freq = solvers[0].G_freq.copy()
-    cpa_G_freq << Fourier(cpa_G_time)
-    # replace solver Sigma with cpa Sigma
-    for icrsh in range(n_inequiv_shells):
-        solvers[icrsh].Sigma_freq << inverse(cpa_G0_freq[icrsh]) - inverse(cpa_G_freq)
-
-    return solvers

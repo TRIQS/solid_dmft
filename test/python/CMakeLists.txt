@@ -7,7 +7,6 @@ set (all_pytests
      test_observables.py
      test_postproc_toml_dict.py
      test_postproc_toml_dict_integration.py
-     test_read_config.py
     )
 
 foreach(test ${all_pytests})

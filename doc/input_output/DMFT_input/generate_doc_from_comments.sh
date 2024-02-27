@@ -97,7 +97,7 @@ cat > general.rst << EOF
 [general]: General parameters
 -----------------------------
 
-Includes the majority of the parameters
+Frequently used parameters that apply to the whole simulation.
 
 
 EOF
@@ -113,10 +113,7 @@ cat > solver.rst << EOF
 
 Here are the parameters that are uniquely dependent on the solver chosen. Some parameters are used within solid_dmft and some are passed directly into the triqs solver.
 To see which parameters were passed to the solver for a given calculation, look at the triqs_solver_params in DMFT_input/solver in the h5 archive.
-Below a list of the supported solvers:
-
-
-
+Solver-specific parameters are listed in the respective sections.
 
 
 EOF
@@ -125,16 +122,13 @@ echo -e "\n"  >> solver.rst
 cat solver.tmp >> solver.rst
 ##############
 
-
-
 ###############
 cat > dft.rst << EOF
 
 [dft]: DFT related inputs
 -------------------------
 
-List of parameters that relate to the DFT calculation, useful mostly when doing CSC.
-
+List of parameters for the DFT calculation in charge-self-consistent calculations.
 
 
 EOF
@@ -149,7 +143,7 @@ cat > advanced.rst << EOF
 [advanced]: Advanced inputs
 ---------------------------
 
-Advanced parameters, do not modify default value unless you know what you are doing
+Advanced parameters, do not modify the default value unless you know what you are doing.
 
 
 EOF

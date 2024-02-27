@@ -23,7 +23,6 @@
 ################################################################################
 import numpy as np
 from itertools import product
-from copy import deepcopy
 
 from triqs.gf import MeshImTime, MeshReTime, MeshReFreq, MeshLegendre, Gf, BlockGf, make_hermitian, Omega, iOmega_n, make_gf_from_fourier, fit_hermitian_tail
 from triqs.gf.tools import inverse, make_zero_tail
@@ -388,13 +387,15 @@ class SolverStructure:
                 self.triqs_solver.G0_iw << self.G0_freq
 
             # update solver in h5 archive one last time for debugging if solve command crashes
-            if self.general_params['store_solver'] and mpi.is_master_node():
+            if mpi.is_master_node():
                 with HDFArchive(self.general_params['jobname']+'/'+self.general_params['seedname']+'.h5', 'a') as archive:
                     if not 'it_-1' in archive['DMFT_input/solver']:
                         archive['DMFT_input/solver'].create_group('it_-1')
-                    archive['DMFT_input/solver/it_-1'][f'S_{self.icrsh}'] = self.triqs_solver
                     archive['DMFT_input/solver/it_-1'][f'triqs_solver_params_{self.icrsh}'] = prep_params_for_h5(self.triqs_solver_params)
                     archive['DMFT_input/solver/it_-1']['mpi_size'] = mpi.size
+                    if self.general_params['store_solver']:
+                        archive['DMFT_input/solver/it_-1'][f'S_{self.icrsh}'] = self.triqs_solver
+            mpi.barrier()
 
             # Solve the impurity problem for icrsh shell
             # *************************************
@@ -768,9 +769,9 @@ class SolverStructure:
                 icrsh : int
                     correlated shell number
             """
-            for key in ['dc', 'dc_type']:
-                if key in general_params and general_params[key] is not None:
-                    setattr(hartree_instance, key, general_params[key])
+            setattr(hartree_instance, 'dc', general_params['dc'])
+            if general_params['dc_type'][icrsh] is not None:
+                setattr(hartree_instance, 'dc_type', general_params['dc_type'][icrsh])
 
             for key in ['dc_factor', 'dc_fixed_value']:
                 if key in advanced_params and advanced_params[key] is not None:

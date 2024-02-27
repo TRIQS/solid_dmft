@@ -297,8 +297,6 @@ def set_initial_mu(general_params, sum_k, iteration_offset, archive, broadening)
 
     # In first iteration, determines mu and returns
     if iteration_offset == 0:
-        if general_params['dc'] and general_params['dc_type'] == 4:
-            return sum_k
         sum_k.calc_mu(precision=general_params['prec_mu'], method=general_params['calc_mu_method'],
                       broadening=broadening)
         return sum_k

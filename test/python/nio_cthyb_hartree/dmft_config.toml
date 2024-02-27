@@ -22,8 +22,8 @@ calc_energies = true
 
 n_iter_dmft = 1
 
-dc_type = 0
 dc = true
+dc_type = [0, 1]
 dc_dmft = false
 
 [[solver]]
