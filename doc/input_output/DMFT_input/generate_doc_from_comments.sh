@@ -19,8 +19,8 @@ sed 's/\(.*\) :\s*\(.*\)/\n.. admonition:: \1 \n 	:class: intag  \n \n          
 #sed -i 's/\(\*type=.*\),/\1 \n\n           /g'  matches_comments.txt
 #sed -i 's/\(\*type=.*\),/\1 \n\n           /g'  matches_comments.txt
 
-# make 'optional' and 'default' bold
-sed -i 's/,.*\(\optional\)/;  \*\*\1\*\*/g'  matches_comments.txt
+# make 'mandatory' and 'default' bold
+sed -i 's/,.*\(\mandatory\)/;  \*\*\1\*\*/g'  matches_comments.txt
 sed -i 's/,.*\(\default=\)/;  \*\*\1\*\* /g'  matches_comments.txt
 
 # grep all admonitions and store them in a file
@@ -129,6 +129,7 @@ cat > dft.rst << EOF
 -------------------------
 
 List of parameters for the DFT calculation in charge-self-consistent calculations.
+The parameters are ignored in one-shot calculations.
 
 
 EOF

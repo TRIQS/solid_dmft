@@ -1,7 +1,7 @@
 [general]
 afm_order = false
 beta = "<none>"
-block_threshold = 1.0e-5
+block_threshold = 1e-5
 broy_max_it = -1
 calc_energies = false
 calc_mu_method = "dichotomy"
@@ -134,7 +134,7 @@ dmrg_maxm = 100
 dmrg_maxmB = 100
 dmrg_maxmI = 100
 dmrg_maxmIB = 100
-dmrg_tw = 1.0e-9
+dmrg_tw = 1e-9
 dt = "<no default>"
 enforce_gap = "<none>"
 ignore_weight = 0.0
@@ -148,7 +148,7 @@ ph_symm = false
 refine_factor = 1
 state_storage = "./"
 sweeps = 10
-tw = 1.0e-9
+tw = 1e-9
 
 [[solver]]
 type = "hartree"
@@ -169,7 +169,7 @@ n_iter_first = "<dft.n_iter>"
 projector_type = "w90"
 store_eigenvals = false
 w90_exec = "wannier90.x"
-w90_tolerance = 1.0e-6
+w90_tolerance = 1e-6
 
 [advanced]
 dc_factor = "<none>"
