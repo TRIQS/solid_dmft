@@ -123,16 +123,20 @@ def _resolve_references(d: ParamDict, section_name: str, output: FullConfig) -> 
                 raise ValueError(f'"{ref_key[1]}" in section "{ref_key[0]}" is a reference itself.')
             d[key] = referenced_val
 
-def merge_config_with_default(cfg_inp: Dict[str, Any], cfg_def: Dict[str, Any],
-                              match_key: Dict[str, str] = {}) -> FullConfig:
+# type hints currently not supported by sphinx autodoc
+# def merge_config_with_default(cfg_inp: Dict[str, Any], cfg_def: Dict[str, Any],
+#                               match_key: Dict[str, str] = {}) -> FullConfig:
+def merge_config_with_default(cfg_inp, cfg_def, match_key={}):
     """
     Merge a TOML config dict with a default TOML dict.
     The default dict dictates the structure of the input:
+
     - Only sections and keys in the default are allowed in the input
     - All sections listed in match_key must be lists of dicts in the default
       and can be lists of dicts or dicts in the config
 
     The dicts allows for the following extensions:
+
     - Mandatory inputs for all calculations indicated by "<no default>"
     - None indicated by "<none>". Also works inside lists
     - References within the dictionary indicated by "<section.key>"

@@ -13,7 +13,7 @@ docfile="$buildfolder/python/solid_dmft/io_tools/documentation.txt"
 
 #from the documentation file
 echo "Generating .rst syntax from the python syntax"
-sed 's/\(.*\) :\s*\(.*\)/\n.. admonition:: \1 \n 	:class: intag  \n \n            \*\*type=\*\* \2\n/g' $docfile > matches_comments.txt
+sed 's/\(.*\) :\s*\(.*\)/\n.. admonition:: \1 \n 	:class: intag  \n \n            \*\*type\*\* = \2\n/g' $docfile > matches_comments.txt
 
 #add blank line after type
 #sed -i 's/\(\*type=.*\),/\1 \n\n           /g'  matches_comments.txt
@@ -21,7 +21,7 @@ sed 's/\(.*\) :\s*\(.*\)/\n.. admonition:: \1 \n 	:class: intag  \n \n          
 
 # make 'mandatory' and 'default' bold
 sed -i 's/,.*\(\mandatory\)/;  \*\*\1\*\*/g'  matches_comments.txt
-sed -i 's/,.*\(\default=\)/;  \*\*\1\*\* /g'  matches_comments.txt
+sed -i 's/,.*\(\default\)/;  \*\*\1\*\* /g'  matches_comments.txt
 
 # grep all admonitions and store them in a file
 
