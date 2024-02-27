@@ -182,6 +182,18 @@ def _calculate_rotation_matrix(general_params, sum_k):
     diagonalizing the local Hamiltonian has.
     Note that the interaction Hamiltonian has to be rotated if it is not fully
     orbital-gauge invariant (only the Kanamori fulfills that).
+
+    Parameters
+    ----------
+    general_params : dict
+        general parameters as a dict
+    sum_k : SumkDFT object
+        Sumk Object
+
+    Returns
+    -------
+    sum_k : SumkDFT Object
+        updated Sumk object with the new rotation matrices
     """
 
     # Extracts new rotation matrices from density_mat or local Hamiltonian
