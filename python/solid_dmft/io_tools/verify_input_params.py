@@ -85,12 +85,14 @@ def _verify_input_params_advanced(params: FullConfig) -> None:
     pass
 
 def verify_before_dmft_cycle(params: FullConfig) -> None:
+    """ All checks of params that can be done before dmft_cycle is called. """
     _verify_input_params_general(params)
     _verify_input_params_dft(params)
     _verify_input_params_solver(params)
     _verify_input_params_advanced(params)
 
 def verify_h5_dependent(sum_k, solver_type_per_imp, general_params):
+    """ All checks of params that depend on the h5 file content that is stored in the SumkDFT object. """
     # Incompatabilities for SO coupling
     if sum_k.SO == 1 and general_params['magnetic'] and general_params['afm_order']:
         raise ValueError('AFM order not supported with SO coupling')

@@ -16,8 +16,10 @@ def _iteratively_replace_none(to_write, replace_from, replace_with):
     return to_write
 
 def prep_params_for_h5(dict_to_write):
+    """ Replace all NoneType with a string 'none' to be able to write to h5. """
     return _iteratively_replace_none(deepcopy(dict_to_write), None, 'none')
 
 # Not sure if the reverse route is actually needed
 def prep_params_from_h5(dict_to_read):
+    """ Replace all 'none' strings with NoneType to parse the dict coming from h5. """
     return _iteratively_replace_none(deepcopy(dict_to_read), 'none', None)

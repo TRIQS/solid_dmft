@@ -67,6 +67,7 @@ h_field_it : int, default = 0
         number of iterations the magnetic field is kept on
 h_int_basis : string, default = 'triqs'
         cubic basis convention to compute the interaction U matrix
+
         * 'triqs'
         * 'vasp' (equivalent to 'triqs')
         * 'wien2k'
@@ -88,7 +89,8 @@ h_int_type : string, mandatory
 h5_save_freq : int, default = 5
         how often is the output saved to the h5 archive
 J :  float or list of float, mandatory
-        J values for impurities if only one value is given, the same J is assumed for all impurities
+        J interaction value. If it is a float, the same J is assumed for all impurities,
+        otherwise as a list a different J can be specified per impurity.
 jobname : str, default = 'dmft_dir'
         the output directory for one-shot calculations
 load_sigma : bool, default = False
@@ -110,8 +112,8 @@ mu_gap_gb2_threshold : float, default = None
         of MaxEnt's lattice spectral function to put the chemical potential
         into the middle of the gap. Does not work if system completely full
         or empty, mu mixing is not applied to it. Recommended value 0.01.
-mu_gap_occ_deviation : float, default = none
-        Only used if mu_gap_gb2_threshold != none. Sets additional criterion
+mu_gap_occ_deviation : float, default = None
+        Only used if mu_gap_gb2_threshold != None. Sets additional criterion
         for finding the middle of the gap through occupation deviation to
         avoid getting stuck in an insulating state with wrong occupation.
 mu_initial_guess : float, default = None
@@ -137,11 +139,11 @@ n_iter_dmft_first : int, default = 10
 n_iter_dmft_per : int, default = 2
         number of iterations per dmft step in CSC calculations
 n_iw : int, default = 1025
-        number of Matsubara frequencies
+        number of Matsubara frequencies for the imaginary-frequency grid
 n_tau : int, default = 10001
-        number of imaginary time points
+        number of imaginary time points for the imaginary-time grid
 n_w : int, default = 5001
-        number of real frequency points
+        number of real frequency points for the real-frequency grid
 noise_level_initial_sigma : float, default = 0.0
         spread of Gaussian noise applied to the initial Sigma
 occ_conv_crit : float, default = -1.0
@@ -164,22 +166,29 @@ sampling_iterations : int, default = 0
 seedname : str, mandatory
         seedname for h5 archive with DMFT input and output
 set_rot : string, default = None
-        use density_mat_dft to diagonalize occupations = 'den'
-        use hloc_dft to diagonalize occupations = 'hloc'
+        Local orbital rotations added by solid_dmft
+
+        * None: keep the rotations stored in the h5 archive
+        * 'den' use the DFT occupations density_mat_dft for diagonalization
+        * 'hloc': use the DFT local Hamiltonian hloc_dft for diagonalization
 sigma_conv_crit : float, default = -1.0
         stop the calculation if sum_w 1/(w^0.6) ||Sigma-Sigma_prev|| is smaller than threshold
 sigma_mix : float, default = 1.0
-        careful: Sigma mixing can break orbital symmetries, use G0 mixing
+        careful: Sigma mixing can break orbital symmetries, use G0 mixing.
         mixing sigma with previous iteration sigma for better convergency. 1.0 means no mixing
 store_solver : bool, default = False
-        store the whole solver object under DMFT_input in h5 archive
+        whether to store the whole solver object under DMFT_input in h5 archive
 U : float or list of float, mandatory
-        U values for impurities if only one value is given, the same U is assumed for all impurities
+        U interaction value. If it is a float, the same U is assumed for all impurities,
+        otherwise as a list a different U can be specified per impurity.
 U_prime : float or list of floats, default = None
-        U prime values for impurities if only one value is given, the same U prime is assumed for all impurities
-        only used if h_int_type is kanamori
+        U prime interaction value.
+        Only used for impurities where general.h_int_type is kanamori.
+        If it is a float, the same U prime is assumed for all impurities,
+        otherwise as a list a different U prime can be specified per impurity.
+        For None, the default of U prime = U-2J is used.
 w_range : list of int, default = [-10, 10]
-        Contains w_min and w_max
+        Minimal and maximal range of the real-frequency grid
 
 [  solver  ]
 ------------
@@ -224,9 +233,12 @@ max_time : int, default = -1
 measure_chi_insertions : int, default = 100
         number of insertation for measurement of chi
 measure_chi : str, default = None
-        TODO: update
-        measure the dynamic spin suszeptibility chi(sz,sz(tau))
+        measure the dynamic suszeptibility of an operator O, chi(O,O(tau))
         triqs.github.io/cthyb/unstable/guide/dynamic_susceptibility_notebook.html
+        Possible values for this flag are:
+
+        * 'SzSz': spin susceptibility
+        * 'NN': occupation susceptibility
 measure_density_matrix : bool, default = False
         measures the impurity density matrix and sets also
         use_norm_as_weight to true
@@ -409,8 +421,14 @@ dft_exec : string, default = 'vasp_std'
         command for the DFT executable
 mpi_env : string, default = 'default'
         selection for mpi env for DFT / VASP in default this will only call VASP as mpirun -np n_cores_dft dft_exec
+        Possible values:
+
+        * 'default'
+        * 'openmpi'
+        * 'openmpi-intra'
+        * 'mpich'
 n_cores : int, None
-        number of cores for the DFT code (VASP)
+        number of cores for the DFT code (VASP). Mandatory for charge-self-consistent calculations
 n_iter : int, default = 4
         only needed for VASP. Number of DFT iterations to feed the DMFT
         charge density into DFT, which generally takes multiple Davidson steps.
@@ -445,15 +463,15 @@ dc_nominal : bool, default = False
 dc_orb_shift : list of float, default = None
         extra potential shift per orbital per impurity added to the DC
 dc_J :  float or list of float, default = general.J
-        J values for DC determination if only one value is given, the same J is assumed for all impurities
+        J values for DC determination. If only one value is given, the same J is assumed for all impurities
 dc_U :  float or list of float, default = general.U
-        U values for DC determination if only one value is given, the same U is assumed for all impurities
+        U values for DC determination. If only one value is given, the same U is assumed for all impurities
 map_solver_struct : list of dict, default = None
         Additional manual mapping of the solver block structure, applied
         after the block structure finder for each impurity.
         Give exactly one dict per ineq impurity.
         see also triqs.github.io/dft_tools/latest/_python_api/triqs_dft_tools.block_structure.BlockStructure.map_gf_struct_solver.html
-mapped_solver_struct_degeneracies : list, default = none
+mapped_solver_struct_degeneracies : list, default = None
         Degeneracies applied when using map_solver_struct, for each impurity.
         If not given and map_solver_struct is used, no symmetrization will happen.
 pick_solver_struct : list of dict, default = None

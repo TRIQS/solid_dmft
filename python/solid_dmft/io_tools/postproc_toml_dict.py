@@ -140,6 +140,21 @@ def merge_config_with_default(cfg_inp, cfg_def, match_key={}):
     - Mandatory inputs for all calculations indicated by "<no default>"
     - None indicated by "<none>". Also works inside lists
     - References within the dictionary indicated by "<section.key>"
+
+    Parameters
+    ----------
+    cfg_inp : dict
+        The input config dict
+    cfg_def : dict
+        The default config dict
+    match_key : dict, optional
+        A dictionary that contains section/key pairs to map entries in listed sections
+        between the input and default config.
+
+    Returns
+    -------
+    dict
+        The merged config dict
     """
 
     # Check restrictions and makes sure that config and default are of type FullConfig
