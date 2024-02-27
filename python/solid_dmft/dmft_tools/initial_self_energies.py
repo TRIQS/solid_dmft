@@ -102,6 +102,7 @@ def calculate_double_counting(sum_k, density_matrix, general_params, advanced_pa
             sum_k.calc_dc(density_matrix_DC[icrsh], U_interact=Uavg, J_hund=Javg,
                           orb=icrsh, use_dc_formula=0)
         else:
+            mpi.report(f'\nCalculating standard DC for impurity {icrsh} with U={advanced_params["dc_U"][icrsh]} and J={advanced_params["dc_J"][icrsh]}')
             sum_k.calc_dc(density_matrix_DC[icrsh], U_interact=advanced_params['dc_U'][icrsh],
                           J_hund=advanced_params['dc_J'][icrsh], orb=icrsh,
                           use_dc_formula=general_params['dc_type'][icrsh])

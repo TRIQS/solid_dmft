@@ -697,10 +697,10 @@ def _dmft_step(sum_k, solvers, it, general_params,
                                                         solver_type_per_imp)
 
     #The hartree solver computes the DC energy internally, set it in sum_k
-    # FIXME: this is incorrect, the DC energy is per correlated shell
-    for icrsh in range(sum_k.n_inequiv_shells):
-        if solver_type_per_imp[icrsh] == 'hartree':
-            sum_k.dc_energ[icrsh] = solvers[icrsh].DC_energy
+    for icrsh in range(sum_k.n_corr_shells):
+        iineq = sum_k.corr_to_inequiv[icrsh]
+        if solver_type_per_imp[iineq] == 'hartree':
+            sum_k.dc_energ[icrsh] = solvers[iineq].DC_energy
 
     # doing the dmft loop and set new sigma into sumk
     sum_k.put_Sigma([solvers[icrsh].Sigma_freq for icrsh in range(sum_k.n_inequiv_shells)])
