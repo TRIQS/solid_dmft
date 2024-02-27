@@ -151,8 +151,6 @@ occ_conv_crit : float, default = -1.0
 path_to_sigma : str, default = None
         path to h5 file from which the sigma should be loaded.
         Needed if load_sigma is true
-plo_cfg : str, default = 'plo.cfg'
-        config file for PLOs for the converter
 prec_mu : float, default = 1e-4
         general precision for determining the chemical potential at any time calc_mu is called
 ratio_F4_F2 : float or list of float, default = None
@@ -437,6 +435,8 @@ n_iter : int, default = 4
 n_iter_first : int, default = dft.n_iter
         number of DFT iterations in the first charge correction because this
         first charge correction usually changes the DFT wave functions the most.
+plo_cfg : str, default = 'plo.cfg'
+        config file for PLOs for the converter
 projector_type : string, default = 'w90'
         plo: uses VASP's PLO formalism, requires LOCPROJ in the INCAR
         w90: uses Wannier90 (for VASP and QuantumEspresso)

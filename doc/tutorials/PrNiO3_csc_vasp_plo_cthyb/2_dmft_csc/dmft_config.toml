@@ -3,7 +3,7 @@ seedname = "vasp"
 set_rot = "hloc"
 
 csc = true
-plo_cfg = "plo.cfg"
+
 
 prec_mu = 0.001
 
@@ -43,5 +43,6 @@ n_cores = 1
 dft_code = "vasp"
 dft_exec = "vasp_std"
 mpi_env = "default"
+plo_cfg = "plo.cfg"
 projector_type = "plo"
 store_eigenvals = true

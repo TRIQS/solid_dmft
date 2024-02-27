@@ -44,18 +44,18 @@ from solid_dmft.dmft_cycle import dmft_cycle
 from solid_dmft.dft_managers import vasp_manager as vasp
 from solid_dmft.dft_managers import qe_manager as qe
 
-def _run_plo_converter(general_params):
+def _run_plo_converter(general_params, dft_params):
     if not mpi.is_master_node():
         return
 
     # Checks for plo file for projectors
-    if not os.path.exists(general_params['plo_cfg']):
+    if not os.path.exists(dft_params['plo_cfg']):
         print('*** Input PLO config file not found! '
-              + 'I was looking for {} ***'.format(general_params['plo_cfg']))
+              + 'I was looking for {} ***'.format(dft_params['plo_cfg']))
         mpi.MPI.COMM_WORLD.Abort(1)
 
     # Runs plo converter
-    plo_converter.generate_and_output_as_text(general_params['plo_cfg'], vasp_dir='./')
+    plo_converter.generate_and_output_as_text(dft_params['plo_cfg'], vasp_dir='./')
     # Writes new H(k) to h5 archive
     converter = VaspConverter(filename=general_params['seedname'])
     converter.convert_dft_input()
@@ -190,7 +190,7 @@ def _full_vasp_run(general_params, dft_params, initial_run, n_iter_dft=1, sum_k=
             vasp.run_charge_update()
 
         if dft_params['projector_type'] == 'plo':
-            _run_plo_converter(general_params)
+            _run_plo_converter(general_params, dft_params)
             irred_indices = None
         elif dft_params['projector_type'] == 'w90':
             _run_wannier90(general_params, dft_params)
