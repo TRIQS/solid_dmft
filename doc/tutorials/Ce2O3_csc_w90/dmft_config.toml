@@ -41,4 +41,4 @@ n_cores = 10
 mpi_env = "default"
 projector_type = "w90"
 dft_exec = "pw.x"
-w90_tolerance = 1.e-1
+w90_tolerance = 1e-1

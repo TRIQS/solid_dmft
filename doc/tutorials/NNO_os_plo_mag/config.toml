@@ -18,7 +18,7 @@ J = 1.0
 beta = 40
 
 magnetic = true
-magmom = -0.3, 0.3
+magmom = [-0.3, 0.3]
 afm_order = true
 
 n_iter_dmft = 14
