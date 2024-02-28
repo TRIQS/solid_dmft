@@ -4,19 +4,19 @@ ARG APPNAME=solid_dmft
 
 # install dfttools maxent hubbardI and HartreeFock
 # dft_tools
-RUN cd / && git clone -b unstable --depth 1 https://github.com/TRIQS/dft_tools.git dft_tools.src \
+RUN cd / && git clone -b 3.2.x --depth 1 https://github.com/TRIQS/dft_tools.git dft_tools.src \
     && mkdir -p dft_tools.build && cd dft_tools.build \
     && cmake ../dft_tools.src \
     && make -j4 install
 
 # hubbardI
-RUN cd / && git clone -b unstable --depth 1 https://github.com/TRIQS/hubbardI.git hubbardI.src \
+RUN cd / && git clone -b 3.2.x --depth 1 https://github.com/TRIQS/hubbardI.git hubbardI.src \
     && mkdir -p hubbardI.build && cd hubbardI.build \
     && cmake ../hubbardI.src \
     && make install
 
 # Hartree-Fock solver
-RUN cd / && git clone -b unstable --depth 1 https://github.com/TRIQS/hartree_fock.git hartree.src \
+RUN cd / && git clone -b 3.2.x --depth 1 https://github.com/TRIQS/hartree_fock.git hartree.src \
     && mkdir -p hartree.build && cd hartree.build \
     && cmake ../hartree.src \
     && make install

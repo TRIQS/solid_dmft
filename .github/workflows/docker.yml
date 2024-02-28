@@ -2,7 +2,9 @@ name: Create and publish Docker images
 
 on:
   push: { branches: [ 3.2.x ] }
-  pull_request: { branches: [ 3.2.x ] }
+  pull_request:
+    branches: [ 3.2.x ]
+    paths: ['Docker/**']
   workflow_call:
   workflow_dispatch:
 
