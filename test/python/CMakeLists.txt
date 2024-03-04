@@ -1,29 +1,12 @@
-# all pytest unittests
-set (all_pytests
-     test_afm_mapping
-     test_dict_to_h5
-     test_interaction_hamiltonian
-     test_manipulate_chemical_potential.py
-     test_observables.py
-     test_postproc_toml_dict.py
-     test_postproc_toml_dict_integration.py
-    )
-
-foreach(test ${all_pytests})
-  get_filename_component(test_name ${test} NAME_WE)
-  get_filename_component(test_dir ${test} DIRECTORY)
-
-  add_test(NAME ${test_name}
-           COMMAND ${TRIQS_PYTHON_EXECUTABLE} -m pytest -vv ${CMAKE_CURRENT_SOURCE_DIR}/${test_dir}/${test_name}.py
-           WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${test_dir})
-
-  set_property(TEST ${test_name} APPEND PROPERTY ENVIRONMENT PYTHONPATH=${PROJECT_BINARY_DIR}/python:$ENV{PYTHONPATH})
-endforeach()
-
-# ------------------------------#
-
 # all other tests
-set(all_tests
+set(basic_tests
+    test_afm_mapping
+    test_dict_to_h5
+    test_interaction_hamiltonian
+    test_manipulate_chemical_potential
+    test_observables
+    test_postproc_toml_dict
+    test_postproc_toml_dict_integration
     test_convergence
     test_matheval
     test_plot_correlated_bands
@@ -42,7 +25,7 @@ set(all_tests
   # copy reference data for respack test
   FILE(COPY respack_sfo_data DESTINATION ${test_dir})
 
-  foreach(test ${all_tests})
+  foreach(test ${basic_tests})
   get_filename_component(test_name ${test} NAME_WE)
   get_filename_component(test_dir ${test} DIRECTORY)
   add_test(NAME ${test_name} COMMAND ${TRIQS_PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${test_dir}/${test_name}.py WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${test_dir})

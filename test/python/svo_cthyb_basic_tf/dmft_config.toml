@@ -3,10 +3,10 @@ seedname = "inp"
 jobname = "out"
 enforce_off_diag = false
 block_threshold = 0.001
-mu_initial_guess = -0.027041
+mu_initial_guess = -0.0289
 
-prec_mu = 0.001
-n_iw = 501
+prec_mu = 0.01
+n_iw = 301
 
 h_int_type = "kanamori"
 U = 8.0
@@ -34,8 +34,8 @@ load_sigma = false
 
 [solver]
 type = "cthyb"
-length_cycle = 120
-n_warmup_cycles = 8000
+length_cycle = 400
+n_warmup_cycles = 1e+3
 n_cycles_tot = 1e+4
 imag_threshold = 1e-5
 delta_interface = true
