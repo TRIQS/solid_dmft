@@ -43,10 +43,10 @@ for (int i = 0; i < dockerPlatforms.size(); i++) {
       if (platform == documentationPlatform)
         args = '-DBuild_Documentation=0'
       else if (platform == "sanitize")
-        args = '-DASAN=ON -DUBSAN=ON'
+        args = '-DASAN=ON -DUBSAN=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo'
       def img = docker.build("flatironinstitute/${dockerName}:${env.BRANCH_NAME}-${env.STAGE_NAME}", "--build-arg APPNAME=${projectName} --build-arg BUILD_ID=${env.BUILD_TAG} --build-arg CMAKE_ARGS='${args}' .")
       catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
-        img.inside() {
+        img.inside("--shm-size=4gb") {
           sh "make -C \$BUILD/${projectName} test CTEST_OUTPUT_ON_FAILURE=1"
         }
       }
