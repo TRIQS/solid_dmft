@@ -396,7 +396,7 @@ def _calc_kslice(n_orb, mu, eta, e_mat, sigma, qp_bands, e_vecs=None, proj_nuk=N
     return alatt_k_w
 
 
-def _get_tb_bands(e_mat, proj_on_orb=[None], **specs):
+def get_tb_bands(e_mat, proj_on_orb=[None], **specs):
     '''
     calculate eigenvalues and eigenvectors for given list of e_mat on kmesh
 
@@ -439,12 +439,20 @@ def _get_tb_bands(e_mat, proj_on_orb=[None], **specs):
 def get_tb_kslice(tb, mu_tb, **specs):
 
     w90_paths = list(map(lambda section: (np.array(specs[section[0]]), np.array(specs[section[1]])), specs['bands_path']))
-    upper_left = np.diff(w90_paths[0][::-1], axis=0)[0]
-    lower_right = np.diff(w90_paths[1], axis=0)[0]
-    Z = np.array(specs['Z'])
+    upper_left = w90_paths[0][0]
+    lower_right = w90_paths[1][-1]
+    origin = w90_paths[0][1]
+    assert np.allclose(origin, w90_paths[1][0]), '"bands_path" coordinates for origin of Fermi surface needs to be consistent'
+    if 'kz' in specs and specs['kz'] != 0.:
+        assert 'Z' in specs, 'Please provide Z point coordinate in tb_data_dict as input coordinate'
+        Z = np.array(specs['Z'])
+        kz = specs['kz']
+    else:
+        kz = 0.
+        Z = np.zeros((3))
 
     # calculate FS at the mu_tb value
-    FS_kx_ky, band_char = get_kx_ky_FS(lower_right, upper_left, Z, tb, N_kxy=specs['n_k'], kz=specs['kz'], fermi=mu_tb)
+    FS_kx_ky, band_char = get_kx_ky_FS(lower_right, upper_left, origin, Z, tb, N_kxy=specs['n_k'], kz=kz, fermi=mu_tb)
 
     return FS_kx_ky, band_char
 
@@ -456,7 +464,7 @@ def _fract_ind_to_val(x, ind):
     return x[int_ind] + (x[int_ind_p1] - x[int_ind])*(np.array(ind)-np.array(int_ind))
 
 
-def get_kx_ky_FS(lower_right, upper_left, Z, tb, select=None, N_kxy=10, kz=0.0, fermi=0.0):
+def get_kx_ky_FS(lower_right, upper_left, origin, Z, tb, select=None, N_kxy=10, kz=0.0, fermi=0.0):
 
     # create mesh
     kx = np.linspace(0, 0.5, N_kxy)
@@ -468,7 +476,7 @@ def get_kx_ky_FS(lower_right, upper_left, Z, tb, select=None, N_kxy=10, kz=0.0, 
     # go in horizontal arrays from bottom to top
     E_FS = np.zeros((tb.n_orbitals, N_kxy, N_kxy))
     for kyi in range(N_kxy):
-        path_FS = [(upper_left/(N_kxy-1)*kyi + kz*Z, lower_right+upper_left/(N_kxy-1)*kyi+kz*Z)]
+        path_FS = [((upper_left - origin)/(N_kxy-1)*kyi+kz*Z+origin, origin+(lower_right-origin)+(upper_left-origin)/(N_kxy-1)*kyi+kz*Z)]
         k_vec, dst, tks = k_space_path(path_FS, num=N_kxy)
         E_FS[:, :, kyi] = tb.dispersion(k_vec).transpose() - fermi
 
@@ -559,7 +567,7 @@ def plot_bands(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb, tb=True, alatt=Fal
             eps_nuk = tb_data['e_mat']
             evec_nuk = tb_data['e_vecs']
         else:
-            eps_nuk, evec_nuk, _ = _get_tb_bands(**tb_data)
+            eps_nuk, evec_nuk, _ = get_tb_bands(**tb_data)
         for band in range(n_orb):
             if not proj_on_orb[0] is not None:
                 if isinstance(plot_dict['colorscheme_bands'], str):
@@ -614,6 +622,7 @@ def plot_kslice(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb, tb_dict, tb=True,
 
     vmax = plot_dict['vmax'] if 'vmax' in plot_dict else np.max(alatt_k_w)
     vmin = plot_dict['vmin'] if 'vmin' in plot_dict else 0.0
+    assert vmax > vmin, 'vmax needs to be larger than vmin'
 
     if alatt:
         if alatt_k_w is None:
@@ -816,16 +825,22 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, mu_tb, add_spin=False, add_lambda=
         e_mat = np.einsum('ij, jkl -> ikl', np.linalg.inv(change_of_basis),
                           np.einsum('ijk, jm -> imk', e_mat, change_of_basis))
     else:
-        assert 'Z' in specs, 'Please provide Z point coordinate in tb_data_dict as input coordinate'
-        Z = np.array(specs['Z'])
+        if 'kz' in specs and specs['kz'] != 0.:
+            assert 'Z' in specs, 'Please provide Z point coordinate in tb_data_dict as input coordinate'
+            Z = np.array(specs['Z'])
+            kz = specs['kz']
+        else:
+            kz = 0.
+            Z = np.zeros((3))
 
         k_vec = np.zeros((n_k*n_k, 3))
         e_mat = np.zeros((n_orb, n_orb, n_k, n_k), dtype=complex)
 
-        upper_left = np.diff(w90_paths[0][::-1], axis=0)[0]
-        lower_right = np.diff(w90_paths[1], axis=0)[0]
+        upper_left = w90_paths[0][0]
+        lower_right = w90_paths[1][-1]
+        origin = w90_paths[0][1]
         for ik_y in range(n_k):
-            path_along_x = [(upper_left/(n_k-1)*ik_y + specs['kz']*Z, lower_right+upper_left/(n_k-1)*ik_y+specs['kz']*Z)]
+            path_along_x = [((upper_left - origin)/(n_k-1)*ik_y+kz*Z+origin, origin+(lower_right-origin)+(upper_left-origin)/(n_k-1)*ik_y+kz*Z)]
             k_vec[ik_y*n_k:ik_y*n_k+n_k, :], k_1d, special_k = k_space_path(path_along_x, bz=tb.bz, num=n_k)
             e_mat[:, :, :, ik_y] = tb.fourier(k_vec[ik_y*n_k:ik_y*n_k+n_k, :]).transpose(1, 2, 0)
         #if add_spin:
@@ -833,7 +848,7 @@ def get_dmft_bands(n_orb, w90_path, w90_seed, mu_tb, add_spin=False, add_lambda=
         e_mat = np.einsum('ij, jklm -> iklm', np.linalg.inv(change_of_basis), np.einsum('ijkl, jm -> imkl', e_mat, change_of_basis))
 
     if band_basis:
-        e_mat, e_vecs, orb_proj = _get_tb_bands(e_mat, proj_on_orb)
+        e_mat, e_vecs, orb_proj = get_tb_bands(e_mat, proj_on_orb)
     else:
         e_vecs = total_proj = orb_proj = None
 
