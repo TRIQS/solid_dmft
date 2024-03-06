@@ -83,6 +83,9 @@ if(Build_Tests)
   enable_testing()
 endif()
 
+# Provide GNU Installation directories
+include(GNUInstallDirs)
+
 # #############
 # Build Project
 
