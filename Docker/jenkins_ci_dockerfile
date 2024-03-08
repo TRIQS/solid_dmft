@@ -2,6 +2,8 @@
 FROM flatironinstitute/cthyb:master-ubuntu-clang
 ARG APPNAME=solid_dmft
 
+ENV OMP_NUM_THREADS=1
+
 # install dfttools maxent hubbardI and HartreeFock
 # dft_tools
 RUN cd / && git clone -b unstable --depth 1 https://github.com/TRIQS/dft_tools.git dft_tools.src \
