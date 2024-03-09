@@ -72,12 +72,12 @@ RUN pip3 install --no-cache-dir \
     decorator \
     jupyter \
     ipywidgets \
-    pytest \
     pylint \
     pandas \
     shapely \
     monty \
     mpi4py \
+    numpydoc \
     pymatgen \
     Jinja2 \
     Mako \

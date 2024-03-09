@@ -76,9 +76,39 @@ class test_convergence(unittest.TestCase):
                       'orbital_order_dmft': self.orbital_order_to, 'spin': 'up',
                       'block': 0, 'eta': 0.0, 'linearize': False}
 
+        # use kz to create non kz=0.0 slice first and then explicity coordinates
+        tb_kslice = {'bands_path': [('Y', 'G'), ('G', 'X')],
+                     'Y': np.array([0.5, 0.0, 0]), 'G': [0., 0., 0.],
+                     'Z': np.array([0, 0, 1.0]), 'X': [0., 0.5, 0.],
+                     'n_k': 50, 'kz': 0.34}
+
+        tb_data_kz, alatt_k_w_kz, _ = pcb.get_dmft_bands(fermi_slice=True, with_sigma='calc', add_mu_tb=True,
+                                                         orbital_order_to=self.orbital_order_to,
+                                                         **self.w90_dict, **tb_kslice, **sigma_dict)
+
+        # now explicittly define the coordinates
+        tb_kslice = {'bands_path': [('YZ', 'GZ'), ('GZ', 'XZ')],
+                     'YZ': np.array([0.5, 0.0, 0.34]), 'GZ': [0., 0., 0.34], 'XZ': [0., 0.5, 0.34],
+                     'n_k': 50}
+
+        tb_data_exp, alatt_k_w_exp, _ = pcb.get_dmft_bands(fermi_slice=True, with_sigma='calc', add_mu_tb=True,
+                                                           orbital_order_to=self.orbital_order_to,
+                                                           **self.w90_dict, **tb_kslice, **sigma_dict)
+
+
+        assert np.allclose(tb_data_kz['e_mat'], tb_data_exp['e_mat'])
+        assert np.allclose(alatt_k_w_kz, alatt_k_w_exp)
+
+    def test_get_kslice_nokz(self):
+
+        freq_mesh_kslice = {'window': [-0.5, 0.5], 'n_w': int(1e6)}
+        sigma_dict = {'dmft_path': './svo_example.h5', 'it': 'last_iter', 'w_mesh': freq_mesh_kslice,
+                      'orbital_order_dmft': self.orbital_order_to, 'spin': 'up',
+                      'block': 0, 'eta': 0.0, 'linearize': False}
+
         tb_kslice = {'bands_path': [('Y', 'G'), ('G', 'X')], 'Y': np.array([0.5, 0.0, 0]), 'G': [0., 0., 0.],
-                     'Z': np.array([0, 0, 0.5]), 'M': [0.5, 0.5, 0.], 'R': [0.5, 0.5, 0.5],
-                     'X': [0.,  0.5, 0.], 'n_k': 50, 'kz': 0.0}
+                     'M': [0.5, 0.5, 0.], 'R': [0.5, 0.5, 0.5],
+                     'X': [0.,  0.5, 0.], 'n_k': 50}
 
         tb_data, alatt_k_w, freq_dict = pcb.get_dmft_bands(fermi_slice=True, with_sigma='calc', add_mu_tb=True,
                                                            orbital_order_to=self.orbital_order_to,

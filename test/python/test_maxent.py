@@ -16,24 +16,24 @@ maxent_gf_latt.main('svo_hubbardI_basic/out/inp.h5',
                     omega_min=-20,
                     omega_max=20)
 
-# Runs maxent on the impurity Green function
-# No comparison to reference because the spectral function would be too "spiky"
-# because of HubbardI so that numerical differences can dominate the comparison
-mpi.report('#########\nTesting impurity Gf Maxent\n#########')
-maxent_gf_imp.main('svo_hubbardI_basic/out/inp.h5', sum_spins=True,
-                   n_points_maxent=50, n_points_alpha=20)
-
 if mpi.is_master_node():
     print('Comparing Alatt_maxent')
     with HDFArchive('svo_hubbardI_basic/out/inp.h5', 'r') as out, HDFArchive('svo_hubbardI_basic/ref.h5', 'r') as ref:
         assert are_iterables_equal(out['DMFT_results']['last_iter']['Alatt_maxent'], ref['DMFT_results']['last_iter']['Alatt_maxent'])
 
+# Runs maxent on the impurity Green function
+# No comparison to reference because the spectral function would be too "spiky"
+# because of HubbardI so that numerical differences can dominate the comparison
+mpi.report('#########\nTesting impurity Gf Maxent\n#########')
+maxent_gf_imp.main('svo_hubbardI_basic/out/inp.h5', sum_spins=True,
+                   n_points_maxent=20, n_points_alpha=10)
+
 # Run sigma maxent
 mpi.report('#########\nTesting Sigma Maxent\n#########')
 maxent_sigma.main(external_path='svo_hubbardI_basic/out/inp.h5',
                   omega_min=-12, omega_max=12,
-                  maxent_error=0.001, iteration=None,
-                  n_points_maxent=50,
+                  maxent_error=0.002, iteration=None,
+                  n_points_maxent=20,
                   n_points_alpha=10,
                   analyzer='LineFitAnalyzer',
                   n_points_interp=501,

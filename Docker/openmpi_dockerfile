@@ -57,10 +57,10 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
       python3-nbsphinx \
       python3-notebook \
       python3-numpy \
+      python3-numpydoc \
       python3-pandas \
       python3-pip \
       python3-pymatgen \
-      python3-pytest \
       python3-scipy \
       python3-shapely \
       python3-skimage \
@@ -179,7 +179,7 @@ ENV CPATH=/triqs/include:/usr/include/mkl:${CPATH} \
     CMAKE_PREFIX_PATH=/triqs/share/cmake:${CMAKE_PREFIX_PATH} \
     CMAKE_BUILD_PARALLEL_LEVEL=${NCORES} \
     CTEST_OUTPUT_ON_FAILURE=1 \
-    CTEST_PARALLEL_LEVEL=${NCORES} \
+    CTEST_PARALLEL_LEVEL=1 \
     BLA_VENDOR=Intel10_64_dyn \
     TRIQS_ROOT=/triqs
 
