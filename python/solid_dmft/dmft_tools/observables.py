@@ -146,7 +146,7 @@ def write_header_to_file(general_params, sum_k):
             obs_file.write(header + '\n')
 
 
-def add_dft_values_as_zeroth_iteration(observables, general_params, dft_mu, dft_energy,
+def add_dft_values_as_zeroth_iteration(observables, general_params, solver_type_per_imp, dft_mu, dft_energy,
                                        sum_k, G_loc_all_dft, shell_multiplicity):
     """
     Calculates the DFT observables that should be written as the zeroth iteration.
@@ -156,6 +156,9 @@ def add_dft_values_as_zeroth_iteration(observables, general_params, dft_mu, dft_
     observables : observable arrays/dicts
 
     general_params : general parameters as a dict
+
+    solver_type_per_imp : list of strings
+        list of solver types for each impurity
 
     dft_mu : dft chemical potential
 
@@ -208,7 +211,7 @@ def add_dft_values_as_zeroth_iteration(observables, general_params, dft_mu, dft_
                 if not spin in spin_channel:
                     continue
 
-                if general_params['solver_type'] in ['ftps']:
+                if solver_type_per_imp[iineq] == 'ftps':
                     freq_mesh = np.array([w.value for w in G_loc_all_dft[iineq][spin_channel].mesh])
                     fermi_idx = abs(freq_mesh).argmin()
                     gb2_averaged = G_loc_all_dft[iineq][spin_channel].data[fermi_idx].imag
@@ -256,7 +259,7 @@ def add_dft_values_as_zeroth_iteration(observables, general_params, dft_mu, dft_
     return observables
 
 
-def add_dmft_observables(observables, general_params, solver_params, dft_energy, it, solvers, h_int,
+def add_dmft_observables(observables, general_params, solver_params, map_imp_solver, solver_type_per_imp, dft_energy, it, solvers, h_int,
                          previous_mu, sum_k, density_mat, shell_multiplicity, E_bandcorr):
     """
     calculates the observables for given Input, I decided to calculate the observables
@@ -302,36 +305,29 @@ def add_dmft_observables(observables, general_params, solver_params, dft_energy,
     observables['E_bandcorr'].append(E_bandcorr)
     observables['E_dft'].append(dft_energy)
 
-    # if density matrix was measured store result in observables
-    if general_params['solver_type'] in ['cthyb', 'hubbardI'] and solver_params["measure_density_matrix"]:
-        mpi.report("\nextracting the impurity density matrix")
-        # Extract accumulated density matrix
-        density_matrix = [solvers[icrsh].density_matrix for icrsh in range(sum_k.n_inequiv_shells)]
-        # Object containing eigensystem of the local Hamiltonian
-        diag_local_ham = [solvers[icrsh].h_loc_diagonalization for icrsh in range(sum_k.n_inequiv_shells)]
-
     if general_params['calc_energies']:
-        # dmft interaction energy with E_int = 0.5 * Tr[Sigma * G]
-        if (general_params['solver_type'] in ['cthyb', 'hubbardI']
-            and solver_params["measure_density_matrix"]):
-            E_int = [trace_rho_op(density_matrix[icrsh], h_int[icrsh], diag_local_ham[icrsh])
-                     for icrsh in range(sum_k.n_inequiv_shells)]
-        elif general_params['solver_type'] == 'hartree':
-            E_int = [solvers[icrsh].interaction_energy for icrsh in range(sum_k.n_inequiv_shells)]
-        else:
-            warning = ( "!-------------------------------------------------------------------------------------------!\n"
-                        "! WARNING: calculating interaction energy using Migdal formula                              !\n"
-                        "! consider turning on measure density matrix to use the more stable trace_rho_op function   !\n"
-                        "!-------------------------------------------------------------------------------------------!" )
-            print(warning)
-            # calc energy for given S and G
-            E_int = [0.5 * np.real((solvers[icrsh].G_freq * solvers[icrsh].Sigma_freq).total_density())
-                     for icrsh in range(sum_k.n_inequiv_shells)]
-
+        mpi.report('\nCalculating interaction energies')
         for icrsh in range(sum_k.n_inequiv_shells):
-            observables['E_int'][icrsh].append(shell_multiplicity[icrsh]*E_int[icrsh].real)
-            E_corr_en += shell_multiplicity[icrsh] * (E_int[icrsh].real - sum_k.dc_energ[sum_k.inequiv_to_corr[icrsh]])
+            if (solver_type_per_imp[icrsh] in ['cthyb', 'hubbardI']
+                    and solver_params[map_imp_solver[icrsh]]["measure_density_matrix"]):
+                mpi.report(f'    Imp {icrsh}: from impurity density matrix')
+                # Extract accumulated density matrix
+                density_matrix = solvers[icrsh].density_matrix
+                # Object containing eigensystem of the local Hamiltonian
+                diag_local_ham = solvers[icrsh].h_loc_diagonalization
+                E_int = trace_rho_op(density_matrix, h_int[icrsh], diag_local_ham)
+            elif solver_type_per_imp[icrsh] == 'hartree':
+                mpi.report(f'    Imp {icrsh}: from Hartree')
+                E_int = solvers[icrsh].interaction_energy
+            else:
+                mpi.report(f'    Imp {icrsh}: from Migdal formula. '
+                           'WARNING: less stable than measuring density matrix and using trace_rho_op!')
+                # calc energy for given S and G
+                # dmft interaction energy with E_int = 0.5 * Tr[Sigma * G]
+                E_int = 0.5 * np.real((solvers[icrsh].G_freq * solvers[icrsh].Sigma_freq).total_density())
 
+            observables['E_int'][icrsh].append(shell_multiplicity[icrsh]*E_int.real)
+            E_corr_en += shell_multiplicity[icrsh] * (E_int.real - sum_k.dc_energ[sum_k.inequiv_to_corr[icrsh]])
 
     observables['E_corr_en'].append(E_corr_en)
 
@@ -345,7 +341,7 @@ def add_dmft_observables(observables, general_params, solver_params, dft_energy,
         else:
             observables['E_DC'][icrsh].append(0.0)
 
-        if general_params['solver_type'] not in ['ftps']:
+        if solver_type_per_imp[icrsh] != 'ftps':
             if solvers[icrsh].G_time:
                 G_time = solvers[icrsh].G_time
             else:
@@ -363,7 +359,7 @@ def add_dmft_observables(observables, general_params, solver_params, dft_energy,
             for spin_channel in sorted(sum_k.gf_struct_solver[icrsh].keys()):
                 if not spin in spin_channel:
                     continue
-                if general_params['solver_type'] in ['ftps']:
+                if solver_type_per_imp[icrsh] == 'ftps':
                     freq_mesh = np.array([w.value for w in solvers[icrsh].G_freq[spin_channel].mesh])
                     fermi_idx = abs(freq_mesh).argmin()
                     gb2_averaged = solvers[icrsh].G_freq[spin_channel].data[fermi_idx].imag

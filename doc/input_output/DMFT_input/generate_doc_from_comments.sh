@@ -7,25 +7,23 @@
 green='\033[1;32m'
 wipe="\033[1m\033[0m"
 
-echo -e "${green}Extracting the comments from read_config.py file${wipe}"
+echo -e "${green}Extracting the comments from io_tools/documentation.txt file${wipe}"
 buildfolder="../../.."
-docfile="$buildfolder/python/solid_dmft/read_config.py"
+docfile="$buildfolder/python/solid_dmft/io_tools/documentation.txt"
 
-awk '/---XXX---start/{flag=1; c=0} flag; /---XXX/&& ++c==2{flag=0}' $docfile | tail -n +2 | head -n -2 > python_comments.txt
-
-#from the python comments 
+#from the documentation file
 echo "Generating .rst syntax from the python syntax"
-sed 's/\(.*\) :\s*\(.*\)/\n.. admonition:: \1 \n 	:class: intag  \n \n            \*\*type=\*\* \2\n/g' python_comments.txt > matches_comments.txt
+sed 's/\(.*\) :\s*\(.*\)/\n.. admonition:: \1 \n 	:class: intag  \n \n            \*\*type\*\* = \2\n/g' $docfile > matches_comments.txt
 
 #add blank line after type
 #sed -i 's/\(\*type=.*\),/\1 \n\n           /g'  matches_comments.txt
 #sed -i 's/\(\*type=.*\),/\1 \n\n           /g'  matches_comments.txt
 
-# make 'optional' and 'default' bold
-sed -i 's/,.*\(\optional\)/;  \*\*\1\*\*/g'  matches_comments.txt
-sed -i 's/,.*\(\default=\)/;  \*\*\1\*\* /g'  matches_comments.txt
+# make 'mandatory' and 'default' bold
+sed -i 's/,.*\(\mandatory\)/;  \*\*\1\*\*/g'  matches_comments.txt
+sed -i 's/,.*\(\default\)/;  \*\*\1\*\* /g'  matches_comments.txt
 
-# grep all admonitions and store them in a file 
+# grep all admonitions and store them in a file
 
 echo "Generating input page"
 cat > input.rst << EOF
@@ -51,7 +49,7 @@ EOF
 #
 # awk '/\[  SECTION  \]/{flag=1; c=0} flag; /\[ /&& ++c==2{flag=0}'
 # matches from the pattern '[  SECTION  ]'(note, two spaces are important) up to either the next occurence of
-# '[  ', which is the next group, or the end of the file 
+# '[  ', which is the next group, or the end of the file
 #
 #
 # the second part takes the divided section and extracts a list out of it:
@@ -99,7 +97,7 @@ cat > general.rst << EOF
 [general]: General parameters
 -----------------------------
 
-Includes the majority of the parameters
+Frequently used parameters that apply to the whole simulation.
 
 
 EOF
@@ -113,10 +111,9 @@ cat > solver.rst << EOF
 [solver]: solver specific parameters
 ------------------------------------
 
-Here are the parameters that are uniquely dependent on the solver chosen. Below a list of the supported solvers:
-
-
-
+Here are the parameters that are uniquely dependent on the solver chosen. Some parameters are used within solid_dmft and some are passed directly into the triqs solver.
+To see which parameters were passed to the solver for a given calculation, look at the triqs_solver_params in DMFT_input/solver in the h5 archive.
+Solver-specific parameters are listed in the respective sections.
 
 
 EOF
@@ -125,16 +122,14 @@ echo -e "\n"  >> solver.rst
 cat solver.tmp >> solver.rst
 ##############
 
-
-
 ###############
 cat > dft.rst << EOF
 
 [dft]: DFT related inputs
 -------------------------
 
-List of parameters that relate to the DFT calculation, useful mostly when doing CSC.
-
+List of parameters for the DFT calculation in charge-self-consistent calculations.
+The parameters are ignored in one-shot calculations.
 
 
 EOF
@@ -149,7 +144,7 @@ cat > advanced.rst << EOF
 [advanced]: Advanced inputs
 ---------------------------
 
-Advanced parameters, do not modify default value unless you know what you are doing
+Advanced parameters, do not modify the default value unless you know what you are doing.
 
 
 EOF

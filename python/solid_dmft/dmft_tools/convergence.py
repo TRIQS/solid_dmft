@@ -169,7 +169,7 @@ def max_G_diff(G1, G2, norm_temp = True):
 
     return norm
 
-def prep_conv_obs(h5_archive, sum_k):
+def prep_conv_obs(h5_archive):
     """
     prepares the conv arrays and files for the DMFT calculation
 
@@ -177,7 +177,6 @@ def prep_conv_obs(h5_archive, sum_k):
     ----------
     h5_archive: hdf archive instance
         hdf archive for calculation
-    sum_k : SumK Object instances
 
     __Returns:__
     conv_obs : dict

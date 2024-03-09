@@ -19,7 +19,7 @@ import numpy as np
 from itertools import product
 
 from h5 import HDFArchive
-from solid_dmft.postprocessing.eval_U_cRPA_RESPACK import read_interaction, fit_slater_fulld
+from solid_dmft.postprocessing.eval_U_cRPA_RESPACK import read_interaction, fit_slater
 from solid_dmft.postprocessing.eval_U_cRPA_Vasp import fit_slater_fulld as fit_slater_vasp
 
 from triqs.operators.util.U_matrix import transform_U_matrix
@@ -38,10 +38,10 @@ class test_respack_reader(unittest.TestCase):
     def test_U_J_fit(self):
         print('------------')
         print('Fitting screened interaction with fixed F4/F2 ratio')
-        U_int, J_int = fit_slater_fulld(self.res.Uijij.real,
-                                        self.res.Uijji.real,
-                                        U_init=2, J_init=1,
-                                        fixed_F4_F2=True)
+        U_int, J_int = fit_slater(self.res.Uijij.real,
+                                  self.res.Uijji.real,
+                                  U_init=2, J_init=1,
+                                  fixed_F4_F2=True)
 
         assert abs(U_int - 1.6087813069026353) < 1e-4
         assert abs(J_int - 0.6085825226244702) < 1e-4
@@ -55,23 +55,34 @@ class test_respack_reader(unittest.TestCase):
 
         print('------------')
         print('Fitting bare interaction with fixed F4/F2 ratio')
-        U_int, J_int = fit_slater_fulld(self.res.Vijij.real,
-                                        self.res.Vijji.real,
-                                        U_init=1.7, J_init=0.7,
-                                        fixed_F4_F2=True)
+        U_int, J_int = fit_slater(self.res.Vijij.real,
+                                  self.res.Vijji.real,
+                                  U_init=1.7, J_init=0.7,
+                                  fixed_F4_F2=True)
 
         assert abs(U_int - 13.169980952573283) < 1e-4
         assert abs(J_int - 0.7852793988793887) < 1e-4
 
         return
 
+    def test_U_J_fit_p(self):
+        print('------------')
+        print('Fitting screened interaction for p-shell with fixed F4/F2 ratio')
+        print(self.res.Uijij.real[:3,:3])
+        U_int, J_int = fit_slater(self.res.Uijij.real[:3,:3],
+                                  self.res.Uijji.real[:3,:3],
+                                  U_init=2, J_init=1,
+                                  fixed_F4_F2=True)
+        assert abs(U_int - 1.7803822) < 1e-4
+        assert abs(J_int - 0.6158827) < 1e-4
+
     def test_F0_F2_F4_fit(self):
         print('------------')
         print('Fitting screened interaction to F0, F2, F4')
-        U_int, J_int = fit_slater_fulld(self.res.U_R[(0, 0, 0)].real,
-                                        self.res.J_R[(0, 0, 0)].real,
-                                        U_init=13, J_init=1,
-                                        fixed_F4_F2=False)
+        U_int, J_int = fit_slater(self.res.U_R[(0, 0, 0)].real,
+                                  self.res.J_R[(0, 0, 0)].real,
+                                  U_init=13, J_init=1,
+                                  fixed_F4_F2=False)
 
         assert abs(U_int - 1.6072376926602756) < 1e-4
         assert abs(J_int - 0.6166868032423679) < 1e-4

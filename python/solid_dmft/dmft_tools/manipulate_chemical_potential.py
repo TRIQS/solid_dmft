@@ -31,7 +31,7 @@ next iteration.
 import numpy as np
 
 import triqs.utility.mpi as mpi
-from triqs.gf import BlockGf, GfImFreq, GfImTime, Fourier
+from triqs.gf import BlockGf, GfImFreq, GfImTime, Fourier, MeshImFreq
 try:
     if mpi.is_master_node():
         from solid_dmft.postprocessing import maxent_gf_latt
@@ -257,7 +257,7 @@ def _set_mu_to_gap_middle_with_maxent(general_params, sum_k, gf_lattice_iw, arch
 
     return sum_k.chemical_potential + (valence_edge + conduction_edge) / 2
 
-def set_initial_mu(general_params, sum_k, iteration_offset, archive, shell_multiplicity):
+def set_initial_mu(general_params, sum_k, iteration_offset, archive, broadening):
     """
     Handles the different ways of setting the initial chemical potential mu:
     * Chemical potential set to fixed value: uses this value
@@ -282,8 +282,6 @@ def set_initial_mu(general_params, sum_k, iteration_offset, archive, shell_multi
         the number of iterations executed in previous calculations.
     archive : HDFArchive
         needed to potentially load previous results and write MaxEnt results to.
-    shell_multiplicity : iterable of ints
-        number of equivalent shells per impurity.
 
     Returns
     -------
@@ -292,19 +290,15 @@ def set_initial_mu(general_params, sum_k, iteration_offset, archive, shell_multi
     """
 
     # Uses fixed_mu_value as chemical potential if parameter is given
-    if general_params['fixed_mu_value'] != 'none':
+    if general_params['fixed_mu_value'] is not None:
         sum_k.set_mu(general_params['fixed_mu_value'])
         mpi.report('+++ Keeping the chemical potential fixed at {:.3f} eV +++'.format(general_params['fixed_mu_value']))
         return sum_k
 
     # In first iteration, determines mu and returns
     if iteration_offset == 0:
-        if general_params['dc'] and general_params['dc_type'] == 4:
-            return sum_k
-        if general_params['solver_type'] in ['ftps']:
-            sum_k.calc_mu(precision=general_params['prec_mu'], broadening=general_params['eta'])
-        else:
-            sum_k.calc_mu(precision=general_params['prec_mu'], method=general_params['calc_mu_method'])
+        sum_k.calc_mu(precision=general_params['prec_mu'], method=general_params['calc_mu_method'],
+                      broadening=broadening)
         return sum_k
 
     # If continuing calculation and not updating mu, loads sold value
@@ -324,11 +318,10 @@ def set_initial_mu(general_params, sum_k, iteration_offset, archive, shell_multi
     previous_mu = mpi.bcast(previous_mu)
 
     # Runs maxent if spectral weight too low and occupation is close to desired one
-    # TODO: which solvers work?
-    if general_params['solver_type'] in ['cthyb', 'ctint'] and general_params['mu_gap_gb2_threshold'] != 'none':
+    if isinstance(sum_k.mesh, MeshImFreq) and general_params['mu_gap_gb2_threshold'] is not None:
         sum_k.chemical_potential = previous_mu
         gf_lattice_iw, g_betahalf, occupation = _initialize_lattice_gf(sum_k, general_params)
-        fulfills_occupation_crit = (general_params['mu_gap_occ_deviation'] == 'none'
+        fulfills_occupation_crit = (general_params['mu_gap_occ_deviation'] is None
                                     or np.abs(occupation - sum_k.density_required) < general_params['mu_gap_occ_deviation'])
 
         if -np.real(g_betahalf) < general_params['mu_gap_gb2_threshold'] and fulfills_occupation_crit:
@@ -345,10 +338,8 @@ def set_initial_mu(general_params, sum_k, iteration_offset, archive, shell_multi
         _, _, occupation = _initialize_lattice_gf(sum_k, general_params)
 
     # If system not gapped, gets chemical potential from dichotomy method
-    if general_params['solver_type'] in ['ftps']:
-        sum_k.calc_mu(precision=general_params['prec_mu'], broadening=general_params['eta'])
-    else:
-        sum_k.calc_mu(precision=general_params['prec_mu'], method=general_params['calc_mu_method'])
+    sum_k.calc_mu(precision=general_params['prec_mu'], method=general_params['calc_mu_method'],
+                  broadening=broadening)
 
     # Applies mu mixing to dichotomy result
     sum_k.chemical_potential = _mix_chemical_potential(general_params, occupation,
@@ -357,7 +348,7 @@ def set_initial_mu(general_params, sum_k, iteration_offset, archive, shell_multi
 
     return sum_k
 
-def update_mu(general_params, sum_k, it, archive):
+def update_mu(general_params, sum_k, it, archive, broadening):
     """
     Handles the different ways of updating the chemical potential mu:
     * Chemical potential set to fixed value: uses this value
@@ -386,7 +377,7 @@ def update_mu(general_params, sum_k, it, archive):
     """
 
     # Uses fixed_mu_value as chemical potential if parameter is given
-    if general_params['fixed_mu_value'] != 'none':
+    if general_params['fixed_mu_value'] is not None:
         sum_k.set_mu(general_params['fixed_mu_value'])
         mpi.report('+++ Keeping the chemical potential fixed at {:.3f} eV +++'.format(general_params['fixed_mu_value']))
         return sum_k
@@ -399,9 +390,9 @@ def update_mu(general_params, sum_k, it, archive):
 
     # Runs maxent if spectral weight too low and occupation is close to desired one
     # TODO: which solvers work?
-    if general_params['solver_type'] in ['cthyb', 'ctint','ctseg'] and general_params['mu_gap_gb2_threshold'] != 'none':
+    if isinstance(sum_k.mesh, MeshImFreq) and general_params['mu_gap_gb2_threshold'] is not None:
         gf_lattice_iw, g_betahalf, occupation = _initialize_lattice_gf(sum_k, general_params)
-        fulfills_occupation_crit = (general_params['mu_gap_occ_deviation'] == 'none'
+        fulfills_occupation_crit = (general_params['mu_gap_occ_deviation'] is None
                                     or np.abs(occupation - sum_k.density_required) < general_params['mu_gap_occ_deviation'])
 
         if -np.real(g_betahalf) < general_params['mu_gap_gb2_threshold'] and fulfills_occupation_crit:
@@ -419,10 +410,8 @@ def update_mu(general_params, sum_k, it, archive):
 
     # If system not gapped, gets chemical potential from dichotomy method
     previous_mu = sum_k.chemical_potential
-    if general_params['solver_type'] in ['ftps']:
-        sum_k.calc_mu(precision=general_params['prec_mu'], broadening=general_params['eta'])
-    else:
-        sum_k.calc_mu(precision=general_params['prec_mu'], method=general_params['calc_mu_method'])
+    sum_k.calc_mu(precision=general_params['prec_mu'], method=general_params['calc_mu_method'],
+                  broadening=broadening)
 
     # Applies mu mixing to dichotomy result
     sum_k.chemical_potential = _mix_chemical_potential(general_params, occupation,

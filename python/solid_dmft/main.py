@@ -36,61 +36,59 @@ import sys
 import shutil
 from timeit import default_timer as timer
 
+try:
+    import tomllib
+except ImportError:
+    import tomli as tomllib
+
 # triqs
 import triqs.utility.mpi as mpi
 
 # own modules
-from solid_dmft.read_config import read_config
 from solid_dmft.dmft_cycle import dmft_cycle
 from solid_dmft.csc_flow import csc_flow_control
 from solid_dmft.gw_embedding.gw_flow import embedding_driver
+from solid_dmft.io_tools import postproc_toml_dict, verify_input_params
 
-
-def main(argv=sys.argv):
-    """The main function for one-shot and charge-self-consistent calculations"""
+def run_dmft(params, config_file_name=None):
     # timing information
     if mpi.is_master_node():
         global_start = timer()
 
-    # reading configuration for calculation
-    general_params = None
-    solver_params = None
-    dft_params = None
-    advanced_params = None
-    gw_params = None
-    if len(argv) > 1:
-        config_file_name = str(argv[1])
-    else:
-        config_file_name = 'dmft_config.ini'
-    if not os.path.isfile(config_file_name):
-        raise FileNotFoundError(f'Could not find config file {config_file_name}.')
-
+    # Reads in default params file and merges with params
+    full_params = None
+    default_config_name = os.path.join(os.path.dirname(__file__),
+                                       'io_tools', 'default.toml')
     if mpi.is_master_node():
-        print('Reading the config file ' + config_file_name)
-        general_params, solver_params, dft_params, advanced_params, gw_params = read_config(config_file_name)
-        general_params['config_file'] = config_file_name
+        with open(default_config_name, 'rb') as file:
+            default_params = tomllib.load(file)
+        full_params = postproc_toml_dict.merge_config_with_default(params, default_params,
+                                                                   {'solver': 'type'})
+        verify_input_params.verify_before_dmft_cycle(full_params)
+    full_params = mpi.bcast(full_params)
 
-        print('-'*25 + '\nGeneral parameters:')
-        for key, value in general_params.items():
-            print('{0: <20} {1: <4}'.format(key, str(value)))
-        print('-'*25 + '\nSolver parameters:')
-        for key, value in solver_params.items():
-            print('{0: <20} {1: <4}'.format(key, str(value)))
-        print('-'*25 + '\nDFT parameters:')
-        for key, value in dft_params.items():
-            print('{0: <20} {1: <4}'.format(key, str(value)))
-        print('-'*25 + '\nAdvanced parameters, don\'t change them unless you know what you are doing:')
-        for key, value in advanced_params.items():
-            print('{0: <20} {1: <4}'.format(key, str(value)))
-        print('-'*25 + '\nGW embedding parameters:')
-        for key, value in gw_params.items():
-            print('{0: <20} {1: <4}'.format(key, str(value)))
+    # Prints parameters
+    if mpi.is_master_node():
+        # Prints only sections that are in the input file
+        for section_name in params:
+            section = full_params[section_name]
+            print(f'\n{section_name} parameters')
+            if isinstance(section, dict):
+                for key, value in section.items():
+                    print(f'    {key: <30} {str(value)}')
+            else:
+                for i, entry in enumerate(section):
+                    print(f'entry {i+1}')
+                    for key, value in entry.items():
+                        print(f'    {key: <30} {str(value)}')
+        print('')
+    mpi.barrier()
 
-    general_params = mpi.bcast(general_params)
-    solver_params = mpi.bcast(solver_params)
-    dft_params = mpi.bcast(dft_params)
-    gw_params = mpi.bcast(gw_params)
-    advanced_params = mpi.bcast(advanced_params)
+    general_params = full_params['general']
+    solver_params = full_params['solver']
+    dft_params = full_params['dft']
+    gw_params = full_params['gw']
+    advanced_params = full_params['advanced']
 
     if general_params['csc']:
         # Start CSC calculation, always in same folder as dmft_config
@@ -107,8 +105,8 @@ def main(argv=sys.argv):
     else:
         # Sets up one-shot calculation
         mpi.report('', '#'*80)
-        mpi.report(f'Using input file {general_params["seedname"]}.h5 '
-                   + f'and running in folder {general_params["jobname"]}')
+        mpi.report(f'Using input file "{general_params["seedname"]}.h5" '
+                   + f'and running in folder "{general_params["jobname"]}".')
 
         if mpi.is_master_node():
             # Checks for h5 file
@@ -119,11 +117,14 @@ def main(argv=sys.argv):
             if not os.path.exists(general_params['jobname']):
                 os.makedirs(general_params['jobname'])
 
-            # Copies h5 archive and config file to subfolder if are not there
-            for file in (general_params['seedname']+'.h5',
-                         general_params['config_file']):
-                if not os.path.isfile(general_params['jobname']+'/'+os.path.basename(file)):
-                    shutil.copyfile(file, general_params['jobname']+'/'+os.path.basename(file))
+            # Copies h5 archive to subfolder if it is not there
+            h5_name = general_params['seedname']+'.h5'
+            if not os.path.isfile(general_params['jobname']+'/'+os.path.basename(h5_name)):
+                shutil.copyfile(h5_name, general_params['jobname']+'/'+os.path.basename(h5_name))
+
+            # Copies config file to subfolder
+            if config_file_name is not None:
+                shutil.copyfile(config_file_name, general_params['jobname']+'/'+os.path.basename(config_file_name))
         mpi.barrier()
 
         # Runs dmft_cycle
@@ -133,9 +134,21 @@ def main(argv=sys.argv):
     mpi.barrier()
     if mpi.is_master_node():
         global_end = timer()
-        print('-------------------------------')
+        print('-'*80)
         print('overall elapsed time: %10.4f seconds'%(global_end-global_start))
 
+def main(argv=sys.argv):
+    """The main function for one-shot and charge-self-consistent calculations"""
+    config_file_name = str(argv[1]) if len(argv) > 1 else 'dmft_config.toml'
+
+    params = None
+    if mpi.is_master_node():
+        print('Reading the config file', config_file_name)
+        with open(config_file_name, 'rb') as file:
+            params = tomllib.load(file)
+    params = mpi.bcast(params)
+
+    run_dmft(params, config_file_name)
 
 if __name__ == '__main__':
     main(sys.argv)

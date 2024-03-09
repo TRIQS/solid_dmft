@@ -14,7 +14,7 @@ if mpi.is_master_node():
 
 mpi.barrier()
 
-solid.main([None, 'dmft_config.ini'])
+solid.main([None, 'dmft_config.toml'])
 
 # with HDFArchive('out/inp.h5','r') as ar:
 #     G_iw = ar['DMFT_results/last_iter/Gimp_freq_0']

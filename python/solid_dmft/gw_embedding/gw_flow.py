@@ -53,6 +53,7 @@ from solid_dmft.dmft_tools import formatter
 from solid_dmft.dmft_tools import results_to_archive
 from solid_dmft.dmft_tools.solver import SolverStructure
 from solid_dmft.dmft_tools import interaction_hamiltonian
+from solid_dmft.dmft_cycle import _extract_quantity_per_inequiv
 from solid_dmft.gw_embedding.bdft_converter import convert_gw_output
 
 
@@ -199,6 +200,9 @@ def embedding_driver(general_params, solver_params, gw_params, advanced_params):
                 ar['DMFT_input']['version']['solid_dmft_hash'] = solid_dmft_hash
                 ar['DMFT_input']['version']['solid_dmft_version'] = solid_dmft_version
 
+    # make sure each iteration is saved to h5 file
+    general_params['h5_save_freq'] = 1
+
     # lad GW input from h5 file
     if mpi.is_master_node():
         gw_data, ir_kernel = convert_gw_output(
@@ -225,7 +229,25 @@ def embedding_driver(general_params, solver_params, gw_params, advanced_params):
     general_params['beta'] = gw_params['beta']
 
     # create h_int
+    general_params = _extract_quantity_per_inequiv('h_int_type', sumk.n_inequiv_shells, general_params)
     h_int = interaction_hamiltonian.construct(sumk, general_params, advanced_params, gw_params)
+
+    if len(solver_params) == 1 and solver_params[0]['idx_impurities'] is None:
+        map_imp_solver = [0] * sumk.n_inequiv_shells
+    else:
+        all_idx_imp = [i for entry in solver_params for i in entry['idx_impurities']]
+        if sorted(all_idx_imp) != list(range(sumk.n_inequiv_shells)):
+            raise ValueError('All impurities must be listed exactly once in solver.idx_impurities'
+                             f'but instead got {all_idx_imp}')
+
+        map_imp_solver = []
+        for iineq in range(sumk.n_inequiv_shells):
+            for isolver, entry in enumerate(solver_params):
+                if iineq in entry['idx_impurities']:
+                    map_imp_solver.append(isolver)
+                    break
+    solver_type_per_imp = [solver_params[map_imp_solver[iineq]]['type'] for iineq in range(sumk.n_inequiv_shells)]
+    mpi.report(f'\nSolver type per impurity: {solver_type_per_imp}')
 
     # create solver objects
     solvers = [None] * sumk.n_inequiv_shells
@@ -241,9 +263,11 @@ def embedding_driver(general_params, solver_params, gw_params, advanced_params):
         Vhf_imp_sIab = np.zeros((gw_params['number_of_spins'],
                                  sumk.n_inequiv_shells,
                                  max(gw_params['n_orb']),max(gw_params['n_orb'])),dtype=complex)
+
     for ish in range(sumk.n_inequiv_shells):
         # Construct the Solver instances
-        solvers[ish] = SolverStructure(general_params, solver_params, advanced_params, sumk, ish, h_int[ish])
+        solvers[ish] = SolverStructure(general_params, solver_params[map_imp_solver[ish]],
+                                       advanced_params, sumk, ish, h_int[ish])
 
     # init local density matrices for observables
     density_tot = 0.0
@@ -271,7 +295,7 @@ def embedding_driver(general_params, solver_params, gw_params, advanced_params):
                 mpi.report('{}, {} part'.format(key, name))
                 mpi.report(func(value))
 
-        if general_params['solver_type'] == 'cthyb' and general_params['cthyb_delta_interface']:
+        if solver_type_per_imp[ish] == 'cthyb' and solver_params[ish]['delta_interface']:
             mpi.report('\n Using the delta interface for cthyb passing Delta(tau) and Hloc0 directly.\n')
             # prepare solver input
             imp_eal = gw_params['Hloc0'][ish]
@@ -299,7 +323,7 @@ def embedding_driver(general_params, solver_params, gw_params, advanced_params):
                 else:
                     solvers[ish].Delta_time[name] << Delta_tau
 
-                if general_params['diag_delta']:
+                if solver_params[ish]['diag_delta']:
                     for o1 in range(imp_eal[name].shape[0]):
                         for o2 in range(imp_eal[name].shape[0]):
                             if o1 != o2:
@@ -374,8 +398,9 @@ def embedding_driver(general_params, solver_params, gw_params, advanced_params):
     # Writes results to h5 archive
     if mpi.is_master_node():
         with HDFArchive(general_params['jobname'] + '/' + general_params['seedname'] + '.h5', 'a') as ar:
-            results_to_archive.write(ar, sumk, general_params, solver_params, solvers, iteration,
-                             False, gw_params['mu_emb'], density_mat_pre, density_mat)
+            results_to_archive.write(ar, sumk, general_params, solver_params, solvers,
+                                     map_imp_solver, solver_type_per_imp, iteration,
+                                     False, gw_params['mu_emb'], density_mat_pre, density_mat)
 
             # store also IR / DLR Sigma
             ar['DMFT_results/it_{}'.format(iteration)]['ir_mesh'] = ir_mesh

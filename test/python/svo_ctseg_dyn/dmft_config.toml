@@ -1,0 +1,31 @@
+[general]
+seedname = "inp"
+jobname = "out"
+mu_initial_guess = 13.223155
+
+prec_mu = 0.001
+n_iw = 1000
+n_tau = 10000
+
+h_int_type = "dyn_density_density"
+
+beta = 40
+
+n_iter_dmft = 1
+
+dc_type = 6
+dc = true
+
+h5_save_freq = 1
+
+[solver]
+type = "ctseg"
+length_cycle = 120
+n_warmup_cycles = 1e+4
+n_cycles_tot = 1e+6
+legendre_fit = true
+n_l = 30
+n_w_b_nn = 2000
+
+[gw]
+code = "aimbes"

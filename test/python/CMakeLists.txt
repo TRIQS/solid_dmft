@@ -1,12 +1,12 @@
 # all pytest unittests
 set (all_pytests
      test_afm_mapping
+     test_dict_to_h5
      test_interaction_hamiltonian
      test_manipulate_chemical_potential.py
      test_observables.py
-     test_read_config.py
-     test_update_dmft_config.py
-     test_update_results_h5.py
+     test_postproc_toml_dict.py
+     test_postproc_toml_dict_integration.py
     )
 
 foreach(test ${all_pytests})
@@ -62,6 +62,8 @@ set (integration_tests
      svo_cthyb_crpa
      svo_ctseg_dyn
      svo_gw_emb_stat
+     lco_ftps
+     nio_cthyb_hartree
      )
 
 # copy other test files
@@ -70,7 +72,7 @@ FILE(COPY UIJKL DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 foreach(test ${integration_tests})
   set (test_dir ${CMAKE_CURRENT_BINARY_DIR}/${test})
 
-  foreach(file dmft_config.ini inp.h5 ref.h5 test.py)
+  foreach(file dmft_config.toml inp.h5 ref.h5 test.py)
     FILE(COPY ${test}/${file} DESTINATION ${test_dir})
   endforeach()
 
@@ -99,3 +101,24 @@ add_test(NAME maxent_${test}
         )
 
 set_property(TEST maxent_${test} APPEND PROPERTY ENVIRONMENT PYTHONPATH=${PROJECT_BINARY_DIR}/python:$ENV{PYTHONPATH})
+
+# ------------------------------#
+
+# integration test for restarting svo_hartree
+set (restart_integration_test
+     svo_hubbardI_basic)
+
+foreach(test ${restart_integration_test})
+  set (test_dir ${CMAKE_CURRENT_BINARY_DIR}/${test})
+
+  foreach(file ref_restart.h5 test_restart.py)
+    FILE(COPY ${test}/${file} DESTINATION ${test_dir})
+  endforeach()
+
+  add_test(NAME restart_${test}
+           COMMAND ${MPIEXEC_EXECUTABLE} ${MPIEXEC_PREFLAGS} ${TRIQS_PYTHON_EXECUTABLE} test_restart.py
+           WORKING_DIRECTORY ${test_dir}
+          )
+
+  set_property(TEST restart_${test} APPEND PROPERTY ENVIRONMENT PYTHONPATH=${PROJECT_BINARY_DIR}/python:$ENV{PYTHONPATH})
+endforeach()

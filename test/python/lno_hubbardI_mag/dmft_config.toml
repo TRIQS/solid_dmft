@@ -1,0 +1,33 @@
+[general]
+seedname = "inp"
+jobname = "out"
+block_threshold = 0.001
+mu_initial_guess = -0.003377
+
+n_iw = 501
+beta = 40
+n_w = 501
+w_range = [-5, 5]
+eta = 0.05
+n_tau = 10001
+
+prec_mu = 0.001
+
+h_int_type = "kanamori"
+U = 1.83
+J = 0.37
+
+magnetic = true
+magmom = [-0.2, 0.2]
+
+n_iter_dmft = 1
+
+dc_type = 1
+dc = true
+dc_dmft = false
+
+[solver]
+type = "hubbardI"
+idx_impurities = [0, 1]
+measure_G_tau = true
+measure_density_matrix = true

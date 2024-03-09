@@ -10,56 +10,63 @@ sys.path.append('./src')
 from solid_dmft.dmft_tools import afm_mapping
 from helper import are_iterables_equal
 
-def test_determine_afm_mapping():
-    general_params = {'magmom': [+1, -1, +1, -1], 'afm_order': True}
-    archive = {'DMFT_input': {}}
-    n_inequiv_shells = 4
+import unittest
 
-    expected_general_params = general_params.copy()
-    #                                            copy, source, switch
-    expected_general_params['afm_mapping'] = [[False, 0, False], [True, 0, True],
-                                                  [True, 0, False], [True, 0, True]]
+class test_afm_mapping(unittest.TestCase):
+    def test_determine_afm_mapping(self):
+        general_params = {'magmom': [+1, -1, +1, -1], 'afm_order': True}
+        archive = {'DMFT_input': {}}
+        n_inequiv_shells = 4
 
-    general_params = afm_mapping.determine(general_params, archive, n_inequiv_shells)
+        expected_general_params = general_params.copy()
+        #                                            copy, source, switch
+        expected_general_params['afm_mapping'] = [[False, 0, False], [True, 0, True],
+                                                      [True, 0, False], [True, 0, True]]
 
-    assert are_iterables_equal(general_params, expected_general_params)
+        general_params = afm_mapping.determine(general_params, archive, n_inequiv_shells)
 
-    general_params = {'magmom': [+1, -1, +2, +2], 'afm_order': True}
-    archive = {'DMFT_input': {}}
-    n_inequiv_shells = 4
+        assert are_iterables_equal(general_params, expected_general_params)
 
-    expected_general_params = general_params.copy()
-    #                                            copy, source, switch
-    expected_general_params['afm_mapping'] = [[False, 0, False], [True, 0, True],
-                                                  [False, 2, False], [True, 2, False]]
+        general_params = {'magmom': [+1, -1, +2, +2], 'afm_order': True}
+        archive = {'DMFT_input': {}}
+        n_inequiv_shells = 4
 
-    general_params = afm_mapping.determine(general_params, archive, n_inequiv_shells)
+        expected_general_params = general_params.copy()
+        #                                            copy, source, switch
+        expected_general_params['afm_mapping'] = [[False, 0, False], [True, 0, True],
+                                                      [False, 2, False], [True, 2, False]]
 
-    assert are_iterables_equal(general_params, expected_general_params)
+        general_params = afm_mapping.determine(general_params, archive, n_inequiv_shells)
 
-    # Reading in the afm_mapping from the archive
-    general_params = {'magmom': [+1, -1, +2], 'afm_order': True}
-    archive = {'DMFT_input': {'afm_mapping': [[False, 0, False], [False, 1, False],
-                                              [False, 2, False]]}}
-    n_inequiv_shells = 3
+        assert are_iterables_equal(general_params, expected_general_params)
 
-    expected_general_params = general_params.copy()
-    #                                            copy, source, switch
-    expected_general_params['afm_mapping'] = [[False, 0, False], [False, 1, False],
-                                                  [False, 2, False]]
+        # Reading in the afm_mapping from the archive
+        general_params = {'magmom': [+1, -1, +2], 'afm_order': True}
+        archive = {'DMFT_input': {'afm_mapping': [[False, 0, False], [False, 1, False],
+                                                  [False, 2, False]]}}
+        n_inequiv_shells = 3
 
-    general_params = afm_mapping.determine(general_params, archive, n_inequiv_shells)
+        expected_general_params = general_params.copy()
+        #                                            copy, source, switch
+        expected_general_params['afm_mapping'] = [[False, 0, False], [False, 1, False],
+                                                      [False, 2, False]]
 
-    assert are_iterables_equal(general_params, expected_general_params)
+        general_params = afm_mapping.determine(general_params, archive, n_inequiv_shells)
 
-    general_params = {'magmom': [+1, -1, +2, +2], 'afm_order': True}
-    archive = {'DMFT_input': {}}
-    n_inequiv_shells = 3
+        assert are_iterables_equal(general_params, expected_general_params)
 
-    expected_general_params = general_params.copy()
-    #                                            copy, source, switch
-    expected_general_params['afm_order'] = False
+        general_params = {'magmom': [+1, -1, +2, +2], 'afm_order': True}
+        archive = {'DMFT_input': {}}
+        n_inequiv_shells = 3
 
-    general_params = afm_mapping.determine(general_params, archive, n_inequiv_shells)
+        expected_general_params = general_params.copy()
+        #                                            copy, source, switch
+        expected_general_params['afm_order'] = False
 
-    assert are_iterables_equal(general_params, expected_general_params)
+        general_params = afm_mapping.determine(general_params, archive, n_inequiv_shells)
+
+        assert are_iterables_equal(general_params, expected_general_params)
+
+if __name__ == '__main__':
+    unittest.main()
+

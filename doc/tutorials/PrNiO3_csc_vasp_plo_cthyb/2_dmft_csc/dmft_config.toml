@@ -1,0 +1,48 @@
+[general]
+seedname = "vasp"
+set_rot = "hloc"
+
+csc = true
+
+
+prec_mu = 0.001
+
+h_int_type = "kanamori"
+U = 2.50
+J = 0.50
+beta = 40
+
+g0_mix = 0.95
+n_iter_dmft_first = 4
+n_iter_dmft_per = 2
+n_iter_dmft = 26
+h5_save_freq = 5
+
+dc = true
+dc_type = 1
+dc_dmft = true
+
+calc_energies = true
+
+[solver]
+type = "cthyb"
+n_l = 33
+length_cycle = 1000
+n_warmup_cycles = 10000
+n_cycles_tot = 2e+6
+imag_threshold = 1e-5
+legendre_fit = true
+measure_density_matrix = true
+measure_pert_order = true
+
+[dft]
+n_iter = 4
+# as of openmpi ver 4.0.7 there is a problem running with more than one core
+# use OMP_NUM_THREADS instead
+n_cores = 1
+dft_code = "vasp"
+dft_exec = "vasp_std"
+mpi_env = "default"
+plo_cfg = "plo.cfg"
+projector_type = "plo"
+store_eigenvals = true

@@ -56,13 +56,14 @@ def test_add_dft_values_one_impurity_one_band():
     gf_down << SemiCircular(1, 0)
     G_loc_all_dft = [BlockGf(name_list=('up_0', 'down_0'), block_list=(gf_up, gf_down), make_copies=True)]
 
+    solver_type_per_imp = ['cthyb']
     density_mat_dft = [G_loc_all_dft[iineq].density() for iineq in range(sum_k.n_inequiv_shells)]
     dft_mu = 12.
     shell_multiplicity = [4]
 
     observables = _set_up_observables(sum_k.n_inequiv_shells)
 
-    observables = add_dft_values_as_zeroth_iteration(observables, general_params, dft_mu, None, sum_k,
+    observables = add_dft_values_as_zeroth_iteration(observables, general_params, solver_type_per_imp, dft_mu, None, sum_k,
                                                      G_loc_all_dft, shell_multiplicity)
 
     expected_observables = {'E_bandcorr': ['none'], 'E_tot': ['none'], 'E_dft': ['none'],
@@ -112,14 +113,14 @@ def test_add_dft_values_two_impurites_two_bands():
                              make_copies=True),
                      BlockGf(name_list=('up_0', 'down_0'), block_list=(gf_up_two_bands, gf_down_two_bands), make_copies=True)]
 
-    density_mat_dft = [G_loc_all_dft[iineq].density() for iineq in range(sum_k.n_inequiv_shells)]
+    solver_type_per_imp = ['cthyb', 'cthyb']
     dft_mu = 2.
     dft_energy = None
     shell_multiplicity = [3, 1]
 
     observables = _set_up_observables(sum_k.n_inequiv_shells)
 
-    observables = add_dft_values_as_zeroth_iteration(observables, general_params, dft_mu, dft_energy, sum_k,
+    observables = add_dft_values_as_zeroth_iteration(observables, general_params, solver_type_per_imp, dft_mu, dft_energy, sum_k,
                                                      G_loc_all_dft, shell_multiplicity)
     expected_observables = {'E_bandcorr': [0.0], 'E_tot': [-5.3], 'E_dft': [0.0],
                             'E_DC': [[0.3], [5.0]], 'E_int': [[0.0], [0.0]],
@@ -153,7 +154,7 @@ def test_add_dmft_observables_one_impurity_one_band():
     general_params['solver_type'] = 'cthyb'
     general_params['n_tau'] = 10001
 
-    solver_params = {'measure_density_matrix': False}
+    solver_params = [{'measure_density_matrix': False}]
 
     observables = _set_up_observables(sum_k.n_inequiv_shells)
 
@@ -180,10 +181,11 @@ def test_add_dmft_observables_one_impurity_one_band():
     # misusing here G_freq to get some comparable dummy values for Z
     solvers[0].Sigma_freq = gf_iw[0]
 
+    map_imp_solver = [0]
+    solver_type_per_imp = ['cthyb']
     density_mat = [gf_iw[iineq].density() for iineq in range(sum_k.n_inequiv_shells)]
 
-
-    observables = add_dmft_observables(observables, general_params, solver_params, None, it, solvers, h_int,
+    observables = add_dmft_observables(observables, general_params, solver_params, map_imp_solver, solver_type_per_imp, None, it, solvers, h_int,
                                        previous_mu, sum_k, density_mat, shell_multiplicity, E_bandcorr)
     print(observables['orb_Z'])
     expected_observables = {'iteration': [1], 'mu': [1.56], 'E_tot': [10.43], 'E_bandcorr': [10.43],

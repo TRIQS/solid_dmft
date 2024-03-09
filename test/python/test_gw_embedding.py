@@ -70,9 +70,9 @@ class test_gw_embedding(unittest.TestCase):
         W_dlr = calc_W_from_Gloc(Gloc_dlr, U_dict)
 
         Sig_DC_dlr, Sig_DC_hartree, Sig_DC_exchange = calc_Sigma_DC_gw(W_dlr['up_0'], Gloc_dlr['up_0'], Uloc_0)
-        DC_ref = np.array([[1.13031371e-01-0.0j , 0.0+0.0j, 0.0+0.0j],
-                           [0.0+0.0j,  1.13030001e-01+0.0j      , 0.0+0.0j],
-                           [0.0+0.0j, 0.0+0.0j, 1.13031969e-01+0.0j]])
+        DC_ref = np.array([[1.0030e-01-0.0j , 0.0+0.0j, 0.0+0.0j],
+                           [0.0+0.0j,  1.003e-01+0.0j      , 0.0+0.0j],
+                           [0.0+0.0j, 0.0+0.0j, 1.003e-01+0.0j]])
         assert np.allclose(Sig_DC_hartree, DC_ref, rtol=1e-3, atol=1e-3)
 
 

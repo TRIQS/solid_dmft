@@ -4,3 +4,5 @@ scipy
 argparse
 pytest
 scikit-image
+# From python 3.11 and newer, toml is part of standard implementation
+tomli

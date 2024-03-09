@@ -1,0 +1,51 @@
+[general]
+seedname = "inp"
+jobname = "out"
+
+# solver ftps
+# freq range of all objects
+w_range = [-15,15]
+n_w = 1001
+# broadening for k sum and discretization of hyb function
+eta=0.2
+
+n_iter_dmft = 1
+
+prec_mu = 0.001
+mu_initial_guess = 12.865491
+
+h_int_type = "kanamori"
+U = 3.6
+J = 0.0
+
+dc_type = 0
+dc_dmft = false
+
+h5_save_freq = 1
+store_solver = true
+
+[solver]
+type = "ftps"
+# time step sizes, larger less accurant
+dt = 0.2
+# automatic bath fit
+bath_fit = true
+# only relevant for multiorbital
+diag_delta = true
+# small bath fit weights are ignored
+ignore_weight = 0.1
+# where the MPS states are stored, fast r/w important
+state_storage = "./"
+# use symmetries of sumk block struc
+calc_me = true
+# time evo bond dim and cutoff
+tw = 1e-10
+maxmI = 16
+maxmIB = 16
+maxmB = 16
+# DMRG paramaters
+dmrg_tw = 1e-13
+sweeps = 12
+dmrg_maxmI = 40
+dmrg_maxmIB = 40
+dmrg_maxmB = 40

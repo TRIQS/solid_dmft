@@ -219,16 +219,16 @@ def construct_Uijkl(Uijij, Uiijj):
     return Uijkl
 
 
-def fit_slater_fulld(u_ijij_crpa, u_ijji_crpa, U_init, J_init, fixed_F4_F2=True):
+def fit_slater(u_ijij_crpa, u_ijji_crpa, U_init, J_init, fixed_F4_F2=True):
     '''
     finds best Slater parameters U, J for given Uijij and Uijji matrices
     using the triqs U_matrix operator routine assumes F4/F2=0.625
 
     Parameters:
     -----------
-    u_ijij_crpa: np.ndarray of shape (5, 5)
+    u_ijij_crpa: np.ndarray of shape (3,3) or (5, 5)
         Uijij matrix
-    u_ijji_crpa: np.ndarray of shape (5, 5)
+    u_ijji_crpa: np.ndarray of shape (3,3) or (5, 5)
         Uijji matrix
     U_init: float
         inital value of U for optimization
@@ -248,12 +248,18 @@ def fit_slater_fulld(u_ijij_crpa, u_ijji_crpa, U_init, J_init, fixed_F4_F2=True)
     from scipy.optimize import minimize
 
     # input checks
-    assert u_ijij_crpa.shape == (5, 5), 'fit slater only implemented for full d shell (5 orbitals)'
-    assert u_ijji_crpa.shape == (5, 5), 'fit slater only implemented for full d shell (5 orbitals)'
+    if u_ijij_crpa.shape == (3,3):
+        l=1
+        # for p shell there are only 2 parameters
+        fixed_F4_F2 = True
+    elif u_ijij_crpa.shape == (5,5):
+        l=2
+    else:
+        raise ValueError('fit slater only implemented for full p or d shell')
 
     def minimizer(parameters):
         U_int, J_hund = parameters
-        Umat_full = U_matrix_slater(l=2, U_int=U_int, J_hund=J_hund, basis='spherical')
+        Umat_full = U_matrix_slater(l=l, U_int=U_int, J_hund=J_hund, basis='spherical')
         Umat_full = transform_U_matrix(Umat_full, T)
 
         Umat, u_ijij_slater = reduce_4index_to_2index(Umat_full)
@@ -261,8 +267,7 @@ def fit_slater_fulld(u_ijij_crpa, u_ijji_crpa, U_init, J_init, fixed_F4_F2=True)
         return np.sum((u_ijji_crpa - u_iijj_slater)**2 + (u_ijij_crpa - u_ijij_slater)**2)
 
     def minimizer_radial(parameters):
-        F0, F2, F4 = parameters
-        Umat_full = U_matrix_slater(l=2, radial_integrals=[F0, F2, F4], basis='spherical')
+        Umat_full = U_matrix_slater(l=l, radial_integrals=parameters, basis='spherical')
         Umat_full = transform_U_matrix(Umat_full, T)
 
         Umat, u_ijij_slater = reduce_4index_to_2index(Umat_full)
@@ -270,7 +275,7 @@ def fit_slater_fulld(u_ijij_crpa, u_ijji_crpa, U_init, J_init, fixed_F4_F2=True)
         return np.sum((u_ijji_crpa - u_iijj_slater)**2 + (u_ijij_crpa - u_ijij_slater)**2)
 
     # transformation matrix from spherical to w90 basis
-    T = spherical_to_cubic(l=2, convention='wannier90')
+    T = spherical_to_cubic(l=l, convention='wannier90')
 
     if fixed_F4_F2:
         result = minimize(minimizer, (U_init, J_init))
@@ -284,7 +289,7 @@ def fit_slater_fulld(u_ijij_crpa, u_ijji_crpa, U_init, J_init, fixed_F4_F2=True)
         F2 = J_init * 14.0 / (1.0 + 0.63)
         F4 = 0.630 * F2
 
-        initial_guess = (F0, F2, F4)
+        initial_guess = [F0, F2, F4]
 
         print('Initial guess: F0 = {0[0]:.3f} eV, F2 = {0[1]:.3f} eV, F4 = {0[2]:.3f} eV'.format(initial_guess))
 

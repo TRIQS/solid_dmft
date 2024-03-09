@@ -7,6 +7,10 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
       ca-certificates \
       clang-${LLVM} \
       cmake \
+      sudo \
+      less \
+      vim \
+      nano \
       curl \
       cython3 \
       debhelper \
@@ -62,6 +66,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
       python3-skimage \
       python3-sphinx \
       python3-sphinx-rtd-theme \
+      python3-tomli \
       && \
       apt-get autoremove --purge -y && \
       apt-get autoclean -y && \
@@ -242,4 +247,3 @@ RUN ["chmod", "+x", "/usr/local/bin/jupyter.sh"]
 
 # change user and group id to match host machine if options are passed accordingly
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-

@@ -47,6 +47,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
       python3-skimage \
       python3-sphinx \
       python3-sphinx-rtd-theme \
+      python3-tomli \
       rsync \
       sudo \
       && \
