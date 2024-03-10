@@ -27,11 +27,9 @@ main DMFT cycle, DMFT step, and helper functions
 
 
 # system
-import os
 from copy import deepcopy
 from timeit import default_timer as timer
 import numpy as np
-from scipy.constants import physical_constants
 
 # triqs
 from triqs.operators.util.observables import S_op, N_op
@@ -39,13 +37,10 @@ from triqs.version import git_hash as triqs_hash
 from triqs.version import version as triqs_version
 from h5 import HDFArchive
 import triqs.utility.mpi as mpi
-from triqs.operators import c_dag, c, Operator, util
-from triqs.gf import Gf, make_gf_dlr_imfreq, make_hermitian, fit_hermitian_tail, MeshReFreq, MeshImFreq, make_gf_imfreq, make_gf_from_fourier, iOmega_n, Omega
+from triqs.operators import c_dag, c, Operator
+from triqs.gf import make_hermitian, fit_hermitian_tail, MeshReFreq, MeshImFreq, make_gf_from_fourier, iOmega_n
 from triqs.gf.tools import inverse, make_zero_tail
-from triqs.gf import Gf, make_hermitian, MeshReFreq, MeshImFreq
-from triqs.gf.tools import inverse
 from triqs_dft_tools.sumk_dft import SumkDFT
-from triqs_dft_tools import BlockStructure
 
 # own modules
 from solid_dmft.version import solid_dmft_hash
@@ -61,7 +56,6 @@ from solid_dmft.dmft_tools import afm_mapping
 from solid_dmft.dmft_tools import manipulate_chemical_potential as manipulate_mu
 from solid_dmft.dmft_tools import initial_self_energies as initial_sigma
 from solid_dmft.dmft_tools import greens_functions_mixer as gf_mixer
-from solid_dmft.gw_embedding.bdft_converter import convert_gw_output
 from solid_dmft.io_tools import verify_input_params, dict_to_h5
 
 def _extract_quantity_per_inequiv(param_name, n_inequiv_shells, general_params):
@@ -149,7 +143,7 @@ def _determine_block_structure(sum_k, general_params, advanced_params, solver_ty
     # Applies manual selection of the solver struct
     if any(s is not None for s in advanced_params['pick_solver_struct']):
         mpi.report('selecting subset of orbital space for gf_struct_solver from input:')
-        mpi.report(advanced_params['pick_solver_struct'])
+        mpi.report(advanced_params['pick_solver_struct'][icrsh])
         sum_k.block_structure.pick_gf_struct_solver(advanced_params['pick_solver_struct'])
 
     # Applies the manual mapping to each inequivalent shell
