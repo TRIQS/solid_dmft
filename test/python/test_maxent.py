@@ -26,15 +26,15 @@ if mpi.is_master_node():
 # because of HubbardI so that numerical differences can dominate the comparison
 mpi.report('#########\nTesting impurity Gf Maxent\n#########')
 maxent_gf_imp.main('svo_hubbardI_basic/out/inp.h5', sum_spins=True,
-                   n_points_maxent=20, n_points_alpha=10)
+                   n_points_maxent=40, n_points_alpha=6, maxent_error=0.01)
 
 # Run sigma maxent
 mpi.report('#########\nTesting Sigma Maxent\n#########')
 maxent_sigma.main(external_path='svo_hubbardI_basic/out/inp.h5',
                   omega_min=-12, omega_max=12,
                   maxent_error=0.002, iteration=None,
-                  n_points_maxent=20,
-                  n_points_alpha=10,
+                  n_points_maxent=40,
+                  n_points_alpha=6,
                   analyzer='LineFitAnalyzer',
                   n_points_interp=501,
                   n_points_final=501,

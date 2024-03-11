@@ -79,6 +79,7 @@ add_test(NAME maxent_${test}
         )
 
 set_property(TEST maxent_${test} APPEND PROPERTY ENVIRONMENT PYTHONPATH=${PROJECT_BINARY_DIR}/python:$ENV{PYTHONPATH})
+set_property(TEST maxent_${test} APPEND PROPERTY DEPENDS "svo_hubbardI_basic")
 
 # ------------------------------#
 
@@ -100,3 +101,4 @@ foreach(test ${restart_integration_test})
 
   set_property(TEST restart_${test} APPEND PROPERTY ENVIRONMENT PYTHONPATH=${PROJECT_BINARY_DIR}/python:$ENV{PYTHONPATH})
 endforeach()
+set_property(TEST maxent_${test} APPEND PROPERTY DEPENDS "svo_hubbardI_basic")
