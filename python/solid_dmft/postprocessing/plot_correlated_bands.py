@@ -481,7 +481,7 @@ def get_kx_ky_FS(lower_right, upper_left, Z, tb, select=None, N_kxy=10, kz=0.0, 
 
     sheet_ct = 0
     for sheet in contours.keys():
-        for sec_per_sheet in range(np.shape(contours[sheet])[0]):
+        for sec_per_sheet in range(len(contours[sheet])):
             # once on 2D cubic mesh
             FS_kx_ky[sheet_ct] = np.vstack([_fract_ind_to_val(kx, contours[sheet][sec_per_sheet][:, 0]),
                                             _fract_ind_to_val(ky, contours[sheet][sec_per_sheet][:, 1]),
