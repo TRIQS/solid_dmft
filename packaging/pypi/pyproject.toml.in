@@ -23,9 +23,7 @@ classifiers = [
 dependencies = [
     "numpy",
     "scipy",
-    "pytest",
-    "scikit-image",
-    "argparse"
+    "pytest"
 ]
 
 [project.urls]

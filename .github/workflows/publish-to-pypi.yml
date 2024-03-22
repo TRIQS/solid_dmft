@@ -11,8 +11,7 @@ jobs:
     name: Build distribution 📦
     runs-on: ubuntu-latest
     container:   # we have to provide a working triqs installation to make the cmake step work
-      # image: materialstheory/solid_dmft_ci:${{github.ref_name}}
-      image: materialstheory/solid_dmft_ci:3.2.x
+      image: ghcr.io/triqs/solid_dmft_github_ci:3.2.x
 
     steps:
     - uses: actions/checkout@v4
@@ -28,11 +27,11 @@ jobs:
         --user
     - name: prepare python distribution
       run: |
-        mkdir build && cd build 
-        cmake ../
-        cp packaging/pypi/* ../
-        mv python/solid_dmft/version.py ../python/solid_dmft/version.py
-        rm ../python/solid_dmft/version.py.in
+        git config --global --add safe.directory ${GITHUB_WORKSPACE}
+        cmake -S . -B build/
+        cp build/packaging/pypi/* ./
+        mv build/python/solid_dmft/version.py ./python/solid_dmft/version.py
+        rm ./python/solid_dmft/version.py.in
     - name: Build a binary wheel and a source tarball
       run: python3 -m build
     - name: Store the distribution packages
