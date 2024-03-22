@@ -4,6 +4,17 @@ on:
   push:
     branches: [ 3.2.x ]
 
+env:
+  CMAKE_BUILD_PARALLEL_LEVEL: 2
+  CTEST_PARALLEL_LEVEL: 1
+  CTEST_OUTPUT_ON_FAILURE: 1
+  OMPI_ALLOW_RUN_AS_ROOT: 1
+  OMPI_ALLOW_RUN_AS_ROOT_CONFIRM: 1
+  OMPI_MCA_rmaps_base_oversubscribe: "yes"
+
+permissions:
+  contents: write
+
 jobs:
   build:
 
@@ -11,20 +22,18 @@ jobs:
       fail-fast: false
 
     runs-on: ubuntu-latest
-    container: materialstheory/solid_dmft_ci:3.2.x
+    container:
+      image: ghcr.io/triqs/solid_dmft_github_ci:3.2.x
 
     steps:
-      - uses: actions/checkout@v2
-        with: 
-          path: 'solid_dmft.src'
+      - uses: actions/checkout@v4
 
       - name: Build solid_dmft
         run: |
-          mkdir solid_dmft.build && cd solid_dmft.build && cmake ../solid_dmft.src -DMPIEXEC_PREFLAGS='--allow-run-as-root' 
-          make
+          cmake -S . -B build/
+          cmake --build build/ --verbose
 
       - name: Test solid_dmft
         run: |
-          cd solid_dmft.build
-          ctest --output-on-failure
+          cmake --build build/ --target test
 

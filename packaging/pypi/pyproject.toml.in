@@ -23,8 +23,7 @@ classifiers = [
 dependencies = [
     "numpy",
     "scipy",
-    "scikit-image",
-    "argparse"
+    "scikit-image"
 ]
 
 [project.urls]
