@@ -6,3 +6,9 @@ scikit-image
 numpydoc
 # From python 3.11 and newer, toml is part of standard implementation
 tomli
+# For documentation builds we additionaly require
+#sphinx
+#nbsphinx
+#sphinx_rtd_theme
+#myst_parser
+#linkify-it-py
