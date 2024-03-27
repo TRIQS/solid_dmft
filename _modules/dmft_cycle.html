@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>dmft_cycle &mdash; solid_dmft  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/plot_directive.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #7E588A" >
+            <a href="../index.html" class="icon icon-home"> solid_dmft
+            <img src="../_static/logo_no_text.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                3.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../install.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../install.html#installation-via-pip">Installation via pip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../install.html#manual-installation-via-cmake">Manual installation via CMake</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../install.html#docker-files-images">Docker files &amp; images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../install.html#version-compatibility">Version compatibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../install.html#custom-cmake-options">Custom CMake options</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../documentation.html">Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../documentation.html#code-structure">Code structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../documentation.html#dft-interface-notes">DFT interface notes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../md_notes/w90_interface.html">Wannier90 interface</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../md_notes/w90_interface.html#orbital-order-in-the-w90-converter">orbital order in the W90 converter</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../md_notes/vasp_csc.html">Interface to VASP</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../md_notes/vasp_csc.html#general-remarks">General remarks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../md_notes/vasp_csc.html#locproj-bug-for-individual-projections">LOCPROJ bug for individual projections:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../md_notes/vasp_csc.html#convergence-of-projectors-with-vasp">convergence of projectors with Vasp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../md_notes/vasp_csc.html#enabling-csc-calculations-with-wannier90-projectors">Enabling CSC calculations with Wannier90 projectors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../md_notes/vasp_csc.html#speeding-up-by-not-writing-projectors-at-every-step">Speeding up by not writing projectors at every step</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../cRPA_VASP/README.html">How to do cRPA calculations with VASP</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../cRPA_VASP/README.html#file-description">file description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../cRPA_VASP/README.html#workflow">Workflow:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../cRPA_VASP/README.html#important-flags">important flags:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../cRPA_VASP/README.html#convergency-tests">convergency tests:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../cRPA_VASP/README.html#parameterization-of-u-and-j-from-crpa-calculations">Parameterization of U and J from cRPA calculations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../cRPA_VASP/README.html#general-sidemarks">general sidemarks:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../cRPA_VASP/README.html#version-and-compilation">version and compilation:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../documentation.html#input-output">Input/Output</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../input_output/DMFT_input/input.html">Input</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../input_output/DMFT_input/general.html">[general]: General parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../input_output/DMFT_input/solver.html">[solver]: solver specific parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../input_output/DMFT_input/dft.html">[dft]: DFT related inputs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../input_output/DMFT_input/advanced.html">[advanced]: Advanced inputs</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../input_output/DMFT_output/results.html">Output / results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../input_output/DMFT_output/results.html#group-structure">Group structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../input_output/DMFT_output/results.html#subgroups">Subgroups</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../documentation.html#further-details-for-running">Further details for running</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../md_notes/docker.html">Docker</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../md_notes/docker.html#building-the-docker-image">Building the docker image</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../md_notes/docker.html#pulling-a-docker-image">Pulling a docker image</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../md_notes/docker.html#getting-docker-images-onto-cscs-daint">Getting docker images onto CSCS daint</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../md_notes/run_locally.html">Run on your machine</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../md_notes/run_locally.html#csc-calculations-locally">CSC calculations locally</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../md_notes/run_cluster.html">Running solid_dmft on a cluster</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../md_notes/run_cluster.html#running-on-cscs-daint">Running on CSCS daint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../md_notes/run_cluster.html#one-shot-job-on-daint">one shot job on daint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../md_notes/run_cluster.html#csc-calculations-on-daint">CSC calculations on daint</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../documentation.html#module-reference-manual">Module reference manual</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../_ref/csc_flow.html">csc_flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_ref/dft_managers.html">dft_managers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/dft_managers.mpi_helpers.html">dft_managers.mpi_helpers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/dft_managers.qe_manager.html">dft_managers.qe_manager</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/dft_managers.vasp_manager.html">dft_managers.vasp_manager</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../_ref/dmft_cycle.html">dmft_cycle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_ref/dmft_tools.html">dmft_tools</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/dmft_tools.afm_mapping.html">dmft_tools.afm_mapping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/dmft_tools.convergence.html">dmft_tools.convergence</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/dmft_tools.formatter.html">dmft_tools.formatter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/dmft_tools.greens_functions_mixer.html">dmft_tools.greens_functions_mixer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/dmft_tools.initial_self_energies.html">dmft_tools.initial_self_energies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/dmft_tools.interaction_hamiltonian.html">dmft_tools.interaction_hamiltonian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/dmft_tools.legendre_filter.html">dmft_tools.legendre_filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/dmft_tools.manipulate_chemical_potential.html">dmft_tools.manipulate_chemical_potential</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/dmft_tools.matheval.html">dmft_tools.matheval</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/dmft_tools.observables.html">dmft_tools.observables</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/dmft_tools.results_to_archive.html">dmft_tools.results_to_archive</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/dmft_tools.solver.html">dmft_tools.solver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../_ref/io_tools.html">io_tools</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/io_tools.dict_to_h5.html">io_tools.dict_to_h5</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/io_tools.postproc_toml_dict.html">io_tools.postproc_toml_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/io_tools.verify_input_params.html">io_tools.verify_input_params</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../_ref/postprocessing.html">postprocessing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/postprocessing.eval_U_cRPA_RESPACK.html">postprocessing.eval_U_cRPA_RESPACK</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/postprocessing.eval_U_cRPA_Vasp.html">postprocessing.eval_U_cRPA_Vasp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/postprocessing.maxent_gf_imp.html">postprocessing.maxent_gf_imp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/postprocessing.maxent_gf_latt.html">postprocessing.maxent_gf_latt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/postprocessing.maxent_sigma.html">postprocessing.maxent_sigma</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/postprocessing.pade_sigma.html">postprocessing.pade_sigma</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/postprocessing.plot_correlated_bands.html">postprocessing.plot_correlated_bands</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../_ref/util.html">util</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/util.symmetrize_gamma_file.html">util.symmetrize_gamma_file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/util.write_kslice_to_h5.html">util.write_kslice_to_h5</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/SVO_os_qe/tutorial.html">1. OS with QE/W90 and cthyb: SrVO3 MIT</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/SVO_os_qe/tutorial.html#1.-Starting-out-with-DMFT">1. Starting out with DMFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/SVO_os_qe/tutorial.html#2.-Looking-at-the-Metal-Insulator-Transition">2. Looking at the Metal-Insulator Transition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/SVO_os_qe/tutorial.html#3.-Refining-the-diagram">3. Refining the diagram</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/SVO_os_qe/tutorial.html#4.-Plotting-the-spectral-function">4. Plotting the spectral function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/SVO_os_qe/tutorial.html#5-Visualizing-the-MIT">5 Visualizing the MIT</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html">2. CSC with VASP PLOs: charge order in PrNiO3</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#1.-Running-the-initial-scf-DFT-calculation">1. Running the initial scf DFT calculation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#2.-Running-the-CSC-DMFT-calculations">2. Running the CSC DMFT calculations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Input-files-for-CSC-DMFT-calculations">Input files for CSC DMFT calculations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Starting-the-calculations">Starting the calculations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Analyzing-the-projectors">Analyzing the projectors</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Plotting-the-results:-observables">3. Plotting the results: observables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green’s-function">4. Plotting the results: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Next-steps-to-try">5. Next steps to try</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/Ce2O3_csc_w90/tutorial.html">3. CSC with QE/W90 and HubbardI: total energy in Ce2O3</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/Ce2O3_csc_w90/tutorial.html#1.-Input-file-preparation">1. Input file preparation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/Ce2O3_csc_w90/tutorial.html#DFT-files">DFT files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/Ce2O3_csc_w90/tutorial.html#DMFT">DMFT</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/Ce2O3_csc_w90/tutorial.html#2.-Running-DFT+DMFT">2. Running DFT+DMFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/Ce2O3_csc_w90/tutorial.html#3.-Non-interacting-Hamiltonian-and-convergence-analysis">3. Non-interacting Hamiltonian and convergence analysis</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/Ce2O3_csc_w90/tutorial.html#Tight-binding-Hamiltonian">Tight-binding Hamiltonian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/Ce2O3_csc_w90/tutorial.html#Convergence">Convergence</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/NNO_os_plo_mag/tutorial.html">4. OS with VASP/PLOs and cthyb: AFM state of NdNiO2</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/NNO_os_plo_mag/tutorial.html#1.-Run-DFT">1. Run DFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/NNO_os_plo_mag/tutorial.html#2.-Creating-the-hdf5-archive-/-DMFT-input">2. Creating the hdf5 archive / DMFT input</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/NNO_os_plo_mag/tutorial.html#3.-Running-the-AFM-calculation">3. Running the AFM calculation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/NNO_os_plo_mag/tutorial.html#5.-Multiplet-analysis">5. Multiplet analysis</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/correlated_bandstructure/plot_correlated_bands.html">5. Plotting the spectral function</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/correlated_bandstructure/plot_correlated_bands.html#1.-Configuration">1. Configuration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/correlated_bandstructure/plot_correlated_bands.html#Basic-options">Basic options</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/correlated_bandstructure/plot_correlated_bands.html#Wannier90">Wannier90</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/correlated_bandstructure/plot_correlated_bands.html#BZ-configuration">BZ configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/correlated_bandstructure/plot_correlated_bands.html#Self-energy">Self-energy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/correlated_bandstructure/plot_correlated_bands.html#Plotting-options">Plotting options</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/correlated_bandstructure/plot_correlated_bands.html#2.-Run-and-Plotting">2. Run and Plotting</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../issues.html">Support &amp; contribute</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../issues.html#seeking-help">Seeking help</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../issues.html#improving-solid-dmft">Improving solid_dmft</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../issues.html#reporting-issues">Reporting issues</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ChangeLog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-3-2-0">Version 3.2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#general">General</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#fix">fix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#build">build</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#feat">feat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#doc">doc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#test">test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-3-1-5">Version 3.1.5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-3-1-4">Version 3.1.4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-3-1-3">Version 3.1.3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-3-1-2">Version 3.1.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-3-1-1">Version 3.1.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-3-1-0">Version 3.1.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-3-0-0">Version 3.0.0</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #7E588A" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">solid_dmft</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Module code</a> &raquo;</li>
+      <li>dmft_cycle</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for dmft_cycle</h1><div class="highlight"><pre>
+<span></span><span class="c1">################################################################################</span>
+<span class="c1">#</span>
+<span class="c1"># solid_dmft - A versatile python wrapper to perform DFT+DMFT calculations</span>
+<span class="c1">#              utilizing the TRIQS software library</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (C) 2018-2020, ETH Zurich</span>
+<span class="c1"># Copyright (C) 2021, The Simons Foundation</span>
+<span class="c1">#      authors: A. Hampel, M. Merkel, and S. Beck</span>
+<span class="c1">#</span>
+<span class="c1"># solid_dmft is free software: you can redistribute it and/or modify it under the</span>
+<span class="c1"># terms of the GNU General Public License as published by the Free Software</span>
+<span class="c1"># Foundation, either version 3 of the License, or (at your option) any later</span>
+<span class="c1"># version.</span>
+<span class="c1">#</span>
+<span class="c1"># solid_dmft is distributed in the hope that it will be useful, but WITHOUT ANY</span>
+<span class="c1"># WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A</span>
+<span class="c1"># PARTICULAR PURPOSE. See the GNU General Public License for more details.</span>
+
+<span class="c1"># You should have received a copy of the GNU General Public License along with</span>
+<span class="c1"># solid_dmft (in the file COPYING.txt in this directory). If not, see</span>
+<span class="c1"># &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="c1">#</span>
+<span class="c1">################################################################################</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">main DMFT cycle, DMFT step, and helper functions</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="c1"># system</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">timeit</span> <span class="kn">import</span> <span class="n">default_timer</span> <span class="k">as</span> <span class="n">timer</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># triqs</span>
+<span class="kn">from</span> <span class="nn">triqs.operators.util.observables</span> <span class="kn">import</span> <span class="n">S_op</span><span class="p">,</span> <span class="n">N_op</span>
+<span class="kn">from</span> <span class="nn">triqs.version</span> <span class="kn">import</span> <span class="n">git_hash</span> <span class="k">as</span> <span class="n">triqs_hash</span>
+<span class="kn">from</span> <span class="nn">triqs.version</span> <span class="kn">import</span> <span class="n">version</span> <span class="k">as</span> <span class="n">triqs_version</span>
+<span class="kn">from</span> <span class="nn">h5</span> <span class="kn">import</span> <span class="n">HDFArchive</span>
+<span class="kn">import</span> <span class="nn">triqs.utility.mpi</span> <span class="k">as</span> <span class="nn">mpi</span>
+<span class="kn">from</span> <span class="nn">triqs.gf</span> <span class="kn">import</span> <span class="n">Gf</span><span class="p">,</span> <span class="n">make_hermitian</span><span class="p">,</span> <span class="n">MeshReFreq</span><span class="p">,</span> <span class="n">MeshImFreq</span>
+<span class="kn">from</span> <span class="nn">triqs.gf.tools</span> <span class="kn">import</span> <span class="n">inverse</span>
+<span class="kn">from</span> <span class="nn">triqs_dft_tools</span> <span class="kn">import</span> <span class="n">BlockStructure</span>
+<span class="kn">from</span> <span class="nn">triqs_dft_tools.sumk_dft</span> <span class="kn">import</span> <span class="n">SumkDFT</span>
+
+<span class="c1"># own modules</span>
+<span class="kn">from</span> <span class="nn">solid_dmft.version</span> <span class="kn">import</span> <span class="n">solid_dmft_hash</span>
+<span class="kn">from</span> <span class="nn">solid_dmft.version</span> <span class="kn">import</span> <span class="n">version</span> <span class="k">as</span> <span class="n">solid_dmft_version</span>
+<span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools.observables</span> <span class="kn">import</span> <span class="p">(</span><span class="n">calc_dft_kin_en</span><span class="p">,</span> <span class="n">add_dmft_observables</span><span class="p">,</span> <span class="n">calc_bandcorr_man</span><span class="p">,</span> <span class="n">write_obs</span><span class="p">,</span>
+                                         <span class="n">add_dft_values_as_zeroth_iteration</span><span class="p">,</span> <span class="n">write_header_to_file</span><span class="p">,</span> <span class="n">prep_observables</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools.solver</span> <span class="kn">import</span> <span class="n">SolverStructure</span>
+<span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools</span> <span class="kn">import</span> <span class="n">convergence</span>
+<span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools</span> <span class="kn">import</span> <span class="n">formatter</span>
+<span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools</span> <span class="kn">import</span> <span class="n">interaction_hamiltonian</span>
+<span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools</span> <span class="kn">import</span> <span class="n">results_to_archive</span>
+<span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools</span> <span class="kn">import</span> <span class="n">afm_mapping</span>
+<span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools</span> <span class="kn">import</span> <span class="n">manipulate_chemical_potential</span> <span class="k">as</span> <span class="n">manipulate_mu</span>
+<span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools</span> <span class="kn">import</span> <span class="n">initial_self_energies</span> <span class="k">as</span> <span class="n">initial_sigma</span>
+<span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools</span> <span class="kn">import</span> <span class="n">greens_functions_mixer</span> <span class="k">as</span> <span class="n">gf_mixer</span>
+<span class="kn">from</span> <span class="nn">solid_dmft.io_tools</span> <span class="kn">import</span> <span class="n">verify_input_params</span><span class="p">,</span> <span class="n">dict_to_h5</span>
+
+<span class="k">def</span> <span class="nf">_extract_quantity_per_inequiv</span><span class="p">(</span><span class="n">param_name</span><span class="p">,</span> <span class="n">n_inequiv_shells</span><span class="p">,</span> <span class="n">general_params</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For quantities that can be different for each inequivalent shell, this</span>
+<span class="sd">    function checks if the quantity is a single value or a list of the correct</span>
+<span class="sd">    length. If just a single value is given, this value is applied to each shell.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    param_name : str</span>
+<span class="sd">        name of the parameter to be checked</span>
+<span class="sd">    n_inequiv_shells : int</span>
+<span class="sd">        number of inequivalent shells</span>
+<span class="sd">    general_params : dict</span>
+<span class="sd">        general parameters as a dict</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    general_params : dict</span>
+<span class="sd">        updated general parameters as a dict</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+
+    <span class="k">def</span> <span class="nf">formatter</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{:.2f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="n">param</span> <span class="o">=</span> <span class="n">general_params</span><span class="p">[</span><span class="n">param_name</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;Assuming </span><span class="si">{}</span><span class="s1"> = &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">param_name</span><span class="p">)</span>
+                <span class="o">+</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> for all correlated shells&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">formatter</span><span class="p">(</span><span class="n">param</span><span class="p">)))</span>
+        <span class="n">general_params</span><span class="p">[</span><span class="n">param_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">param</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_inequiv_shells</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">param</span><span class="p">)</span> <span class="o">==</span> <span class="n">n_inequiv_shells</span><span class="p">:</span>
+        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">param_name</span><span class="si">}</span><span class="s1"> list for correlated shells: &#39;</span>
+                   <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">formatter</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">param</span><span class="p">]))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">param_name</span><span class="si">}</span><span class="s1"> must be list of length &#39;</span>
+                         <span class="sa">f</span><span class="s1">&#39;n_inequiv_shells=</span><span class="si">{</span><span class="n">n_inequiv_shells</span><span class="si">}</span><span class="s1"> &#39;</span>
+                         <span class="s1">&#39;or single value but is &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">general_params</span><span class="p">[</span><span class="n">param_name</span><span class="p">]))</span>
+
+    <span class="k">return</span> <span class="n">general_params</span>
+
+<span class="k">def</span> <span class="nf">_determine_block_structure</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">advanced_params</span><span class="p">,</span> <span class="n">solver_type_per_imp</span><span class="p">,</span> <span class="n">dens_mat</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Determines block structrure and degenerate deg_shells</span>
+<span class="sd">    computes first DFT density matrix to determine block structure and changes</span>
+<span class="sd">    the density matrix according to needs i.e. magnetic calculations, or keep</span>
+<span class="sd">    off-diag elements</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sum_k : SumK Object instances</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    sum_k : SumK Object instances</span>
+<span class="sd">        updated sum_k Object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> *** Determination of block structure ***&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Adds spin degeneracies if not spin-orbit coupled</span>
+    <span class="k">if</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">SO</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">sum_k</span><span class="o">.</span><span class="n">block_structure</span><span class="o">.</span><span class="n">deg_shells</span> <span class="o">=</span> <span class="p">[[[</span><span class="s1">&#39;up_0&#39;</span><span class="p">,</span> <span class="s1">&#39;down_0&#39;</span><span class="p">]]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">)]</span>
+
+    <span class="c1"># Evaluates degeneracies for ftps</span>
+    <span class="n">imp_ftps</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">solver_type_per_imp</span><span class="p">)</span> <span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="s1">&#39;ftps&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">imp_ftps</span><span class="p">:</span>
+        <span class="n">mock_sumk</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">sum_k</span><span class="p">)</span>
+        <span class="n">mock_sumk</span><span class="o">.</span><span class="n">analyse_block_structure</span><span class="p">(</span><span class="n">dm</span><span class="o">=</span><span class="n">dens_mat</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;block_threshold&#39;</span><span class="p">],</span> <span class="n">include_shells</span><span class="o">=</span><span class="n">imp_ftps</span><span class="p">)</span>
+        <span class="n">deg_orbs_ftps</span> <span class="o">=</span> <span class="p">[</span><span class="n">mock_sumk</span><span class="o">.</span><span class="n">deg_shells</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span> <span class="k">if</span> <span class="n">icrsh</span> <span class="ow">in</span> <span class="n">imp_ftps</span> <span class="k">else</span> <span class="kc">None</span>
+                         <span class="k">for</span> <span class="n">icrsh</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">)]</span>
+        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;Block structure written to &quot;deg_orbs_ftps&quot;:&#39;</span><span class="p">)</span>
+        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="n">deg_orbs_ftps</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">deg_orbs_ftps</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># Only removes the off-diagonal terms for the selected impurities</span>
+    <span class="n">imp_to_analyze</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">offdiag</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;enforce_off_diag&#39;</span><span class="p">])</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">offdiag</span><span class="p">]</span>
+    <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;using 1-particle density matrix and Hloc (atomic levels) to determine the block structure&#39;</span><span class="p">)</span>
+    <span class="n">sum_k</span><span class="o">.</span><span class="n">analyse_block_structure</span><span class="p">(</span><span class="n">dm</span><span class="o">=</span><span class="n">dens_mat</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;block_threshold&#39;</span><span class="p">],</span> <span class="n">include_shells</span><span class="o">=</span><span class="n">imp_to_analyze</span><span class="p">)</span>
+
+    <span class="c1"># Applies manual selection of the solver struct</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">s</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">advanced_params</span><span class="p">[</span><span class="s1">&#39;pick_solver_struct&#39;</span><span class="p">]):</span>
+        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;selecting subset of orbital space for gf_struct_solver from input:&#39;</span><span class="p">)</span>
+        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="n">advanced_params</span><span class="p">[</span><span class="s1">&#39;pick_solver_struct&#39;</span><span class="p">][</span><span class="n">icrsh</span><span class="p">])</span>
+        <span class="n">sum_k</span><span class="o">.</span><span class="n">block_structure</span><span class="o">.</span><span class="n">pick_gf_struct_solver</span><span class="p">(</span><span class="n">advanced_params</span><span class="p">[</span><span class="s1">&#39;pick_solver_struct&#39;</span><span class="p">])</span>
+
+    <span class="c1"># Applies the manual mapping to each inequivalent shell</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">s</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">advanced_params</span><span class="p">[</span><span class="s1">&#39;map_solver_struct&#39;</span><span class="p">]):</span>
+        <span class="n">sum_k</span><span class="o">.</span><span class="n">block_structure</span><span class="o">.</span><span class="n">map_gf_struct_solver</span><span class="p">(</span><span class="n">advanced_params</span><span class="p">[</span><span class="s1">&#39;map_solver_struct&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">s</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">advanced_params</span><span class="p">[</span><span class="s1">&#39;mapped_solver_struct_degeneracies&#39;</span><span class="p">]):</span>
+            <span class="n">sum_k</span><span class="o">.</span><span class="n">block_structure</span><span class="o">.</span><span class="n">deg_shells</span> <span class="o">=</span> <span class="n">advanced_params</span><span class="p">[</span><span class="s1">&#39;mapped_solver_struct_degeneracies&#39;</span><span class="p">]</span>
+
+    <span class="c1"># if we want to do a magnetic calculation we need to lift up/down degeneracy</span>
+    <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;magnetic&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">SO</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;Magnetic calculation: removing the spin degeneracy from the block structure&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">icrsh</span><span class="p">,</span> <span class="n">deg_shells_site</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">block_structure</span><span class="o">.</span><span class="n">deg_shells</span><span class="p">):</span>
+            <span class="n">deg_shell_mag</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="c1"># find degenerate orbitals that do not simply connect different spin channels</span>
+            <span class="k">for</span> <span class="n">deg_orbs</span> <span class="ow">in</span> <span class="n">deg_shells_site</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">spin</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;up&#39;</span><span class="p">,</span> <span class="s1">&#39;down&#39;</span><span class="p">]:</span>
+                    <span class="c1"># create a list of all up / down orbitals</span>
+                    <span class="n">deg</span> <span class="o">=</span> <span class="p">[</span><span class="n">orb</span> <span class="k">for</span> <span class="n">orb</span> <span class="ow">in</span> <span class="n">deg_orbs</span> <span class="k">if</span> <span class="n">spin</span> <span class="ow">in</span> <span class="n">orb</span><span class="p">]</span>
+                    <span class="c1"># if longer than one than we have two deg orbitals also in a magnetic calculation</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">deg</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="n">deg_shell_mag</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">deg</span><span class="p">)</span>
+            <span class="n">sum_k</span><span class="o">.</span><span class="n">block_structure</span><span class="o">.</span><span class="n">deg_shells</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span> <span class="o">=</span> <span class="n">deg_shell_mag</span>
+    <span class="c1"># for SOC we remove all degeneracies</span>
+    <span class="k">elif</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">SO</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">sum_k</span><span class="o">.</span><span class="n">block_structure</span><span class="o">.</span><span class="n">deg_shells</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">)]</span>
+
+    <span class="k">return</span> <span class="n">sum_k</span><span class="p">,</span> <span class="n">deg_orbs_ftps</span>
+
+
+<span class="k">def</span> <span class="nf">_calculate_rotation_matrix</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Applies rotation matrix to make the DMFT calculations easier for the solver.</span>
+<span class="sd">    Possible are rotations diagonalizing either the local Hamiltonian or the</span>
+<span class="sd">    density. Diagonalizing the density has not proven really helpful but</span>
+<span class="sd">    diagonalizing the local Hamiltonian has.</span>
+<span class="sd">    Note that the interaction Hamiltonian has to be rotated if it is not fully</span>
+<span class="sd">    orbital-gauge invariant (only the Kanamori fulfills that).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    general_params : dict</span>
+<span class="sd">        general parameters as a dict</span>
+<span class="sd">    sum_k : SumkDFT object</span>
+<span class="sd">        Sumk Object</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    sum_k : SumkDFT Object</span>
+<span class="sd">        updated Sumk object with the new rotation matrices</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Extracts new rotation matrices from density_mat or local Hamiltonian</span>
+    <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;set_rot&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;hloc&#39;</span><span class="p">:</span>
+        <span class="n">q_diag</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">eff_atomic_levels</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;set_rot&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;den&#39;</span><span class="p">:</span>
+        <span class="n">q_diag</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">density_matrix</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;using_gf&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Parameter set_rot set to wrong value.&#39;</span><span class="p">)</span>
+
+    <span class="n">chnl</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">spin_block_names</span><span class="p">[</span><span class="n">sum_k</span><span class="o">.</span><span class="n">SO</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">rot_mat</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">icrsh</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_corr_shells</span><span class="p">):</span>
+        <span class="n">ish</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">corr_to_inequiv</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span>
+        <span class="n">eigvec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">q_diag</span><span class="p">[</span><span class="n">ish</span><span class="p">][</span><span class="n">chnl</span><span class="p">]))[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">use_rotations</span><span class="p">:</span>
+            <span class="n">rot_mat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">rot_mat</span><span class="p">[</span><span class="n">icrsh</span><span class="p">],</span> <span class="n">eigvec</span><span class="p">)</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">rot_mat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">eigvec</span> <span class="p">)</span>
+
+    <span class="n">sum_k</span><span class="o">.</span><span class="n">rot_mat</span> <span class="o">=</span> <span class="n">rot_mat</span>
+    <span class="c1"># in case sum_k.use_rotations == False before:</span>
+    <span class="n">sum_k</span><span class="o">.</span><span class="n">use_rotations</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="c1"># sum_k.eff_atomic_levels() needs to be recomputed if rot_mat were changed</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="s2">&quot;Hsumk&quot;</span><span class="p">):</span> <span class="nb">delattr</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="s2">&quot;Hsumk&quot;</span><span class="p">)</span>
+    <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;Updating rotation matrices using dft </span><span class="si">{}</span><span class="s1"> eigenbasis to maximise sign&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;set_rot&#39;</span><span class="p">]))</span>
+
+    <span class="c1"># Prints matrices</span>
+    <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">New rotation matrices&#39;</span><span class="p">)</span>
+    <span class="n">formatter</span><span class="o">.</span><span class="n">print_rotation_matrix</span><span class="p">(</span><span class="n">sum_k</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">sum_k</span>
+
+
+<span class="k">def</span> <span class="nf">_chi_setup</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">solver_params</span><span class="p">,</span> <span class="n">map_imp_solver</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sum_k : SumkDFT object</span>
+<span class="sd">        Sumk object with the information about the correct block structure</span>
+<span class="sd">    solver_params: solver params dict</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ops_chi_measurement : list of one-particle operators to measure per impurity</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ops_chi_measure</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span>
+
+    <span class="k">for</span> <span class="n">icrsh</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">):</span>
+        <span class="n">isolv</span> <span class="o">=</span> <span class="n">map_imp_solver</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;measure_chi&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">solver_params</span><span class="p">[</span><span class="n">isolv</span><span class="p">]</span> <span class="ow">or</span> <span class="n">solver_params</span><span class="p">[</span><span class="n">isolv</span><span class="p">][</span><span class="s1">&#39;measure_chi&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="n">n_orb</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">corr_shells</span><span class="p">[</span><span class="n">icrsh</span><span class="p">][</span><span class="s1">&#39;dim&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">solver_params</span><span class="p">[</span><span class="n">isolv</span><span class="p">][</span><span class="s1">&#39;measure_chi&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;SzSz&#39;</span><span class="p">:</span>
+            <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Imp </span><span class="si">{</span><span class="n">icrsh</span><span class="si">}</span><span class="s1"> with solver #</span><span class="si">{</span><span class="n">isolv</span><span class="si">}</span><span class="s1">: Setting up Chi(S_z(tau),S_z(0)) measurement&#39;</span><span class="p">)</span>
+
+            <span class="n">ops_chi_measure</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span> <span class="o">=</span> <span class="n">S_op</span><span class="p">(</span><span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="n">spin_names</span><span class="o">=</span><span class="n">sum_k</span><span class="o">.</span><span class="n">spin_block_names</span><span class="p">[</span><span class="n">sum_k</span><span class="o">.</span><span class="n">SO</span><span class="p">],</span>
+                                          <span class="n">n_orb</span><span class="o">=</span><span class="n">n_orb</span><span class="p">,</span> <span class="n">map_operator_structure</span><span class="o">=</span><span class="n">sum_k</span><span class="o">.</span><span class="n">sumk_to_solver</span><span class="p">[</span><span class="n">icrsh</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">solver_params</span><span class="p">[</span><span class="n">isolv</span><span class="p">][</span><span class="s1">&#39;measure_chi&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;NN&#39;</span><span class="p">:</span>
+            <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Imp </span><span class="si">{</span><span class="n">icrsh</span><span class="si">}</span><span class="s1"> with solver #</span><span class="si">{</span><span class="n">isolv</span><span class="si">}</span><span class="s1">: Setting up Chi(n(tau),n(0)) measurement&#39;</span><span class="p">)</span>
+
+            <span class="n">ops_chi_measure</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span> <span class="o">=</span> <span class="n">N_op</span><span class="p">(</span><span class="n">spin_names</span><span class="o">=</span><span class="n">sum_k</span><span class="o">.</span><span class="n">spin_block_names</span><span class="p">[</span><span class="n">sum_k</span><span class="o">.</span><span class="n">SO</span><span class="p">],</span>
+                                          <span class="n">n_orb</span><span class="o">=</span><span class="n">n_orb</span><span class="p">,</span> <span class="n">map_operator_structure</span><span class="o">=</span><span class="n">sum_k</span><span class="o">.</span><span class="n">sumk_to_solver</span><span class="p">[</span><span class="n">icrsh</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">ops_chi_measure</span>
+
+
+<div class="viewcode-block" id="dmft_cycle"><a class="viewcode-back" href="../_ref/dmft_cycle.html#dmft_cycle.dmft_cycle">[docs]</a><span class="k">def</span> <span class="nf">dmft_cycle</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">solver_params</span><span class="p">,</span> <span class="n">advanced_params</span><span class="p">,</span> <span class="n">dft_params</span><span class="p">,</span>
+               <span class="n">n_iter</span><span class="p">,</span> <span class="n">dft_irred_kpt_indices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dft_energy</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    main dmft cycle that works for one shot and CSC equally</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    general_params : dict</span>
+<span class="sd">        general parameters as a dict</span>
+<span class="sd">    solver_params : dict</span>
+<span class="sd">        solver parameters as a dict</span>
+<span class="sd">    advanced_params : dict</span>
+<span class="sd">        advanced parameters as a dict</span>
+<span class="sd">    observables : dict</span>
+<span class="sd">        current observable array for calculation</span>
+<span class="sd">    n_iter : int</span>
+<span class="sd">        number of iterations to be executed</span>
+<span class="sd">    dft_irred_kpt_indices: iterable of int</span>
+<span class="sd">        If given, writes density correction for csc calculations only for</span>
+<span class="sd">        irreducible kpoints</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    ---------</span>
+<span class="sd">    observables : dict</span>
+<span class="sd">        updated observable array for calculation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Creates real- or imaginary-frequency mesh to store Green functions on</span>
+    <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;Running solid_dmft on imag-freq grid because &quot;general.beta&quot; specified&#39;</span><span class="p">)</span>
+        <span class="n">sumk_mesh</span> <span class="o">=</span> <span class="n">MeshImFreq</span><span class="p">(</span><span class="n">beta</span><span class="o">=</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">],</span>
+                               <span class="n">S</span><span class="o">=</span><span class="s1">&#39;Fermion&#39;</span><span class="p">,</span>
+                               <span class="n">n_iw</span><span class="o">=</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;n_iw&#39;</span><span class="p">])</span>
+        <span class="n">broadening</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;Running solid_dmft on real-freq grid because &quot;general.beta&quot; not specified&#39;</span><span class="p">)</span>
+        <span class="n">sumk_mesh</span> <span class="o">=</span> <span class="n">MeshReFreq</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;w_range&#39;</span><span class="p">],</span>
+                               <span class="n">n_w</span><span class="o">=</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;n_w&#39;</span><span class="p">])</span>
+        <span class="n">broadening</span> <span class="o">=</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;eta&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Creates SumkDFT object</span>
+    <span class="n">sum_k</span> <span class="o">=</span> <span class="n">SumkDFT</span><span class="p">(</span><span class="n">hdf_file</span><span class="o">=</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;jobname&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;/&#39;</span><span class="o">+</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;seedname&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;.h5&#39;</span><span class="p">,</span>
+                    <span class="n">mesh</span><span class="o">=</span><span class="n">sumk_mesh</span><span class="p">,</span> <span class="n">use_dft_blocks</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">h_field</span><span class="o">=</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;h_field&#39;</span><span class="p">])</span>
+
+    <span class="n">iteration_offset</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># determine chemical potential for bare DFT sum_k object</span>
+    <span class="k">if</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
+        <span class="n">archive</span> <span class="o">=</span> <span class="n">HDFArchive</span><span class="p">(</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;jobname&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;/&#39;</span><span class="o">+</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;seedname&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;.h5&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;DMFT_results&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">archive</span><span class="p">:</span>
+            <span class="n">archive</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;DMFT_results&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;last_iter&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_results&#39;</span><span class="p">]:</span>
+            <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_results&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;last_iter&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;DMFT_input&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">archive</span><span class="p">:</span>
+            <span class="n">archive</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;DMFT_input&#39;</span><span class="p">)</span>
+            <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input&#39;</span><span class="p">][</span><span class="s1">&#39;program&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;solid_dmft&#39;</span>
+            <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;solver&#39;</span><span class="p">)</span>
+            <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">)</span>
+            <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input&#39;</span><span class="p">][</span><span class="s1">&#39;version&#39;</span><span class="p">][</span><span class="s1">&#39;triqs_hash&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">triqs_hash</span>
+            <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input&#39;</span><span class="p">][</span><span class="s1">&#39;version&#39;</span><span class="p">][</span><span class="s1">&#39;triqs_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">triqs_version</span>
+            <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input&#39;</span><span class="p">][</span><span class="s1">&#39;version&#39;</span><span class="p">][</span><span class="s1">&#39;solid_dmft_hash&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">solid_dmft_hash</span>
+            <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input&#39;</span><span class="p">][</span><span class="s1">&#39;version&#39;</span><span class="p">][</span><span class="s1">&#39;solid_dmft_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">solid_dmft_version</span>
+
+        <span class="k">if</span> <span class="s1">&#39;iteration_count&#39;</span> <span class="ow">in</span> <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_results&#39;</span><span class="p">]:</span>
+            <span class="n">iteration_offset</span> <span class="o">=</span> <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_results/iteration_count&#39;</span><span class="p">]</span>
+            <span class="n">sum_k</span><span class="o">.</span><span class="n">chemical_potential</span> <span class="o">=</span> <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_results/last_iter/chemical_potential_post&#39;</span><span class="p">]</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;RESTARTING DMFT RUN at iteration </span><span class="si">{</span><span class="n">iteration_offset</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1"> using last self-energy&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;INITIAL DMFT RUN&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="o">*</span><span class="mi">80</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">archive</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">iteration_offset</span> <span class="o">=</span> <span class="n">mpi</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">iteration_offset</span><span class="p">)</span>
+    <span class="n">sum_k</span><span class="o">.</span><span class="n">chemical_potential</span> <span class="o">=</span> <span class="n">mpi</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">chemical_potential</span><span class="p">)</span>
+
+    <span class="c1"># Checks the general parameters that are impurity-dependent and ensures they are a list</span>
+    <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;Checking parameters that are impurity-dependent&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;U&#39;</span><span class="p">,</span> <span class="s1">&#39;J&#39;</span><span class="p">,</span> <span class="s1">&#39;U_prime&#39;</span><span class="p">,</span> <span class="s1">&#39;ratio_F4_F2&#39;</span><span class="p">,</span> <span class="s1">&#39;h_int_type&#39;</span><span class="p">,</span> <span class="s1">&#39;enforce_off_diag&#39;</span><span class="p">,</span> <span class="s1">&#39;dc_type&#39;</span><span class="p">]:</span>
+        <span class="n">general_params</span> <span class="o">=</span> <span class="n">_extract_quantity_per_inequiv</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">,</span> <span class="n">general_params</span><span class="p">)</span>
+    <span class="c1"># Same for advanced params</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;dc_U&#39;</span><span class="p">,</span> <span class="s1">&#39;dc_J&#39;</span><span class="p">,</span> <span class="s1">&#39;dc_fixed_occ&#39;</span><span class="p">,</span> <span class="s1">&#39;map_solver_struct&#39;</span><span class="p">,</span> <span class="s1">&#39;pick_solver_struct&#39;</span><span class="p">,</span> <span class="s1">&#39;mapped_solver_struct_degeneracies&#39;</span><span class="p">]:</span>
+        <span class="n">advanced_params</span> <span class="o">=</span> <span class="n">_extract_quantity_per_inequiv</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">,</span> <span class="n">advanced_params</span><span class="p">)</span>
+
+    <span class="c1"># Checks that all impurities have an associated solver</span>
+    <span class="c1"># and creates a map between impurity index and solver index</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">solver_params</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">solver_params</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;idx_impurities&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">map_imp_solver</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">all_idx_imp</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">solver_params</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;idx_impurities&#39;</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">all_idx_imp</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;All impurities must be listed exactly once in solver.idx_impurities&#39;</span>
+                             <span class="sa">f</span><span class="s1">&#39;but instead got </span><span class="si">{</span><span class="n">all_idx_imp</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">map_imp_solver</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">iineq</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">isolver</span><span class="p">,</span> <span class="n">entry</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">solver_params</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">iineq</span> <span class="ow">in</span> <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;idx_impurities&#39;</span><span class="p">]:</span>
+                    <span class="n">map_imp_solver</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">isolver</span><span class="p">)</span>
+                    <span class="k">break</span>
+    <span class="n">solver_type_per_imp</span> <span class="o">=</span> <span class="p">[</span><span class="n">solver_params</span><span class="p">[</span><span class="n">map_imp_solver</span><span class="p">[</span><span class="n">iineq</span><span class="p">]][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">iineq</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">)]</span>
+    <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Solver type per impurity: </span><span class="si">{</span><span class="n">solver_type_per_imp</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Checks all parameters that need to be checked against info in SumkDFT object</span>
+    <span class="n">verify_input_params</span><span class="o">.</span><span class="n">verify_h5_dependent</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">solver_type_per_imp</span><span class="p">,</span> <span class="n">general_params</span><span class="p">)</span>
+
+    <span class="c1"># Initializes chemical potential with mu_initial_guess if this is the first iteration</span>
+    <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;mu_initial_guess&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">iteration_offset</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">sum_k</span><span class="o">.</span><span class="n">chemical_potential</span> <span class="o">=</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;mu_initial_guess&#39;</span><span class="p">]</span>
+        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Initial chemical potential set to </span><span class="si">{:.3f}</span><span class="s1"> eV</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">chemical_potential</span><span class="p">))</span>
+
+    <span class="n">dft_mu</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">calc_mu</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;prec_mu&#39;</span><span class="p">],</span> <span class="n">method</span><span class="o">=</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;calc_mu_method&#39;</span><span class="p">],</span>
+                           <span class="n">broadening</span><span class="o">=</span><span class="n">broadening</span><span class="p">)</span>
+
+    <span class="c1"># calculate E_kin_dft for one shot calculations</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;csc&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;calc_energies&#39;</span><span class="p">]:</span>
+        <span class="n">E_kin_dft</span> <span class="o">=</span> <span class="n">calc_dft_kin_en</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span> <span class="n">dft_mu</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">E_kin_dft</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># check for previous broyden data oterhwise initialize it:</span>
+    <span class="k">if</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">()</span> <span class="ow">and</span>  <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;g0_mix_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;broyden&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;broyler&#39;</span> <span class="ow">in</span> <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_results&#39;</span><span class="p">]:</span>
+            <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_results&#39;</span><span class="p">][</span><span class="s1">&#39;broyler&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;mu&#39;</span> <span class="p">:</span> <span class="p">[],</span><span class="s1">&#39;V&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;dV&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;F&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;dF&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+                                                  <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">)]</span>
+
+    <span class="c1"># Generates a rotation matrix to change the basis</span>
+    <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;set_rot&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># calculate new rotation matrices</span>
+        <span class="n">sum_k</span> <span class="o">=</span> <span class="n">_calculate_rotation_matrix</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">)</span>
+    <span class="c1"># Saves rotation matrix to h5 archive:</span>
+    <span class="k">if</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">()</span> <span class="ow">and</span> <span class="n">iteration_offset</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input&#39;</span><span class="p">][</span><span class="s1">&#39;rot_mat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">rot_mat</span>
+    <span class="n">mpi</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
+
+    <span class="c1"># Calculates density in default block structure</span>
+    <span class="n">local_gf_dft_corr</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">extract_G_loc</span><span class="p">(</span><span class="n">broadening</span><span class="o">=</span><span class="n">broadening</span><span class="p">,</span> <span class="n">transform_to_solver_blocks</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">with_Sigma</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">dens_mat_dft</span> <span class="o">=</span> <span class="p">[</span><span class="n">gf</span><span class="o">.</span><span class="n">density</span><span class="p">()</span> <span class="k">for</span> <span class="n">gf</span> <span class="ow">in</span> <span class="n">local_gf_dft_corr</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">iineq</span><span class="p">,</span> <span class="n">gf</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">local_gf_dft_corr</span><span class="p">):</span>
+        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Total density for imp </span><span class="si">{</span><span class="n">iineq</span><span class="si">}</span><span class="s1"> from DFT: &#39;</span>
+                   <span class="s1">&#39;</span><span class="si">{:10.6f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">gf</span><span class="o">.</span><span class="n">total_density</span><span class="p">())))</span>
+
+    <span class="c1"># determine block structure for solver</span>
+    <span class="n">det_blocks</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># load previous block_structure if possible</span>
+    <span class="k">if</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
+        <span class="n">det_blocks</span> <span class="o">=</span> <span class="s1">&#39;block_structure&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input&#39;</span><span class="p">]</span>
+    <span class="n">det_blocks</span> <span class="o">=</span> <span class="n">mpi</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">det_blocks</span><span class="p">)</span>
+
+    <span class="c1"># Previous rot_mat only not None if the rot_mat changed from load_sigma or previous run</span>
+    <span class="n">previous_rot_mat</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">deg_orbs_ftps</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># determine block structure for GF and Hyb function</span>
+    <span class="k">if</span> <span class="n">det_blocks</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;load_sigma&#39;</span><span class="p">]:</span>
+        <span class="n">sum_k</span><span class="p">,</span> <span class="n">deg_orbs_ftps</span> <span class="o">=</span> <span class="n">_determine_block_structure</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">advanced_params</span><span class="p">,</span> <span class="n">solver_type_per_imp</span><span class="p">,</span> <span class="n">dens_mat_dft</span><span class="p">)</span>
+    <span class="c1"># if load sigma we need to load everything from this h5 archive</span>
+    <span class="k">elif</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;load_sigma&#39;</span><span class="p">]:</span>
+        <span class="c1">#loading block_struc and rot_mat and deg_shells</span>
+        <span class="k">if</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
+            <span class="k">with</span> <span class="n">HDFArchive</span><span class="p">(</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;path_to_sigma&#39;</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">old_calc</span><span class="p">:</span>
+                <span class="n">sum_k</span><span class="o">.</span><span class="n">block_structure</span> <span class="o">=</span> <span class="n">old_calc</span><span class="p">[</span><span class="s1">&#39;DMFT_input/block_structure&#39;</span><span class="p">]</span>
+                <span class="n">sum_k</span><span class="o">.</span><span class="n">deg_shells</span> <span class="o">=</span> <span class="n">old_calc</span><span class="p">[</span><span class="s1">&#39;DMFT_input/deg_shells&#39;</span><span class="p">]</span>
+                <span class="n">previous_rot_mat</span> <span class="o">=</span> <span class="n">old_calc</span><span class="p">[</span><span class="s1">&#39;DMFT_input/rot_mat&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">deg_orbs_ftps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">deg_orbs_ftps</span> <span class="o">=</span> <span class="n">old_calc</span><span class="p">[</span><span class="s1">&#39;DMFT_input/solver_struct_ftps&#39;</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">rot_mat</span><span class="p">,</span> <span class="n">previous_rot_mat</span><span class="p">)):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;WARNING: rot_mat in current run is different from loaded_sigma run.&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">previous_rot_mat</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">sum_k</span><span class="o">.</span><span class="n">block_structure</span> <span class="o">=</span> <span class="n">mpi</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">block_structure</span><span class="p">)</span>
+        <span class="n">sum_k</span><span class="o">.</span><span class="n">deg_shells</span> <span class="o">=</span> <span class="n">mpi</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">deg_shells</span><span class="p">)</span>
+        <span class="n">previous_rot_mat</span> <span class="o">=</span> <span class="n">mpi</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">previous_rot_mat</span><span class="p">)</span>
+        <span class="n">deg_orbs_ftps</span> <span class="o">=</span> <span class="n">mpi</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">deg_orbs_ftps</span><span class="p">)</span>
+
+        <span class="c1"># In a magnetic calculation, no shells are degenerate</span>
+        <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;magnetic&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">SO</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">sum_k</span><span class="o">.</span><span class="n">deg_shells</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">)]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Master node checks if rot_mat stayed the same</span>
+        <span class="k">if</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
+            <span class="n">sum_k</span><span class="o">.</span><span class="n">block_structure</span> <span class="o">=</span> <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input&#39;</span><span class="p">][</span><span class="s1">&#39;block_structure&#39;</span><span class="p">]</span>
+            <span class="n">sum_k</span><span class="o">.</span><span class="n">deg_shells</span> <span class="o">=</span> <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input/deg_shells&#39;</span><span class="p">]</span>
+            <span class="n">previous_rot_mat</span> <span class="o">=</span> <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input&#39;</span><span class="p">][</span><span class="s1">&#39;rot_mat&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">rot_mat</span><span class="p">,</span> <span class="n">previous_rot_mat</span><span class="p">)):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;WARNING: rot_mat in current step is different from previous step.&#39;</span><span class="p">)</span>
+                <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input&#39;</span><span class="p">][</span><span class="s1">&#39;rot_mat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">rot_mat</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">previous_rot_mat</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="s1">&#39;solver_struct_ftps&#39;</span> <span class="ow">in</span> <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input&#39;</span><span class="p">]:</span>
+                <span class="n">deg_orbs_ftps</span> <span class="o">=</span> <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input/solver_struct_ftps&#39;</span><span class="p">]</span>
+
+        <span class="n">sum_k</span><span class="o">.</span><span class="n">block_structure</span> <span class="o">=</span> <span class="n">mpi</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">block_structure</span><span class="p">)</span>
+        <span class="n">sum_k</span><span class="o">.</span><span class="n">deg_shells</span> <span class="o">=</span> <span class="n">mpi</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">deg_shells</span><span class="p">)</span>
+        <span class="n">previous_rot_mat</span> <span class="o">=</span> <span class="n">mpi</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">previous_rot_mat</span><span class="p">)</span>
+        <span class="n">deg_orbs_ftps</span> <span class="o">=</span> <span class="n">mpi</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">deg_orbs_ftps</span><span class="p">)</span>
+
+    <span class="c1"># Compatibility with h5 archives from the triqs2 version</span>
+    <span class="c1"># Sumk doesn&#39;t hold corr_to_inequiv anymore, which is in block_structure now</span>
+    <span class="k">if</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">block_structure</span><span class="o">.</span><span class="n">corr_to_inequiv</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
+            <span class="n">sum_k</span><span class="o">.</span><span class="n">block_structure</span><span class="o">.</span><span class="n">corr_to_inequiv</span> <span class="o">=</span> <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;dft_input/corr_to_inequiv&#39;</span><span class="p">]</span>
+        <span class="n">sum_k</span><span class="o">.</span><span class="n">block_structure</span> <span class="o">=</span> <span class="n">mpi</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">block_structure</span><span class="p">)</span>
+
+    <span class="c1"># Determination of shell_multiplicity</span>
+    <span class="n">shell_multiplicity</span> <span class="o">=</span> <span class="p">[</span><span class="n">sum_k</span><span class="o">.</span><span class="n">corr_to_inequiv</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">icrsh</span><span class="p">)</span> <span class="k">for</span> <span class="n">icrsh</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">)]</span>
+
+    <span class="c1"># print block structure and DFT input quantitites!</span>
+    <span class="n">formatter</span><span class="o">.</span><span class="n">print_block_sym</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">dens_mat_dft</span><span class="p">,</span> <span class="n">general_params</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;magnetic&#39;</span><span class="p">]:</span>
+        <span class="n">sum_k</span><span class="o">.</span><span class="n">SP</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;afm_order&#39;</span><span class="p">]:</span>
+            <span class="n">general_params</span> <span class="o">=</span> <span class="n">afm_mapping</span><span class="o">.</span><span class="n">determine</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">archive</span><span class="p">,</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">)</span>
+
+    <span class="c1"># Constructs interaction Hamiltonian and writes it to the h5 archive</span>
+    <span class="n">h_int</span> <span class="o">=</span> <span class="n">interaction_hamiltonian</span><span class="o">.</span><span class="n">construct</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">solver_type_per_imp</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
+        <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input&#39;</span><span class="p">][</span><span class="s1">&#39;h_int&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">h_int</span>
+
+    <span class="c1"># If new calculation, writes input parameters and sum_k &lt;-&gt; solver mapping to archive</span>
+    <span class="k">if</span> <span class="n">iteration_offset</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
+            <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input&#39;</span><span class="p">][</span><span class="s1">&#39;general_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dict_to_h5</span><span class="o">.</span><span class="n">prep_params_for_h5</span><span class="p">(</span><span class="n">general_params</span><span class="p">)</span>
+            <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input&#39;</span><span class="p">][</span><span class="s1">&#39;solver_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dict_to_h5</span><span class="o">.</span><span class="n">prep_params_for_h5</span><span class="p">(</span><span class="n">solver_params</span><span class="p">)</span>
+            <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input&#39;</span><span class="p">][</span><span class="s1">&#39;dft_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dict_to_h5</span><span class="o">.</span><span class="n">prep_params_for_h5</span><span class="p">(</span><span class="n">dft_params</span><span class="p">)</span>
+            <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input&#39;</span><span class="p">][</span><span class="s1">&#39;advanced_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dict_to_h5</span><span class="o">.</span><span class="n">prep_params_for_h5</span><span class="p">(</span><span class="n">advanced_params</span><span class="p">)</span>
+
+            <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input&#39;</span><span class="p">][</span><span class="s1">&#39;block_structure&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">block_structure</span>
+            <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input&#39;</span><span class="p">][</span><span class="s1">&#39;deg_shells&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">deg_shells</span>
+            <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input&#39;</span><span class="p">][</span><span class="s1">&#39;shell_multiplicity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">shell_multiplicity</span>
+            <span class="k">if</span> <span class="n">deg_orbs_ftps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input&#39;</span><span class="p">][</span><span class="s1">&#39;solver_struct_ftps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">deg_orbs_ftps</span>
+    <span class="n">mpi</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
+
+    <span class="n">solvers</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span>
+    <span class="k">for</span> <span class="n">icrsh</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">):</span>
+        <span class="c1"># Construct the Solver instances</span>
+        <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span> <span class="o">=</span> <span class="n">SolverStructure</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">solver_params</span><span class="p">[</span><span class="n">map_imp_solver</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]],</span>
+                                         <span class="n">advanced_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span> <span class="n">icrsh</span><span class="p">,</span> <span class="n">h_int</span><span class="p">[</span><span class="n">icrsh</span><span class="p">],</span>
+                                         <span class="n">iteration_offset</span><span class="p">,</span> <span class="n">deg_orbs_ftps</span><span class="p">)</span>
+
+    <span class="c1"># store solver hash to archive</span>
+    <span class="k">if</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
+        <span class="k">if</span> <span class="s1">&#39;version&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input&#39;</span><span class="p">]:</span>
+            <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">iineq</span><span class="p">,</span> <span class="n">solver</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">solvers</span><span class="p">):</span>
+            <span class="k">if</span> <span class="sa">f</span><span class="s1">&#39;solver </span><span class="si">{</span><span class="n">iineq</span><span class="si">}</span><span class="s1">&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input&#39;</span><span class="p">][</span><span class="s1">&#39;version&#39;</span><span class="p">]:</span>
+                <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input&#39;</span><span class="p">][</span><span class="s1">&#39;version&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;solver </span><span class="si">{</span><span class="n">iineq</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input&#39;</span><span class="p">][</span><span class="s1">&#39;version&#39;</span><span class="p">][</span><span class="sa">f</span><span class="s1">&#39;solver </span><span class="si">{</span><span class="n">iineq</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">solver_params</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span>
+            <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input&#39;</span><span class="p">][</span><span class="s1">&#39;version&#39;</span><span class="p">][</span><span class="sa">f</span><span class="s1">&#39;solver </span><span class="si">{</span><span class="n">iineq</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">][</span><span class="s1">&#39;hash&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">git_hash</span>
+            <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input&#39;</span><span class="p">][</span><span class="s1">&#39;version&#39;</span><span class="p">][</span><span class="sa">f</span><span class="s1">&#39;solver </span><span class="si">{</span><span class="n">iineq</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">][</span><span class="s1">&#39;version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">version</span>
+
+    <span class="c1"># Extracts local GF per *inequivalent* shell</span>
+    <span class="n">local_gf_dft</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">extract_G_loc</span><span class="p">(</span><span class="n">broadening</span><span class="o">=</span><span class="n">broadening</span><span class="p">,</span> <span class="n">with_Sigma</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">dft_mu</span><span class="p">)</span>
+    <span class="n">density_mat_dft</span> <span class="o">=</span> <span class="p">[</span><span class="n">gf</span><span class="o">.</span><span class="n">density</span><span class="p">()</span> <span class="k">for</span> <span class="n">gf</span> <span class="ow">in</span> <span class="n">local_gf_dft</span><span class="p">]</span>
+
+    <span class="c1"># Determines initial Sigma and DC</span>
+    <span class="n">sum_k</span><span class="p">,</span> <span class="n">solvers</span> <span class="o">=</span> <span class="n">initial_sigma</span><span class="o">.</span><span class="n">determine_dc_and_initial_sigma</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">advanced_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span>
+                                                                  <span class="n">archive</span><span class="p">,</span> <span class="n">iteration_offset</span><span class="p">,</span> <span class="n">density_mat_dft</span><span class="p">,</span> <span class="n">solvers</span><span class="p">,</span>
+                                                                  <span class="n">solver_type_per_imp</span><span class="p">)</span>
+
+    <span class="n">sum_k</span> <span class="o">=</span> <span class="n">manipulate_mu</span><span class="o">.</span><span class="n">set_initial_mu</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span> <span class="n">iteration_offset</span><span class="p">,</span> <span class="n">archive</span><span class="p">,</span> <span class="n">broadening</span><span class="p">)</span>
+
+
+    <span class="c1"># setup of measurement of chi(SzSz(tau) if requested</span>
+    <span class="n">ops_chi_measure</span> <span class="o">=</span> <span class="n">_chi_setup</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">solver_params</span><span class="p">,</span> <span class="n">map_imp_solver</span><span class="p">)</span>
+
+    <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> </span><span class="si">{}</span><span class="s1"> DMFT cycles requested. Starting with iteration  </span><span class="si">{}</span><span class="s1">.</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n_iter</span><span class="p">,</span> <span class="n">iteration_offset</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+
+    <span class="c1"># Prepares observable and conv dicts</span>
+    <span class="n">observables</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">conv_obs</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
+        <span class="n">observables</span> <span class="o">=</span> <span class="n">prep_observables</span><span class="p">(</span><span class="n">archive</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">)</span>
+        <span class="n">conv_obs</span> <span class="o">=</span> <span class="n">convergence</span><span class="o">.</span><span class="n">prep_conv_obs</span><span class="p">(</span><span class="n">archive</span><span class="p">)</span>
+    <span class="n">observables</span> <span class="o">=</span> <span class="n">mpi</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">observables</span><span class="p">)</span>
+    <span class="n">conv_obs</span> <span class="o">=</span> <span class="n">mpi</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">conv_obs</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">()</span> <span class="ow">and</span> <span class="n">iteration_offset</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">write_header_to_file</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">)</span>
+        <span class="n">observables</span> <span class="o">=</span> <span class="n">add_dft_values_as_zeroth_iteration</span><span class="p">(</span><span class="n">observables</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">solver_type_per_imp</span><span class="p">,</span> <span class="n">dft_mu</span><span class="p">,</span> <span class="n">dft_energy</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span>
+                                                         <span class="n">local_gf_dft</span><span class="p">,</span> <span class="n">density_mat_dft</span><span class="p">,</span> <span class="n">shell_multiplicity</span><span class="p">)</span>
+        <span class="n">write_obs</span><span class="p">(</span><span class="n">observables</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span> <span class="n">general_params</span><span class="p">)</span>
+        <span class="c1"># write convergence file</span>
+        <span class="n">convergence</span><span class="o">.</span><span class="n">prep_conv_file</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">)</span>
+
+    <span class="c1"># The infamous DMFT self consistency cycle</span>
+    <span class="n">is_converged</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">iteration_offset</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">iteration_offset</span> <span class="o">+</span> <span class="n">n_iter</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+
+        <span class="c1"># remove h_field when number of iterations is reached</span>
+        <span class="k">if</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">h_field</span> <span class="o">!=</span> <span class="mf">0.0</span> <span class="ow">and</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;h_field_it&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">it</span> <span class="o">&gt;</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;h_field_it&#39;</span><span class="p">]:</span>
+            <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Removing magnetic field now.</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">sum_k</span><span class="o">.</span><span class="n">h_field</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="c1"># enforce recomputation of eff_atomic_levels</span>
+            <span class="nb">delattr</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="s1">&#39;Hsumk&#39;</span><span class="p">)</span>
+
+        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="o">*</span><span class="mi">80</span><span class="p">)</span>
+        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;Running iteration: </span><span class="si">{}</span><span class="s1"> / </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">iteration_offset</span> <span class="o">+</span> <span class="n">n_iter</span><span class="p">))</span>
+        <span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">solvers</span><span class="p">,</span>
+         <span class="n">observables</span><span class="p">,</span> <span class="n">is_converged</span><span class="p">)</span> <span class="o">=</span> <span class="n">_dmft_step</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">solvers</span><span class="p">,</span> <span class="n">it</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span>
+                                                 <span class="n">solver_params</span><span class="p">,</span> <span class="n">advanced_params</span><span class="p">,</span> <span class="n">dft_params</span><span class="p">,</span> <span class="n">map_imp_solver</span><span class="p">,</span> <span class="n">solver_type_per_imp</span><span class="p">,</span>
+                                                 <span class="n">h_int</span><span class="p">,</span> <span class="n">archive</span><span class="p">,</span> <span class="n">shell_multiplicity</span><span class="p">,</span> <span class="n">E_kin_dft</span><span class="p">,</span>
+                                                 <span class="n">observables</span><span class="p">,</span> <span class="n">conv_obs</span><span class="p">,</span> <span class="n">ops_chi_measure</span><span class="p">,</span> <span class="n">dft_irred_kpt_indices</span><span class="p">,</span> <span class="n">dft_energy</span><span class="p">,</span> <span class="n">broadening</span><span class="p">,</span>
+                                                 <span class="n">is_converged</span><span class="p">,</span> <span class="n">is_sampling</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">is_converged</span><span class="p">:</span>
+            <span class="k">break</span>
+
+    <span class="k">if</span> <span class="n">is_converged</span><span class="p">:</span>
+        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;*** Required convergence reached ***&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;** All requested iterations finished ***&#39;</span><span class="p">)</span>
+    <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="o">*</span><span class="mi">80</span><span class="p">)</span>
+
+    <span class="c1"># Starts the sampling dmft iterations if requested</span>
+    <span class="k">if</span> <span class="n">is_converged</span> <span class="ow">and</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;sampling_iterations&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;*** Sampling now for </span><span class="si">{}</span><span class="s1"> iterations ***&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;sampling_iterations&#39;</span><span class="p">]))</span>
+        <span class="n">iteration_offset</span> <span class="o">=</span> <span class="n">it</span>
+
+        <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">iteration_offset</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                        <span class="n">iteration_offset</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;sampling_iterations&#39;</span><span class="p">]):</span>
+            <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="o">*</span><span class="mi">80</span><span class="p">)</span>
+            <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;Running iteration: </span><span class="si">{}</span><span class="s1"> / </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">iteration_offset</span><span class="o">+</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;sampling_iterations&#39;</span><span class="p">]))</span>
+            <span class="n">sum_k</span><span class="p">,</span> <span class="n">solvers</span><span class="p">,</span> <span class="n">observables</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_dmft_step</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">solvers</span><span class="p">,</span> <span class="n">it</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span>
+                                                        <span class="n">solver_params</span><span class="p">,</span> <span class="n">advanced_params</span><span class="p">,</span> <span class="n">dft_params</span><span class="p">,</span> <span class="n">map_imp_solver</span><span class="p">,</span> <span class="n">solver_type_per_imp</span><span class="p">,</span>
+                                                        <span class="n">h_int</span><span class="p">,</span> <span class="n">archive</span><span class="p">,</span> <span class="n">shell_multiplicity</span><span class="p">,</span> <span class="n">E_kin_dft</span><span class="p">,</span>
+                                                        <span class="n">observables</span><span class="p">,</span> <span class="n">conv_obs</span><span class="p">,</span> <span class="n">ops_chi_measure</span><span class="p">,</span> <span class="n">dft_irred_kpt_indices</span><span class="p">,</span> <span class="n">dft_energy</span><span class="p">,</span> <span class="n">broadening</span><span class="p">,</span>
+                                                        <span class="n">is_converged</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">is_sampling</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;** Sampling finished ***&#39;</span><span class="p">)</span>
+        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="o">*</span><span class="mi">80</span><span class="p">)</span>
+
+    <span class="n">mpi</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
+
+    <span class="c1"># close the h5 archive</span>
+    <span class="k">if</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
+        <span class="k">del</span> <span class="n">archive</span>
+
+    <span class="k">return</span> <span class="n">is_converged</span><span class="p">,</span> <span class="n">sum_k</span></div>
+
+
+<span class="k">def</span> <span class="nf">_dmft_step</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">solvers</span><span class="p">,</span> <span class="n">it</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span>
+               <span class="n">solver_params</span><span class="p">,</span> <span class="n">advanced_params</span><span class="p">,</span> <span class="n">dft_params</span><span class="p">,</span> <span class="n">map_imp_solver</span><span class="p">,</span> <span class="n">solver_type_per_imp</span><span class="p">,</span>
+               <span class="n">h_int</span><span class="p">,</span> <span class="n">archive</span><span class="p">,</span> <span class="n">shell_multiplicity</span><span class="p">,</span> <span class="n">E_kin_dft</span><span class="p">,</span>
+               <span class="n">observables</span><span class="p">,</span> <span class="n">conv_obs</span><span class="p">,</span> <span class="n">ops_chi_measure</span><span class="p">,</span> <span class="n">dft_irred_kpt_indices</span><span class="p">,</span> <span class="n">dft_energy</span><span class="p">,</span> <span class="n">broadening</span><span class="p">,</span>
+               <span class="n">is_converged</span><span class="p">,</span> <span class="n">is_sampling</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contains the actual dmft steps when all the preparation is done</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># init local density matrices for observables</span>
+    <span class="n">density_tot</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">density_shell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">)</span>
+    <span class="n">density_mat</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span>
+    <span class="n">density_mat_unsym</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span>
+    <span class="n">density_shell_pre</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">)</span>
+    <span class="n">density_mat_pre</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span>
+
+    <span class="n">mpi</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">SO</span><span class="p">:</span>
+        <span class="n">printed</span> <span class="o">=</span> <span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">,</span> <span class="s1">&#39;real&#39;</span><span class="p">),</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">,</span> <span class="s1">&#39;imaginary&#39;</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">printed</span> <span class="o">=</span> <span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">,</span> <span class="s1">&#39;real&#39;</span><span class="p">),</span> <span class="p">)</span>
+
+    <span class="c1"># Extracts G local</span>
+    <span class="n">G_loc_all</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">extract_G_loc</span><span class="p">(</span><span class="n">broadening</span><span class="o">=</span><span class="n">broadening</span><span class="p">)</span>
+
+    <span class="c1"># Copies Sigma and G0 before Solver run for mixing later</span>
+    <span class="n">Sigma_freq_previous</span> <span class="o">=</span> <span class="p">[</span><span class="n">solvers</span><span class="p">[</span><span class="n">iineq</span><span class="p">]</span><span class="o">.</span><span class="n">Sigma_freq</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">iineq</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">)]</span>
+    <span class="n">G0_freq_previous</span> <span class="o">=</span> <span class="p">[</span><span class="n">solvers</span><span class="p">[</span><span class="n">iineq</span><span class="p">]</span><span class="o">.</span><span class="n">G0_freq</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">iineq</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">)]</span>
+
+    <span class="c1"># looping over inequiv shells and solving for each site seperately</span>
+    <span class="k">for</span> <span class="n">icrsh</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">):</span>
+        <span class="c1"># copy the block of G_loc into the corresponding instance of the impurity solver</span>
+        <span class="c1"># TODO: why do we set solvers.G_freq? Isn&#39;t that simply an output of the solver?</span>
+        <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">G_freq</span> <span class="o">&lt;&lt;</span> <span class="n">G_loc_all</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span>
+
+        <span class="n">density_shell_pre</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">G_freq</span><span class="o">.</span><span class="n">total_density</span><span class="p">())</span>
+        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> *** Correlated Shell type #</span><span class="si">{:3d}</span><span class="s1"> : &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">icrsh</span><span class="p">)</span>
+                   <span class="o">+</span> <span class="s1">&#39;Estimated total charge of impurity problem = </span><span class="si">{:.6f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">density_shell_pre</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]))</span>
+        <span class="n">density_mat_pre</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span> <span class="o">=</span> <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">G_freq</span><span class="o">.</span><span class="n">density</span><span class="p">()</span>
+        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;Estimated density matrix:&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">density_mat_pre</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">for</span> <span class="n">func</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">printed</span><span class="p">:</span>
+                <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1"> part&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+                <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="n">func</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+
+        <span class="c1"># dyson equation to extract G0_freq, using Hermitian symmetry</span>
+        <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">G0_freq</span> <span class="o">&lt;&lt;</span> <span class="n">inverse</span><span class="p">(</span><span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">Sigma_freq</span> <span class="o">+</span> <span class="n">inverse</span><span class="p">(</span><span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">G_freq</span><span class="p">))</span>
+
+        <span class="c1"># mixing of G0 if wanted from the second iteration on</span>
+        <span class="k">if</span> <span class="n">it</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span> <span class="o">=</span> <span class="n">gf_mixer</span><span class="o">.</span><span class="n">mix_g0</span><span class="p">(</span><span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">],</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">icrsh</span><span class="p">,</span> <span class="n">archive</span><span class="p">,</span>
+                                             <span class="n">G0_freq_previous</span><span class="p">[</span><span class="n">icrsh</span><span class="p">],</span> <span class="n">it</span><span class="p">,</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">deg_shells</span><span class="p">[</span><span class="n">icrsh</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="n">MeshImFreq</span><span class="p">):</span>
+            <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">G0_freq</span> <span class="o">&lt;&lt;</span> <span class="n">make_hermitian</span><span class="p">(</span><span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">G0_freq</span><span class="p">)</span>
+        <span class="n">sum_k</span><span class="o">.</span><span class="n">symm_deg_gf</span><span class="p">(</span><span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">G0_freq</span><span class="p">,</span> <span class="n">ish</span><span class="o">=</span><span class="n">icrsh</span><span class="p">)</span>
+
+         <span class="c1"># store solver to h5 archive</span>
+        <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;store_solver&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
+            <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input/solver&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;it_&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">it</span><span class="p">))</span>
+            <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input/solver/it_&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">it</span><span class="p">)][</span><span class="s1">&#39;S_&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">icrsh</span><span class="p">)]</span> <span class="o">=</span> <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">triqs_solver</span>
+
+        <span class="c1"># store DMFT input directly in last_iter</span>
+        <span class="k">if</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
+            <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_results/last_iter&#39;</span><span class="p">][</span><span class="s1">&#39;G0_freq_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">icrsh</span><span class="p">)]</span> <span class="o">=</span> <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">G0_freq</span>
+
+        <span class="c1"># setup of measurement of chi(SzSz(tau) if requested</span>
+        <span class="c1"># TODO: move this into solver class?</span>
+        <span class="k">if</span> <span class="n">ops_chi_measure</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">solver_params</span><span class="p">[</span><span class="s1">&#39;measure_O_tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">ops_chi_measure</span><span class="p">[</span><span class="n">icrsh</span><span class="p">],</span> <span class="n">ops_chi_measure</span><span class="p">[</span><span class="n">icrsh</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;magnetic&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;afm_order&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;afm_mapping&#39;</span><span class="p">][</span><span class="n">icrsh</span><span class="p">][</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="c1"># If we do a AFM calculation we can use the init magnetic moments to</span>
+            <span class="c1"># copy the self energy instead of solving it explicitly</span>
+            <span class="n">solvers</span> <span class="o">=</span> <span class="n">afm_mapping</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">icrsh</span><span class="p">,</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">gf_struct_solver</span><span class="p">[</span><span class="n">icrsh</span><span class="p">],</span> <span class="n">solvers</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Solve the impurity problem for this shell</span>
+            <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Solving the impurity problem for shell </span><span class="si">{}</span><span class="s1"> ...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">icrsh</span><span class="p">))</span>
+            <span class="n">mpi</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
+            <span class="n">start_time</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
+            <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">it</span><span class="o">=</span><span class="n">it</span><span class="p">)</span>
+            <span class="n">mpi</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
+            <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;Actual time for solver: </span><span class="si">{:.2f}</span><span class="s1"> s&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">))</span>
+
+        <span class="c1"># some printout of the obtained density matrices and some basic checks from the unsymmetrized solver output</span>
+        <span class="n">density_shell</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">G_freq_unsym</span><span class="o">.</span><span class="n">total_density</span><span class="p">())</span>
+        <span class="n">density_tot</span> <span class="o">+=</span> <span class="n">density_shell</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">*</span><span class="n">shell_multiplicity</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span>
+        <span class="n">density_mat_unsym</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span> <span class="o">=</span> <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">G_freq_unsym</span><span class="o">.</span><span class="n">density</span><span class="p">()</span>
+        <span class="n">density_mat</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span> <span class="o">=</span> <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">G_freq</span><span class="o">.</span><span class="n">density</span><span class="p">()</span>
+        <span class="n">formatter</span><span class="o">.</span><span class="n">print_local_density</span><span class="p">(</span><span class="n">density_shell</span><span class="p">[</span><span class="n">icrsh</span><span class="p">],</span> <span class="n">density_shell_pre</span><span class="p">[</span><span class="n">icrsh</span><span class="p">],</span>
+                                      <span class="n">density_mat_unsym</span><span class="p">[</span><span class="n">icrsh</span><span class="p">],</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">SO</span><span class="p">)</span>
+
+        <span class="c1"># update solver in h5 archive</span>
+        <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;store_solver&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
+            <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_input/solver/it_&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">it</span><span class="p">)][</span><span class="s1">&#39;S_&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">icrsh</span><span class="p">)]</span> <span class="o">=</span> <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">triqs_solver</span>
+
+    <span class="c1"># Done with loop over impurities</span>
+
+    <span class="k">if</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
+        <span class="c1"># Done. Now do post-processing:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> *** Post-processing the solver output ***&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Total charge of all correlated shells : </span><span class="si">{:.6f}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">density_tot</span><span class="p">))</span>
+
+    <span class="n">solvers</span> <span class="o">=</span> <span class="n">gf_mixer</span><span class="o">.</span><span class="n">mix_sigma</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">,</span> <span class="n">solvers</span><span class="p">,</span> <span class="n">Sigma_freq_previous</span><span class="p">)</span>
+
+    <span class="c1"># calculate new DC</span>
+    <span class="c1"># for the hartree solver the DC potential will be formally set to zero as it is already present in the Sigma</span>
+    <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;dc&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;dc_dmft&#39;</span><span class="p">]:</span>
+        <span class="n">sum_k</span> <span class="o">=</span> <span class="n">initial_sigma</span><span class="o">.</span><span class="n">calculate_double_counting</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">density_mat</span><span class="p">,</span>
+                                                        <span class="n">general_params</span><span class="p">,</span> <span class="n">advanced_params</span><span class="p">,</span>
+                                                        <span class="n">solver_type_per_imp</span><span class="p">)</span>
+
+    <span class="c1">#The hartree solver computes the DC energy internally, set it in sum_k</span>
+    <span class="k">for</span> <span class="n">icrsh</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_corr_shells</span><span class="p">):</span>
+        <span class="n">iineq</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">corr_to_inequiv</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">solver_type_per_imp</span><span class="p">[</span><span class="n">iineq</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;hartree&#39;</span><span class="p">:</span>
+            <span class="n">sum_k</span><span class="o">.</span><span class="n">dc_energ</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span> <span class="o">=</span> <span class="n">solvers</span><span class="p">[</span><span class="n">iineq</span><span class="p">]</span><span class="o">.</span><span class="n">DC_energy</span>
+
+    <span class="c1"># doing the dmft loop and set new sigma into sumk</span>
+    <span class="n">sum_k</span><span class="o">.</span><span class="n">put_Sigma</span><span class="p">([</span><span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">Sigma_freq</span> <span class="k">for</span> <span class="n">icrsh</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">)])</span>
+
+    <span class="c1"># saving previous mu for writing to observables file</span>
+    <span class="n">previous_mu</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">chemical_potential</span>
+    <span class="n">sum_k</span> <span class="o">=</span> <span class="n">manipulate_mu</span><span class="o">.</span><span class="n">update_mu</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span> <span class="n">it</span><span class="p">,</span> <span class="n">archive</span><span class="p">,</span> <span class="n">broadening</span><span class="p">)</span>
+
+    <span class="c1"># if we do a CSC calculation we need always an updated GAMMA file</span>
+    <span class="n">E_bandcorr</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">deltaN</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">dens</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;csc&#39;</span><span class="p">]:</span>
+        <span class="c1"># handling the density correction for fcsc calculations</span>
+        <span class="k">assert</span> <span class="n">dft_irred_kpt_indices</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">dft_params</span><span class="p">[</span><span class="s1">&#39;dft_code&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;vasp&#39;</span>
+        <span class="n">deltaN</span><span class="p">,</span> <span class="n">dens</span><span class="p">,</span> <span class="n">E_bandcorr</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">calc_density_correction</span><span class="p">(</span><span class="n">dm_type</span><span class="o">=</span><span class="n">dft_params</span><span class="p">[</span><span class="s1">&#39;dft_code&#39;</span><span class="p">],</span>
+                                                                 <span class="n">kpts_to_write</span><span class="o">=</span><span class="n">dft_irred_kpt_indices</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;calc_energies&#39;</span><span class="p">]:</span>
+        <span class="c1"># for a one shot calculation we are using our own method</span>
+        <span class="n">E_bandcorr</span> <span class="o">=</span> <span class="n">calc_bandcorr_man</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span> <span class="n">E_kin_dft</span><span class="p">)</span>
+
+    <span class="c1"># Writes results to h5 archive</span>
+    <span class="n">results_to_archive</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">archive</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">solver_params</span><span class="p">,</span> <span class="n">solvers</span><span class="p">,</span> <span class="n">map_imp_solver</span><span class="p">,</span> <span class="n">solver_type_per_imp</span><span class="p">,</span> <span class="n">it</span><span class="p">,</span>
+                             <span class="n">is_sampling</span><span class="p">,</span> <span class="n">previous_mu</span><span class="p">,</span> <span class="n">density_mat_pre</span><span class="p">,</span> <span class="n">density_mat</span><span class="p">,</span> <span class="n">deltaN</span><span class="p">,</span> <span class="n">dens</span><span class="p">)</span>
+
+    <span class="n">mpi</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
+
+    <span class="c1"># calculate observables and write them to file</span>
+    <span class="k">if</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> *** calculation of observables ***&#39;</span><span class="p">)</span>
+        <span class="n">observables</span> <span class="o">=</span> <span class="n">add_dmft_observables</span><span class="p">(</span><span class="n">observables</span><span class="p">,</span>
+                                           <span class="n">general_params</span><span class="p">,</span>
+                                           <span class="n">solver_params</span><span class="p">,</span>
+                                           <span class="n">map_imp_solver</span><span class="p">,</span>
+                                           <span class="n">solver_type_per_imp</span><span class="p">,</span>
+                                           <span class="n">dft_energy</span><span class="p">,</span>
+                                           <span class="n">it</span><span class="p">,</span>
+                                           <span class="n">solvers</span><span class="p">,</span>
+                                           <span class="n">h_int</span><span class="p">,</span>
+                                           <span class="n">previous_mu</span><span class="p">,</span>
+                                           <span class="n">sum_k</span><span class="p">,</span>
+                                           <span class="n">density_mat</span><span class="p">,</span>
+                                           <span class="n">shell_multiplicity</span><span class="p">,</span>
+                                           <span class="n">E_bandcorr</span><span class="p">)</span>
+
+        <span class="n">write_obs</span><span class="p">(</span><span class="n">observables</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span> <span class="n">general_params</span><span class="p">)</span>
+
+        <span class="c1"># write the new observable array to h5 archive</span>
+        <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_results&#39;</span><span class="p">][</span><span class="s1">&#39;observables&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">observables</span>
+
+    <span class="c1"># Computes convergence quantities and writes them to file</span>
+    <span class="k">if</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
+        <span class="n">conv_obs</span> <span class="o">=</span> <span class="n">convergence</span><span class="o">.</span><span class="n">calc_convergence_quantities</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">conv_obs</span><span class="p">,</span> <span class="n">observables</span><span class="p">,</span>
+                                                           <span class="n">solvers</span><span class="p">,</span> <span class="n">G0_freq_previous</span><span class="p">,</span> <span class="n">G_loc_all</span><span class="p">,</span> <span class="n">Sigma_freq_previous</span><span class="p">)</span>
+        <span class="n">convergence</span><span class="o">.</span><span class="n">write_conv</span><span class="p">(</span><span class="n">conv_obs</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span> <span class="n">general_params</span><span class="p">)</span>
+        <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_results&#39;</span><span class="p">][</span><span class="s1">&#39;convergence_obs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">conv_obs</span>
+    <span class="n">conv_obs</span> <span class="o">=</span> <span class="n">mpi</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">conv_obs</span><span class="p">)</span>
+
+    <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;*** iteration finished ***&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Checks for convergence</span>
+    <span class="n">is_now_converged</span> <span class="o">=</span> <span class="n">convergence</span><span class="o">.</span><span class="n">check_convergence</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">conv_obs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">is_now_converged</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">is_converged</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># if convergency criteria was already reached don&#39;t overwrite it!</span>
+        <span class="n">is_converged</span> <span class="o">=</span> <span class="n">is_converged</span> <span class="ow">or</span> <span class="n">is_now_converged</span>
+
+    <span class="c1"># Final prints</span>
+    <span class="n">formatter</span><span class="o">.</span><span class="n">print_summary_observables</span><span class="p">(</span><span class="n">observables</span><span class="p">,</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">,</span>
+                                        <span class="n">sum_k</span><span class="o">.</span><span class="n">spin_block_names</span><span class="p">[</span><span class="n">sum_k</span><span class="o">.</span><span class="n">SO</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;calc_energies&#39;</span><span class="p">]:</span>
+        <span class="n">formatter</span><span class="o">.</span><span class="n">print_summary_energetics</span><span class="p">(</span><span class="n">observables</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;magnetic&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">SO</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># if a magnetic calculation is done print out a summary of up/down occ</span>
+        <span class="n">formatter</span><span class="o">.</span><span class="n">print_summary_magnetic_occ</span><span class="p">(</span><span class="n">observables</span><span class="p">,</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">)</span>
+    <span class="n">formatter</span><span class="o">.</span><span class="n">print_summary_convergence</span><span class="p">(</span><span class="n">conv_obs</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">sum_k</span><span class="p">,</span> <span class="n">solvers</span><span class="p">,</span> <span class="n">observables</span><span class="p">,</span> <span class="n">is_converged</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (C) 2018-2020, ETH Zurich Copyright (C) 2021-2022, The Simons Foundation authors: A. Hampel, M. Merkel, A. Carta, and S. Beck.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

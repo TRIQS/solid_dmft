@@ -1,0 +1,33 @@
+﻿io\_tools
+=========
+
+.. automodule:: io_tools
+    :members:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+    :toctree:
+    :template: autosummary_module_template.rst 
+    :recursive:
+
+    
+    io_tools.dict_to_h5
+    io_tools.postproc_toml_dict
+    io_tools.verify_input_params
+
+

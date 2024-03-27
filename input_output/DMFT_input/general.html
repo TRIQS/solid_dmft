@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>[general]: General parameters &mdash; solid_dmft  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/plot_directive.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="[solver]: solver specific parameters" href="solver.html" />
+    <link rel="prev" title="Input" href="input.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #7E588A" >
+            <a href="../../index.html" class="icon icon-home"> solid_dmft
+            <img src="../../_static/logo_no_text.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                3.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#installation-via-pip">Installation via pip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#manual-installation-via-cmake">Manual installation via CMake</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#docker-files-images">Docker files &amp; images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#version-compatibility">Version compatibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#custom-cmake-options">Custom CMake options</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../documentation.html">Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#code-structure">Code structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#dft-interface-notes">DFT interface notes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../md_notes/w90_interface.html">Wannier90 interface</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/w90_interface.html#orbital-order-in-the-w90-converter">orbital order in the W90 converter</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../md_notes/vasp_csc.html">Interface to VASP</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/vasp_csc.html#general-remarks">General remarks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/vasp_csc.html#locproj-bug-for-individual-projections">LOCPROJ bug for individual projections:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/vasp_csc.html#convergence-of-projectors-with-vasp">convergence of projectors with Vasp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/vasp_csc.html#enabling-csc-calculations-with-wannier90-projectors">Enabling CSC calculations with Wannier90 projectors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/vasp_csc.html#speeding-up-by-not-writing-projectors-at-every-step">Speeding up by not writing projectors at every step</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../cRPA_VASP/README.html">How to do cRPA calculations with VASP</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#file-description">file description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#workflow">Workflow:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#important-flags">important flags:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#convergency-tests">convergency tests:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#parameterization-of-u-and-j-from-crpa-calculations">Parameterization of U and J from cRPA calculations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#general-sidemarks">general sidemarks:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#version-and-compilation">version and compilation:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../documentation.html#input-output">Input/Output</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="input.html">Input</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">[general]: General parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="solver.html">[solver]: solver specific parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dft.html">[dft]: DFT related inputs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="advanced.html">[advanced]: Advanced inputs</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../DMFT_output/results.html">Output / results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../DMFT_output/results.html#group-structure">Group structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../DMFT_output/results.html#subgroups">Subgroups</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#further-details-for-running">Further details for running</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../md_notes/docker.html">Docker</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/docker.html#building-the-docker-image">Building the docker image</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/docker.html#pulling-a-docker-image">Pulling a docker image</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/docker.html#getting-docker-images-onto-cscs-daint">Getting docker images onto CSCS daint</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../md_notes/run_locally.html">Run on your machine</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/run_locally.html#csc-calculations-locally">CSC calculations locally</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../md_notes/run_cluster.html">Running solid_dmft on a cluster</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/run_cluster.html#running-on-cscs-daint">Running on CSCS daint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/run_cluster.html#one-shot-job-on-daint">one shot job on daint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/run_cluster.html#csc-calculations-on-daint">CSC calculations on daint</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#module-reference-manual">Module reference manual</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/csc_flow.html">csc_flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/dft_managers.html">dft_managers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dft_managers.mpi_helpers.html">dft_managers.mpi_helpers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dft_managers.qe_manager.html">dft_managers.qe_manager</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dft_managers.vasp_manager.html">dft_managers.vasp_manager</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/dmft_cycle.html">dmft_cycle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/dmft_tools.html">dmft_tools</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.afm_mapping.html">dmft_tools.afm_mapping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.convergence.html">dmft_tools.convergence</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.formatter.html">dmft_tools.formatter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.greens_functions_mixer.html">dmft_tools.greens_functions_mixer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.initial_self_energies.html">dmft_tools.initial_self_energies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.interaction_hamiltonian.html">dmft_tools.interaction_hamiltonian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.legendre_filter.html">dmft_tools.legendre_filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.manipulate_chemical_potential.html">dmft_tools.manipulate_chemical_potential</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.matheval.html">dmft_tools.matheval</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.observables.html">dmft_tools.observables</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.results_to_archive.html">dmft_tools.results_to_archive</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.solver.html">dmft_tools.solver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/io_tools.html">io_tools</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/io_tools.dict_to_h5.html">io_tools.dict_to_h5</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/io_tools.postproc_toml_dict.html">io_tools.postproc_toml_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/io_tools.verify_input_params.html">io_tools.verify_input_params</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/postprocessing.html">postprocessing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.eval_U_cRPA_RESPACK.html">postprocessing.eval_U_cRPA_RESPACK</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.eval_U_cRPA_Vasp.html">postprocessing.eval_U_cRPA_Vasp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.maxent_gf_imp.html">postprocessing.maxent_gf_imp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.maxent_gf_latt.html">postprocessing.maxent_gf_latt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.maxent_sigma.html">postprocessing.maxent_sigma</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.pade_sigma.html">postprocessing.pade_sigma</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.plot_correlated_bands.html">postprocessing.plot_correlated_bands</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/util.html">util</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/util.symmetrize_gamma_file.html">util.symmetrize_gamma_file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/util.write_kslice_to_h5.html">util.write_kslice_to_h5</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/SVO_os_qe/tutorial.html">1. OS with QE/W90 and cthyb: SrVO3 MIT</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/SVO_os_qe/tutorial.html#1.-Starting-out-with-DMFT">1. Starting out with DMFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/SVO_os_qe/tutorial.html#2.-Looking-at-the-Metal-Insulator-Transition">2. Looking at the Metal-Insulator Transition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/SVO_os_qe/tutorial.html#3.-Refining-the-diagram">3. Refining the diagram</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/SVO_os_qe/tutorial.html#4.-Plotting-the-spectral-function">4. Plotting the spectral function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/SVO_os_qe/tutorial.html#5-Visualizing-the-MIT">5 Visualizing the MIT</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html">2. CSC with VASP PLOs: charge order in PrNiO3</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#1.-Running-the-initial-scf-DFT-calculation">1. Running the initial scf DFT calculation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#2.-Running-the-CSC-DMFT-calculations">2. Running the CSC DMFT calculations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Input-files-for-CSC-DMFT-calculations">Input files for CSC DMFT calculations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Starting-the-calculations">Starting the calculations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Analyzing-the-projectors">Analyzing the projectors</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Plotting-the-results:-observables">3. Plotting the results: observables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green’s-function">4. Plotting the results: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Next-steps-to-try">5. Next steps to try</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/Ce2O3_csc_w90/tutorial.html">3. CSC with QE/W90 and HubbardI: total energy in Ce2O3</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/Ce2O3_csc_w90/tutorial.html#1.-Input-file-preparation">1. Input file preparation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/Ce2O3_csc_w90/tutorial.html#DFT-files">DFT files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/Ce2O3_csc_w90/tutorial.html#DMFT">DMFT</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/Ce2O3_csc_w90/tutorial.html#2.-Running-DFT+DMFT">2. Running DFT+DMFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/Ce2O3_csc_w90/tutorial.html#3.-Non-interacting-Hamiltonian-and-convergence-analysis">3. Non-interacting Hamiltonian and convergence analysis</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/Ce2O3_csc_w90/tutorial.html#Tight-binding-Hamiltonian">Tight-binding Hamiltonian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/Ce2O3_csc_w90/tutorial.html#Convergence">Convergence</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/NNO_os_plo_mag/tutorial.html">4. OS with VASP/PLOs and cthyb: AFM state of NdNiO2</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/NNO_os_plo_mag/tutorial.html#1.-Run-DFT">1. Run DFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/NNO_os_plo_mag/tutorial.html#2.-Creating-the-hdf5-archive-/-DMFT-input">2. Creating the hdf5 archive / DMFT input</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/NNO_os_plo_mag/tutorial.html#3.-Running-the-AFM-calculation">3. Running the AFM calculation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/NNO_os_plo_mag/tutorial.html#5.-Multiplet-analysis">5. Multiplet analysis</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/correlated_bandstructure/plot_correlated_bands.html">5. Plotting the spectral function</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/correlated_bandstructure/plot_correlated_bands.html#1.-Configuration">1. Configuration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/correlated_bandstructure/plot_correlated_bands.html#Basic-options">Basic options</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/correlated_bandstructure/plot_correlated_bands.html#Wannier90">Wannier90</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/correlated_bandstructure/plot_correlated_bands.html#BZ-configuration">BZ configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/correlated_bandstructure/plot_correlated_bands.html#Self-energy">Self-energy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/correlated_bandstructure/plot_correlated_bands.html#Plotting-options">Plotting options</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/correlated_bandstructure/plot_correlated_bands.html#2.-Run-and-Plotting">2. Run and Plotting</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../issues.html">Support &amp; contribute</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../issues.html#seeking-help">Seeking help</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../issues.html#improving-solid-dmft">Improving solid_dmft</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../issues.html#reporting-issues">Reporting issues</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../ChangeLog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-2-0">Version 3.2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#general">General</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#fix">fix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#build">build</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#feat">feat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#doc">doc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#test">test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-1-5">Version 3.1.5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-1-4">Version 3.1.4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-1-3">Version 3.1.3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-1-2">Version 3.1.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-1-1">Version 3.1.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-1-0">Version 3.1.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-0-0">Version 3.0.0</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #7E588A" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">solid_dmft</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../documentation.html">Documentation</a> &raquo;</li>
+          <li><a href="input.html">Input</a> &raquo;</li>
+      <li>[general]: General parameters</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/input_output/DMFT_input/general.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="general-general-parameters">
+<h1>[general]: General parameters<a class="headerlink" href="#general-general-parameters" title="Permalink to this headline"></a></h1>
+<p>Frequently used parameters that apply to the whole simulation.</p>
+<div class="intag admonition">
+<p class="first admonition-title">afm_order</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = False</div></blockquote>
+<p class="last">copy self energies instead of solving explicitly for afm order</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">beta</p>
+<blockquote>
+<div><strong>type</strong> = float;  <strong>default</strong>  = None</div></blockquote>
+<p class="last">inverse temperature. If set, solid_dmft stores all Greens functions etc on an imaginary-frequency grid
+and also n_iw and n_tau have to be specified.
+If not set, it uses a real-frequency grid and eta, n_w and w_range have to be set</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">block_threshold</p>
+<blockquote>
+<div><strong>type</strong> = float;  <strong>default</strong>  = 1e-5</div></blockquote>
+<p class="last">threshold for finding block structures in the input data (off-diag yes or no)</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">broy_max_it</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = -1</div></blockquote>
+<p class="last">maximum number of iteration to be considered for broyden mixing.
+Only used if general.g0_mix_type=’broyden’.
+1 corresponds to simple linear mixing</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">calc_energies</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = False</div></blockquote>
+<p class="last">Calculate the energies explicitly within the dmft loop and write them to the observables file.
+Not compatible with ‘ftps’ solver</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">calc_mu_method</p>
+<blockquote>
+<div><strong>type</strong> = string;  <strong>default</strong>  = ‘dichotomy’</div></blockquote>
+<p>optimization method used for finding the chemical potential:</p>
+<ul class="last simple">
+<li>‘dichotomy’: usual method from TRIQS, should always converge but may be slow</li>
+<li>‘newton’: scipy Newton root finder, much faster but might be unstable</li>
+<li>‘brent’: scipy hyperbolic Brent root finder preconditioned with dichotomy to find edge, a compromise between speed and stability</li>
+</ul>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">csc</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = False</div></blockquote>
+<p class="last">are we doing a CSC calculation?</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">dc</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = True</div></blockquote>
+<p class="last">is the double-counting correction on?</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">dc_dmft</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = None</div></blockquote>
+<p>Calculate the double-counting (DC) correction from DMFT or DFT occupations.
+Needs to be set if general.dc = True.</p>
+<ul class="last simple">
+<li>True: DC with DMFT occupation in each iteration</li>
+<li>False: DC with DFT occupations after each DFT cycle</li>
+</ul>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">dc_type</p>
+<blockquote>
+<div><strong>type</strong> = int or list of int;  <strong>default</strong>  = None</div></blockquote>
+<p>Type of double counting correction considered.
+Can be a list per impurity to have different types for different impurities.
+Needs to be set if general.dc = True.</p>
+<ul class="last simple">
+<li>0: FLL</li>
+<li>1: Held formula, needs to be used with slater-kanamori h_int_type=2</li>
+<li>2: AMF</li>
+<li>3: FLL for eg orbitals only with U,J for Kanamori</li>
+</ul>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">enforce_off_diag</p>
+<blockquote>
+<div><strong>type</strong> = bool or list of bool;  <strong>default</strong>  = True</div></blockquote>
+<p class="last">only if False, the block structure can be reduced to ignore off-diagonal elements
+if they are below the general.block_threshold of the block structure finder</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">eta</p>
+<blockquote>
+<div><strong>type</strong> = float;  <strong>default</strong>  = None</div></blockquote>
+<p class="last">broadening of Green’s function. Used when Green’s functions are stored on real-frequency grid,
+i.e., general.beta is None, and for the real-frequency solvers</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">fixed_mu_value</p>
+<blockquote>
+<div><strong>type</strong> = float;  <strong>default</strong>  = None</div></blockquote>
+<p class="last">If given, the chemical potential remains fixed in calculations</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">g0_conv_crit</p>
+<blockquote>
+<div><strong>type</strong> = float;  <strong>default</strong>  = -1.0</div></blockquote>
+<p class="last">stop the calculation if sum_w 1/(w^0.6) ||G0-G0_prev|| is smaller than threshold</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">g0_mix</p>
+<blockquote>
+<div><strong>type</strong> = float;  <strong>default</strong>  = 1.0</div></blockquote>
+<p class="last">Mixing the weiss field G0 with previous iteration G0 for better convergency. 1.0 means no mixing.
+Setting g0_mix to 0.0 with linear mixing can be used for statistic sampling when
+restarting a calculation</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">g0_mix_type</p>
+<blockquote>
+<div><strong>type</strong> = string;  <strong>default</strong>  = ‘linear’</div></blockquote>
+<p class="last">which type of mixing is used. Possible values are:
+linear: linear mixing
+broyden: broyden mixing</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">gimp_conv_crit</p>
+<blockquote>
+<div><strong>type</strong> = float;  <strong>default</strong>  = -1.0</div></blockquote>
+<p class="last">stop the calculation if  sum_w 1/(w^0.6) ||Gimp-Gloc|| is smaller than threshold</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">h_field</p>
+<blockquote>
+<div><strong>type</strong> = float;  <strong>default</strong>  = 0.0</div></blockquote>
+<p class="last">magnetic field</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">h_field_it</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = 0</div></blockquote>
+<p class="last">number of iterations the magnetic field is kept on</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">h_int_basis</p>
+<blockquote>
+<div><strong>type</strong> = string;  <strong>default</strong>  = ‘triqs’</div></blockquote>
+<p>cubic basis convention to compute the interaction U matrix</p>
+<ul class="last simple">
+<li>‘triqs’</li>
+<li>‘vasp’ (equivalent to ‘triqs’)</li>
+<li>‘wien2k’</li>
+<li>‘wannier90’</li>
+<li>‘qe’ (equivalent to ‘wannier90’)</li>
+</ul>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">h_int_type</p>
+<blockquote>
+<div><strong>type</strong> = string;  <strong>mandatory</strong></div></blockquote>
+<p>interaction type:</p>
+<ul class="simple">
+<li>density_density: used for full d-shell or eg- or t2g-subset</li>
+<li>kanamori: only physical for the t2g or the eg subset</li>
+<li>full_slater: used for full d-shell or eg- or t2g-subset</li>
+<li>ntot: U/2 (Ntot^2 - Ntot) interaction</li>
+<li>simple_intra: density-density like but only intra orbital with given U value (no rotations applied)</li>
+<li>crpa: use the cRPA matrix as interaction Hamiltonian</li>
+<li>crpa_density_density: use the density-density terms of the cRPA matrix</li>
+<li>dynamic: use dynamic U from h5 archive</li>
+</ul>
+<p class="last">Needs to be stored as Matsubara Gf under dynamic_U/U_iw in the input h5</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">h5_save_freq</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = 5</div></blockquote>
+<p class="last">how often is the output saved to the h5 archive</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">J</p>
+<blockquote>
+<div><strong>type</strong> = float or list of float;  <strong>mandatory</strong></div></blockquote>
+<p class="last">J interaction value. If it is a float, the same J is assumed for all impurities,
+otherwise as a list a different J can be specified per impurity.</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">jobname</p>
+<blockquote>
+<div><strong>type</strong> = str;  <strong>default</strong>  = ‘dmft_dir’</div></blockquote>
+<p class="last">the output directory for one-shot calculations</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">load_sigma</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = False</div></blockquote>
+<p class="last">load a old sigma from h5 file</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">load_sigma_iter</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = -1</div></blockquote>
+<p class="last">load the sigma from a specific iteration if wanted.
+If it is -1, loads from the last iteration.</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">magmom</p>
+<blockquote>
+<div><strong>type</strong> = list of float;  <strong>default</strong>  = None</div></blockquote>
+<p class="last">Initialize magnetic moments if magnetic is on. length must be #imps.
+List composed of energetic shifts written in electronvolts.
+This will initialize the spin blocks of the sigma with a diagonal shift
+With -shift for the up block, and +shift for the down block
+(positive shift favours the up spin component, not compatible with spin-orbit coupling)</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">magnetic</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = False</div></blockquote>
+<p class="last">are we doing a magnetic calculations? If yes put magnetic to True.
+Not implemented for CSC calculations</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">mu_gap_gb2_threshold</p>
+<blockquote>
+<div><strong>type</strong> = float;  <strong>default</strong>  = None</div></blockquote>
+<p class="last">Threshold of the absolute of the lattice GF at tau=beta/2 for use
+of MaxEnt’s lattice spectral function to put the chemical potential
+into the middle of the gap. Does not work if system completely full
+or empty, mu mixing is not applied to it. Recommended value 0.01.</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">mu_gap_occ_deviation</p>
+<blockquote>
+<div><strong>type</strong> = float;  <strong>default</strong>  = None</div></blockquote>
+<p class="last">Only used if mu_gap_gb2_threshold != None. Sets additional criterion
+for finding the middle of the gap through occupation deviation to
+avoid getting stuck in an insulating state with wrong occupation.</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">mu_initial_guess</p>
+<blockquote>
+<div><strong>type</strong> = float;  <strong>default</strong>  = None</div></blockquote>
+<p class="last">The chemical potential of the DFT calculation.
+If not given, mu will be calculated from the DFT bands</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">mu_mix_const</p>
+<blockquote>
+<div><strong>type</strong> = float;  <strong>default</strong>  = 1.0</div></blockquote>
+<p class="last">Constant term of the mixing of the chemical potential. See mu_mix_per_occupation_offset.</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">mu_mix_per_occupation_offset</p>
+<blockquote>
+<div><strong>type</strong> = float;  <strong>default</strong>  = 0.0</div></blockquote>
+<p>Mu mixing proportional to the occupation offset.
+Mixing between the dichotomy result and the previous mui,</p>
+<p>mu_next = factor * mu_dichotomy + (1-factor) * mu_previous, with
+factor = mu_mix_per_occupation_offset * abs(n - n_target) + mu_mix_const.</p>
+<p class="last">The program ensures that 0 &lt;= factor &lt;= 1.
+mu_mix_const = 1.0 and mu_mix_per_occupation_offset = 0.0 means no mixing.</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">mu_update_freq</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = 1</div></blockquote>
+<p class="last">The chemical potential will be updated every # iteration</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">n_iter_dmft</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>mandatory</strong></div></blockquote>
+<p class="last">number of iterations per dmft cycle after first cycle</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">n_iter_dmft_first</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = 10</div></blockquote>
+<p class="last">number of iterations in first dmft cycle to converge dmft solution</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">n_iter_dmft_per</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = 2</div></blockquote>
+<p class="last">number of iterations per dmft step in CSC calculations</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">n_iw</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = 1025</div></blockquote>
+<p class="last">number of Matsubara frequencies for the imaginary-frequency grid</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">n_tau</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = 10001</div></blockquote>
+<p class="last">number of imaginary time points for the imaginary-time grid</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">n_w</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = 5001</div></blockquote>
+<p class="last">number of real frequency points for the real-frequency grid</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">noise_level_initial_sigma</p>
+<blockquote>
+<div><strong>type</strong> = float;  <strong>default</strong>  = 0.0</div></blockquote>
+<p class="last">spread of Gaussian noise applied to the initial Sigma</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">occ_conv_crit</p>
+<blockquote>
+<div><strong>type</strong> = float;  <strong>default</strong>  = -1.0</div></blockquote>
+<p class="last">stop the calculation if a certain threshold for the imp occ change is reached</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">path_to_sigma</p>
+<blockquote>
+<div><strong>type</strong> = str;  <strong>default</strong>  = None</div></blockquote>
+<p class="last">path to h5 file from which the sigma should be loaded.
+Needed if load_sigma is true</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">prec_mu</p>
+<blockquote>
+<div><strong>type</strong> = float;  <strong>default</strong>  = 1e-4</div></blockquote>
+<p class="last">general precision for determining the chemical potential at any time calc_mu is called</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">ratio_F4_F2</p>
+<blockquote>
+<div><strong>type</strong> = float or list of float;  <strong>default</strong>  = None</div></blockquote>
+<p class="last">Ratio between the Slater integrals  F_4 and F_2. Only used for the
+interaction Hamiltonians ‘density_density’ and ‘full_slater’ and
+only for d-shell impurities;  <strong>default</strong>  is 0.63.</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">sampling_h5_save_freq</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = 5</div></blockquote>
+<p class="last">overwrites h5_save_freq when sampling has started</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">sampling_iterations</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = 0</div></blockquote>
+<p class="last">for how many iterations should the solution sampled after the CSC loop is converged</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">seedname</p>
+<blockquote>
+<div><strong>type</strong> = str;  <strong>mandatory</strong></div></blockquote>
+<p class="last">seedname for h5 archive with DMFT input and output</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">set_rot</p>
+<blockquote>
+<div><strong>type</strong> = string;  <strong>default</strong>  = None</div></blockquote>
+<p>Local orbital rotations added by solid_dmft</p>
+<ul class="last simple">
+<li>None: keep the rotations stored in the h5 archive</li>
+<li>‘den’ use the DFT occupations density_mat_dft for diagonalization</li>
+<li>‘hloc’: use the DFT local Hamiltonian hloc_dft for diagonalization</li>
+</ul>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">sigma_conv_crit</p>
+<blockquote>
+<div><strong>type</strong> = float;  <strong>default</strong>  = -1.0</div></blockquote>
+<p class="last">stop the calculation if sum_w 1/(w^0.6) ||Sigma-Sigma_prev|| is smaller than threshold</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">sigma_mix</p>
+<blockquote>
+<div><strong>type</strong> = float;  <strong>default</strong>  = 1.0</div></blockquote>
+<p class="last">careful: Sigma mixing can break orbital symmetries, use G0 mixing.
+mixing sigma with previous iteration sigma for better convergency. 1.0 means no mixing</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">store_solver</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = False</div></blockquote>
+<p class="last">whether to store the whole solver object under DMFT_input in h5 archive</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">U</p>
+<blockquote>
+<div><strong>type</strong> = float or list of float;  <strong>mandatory</strong></div></blockquote>
+<p class="last">U interaction value. If it is a float, the same U is assumed for all impurities,
+otherwise as a list a different U can be specified per impurity.</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">U_prime</p>
+<blockquote>
+<div><strong>type</strong> = float or list of floats;  <strong>default</strong>  = None</div></blockquote>
+<p class="last">U prime interaction value.
+Only used for impurities where general.h_int_type is kanamori.
+If it is a float, the same U prime is assumed for all impurities,
+otherwise as a list a different U prime can be specified per impurity.
+For None;  <strong>default</strong>  of U prime = U-2J is used.</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">w_range</p>
+<blockquote>
+<div><strong>type</strong> = list of int;  <strong>default</strong>  = [-10, 10]</div></blockquote>
+<p class="last">Minimal and maximal range of the real-frequency grid</p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="input.html" class="btn btn-neutral float-left" title="Input" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="solver.html" class="btn btn-neutral float-right" title="[solver]: solver specific parameters" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (C) 2018-2020, ETH Zurich Copyright (C) 2021-2022, The Simons Foundation authors: A. Hampel, M. Merkel, A. Carta, and S. Beck.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,28 @@
+@import url("theme.css");
+
+.wy-nav-content {
+    max-width: 70em;
+}
+
+/* here we add an empty svg icon to overwrite the rst icon in order to avoid the default exclamation mark, alternatively we can add a small icon  */
+:root {
+  --icon--empty-icon: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d=""/></svg>');
+  --icon--book-icon: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 487.5 487.5" style="disable-backgrounds" xml:space="preserve"><path d="M437 12.3C437 5.5 431.5 0 424.7 0H126.3C84.4 0 50.4 34.1 50.4 75.9v335.7c0 41.9 34.1 75.9 75.9 75.9h298.5c6.8 0 12.3-5.5 12.3-12.3V139.6c0-6.8-5.5-12.3-12.3-12.3H126.3c-28.3 0-51.4-23.1-51.4-51.4S98 24.5 126.3 24.5h298.5c6.7 0 12.2-5.5 12.2-12.2zM126.3 151.8h286.2V463H126.3c-28.3 0-51.4-23.1-51.4-51.4V131.7c13.5 12.5 31.6 20.1 51.4 20.1z"/><path d="M130.5 64.8c-6.8 0-12.3 5.5-12.3 12.3s5.5 12.3 12.3 12.3h280.1c6.8 0 12.3-5.5 12.3-12.3s-5.5-12.3-12.3-12.3H130.5zM178 397.7c6.3 2.4 13.4-.7 15.8-7.1l17.9-46.8h62.7c.5 0 .9-.1 1.3-.1l17.9 46.9c1.9 4.9 6.5 7.9 11.4 7.9 1.5 0 2.9-.3 4.4-.8 6.3-2.4 9.5-9.5 7.1-15.8l-54-141.2c-3-7.9-10.4-13-18.8-13s-15.8 5.1-18.8 13l-54 141.2c-2.4 6.3.8 13.3 7.1 15.8zM243.7 260l22.7 59.3h-45.3l22.6-59.3z"/></svg>');
+  --icon--square: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" style="enable-background:new 0 0 32 32"><path d="M0 0h32v32H0z"/></svg>');
+}
+
+/* definining a new admonition class called 'intag' */
+.admonition.intag {
+  border-color: rgb(0, 0, 0);
+}
+
+/* title layout of the new */
+.admonition.intag > .admonition-title {
+  border-color: rgb(0, 0, 0);
+}
+
+/* Removes everything, including the icon before the title in the 'intag' admonition*/
+.admonition.intag > .admonition-title::before {
+  all:unset;
+}
+

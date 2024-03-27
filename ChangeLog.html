@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Changelog &mdash; solid_dmft  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+      <link rel="stylesheet" href="_static/plot_directive.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Support &amp; contribute" href="issues.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #7E588A" >
+            <a href="index.html" class="icon icon-home"> solid_dmft
+            <img src="_static/logo_no_text.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                3.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="install.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#installation-via-pip">Installation via pip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#manual-installation-via-cmake">Manual installation via CMake</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#docker-files-images">Docker files &amp; images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#version-compatibility">Version compatibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#custom-cmake-options">Custom CMake options</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="documentation.html">Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html#code-structure">Code structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html#dft-interface-notes">DFT interface notes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="md_notes/w90_interface.html">Wannier90 interface</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="md_notes/w90_interface.html#orbital-order-in-the-w90-converter">orbital order in the W90 converter</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="md_notes/vasp_csc.html">Interface to VASP</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="md_notes/vasp_csc.html#general-remarks">General remarks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="md_notes/vasp_csc.html#locproj-bug-for-individual-projections">LOCPROJ bug for individual projections:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="md_notes/vasp_csc.html#convergence-of-projectors-with-vasp">convergence of projectors with Vasp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="md_notes/vasp_csc.html#enabling-csc-calculations-with-wannier90-projectors">Enabling CSC calculations with Wannier90 projectors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="md_notes/vasp_csc.html#speeding-up-by-not-writing-projectors-at-every-step">Speeding up by not writing projectors at every step</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cRPA_VASP/README.html">How to do cRPA calculations with VASP</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cRPA_VASP/README.html#file-description">file description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cRPA_VASP/README.html#workflow">Workflow:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cRPA_VASP/README.html#important-flags">important flags:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cRPA_VASP/README.html#convergency-tests">convergency tests:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cRPA_VASP/README.html#parameterization-of-u-and-j-from-crpa-calculations">Parameterization of U and J from cRPA calculations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cRPA_VASP/README.html#general-sidemarks">general sidemarks:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cRPA_VASP/README.html#version-and-compilation">version and compilation:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html#input-output">Input/Output</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="input_output/DMFT_input/input.html">Input</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="input_output/DMFT_input/general.html">[general]: General parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_output/DMFT_input/solver.html">[solver]: solver specific parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_output/DMFT_input/dft.html">[dft]: DFT related inputs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_output/DMFT_input/advanced.html">[advanced]: Advanced inputs</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="input_output/DMFT_output/results.html">Output / results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="input_output/DMFT_output/results.html#group-structure">Group structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="input_output/DMFT_output/results.html#subgroups">Subgroups</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html#further-details-for-running">Further details for running</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="md_notes/docker.html">Docker</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="md_notes/docker.html#building-the-docker-image">Building the docker image</a></li>
+<li class="toctree-l4"><a class="reference internal" href="md_notes/docker.html#pulling-a-docker-image">Pulling a docker image</a></li>
+<li class="toctree-l4"><a class="reference internal" href="md_notes/docker.html#getting-docker-images-onto-cscs-daint">Getting docker images onto CSCS daint</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="md_notes/run_locally.html">Run on your machine</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="md_notes/run_locally.html#csc-calculations-locally">CSC calculations locally</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="md_notes/run_cluster.html">Running solid_dmft on a cluster</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="md_notes/run_cluster.html#running-on-cscs-daint">Running on CSCS daint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="md_notes/run_cluster.html#one-shot-job-on-daint">one shot job on daint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="md_notes/run_cluster.html#csc-calculations-on-daint">CSC calculations on daint</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html#module-reference-manual">Module reference manual</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="_ref/csc_flow.html">csc_flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_ref/dft_managers.html">dft_managers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dft_managers.mpi_helpers.html">dft_managers.mpi_helpers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dft_managers.qe_manager.html">dft_managers.qe_manager</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dft_managers.vasp_manager.html">dft_managers.vasp_manager</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="_ref/dmft_cycle.html">dmft_cycle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_ref/dmft_tools.html">dmft_tools</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.afm_mapping.html">dmft_tools.afm_mapping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.convergence.html">dmft_tools.convergence</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.formatter.html">dmft_tools.formatter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.greens_functions_mixer.html">dmft_tools.greens_functions_mixer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.initial_self_energies.html">dmft_tools.initial_self_energies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.interaction_hamiltonian.html">dmft_tools.interaction_hamiltonian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.legendre_filter.html">dmft_tools.legendre_filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.manipulate_chemical_potential.html">dmft_tools.manipulate_chemical_potential</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.matheval.html">dmft_tools.matheval</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.observables.html">dmft_tools.observables</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.results_to_archive.html">dmft_tools.results_to_archive</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.solver.html">dmft_tools.solver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="_ref/io_tools.html">io_tools</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_ref/io_tools.dict_to_h5.html">io_tools.dict_to_h5</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/io_tools.postproc_toml_dict.html">io_tools.postproc_toml_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/io_tools.verify_input_params.html">io_tools.verify_input_params</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="_ref/postprocessing.html">postprocessing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_ref/postprocessing.eval_U_cRPA_RESPACK.html">postprocessing.eval_U_cRPA_RESPACK</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/postprocessing.eval_U_cRPA_Vasp.html">postprocessing.eval_U_cRPA_Vasp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/postprocessing.maxent_gf_imp.html">postprocessing.maxent_gf_imp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/postprocessing.maxent_gf_latt.html">postprocessing.maxent_gf_latt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/postprocessing.maxent_sigma.html">postprocessing.maxent_sigma</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/postprocessing.pade_sigma.html">postprocessing.pade_sigma</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/postprocessing.plot_correlated_bands.html">postprocessing.plot_correlated_bands</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="_ref/util.html">util</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_ref/util.symmetrize_gamma_file.html">util.symmetrize_gamma_file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_ref/util.write_kslice_to_h5.html">util.write_kslice_to_h5</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/SVO_os_qe/tutorial.html">1. OS with QE/W90 and cthyb: SrVO3 MIT</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/SVO_os_qe/tutorial.html#1.-Starting-out-with-DMFT">1. Starting out with DMFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/SVO_os_qe/tutorial.html#2.-Looking-at-the-Metal-Insulator-Transition">2. Looking at the Metal-Insulator Transition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/SVO_os_qe/tutorial.html#3.-Refining-the-diagram">3. Refining the diagram</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/SVO_os_qe/tutorial.html#4.-Plotting-the-spectral-function">4. Plotting the spectral function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/SVO_os_qe/tutorial.html#5-Visualizing-the-MIT">5 Visualizing the MIT</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html">2. CSC with VASP PLOs: charge order in PrNiO3</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#1.-Running-the-initial-scf-DFT-calculation">1. Running the initial scf DFT calculation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#2.-Running-the-CSC-DMFT-calculations">2. Running the CSC DMFT calculations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Input-files-for-CSC-DMFT-calculations">Input files for CSC DMFT calculations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Starting-the-calculations">Starting the calculations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Analyzing-the-projectors">Analyzing the projectors</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Plotting-the-results:-observables">3. Plotting the results: observables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green’s-function">4. Plotting the results: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Next-steps-to-try">5. Next steps to try</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/Ce2O3_csc_w90/tutorial.html">3. CSC with QE/W90 and HubbardI: total energy in Ce2O3</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/Ce2O3_csc_w90/tutorial.html#1.-Input-file-preparation">1. Input file preparation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tutorials/Ce2O3_csc_w90/tutorial.html#DFT-files">DFT files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tutorials/Ce2O3_csc_w90/tutorial.html#DMFT">DMFT</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/Ce2O3_csc_w90/tutorial.html#2.-Running-DFT+DMFT">2. Running DFT+DMFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/Ce2O3_csc_w90/tutorial.html#3.-Non-interacting-Hamiltonian-and-convergence-analysis">3. Non-interacting Hamiltonian and convergence analysis</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tutorials/Ce2O3_csc_w90/tutorial.html#Tight-binding-Hamiltonian">Tight-binding Hamiltonian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tutorials/Ce2O3_csc_w90/tutorial.html#Convergence">Convergence</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/NNO_os_plo_mag/tutorial.html">4. OS with VASP/PLOs and cthyb: AFM state of NdNiO2</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/NNO_os_plo_mag/tutorial.html#1.-Run-DFT">1. Run DFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/NNO_os_plo_mag/tutorial.html#2.-Creating-the-hdf5-archive-/-DMFT-input">2. Creating the hdf5 archive / DMFT input</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/NNO_os_plo_mag/tutorial.html#3.-Running-the-AFM-calculation">3. Running the AFM calculation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/NNO_os_plo_mag/tutorial.html#5.-Multiplet-analysis">5. Multiplet analysis</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/correlated_bandstructure/plot_correlated_bands.html">5. Plotting the spectral function</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/correlated_bandstructure/plot_correlated_bands.html#1.-Configuration">1. Configuration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tutorials/correlated_bandstructure/plot_correlated_bands.html#Basic-options">Basic options</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tutorials/correlated_bandstructure/plot_correlated_bands.html#Wannier90">Wannier90</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tutorials/correlated_bandstructure/plot_correlated_bands.html#BZ-configuration">BZ configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tutorials/correlated_bandstructure/plot_correlated_bands.html#Self-energy">Self-energy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tutorials/correlated_bandstructure/plot_correlated_bands.html#Plotting-options">Plotting options</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/correlated_bandstructure/plot_correlated_bands.html#2.-Run-and-Plotting">2. Run and Plotting</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="issues.html">Support &amp; contribute</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="issues.html#seeking-help">Seeking help</a></li>
+<li class="toctree-l2"><a class="reference internal" href="issues.html#improving-solid-dmft">Improving solid_dmft</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="issues.html#reporting-issues">Reporting issues</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-3-2-0">Version 3.2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#general">General</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#fix">fix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#build">build</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#feat">feat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#doc">doc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#test">test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-3-1-5">Version 3.1.5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-3-1-4">Version 3.1.4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-3-1-3">Version 3.1.3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-3-1-2">Version 3.1.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-3-1-1">Version 3.1.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-3-1-0">Version 3.1.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-3-0-0">Version 3.0.0</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #7E588A" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">solid_dmft</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Changelog</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/ChangeLog.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="tex2jax_ignore mathjax_ignore section" id="changelog">
+<span id="id1"></span><h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline"></a></h1>
+<div class="section" id="version-3-2-0">
+<h2>Version 3.2.0<a class="headerlink" href="#version-3-2-0" title="Permalink to this headline"></a></h2>
+<p>solid_dmft version 3.2.0 is a release that</p>
+<ul class="simple">
+<li>adds Jenkins CI support via flatiron-jenkins</li>
+<li>includes several fixes to match the latest triqs 3.2.x release</li>
+<li>changes the Z estimate to a correct linear fit of the first two Matsubara frequencies</li>
+<li>fixes for QE and Vasp CSC</li>
+<li>add option to add a magnetic field in DMFT</li>
+<li>add solid_dmft JOSS paper reference (<a class="reference external" href="http://doi.org/10.21105/joss.04623" rel="noopener noreferrer" target="_blank">doi.org/10.21105/joss.04623</a>)</li>
+<li>add simple Ntot interaction</li>
+<li>allow Uprime!=U-2J in Kanamori</li>
+<li>updates the tutorials</li>
+<li>introduces input output documentation</li>
+<li>add support for the TRIQS Hartree Solver</li>
+<li>add RESPACK support</li>
+</ul>
+<p>We thank all contributors: Sophie Beck, Alberto Carta, Alexander Hampel, Max Merkel, Harrison LaBollita, Nils Wentzell</p>
+<p>Find below an itemized list of changes in this release.</p>
+</div>
+<div class="section" id="general">
+<h2>General<a class="headerlink" href="#general" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li>fix SzSz measurement in triqs unstable</li>
+<li>Updated mpich VASP5 docker file to include HF solver</li>
+<li>add hartree solver</li>
+<li>feat: add regular kmesh option to pcb postproc</li>
+<li>Fix to charge-self-consistency with Vasp (#48)</li>
+<li>removed QE fix files which are now in official release</li>
+<li>Modified dockerfile to add pmi support for cray supercomputing environments</li>
+<li>add RESPACK postprocessing routines (#38)</li>
+<li>Added correction to energy calculation</li>
+<li>add triqs logos to skeleton and include ico in install directive of doc</li>
+<li>change name of dft_mu to mu_initial_guess</li>
+<li>support different DFT cubic basis conventions (#36)</li>
+<li>allow magnetic calculation for CSC (output den correction is always averaged)</li>
+<li>fix sym bug in hubbardI postprocessing</li>
+<li>always calculate dft_mu at start of calculation</li>
+<li>add h_field_it to remove magnetic field after x iterations</li>
+<li>Write solid_dmft hash to h5</li>
+<li>fix delta interface of cthyb for multiple sites with different block structures</li>
+<li>correctly use tail fitted Sigma from cthyb not via double dyson equation</li>
+<li>add paper ref to toml</li>
+<li>minor addition of post-processing script: add_local Hamiltonian, separate from add_lambda. We might remove add_lambda</li>
+<li>update doc with JOSS references</li>
+<li>Bug fix for changes in sumk mesh definition in maxent_gf_latt</li>
+<li>adapt vasp patch files for ver6.3.2</li>
+<li>function to det n_orb_solver, fix test</li>
+<li>apply block picker before block mapping</li>
+<li>fix header writing for obs file</li>
+<li>add pick solver struct option to select specific blocks for the impurity problem</li>
+<li>fix print for failing comparison test</li>
+<li>allow different interaction Hamiltonians per impurity</li>
+<li>enforce PEP standard in interaction Hamiltonian</li>
+<li>print optimal alpha in other maxent scripts</li>
+<li>final corrections for PCB functions</li>
+<li>add proj_on_orb functionality to Akw</li>
+<li>fix bug in max_G_diff function ignoring norm_temp</li>
+<li>change Sigma_imp_iw / _w to Sigma_imp (DFTTools unstable)</li>
+<li>fix load Sigma with new gf_struct in triqs 3.1.x</li>
+<li>adapt to sumk mesh changes in dfttools</li>
+<li>Made the way mesh is stored in maxent_gf_latt consistent with maxent_gf_imp</li>
+</ul>
+</div>
+<div class="section" id="fix">
+<h2>fix<a class="headerlink" href="#fix" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li>fix deg shells in magnetic calculations</li>
+<li>fix parameter n_orb in hint construction</li>
+<li>doc strings of cRPA avering for Slater</li>
+<li>critical bug in hubbardI interface</li>
+<li>PCB fermi surface plot</li>
+<li>updates from triqs unstable</li>
+<li>simple Z estimate as linear fit</li>
+<li>PCB: removing “linearize” function, changing the model</li>
+<li>delta_interface with SOC and store solver options</li>
+<li>convert warmup cycles to int automatically</li>
+<li>problem with ish vs icrsh in PCB Thanks &#64;HenryScottx for reporting!</li>
+<li>h_int uses now n_orb instead of orb_names</li>
+</ul>
+</div>
+<div class="section" id="build">
+<h2>build<a class="headerlink" href="#build" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li>adapt jenkins CI files</li>
+<li>simplify docker image</li>
+<li>update openmpi docker file with clang-15</li>
+<li>update CI dockerfile</li>
+<li>Updated docker file to ubuntu 22</li>
+</ul>
+</div>
+<div class="section" id="feat">
+<h2>feat<a class="headerlink" href="#feat" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li>enable MPI for maxent_gf_imp post-processing routines</li>
+<li>add possibility to specify Uprime in Kanamori interaction</li>
+<li>add loc_n_min / max arg for cthyb</li>
+<li>add additional support for hartree when computing DC from the solver</li>
+<li>add Ntot interaction</li>
+</ul>
+</div>
+<div class="section" id="doc">
+<h2>doc<a class="headerlink" href="#doc" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li>Added observables documentation for DMFT output</li>
+<li>Updated tutorial svo one-shot</li>
+</ul>
+</div>
+<div class="section" id="test">
+<h2>test<a class="headerlink" href="#test" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li>fix tests after Hartree additions</li>
+<li>add Hartree Solver test</li>
+<li>Integration test for maxent gf imp and latt, bug fixes to both scripts (#30)</li>
+<li>add new test for pcb get_dmft_bands function</li>
+</ul>
+</div>
+<div class="section" id="version-3-1-5">
+<h2>Version 3.1.5<a class="headerlink" href="#version-3-1-5" title="Permalink to this headline"></a></h2>
+<p>solid_dmft version 3.1.5 is a patch-release that improves / fixes the following issues:</p>
+<ul class="simple">
+<li>fix to charge-self-consistency with Vasp and QE</li>
+<li>feat add loc_n_min / max arg for cthyb</li>
+<li>fix simple Z estimate as linear fit</li>
+<li>adapt docker images for ubuntu 22.04</li>
+</ul>
+<p>Contributors: Sophie Beck, Alberto Carta, Alexander Hampel, Max Merkel:</p>
+</div>
+<div class="section" id="version-3-1-4">
+<h2>Version 3.1.4<a class="headerlink" href="#version-3-1-4" title="Permalink to this headline"></a></h2>
+<p>solid_dmft version 3.1.4 is a patch-release that improves / fixes the following issues:</p>
+<ul class="simple">
+<li>fix and improve rootfinder in PCB for quasiparticle dispersion</li>
+<li>fix pypi package <a class="reference external" href="http://version.py" rel="noopener noreferrer" target="_blank">version.py</a> module</li>
+</ul>
+<p>Contributors: Sophie Beck, Alberto Carta, Alexander Hampel, Max Merkel:</p>
+</div>
+<div class="section" id="version-3-1-3">
+<h2>Version 3.1.3<a class="headerlink" href="#version-3-1-3" title="Permalink to this headline"></a></h2>
+<p>solid_dmft version 3.1.3 is a patch-release that improves / fixes the following issues:</p>
+<ul class="simple">
+<li>fix delta interface of cthyb for multiple sites with different block structures</li>
+<li>correctly use tail fitted Sigma from cthyb not via double dyson equation</li>
+<li>magnetic param not available in CSC crash PM calc</li>
+<li>improve PCB script from unstable branch</li>
+<li>convert warmup cycles to int automatically</li>
+<li>fix function calls in gap finder</li>
+<li>fix delta_interface with SOC and store solver options</li>
+<li>fix: update svo example for PCB test from unstable</li>
+</ul>
+<p>Contributors: Sophie Beck, Alberto Carta, Alexander Hampel, Max Merkel</p>
+</div>
+<div class="section" id="version-3-1-2">
+<h2>Version 3.1.2<a class="headerlink" href="#version-3-1-2" title="Permalink to this headline"></a></h2>
+<p>solid_dmft version 3.1.1 is a patch-release that improves / fixes the following issues:</p>
+<ul class="simple">
+<li>fix deg shells in magnetic calculations</li>
+<li>fix bug in max_G_diff function ignoring norm_temp</li>
+<li>fix load Sigma with new gf_struct in triqs 3.1.x</li>
+<li>Made the way mesh is stored in maxent_gf_latt consistent with maxent_gf_imp</li>
+<li>adapt vasp patch files for ver6.3.2</li>
+<li>update <a class="reference external" href="http://README.md" rel="noopener noreferrer" target="_blank">README.md</a> for Joss publication</li>
+<li>print optimal alpha in other maxent scripts</li>
+<li>update postprocessing routines for plotting spectral functions</li>
+<li>add new test for pcb get_dmft_bands function</li>
+<li>DOC: extend install instructions &amp; improve readme for #21 #22</li>
+<li>DOC: update support &amp; contribute section, bump ver to 3.1.1</li>
+<li>add proj_on_orb functionality to Akw</li>
+<li>Added observables documentation for DMFT output</li>
+<li>Added input documentation</li>
+<li>Added ETH logo to website, small fixes to documentation</li>
+<li>rename examples to debbuging_examples</li>
+<li>pip package build files</li>
+</ul>
+<p>Contributors: Sophie Beck, Alberto Carta, Alexander Hampel, Max Merkel</p>
+</div>
+<div class="section" id="version-3-1-1">
+<h2>Version 3.1.1<a class="headerlink" href="#version-3-1-1" title="Permalink to this headline"></a></h2>
+<p>solid_dmft version 3.1.1 is a patch-release that improves / fixes the following issues:</p>
+<ul class="simple">
+<li>delete obsolete make_spaghetti.py</li>
+<li>SOC self energies can be continued in maxent</li>
+<li>run hubbardI solver on all nodes due to slow bcast performance of atomdiag object</li>
+<li>fix DFT energy read when running CSC QE</li>
+<li>updated documentation, small fixes to tutorials</li>
+<li>exposed params of maxent_gf_imp</li>
+<li>fix the way dft_mu is loaded in PCB</li>
+<li>fix executable in SVO tutorial</li>
+<li>fix shift in sigma continuator to remove dft_mu</li>
+<li>fix chemical potential in plot Akw and minor fixes</li>
+<li>correct plotlabels in postprocessing</li>
+<li>tiny modification of printing H_loc in postprocessing</li>
+</ul>
+<p>Contributors: Sophie Beck, Alberto Carta, Max Merkel</p>
+</div>
+<div class="section" id="version-3-1-0">
+<h2>Version 3.1.0<a class="headerlink" href="#version-3-1-0" title="Permalink to this headline"></a></h2>
+<p>solid_dmft version 3.1.0 is a major release that provides tutorials in the documentation, changes to app4triqs skeleton, allows CSC calculations with QE, improves postprocessing routines, and add functionality for SOC calculations.</p>
+<ul class="simple">
+<li>all new tutorials</li>
+<li>generalize measure_chi functionality</li>
+<li>CSC with Vasp 6.3.0 works, examples updated</li>
+<li>fix two bugs in w90 interface in vasp</li>
+<li>Renamed files</li>
+<li>fix Fermi level print in mlwf.F LPRJ_WRITE call</li>
+<li>Automatic patching of vasp 6.3.0 with Docker</li>
+<li>Updated tutorial</li>
+<li>Added check on all mpi ranks if dmft_config exists at beginning of run</li>
+<li>fix small bug in <a class="reference external" href="http://convergence.py" rel="noopener noreferrer" target="_blank">convergence.py</a> thanks &#64;merkelm</li>
+<li>Rework convergence metrics</li>
+<li>remove gf_struct_flatten from solver in accordance with latest dfttools version</li>
+<li>Renaming to solid_dmft</li>
+<li>Update of maxent_gf_latt.py: more parameters exposed and spin averaging is not default anymore</li>
+<li>fix bug in afm calculation when measuring density matrix</li>
+<li>Add w90_tolerance flag for CSC</li>
+<li>use sphinx autosummary for module reference</li>
+<li>small changes in IO, additional mpi barriers in csc flow for better stability</li>
+<li>With SOC now program prints real and imag part of matrices</li>
+<li>Fixed creation of Kanamori Hamiltonian with SOC</li>
+<li>Improvements in plot_correlated_bands.py and updated tutorial</li>
+<li>change output name of MaxEnt Sigma to Sigma_maxent</li>
+<li>change to develop version of w90 because of mpi bug in openmpi dockerfile</li>
+<li>bugfix in plot_correlated_bands and cleaning up</li>
+<li>update OpenMPI Dockerfile to latest Ubuntu</li>
+<li>Tutorial to explore correlated bands using the postprocessing script</li>
+<li>check in CSC with QE if optional files are presesnt, otherwise skip calculation</li>
+<li>Updated maxent_sigma: mpi parallelization, continuator types, bug fixes, parameters exposed</li>
+<li>update installation instructions</li>
+<li>add workflow and code structure images</li>
+<li>Updated maxent sigma script</li>
+<li>W90 runs in parallel</li>
+<li>Fixing a bug related to measure_pert_order and measure_chi_SzSz for afm_order</li>
+<li>add vasp crpa scripts and tutorials</li>
+<li>add delta interface for cthyb</li>
+<li>fix get_dmft_bands and pass eta to alatt_k_w correctly</li>
+<li>allows to recompute rotation matrix even if W90 is used</li>
+<li>bugfix in initial_self_energies.py in case dc = False</li>
+<li>flatten gf_struct for triqs solvers to remove depracted warning</li>
+<li>add example files for SVO and LNO</li>
+<li>bump triqs and package version to 3.1</li>
+</ul>
+<p>Contributors: Sophie Beck, Alberto Carta, Max Merkel</p>
+</div>
+<div class="section" id="version-3-0-0">
+<h2>Version 3.0.0<a class="headerlink" href="#version-3-0-0" title="Permalink to this headline"></a></h2>
+<p>solid_dmft version 3.0.0 is a compatibility
+release for TRIQS version 3.0.0 that</p>
+<ul class="simple">
+<li>introduces compatibility with Python 3 (Python 2 no longer supported)</li>
+<li>adds a cmake-based dependency management</li>
+<li>fixes several application issues</li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="issues.html" class="btn btn-neutral float-left" title="Support &amp; contribute" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (C) 2018-2020, ETH Zurich Copyright (C) 2021-2022, The Simons Foundation authors: A. Hampel, M. Merkel, A. Carta, and S. Beck.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

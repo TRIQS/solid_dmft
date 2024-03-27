@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>5. Plotting the spectral function &mdash; solid_dmft  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/plot_directive.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script defer="defer" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=default"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Support &amp; contribute" href="../../issues.html" />
+    <link rel="prev" title="4. OS with VASP/PLOs and cthyb: AFM state of NdNiO2" href="../NNO_os_plo_mag/tutorial.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #7E588A" >
+            <a href="../../index.html" class="icon icon-home"> solid_dmft
+            <img src="../../_static/logo_no_text.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                3.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#installation-via-pip">Installation via pip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#manual-installation-via-cmake">Manual installation via CMake</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#docker-files-images">Docker files &amp; images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#version-compatibility">Version compatibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#custom-cmake-options">Custom CMake options</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../documentation.html">Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#code-structure">Code structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#dft-interface-notes">DFT interface notes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../md_notes/w90_interface.html">Wannier90 interface</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/w90_interface.html#orbital-order-in-the-w90-converter">orbital order in the W90 converter</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../md_notes/vasp_csc.html">Interface to VASP</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/vasp_csc.html#general-remarks">General remarks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/vasp_csc.html#locproj-bug-for-individual-projections">LOCPROJ bug for individual projections:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/vasp_csc.html#convergence-of-projectors-with-vasp">convergence of projectors with Vasp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/vasp_csc.html#enabling-csc-calculations-with-wannier90-projectors">Enabling CSC calculations with Wannier90 projectors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/vasp_csc.html#speeding-up-by-not-writing-projectors-at-every-step">Speeding up by not writing projectors at every step</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../cRPA_VASP/README.html">How to do cRPA calculations with VASP</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#file-description">file description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#workflow">Workflow:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#important-flags">important flags:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#convergency-tests">convergency tests:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#parameterization-of-u-and-j-from-crpa-calculations">Parameterization of U and J from cRPA calculations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#general-sidemarks">general sidemarks:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#version-and-compilation">version and compilation:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#input-output">Input/Output</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../input_output/DMFT_input/input.html">Input</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_input/general.html">[general]: General parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_input/solver.html">[solver]: solver specific parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_input/dft.html">[dft]: DFT related inputs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_input/advanced.html">[advanced]: Advanced inputs</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../input_output/DMFT_output/results.html">Output / results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_output/results.html#group-structure">Group structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_output/results.html#subgroups">Subgroups</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#further-details-for-running">Further details for running</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../md_notes/docker.html">Docker</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/docker.html#building-the-docker-image">Building the docker image</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/docker.html#pulling-a-docker-image">Pulling a docker image</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/docker.html#getting-docker-images-onto-cscs-daint">Getting docker images onto CSCS daint</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../md_notes/run_locally.html">Run on your machine</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/run_locally.html#csc-calculations-locally">CSC calculations locally</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../md_notes/run_cluster.html">Running solid_dmft on a cluster</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/run_cluster.html#running-on-cscs-daint">Running on CSCS daint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/run_cluster.html#one-shot-job-on-daint">one shot job on daint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/run_cluster.html#csc-calculations-on-daint">CSC calculations on daint</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#module-reference-manual">Module reference manual</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/csc_flow.html">csc_flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/dft_managers.html">dft_managers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dft_managers.mpi_helpers.html">dft_managers.mpi_helpers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dft_managers.qe_manager.html">dft_managers.qe_manager</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dft_managers.vasp_manager.html">dft_managers.vasp_manager</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/dmft_cycle.html">dmft_cycle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/dmft_tools.html">dmft_tools</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.afm_mapping.html">dmft_tools.afm_mapping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.convergence.html">dmft_tools.convergence</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.formatter.html">dmft_tools.formatter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.greens_functions_mixer.html">dmft_tools.greens_functions_mixer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.initial_self_energies.html">dmft_tools.initial_self_energies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.interaction_hamiltonian.html">dmft_tools.interaction_hamiltonian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.legendre_filter.html">dmft_tools.legendre_filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.manipulate_chemical_potential.html">dmft_tools.manipulate_chemical_potential</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.matheval.html">dmft_tools.matheval</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.observables.html">dmft_tools.observables</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.results_to_archive.html">dmft_tools.results_to_archive</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.solver.html">dmft_tools.solver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/io_tools.html">io_tools</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/io_tools.dict_to_h5.html">io_tools.dict_to_h5</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/io_tools.postproc_toml_dict.html">io_tools.postproc_toml_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/io_tools.verify_input_params.html">io_tools.verify_input_params</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/postprocessing.html">postprocessing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.eval_U_cRPA_RESPACK.html">postprocessing.eval_U_cRPA_RESPACK</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.eval_U_cRPA_Vasp.html">postprocessing.eval_U_cRPA_Vasp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.maxent_gf_imp.html">postprocessing.maxent_gf_imp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.maxent_gf_latt.html">postprocessing.maxent_gf_latt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.maxent_sigma.html">postprocessing.maxent_sigma</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.pade_sigma.html">postprocessing.pade_sigma</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.plot_correlated_bands.html">postprocessing.plot_correlated_bands</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/util.html">util</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/util.symmetrize_gamma_file.html">util.symmetrize_gamma_file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/util.write_kslice_to_h5.html">util.write_kslice_to_h5</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../tutorials.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../SVO_os_qe/tutorial.html">1. OS with QE/W90 and cthyb: SrVO3 MIT</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../SVO_os_qe/tutorial.html#1.-Starting-out-with-DMFT">1. Starting out with DMFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../SVO_os_qe/tutorial.html#2.-Looking-at-the-Metal-Insulator-Transition">2. Looking at the Metal-Insulator Transition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../SVO_os_qe/tutorial.html#3.-Refining-the-diagram">3. Refining the diagram</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../SVO_os_qe/tutorial.html#4.-Plotting-the-spectral-function">4. Plotting the spectral function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../SVO_os_qe/tutorial.html#5-Visualizing-the-MIT">5 Visualizing the MIT</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html">2. CSC with VASP PLOs: charge order in PrNiO3</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#1.-Running-the-initial-scf-DFT-calculation">1. Running the initial scf DFT calculation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#2.-Running-the-CSC-DMFT-calculations">2. Running the CSC DMFT calculations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Input-files-for-CSC-DMFT-calculations">Input files for CSC DMFT calculations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Starting-the-calculations">Starting the calculations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Analyzing-the-projectors">Analyzing the projectors</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Plotting-the-results:-observables">3. Plotting the results: observables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green’s-function">4. Plotting the results: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Next-steps-to-try">5. Next steps to try</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../Ce2O3_csc_w90/tutorial.html">3. CSC with QE/W90 and HubbardI: total energy in Ce2O3</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../Ce2O3_csc_w90/tutorial.html#1.-Input-file-preparation">1. Input file preparation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../Ce2O3_csc_w90/tutorial.html#DFT-files">DFT files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../Ce2O3_csc_w90/tutorial.html#DMFT">DMFT</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../Ce2O3_csc_w90/tutorial.html#2.-Running-DFT+DMFT">2. Running DFT+DMFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../Ce2O3_csc_w90/tutorial.html#3.-Non-interacting-Hamiltonian-and-convergence-analysis">3. Non-interacting Hamiltonian and convergence analysis</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../Ce2O3_csc_w90/tutorial.html#Tight-binding-Hamiltonian">Tight-binding Hamiltonian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../Ce2O3_csc_w90/tutorial.html#Convergence">Convergence</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../NNO_os_plo_mag/tutorial.html">4. OS with VASP/PLOs and cthyb: AFM state of NdNiO2</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../NNO_os_plo_mag/tutorial.html#1.-Run-DFT">1. Run DFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../NNO_os_plo_mag/tutorial.html#2.-Creating-the-hdf5-archive-/-DMFT-input">2. Creating the hdf5 archive / DMFT input</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../NNO_os_plo_mag/tutorial.html#3.-Running-the-AFM-calculation">3. Running the AFM calculation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../NNO_os_plo_mag/tutorial.html#5.-Multiplet-analysis">5. Multiplet analysis</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">5. Plotting the spectral function</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#1.-Configuration">1. Configuration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Basic-options">Basic options</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Wannier90">Wannier90</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#BZ-configuration">BZ configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Self-energy">Self-energy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Plotting-options">Plotting options</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#2.-Run-and-Plotting">2. Run and Plotting</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../issues.html">Support &amp; contribute</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../issues.html#seeking-help">Seeking help</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../issues.html#improving-solid-dmft">Improving solid_dmft</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../issues.html#reporting-issues">Reporting issues</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../ChangeLog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-2-0">Version 3.2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#general">General</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#fix">fix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#build">build</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#feat">feat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#doc">doc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#test">test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-1-5">Version 3.1.5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-1-4">Version 3.1.4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-1-3">Version 3.1.3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-1-2">Version 3.1.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-1-1">Version 3.1.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-1-0">Version 3.1.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-0-0">Version 3.0.0</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #7E588A" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">solid_dmft</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../tutorials.html">Tutorials</a> &raquo;</li>
+      <li>5. Plotting the spectral function</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/tutorials/correlated_bandstructure/plot_correlated_bands.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="5.-Plotting-the-spectral-function">
+<h1>5. Plotting the spectral function<a class="headerlink" href="#5.-Plotting-the-spectral-function" title="Permalink to this headline"></a></h1>
+<p>In this tutorial we go through the steps to plot tight-binding bands from a Wannier90 Hamiltonian and spectralfunctions with analytically continued (real-frequency) self-energies obtained from DMFT.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">importlib</span><span class="o">,</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">cm</span>
+<span class="kn">from</span> <span class="nn">timeit</span> <span class="kn">import</span> <span class="n">default_timer</span> <span class="k">as</span> <span class="n">timer</span>
+
+<span class="kn">from</span> <span class="nn">ase.io.espresso</span> <span class="kn">import</span> <span class="n">read_espresso_in</span>
+
+<span class="kn">from</span> <span class="nn">h5</span> <span class="kn">import</span> <span class="n">HDFArchive</span>
+<span class="kn">from</span> <span class="nn">solid_dmft.postprocessing</span> <span class="kn">import</span> <span class="n">plot_correlated_bands</span> <span class="k">as</span> <span class="n">pcb</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="1.-Configuration">
+<h2>1. Configuration<a class="headerlink" href="#1.-Configuration" title="Permalink to this headline"></a></h2>
+<p>The script makes use of the <code class="docutils literal notranslate"><span class="pre">triqs.lattice.utils</span></code> class, which allows to set up a tight-binding model based on a Wannier90 Hamiltonian. Additionally, you may upload a self-energy in the usual <code class="docutils literal notranslate"><span class="pre">solid_dmft</span></code> format to compute correlated spectral properties. Currently, the following options are implemented:</p>
+<ol><li><p>bandstructure</p>
+</li><li><p>Fermi slice</p>
+</li></ol><div class="section" id="Basic-options">
+<h3>Basic options<a class="headerlink" href="#Basic-options" title="Permalink to this headline"></a></h3>
+<div class="line-block">
+<div class="line">We start with configuring these options. For this example we try a tight-binding bandstructure including the correlated bands (<code class="docutils literal notranslate"><span class="pre">kslice</span> <span class="pre">=</span> <span class="pre">False</span></code>, <code class="docutils literal notranslate"><span class="pre">'tb':</span> <span class="pre">True</span></code>, <code class="docutils literal notranslate"><span class="pre">'alatt':</span> <span class="pre">True</span></code>), but feel free to come back here to explore. Alternatively to an intensity plot of the correlated bands (<code class="docutils literal notranslate"><span class="pre">qp_bands</span></code>), you can compute the correlated quasiparticle bands assuming a Fermi liquid regime.</div>
+<div class="line">The options for <span class="math notranslate nohighlight">\(\Sigma(\omega)\)</span> are <code class="docutils literal notranslate"><span class="pre">calc</span></code> or <code class="docutils literal notranslate"><span class="pre">model</span></code>, which performs a Fermi liquid linearization in the low-frequency regime. The latter will be reworked, so better stick with <code class="docutils literal notranslate"><span class="pre">calc</span></code> for now.</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">kslice</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="n">bands_config</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;tb&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;alatt&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;qp_bands&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;sigma&#39;</span><span class="p">:</span> <span class="s1">&#39;calc&#39;</span><span class="p">}</span>
+<span class="n">kslice_config</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;tb&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;alatt&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;qp_bands&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;sigma&#39;</span><span class="p">:</span> <span class="s1">&#39;calc&#39;</span><span class="p">}</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">kslice_config</span> <span class="k">if</span> <span class="n">kslice</span> <span class="k">else</span> <span class="n">bands_config</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Wannier90">
+<h3>Wannier90<a class="headerlink" href="#Wannier90" title="Permalink to this headline"></a></h3>
+<p>Next we will set up the Wannier90 Input. Provide the path, seedname, chemical potential and orbital order used in Wannier90. You may add a spin-component, and any other local Hamiltonian. For <code class="docutils literal notranslate"><span class="pre">t2g</span></code> models the orbital order can be changed (to <code class="docutils literal notranslate"><span class="pre">orbital_order_to</span></code>) and a local spin-orbit coupling term can be added (<code class="docutils literal notranslate"><span class="pre">add_lambda</span></code>). The spectral properties can be viewed projected on a specific orbital.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">w90_path</span> <span class="o">=</span> <span class="s1">&#39;./&#39;</span>
+<span class="n">w90_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;w90_seed&#39;</span><span class="p">:</span> <span class="s1">&#39;svo&#39;</span><span class="p">,</span> <span class="s1">&#39;w90_path&#39;</span><span class="p">:</span> <span class="n">w90_path</span><span class="p">,</span> <span class="s1">&#39;mu_tb&#39;</span><span class="p">:</span> <span class="mf">12.3958</span><span class="p">,</span> <span class="s1">&#39;n_orb&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="s1">&#39;orbital_order_w90&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;dxz&#39;</span><span class="p">,</span> <span class="s1">&#39;dyz&#39;</span><span class="p">,</span> <span class="s1">&#39;dxy&#39;</span><span class="p">],</span> <span class="s1">&#39;add_spin&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+
+<span class="n">orbital_order_to</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;dxy&#39;</span><span class="p">,</span> <span class="s1">&#39;dxz&#39;</span><span class="p">,</span> <span class="s1">&#39;dyz&#39;</span><span class="p">]</span>
+<span class="n">proj_on_orb</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># or &#39;dxy&#39; etc</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="BZ-configuration">
+<h3>BZ configuration<a class="headerlink" href="#BZ-configuration" title="Permalink to this headline"></a></h3>
+<div class="section" id="Optional:-ASE-Brillouin-Zone">
+<h4>Optional: ASE Brillouin Zone<a class="headerlink" href="#Optional:-ASE-Brillouin-Zone" title="Permalink to this headline"></a></h4>
+<p>It might be helpful to have a brief look at the Brillouin Zone by loading an input file of your favorite DFT code (Quantum Espresso in this case). ASE will write out the special <span class="math notranslate nohighlight">\(k\)</span>-points, which we can use to configure the BZ path. Alternatively, you can of course define the dictionary <code class="docutils literal notranslate"><span class="pre">kpts_dict</span></code> yourself. Careful, it might not define <span class="math notranslate nohighlight">\(Z\)</span>, which is needed and added below.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">scf_in</span> <span class="o">=</span> <span class="s1">&#39;./svo.scf.in&#39;</span>
+
+<span class="c1"># read scf file</span>
+<span class="n">atoms</span> <span class="o">=</span> <span class="n">read_espresso_in</span><span class="p">(</span><span class="n">scf_in</span><span class="p">)</span>
+<span class="c1"># set up cell and path</span>
+<span class="n">lat</span> <span class="o">=</span> <span class="n">atoms</span><span class="o">.</span><span class="n">cell</span><span class="o">.</span><span class="n">get_bravais_lattice</span><span class="p">()</span>
+<span class="n">path</span> <span class="o">=</span> <span class="n">atoms</span><span class="o">.</span><span class="n">cell</span><span class="o">.</span><span class="n">bandpath</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">npoints</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">kpts_dict</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">todict</span><span class="p">()[</span><span class="s1">&#39;special_points&#39;</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kpts_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+<span class="n">lat</span><span class="o">.</span><span class="n">plot_bz</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+G [0. 0. 0.]
+M [0.5 0.5 0. ]
+R [0.5 0.5 0.5]
+X [0.  0.5 0. ]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;Axes3DSubplot:&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_correlated_bandstructure_plot_correlated_bands_14_2.png" src="../../_images/tutorials_correlated_bandstructure_plot_correlated_bands_14_2.png" />
+</div>
+</div>
+<hr class="docutils" />
+<p>Depending on whether you select <code class="docutils literal notranslate"><span class="pre">kslice=True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code>, a corresponding <code class="docutils literal notranslate"><span class="pre">tb_config</span></code> needs to be provided containing information about the <span class="math notranslate nohighlight">\(k\)</span>-points, resolution (<code class="docutils literal notranslate"><span class="pre">n_k</span></code>) or <code class="docutils literal notranslate"><span class="pre">kz</span></code>-plane in the case of the Fermi slice. Here we just import the <span class="math notranslate nohighlight">\(k\)</span>-point dictionary provided by ASE above and add the <span class="math notranslate nohighlight">\(Z\)</span>-point. If you are unhappy with the resolution of the final plot, come back here and crank up <code class="docutils literal notranslate"><span class="pre">n_k</span></code>. For the kslice, the first letter corresponds to the upper left corner
+of the plotted Brillouin zone, followed by the lower left corner and the lower right one (<span class="math notranslate nohighlight">\(Y\)</span>, <span class="math notranslate nohighlight">\(\Gamma\)</span>, and <span class="math notranslate nohighlight">\(X\)</span> in this case).</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># band specs</span>
+<span class="n">tb_bands</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;bands_path&#39;</span><span class="p">:</span> <span class="p">[(</span><span class="s1">&#39;R&#39;</span><span class="p">,</span> <span class="s1">&#39;G&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="s1">&#39;X&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;X&#39;</span><span class="p">,</span> <span class="s1">&#39;M&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;M&#39;</span><span class="p">,</span> <span class="s1">&#39;G&#39;</span><span class="p">)],</span> <span class="s1">&#39;Z&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.5</span><span class="p">]),</span> <span class="s1">&#39;n_k&#39;</span><span class="p">:</span> <span class="mi">50</span><span class="p">}</span>
+<span class="n">tb_bands</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kpts_dict</span><span class="p">)</span>
+
+<span class="c1"># kslice specs</span>
+<span class="n">tb_kslice</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">tb_bands</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">tb_bands</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">isupper</span><span class="p">()}</span>
+<span class="n">kslice_update</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;bands_path&#39;</span><span class="p">:</span> <span class="p">[(</span><span class="s1">&#39;Y&#39;</span><span class="p">,</span> <span class="s1">&#39;G&#39;</span><span class="p">),(</span><span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="s1">&#39;X&#39;</span><span class="p">)],</span> <span class="s1">&#39;Y&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">0.0</span><span class="p">,</span><span class="mi">0</span><span class="p">]),</span> <span class="s1">&#39;n_k&#39;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="s1">&#39;kz&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">}</span>
+<span class="n">tb_kslice</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kslice_update</span><span class="p">)</span>
+
+<span class="n">tb_config</span> <span class="o">=</span> <span class="n">tb_kslice</span> <span class="k">if</span> <span class="n">kslice</span> <span class="k">else</span> <span class="n">tb_bands</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Self-energy">
+<h3>Self-energy<a class="headerlink" href="#Self-energy" title="Permalink to this headline"></a></h3>
+<p>Here we provide the info needed from the h5Archive, like the self-energy, iteration count, spin and block component and the frequency mesh used for the interpolation. The values for the mesh of course depend on the quantity of interest. For a kslice the resolution around <span class="math notranslate nohighlight">\(\omega=0\)</span> is crucial and we need only a small energy window, while for a bandstructure we are also interested in high energy features.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">freq_mesh_kslice</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;window&#39;</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span> <span class="s1">&#39;n_w&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="mf">1e6</span><span class="p">)}</span>
+<span class="n">freq_mesh_bands</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;window&#39;</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="s1">&#39;n_w&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="mf">1e3</span><span class="p">)}</span>
+<span class="n">freq_mesh</span> <span class="o">=</span> <span class="n">freq_mesh_kslice</span> <span class="k">if</span> <span class="n">kslice</span> <span class="k">else</span> <span class="n">freq_mesh_bands</span>
+
+<span class="n">dmft_path</span> <span class="o">=</span> <span class="s1">&#39;./svo_example.h5&#39;</span>
+
+<span class="n">proj_on_orb</span> <span class="o">=</span> <span class="n">orbital_order_to</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">proj_on_orb</span><span class="p">)</span> <span class="k">if</span> <span class="n">proj_on_orb</span> <span class="k">else</span> <span class="kc">None</span>
+<span class="n">sigma_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;dmft_path&#39;</span><span class="p">:</span> <span class="n">dmft_path</span><span class="p">,</span> <span class="s1">&#39;it&#39;</span><span class="p">:</span> <span class="s1">&#39;last_iter&#39;</span><span class="p">,</span> <span class="s1">&#39;orbital_order_dmft&#39;</span><span class="p">:</span> <span class="n">orbital_order_to</span><span class="p">,</span> <span class="s1">&#39;spin&#39;</span><span class="p">:</span> <span class="s1">&#39;up&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;block&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;eta&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;w_mesh&#39;</span><span class="p">:</span> <span class="n">freq_mesh</span><span class="p">,</span> <span class="s1">&#39;linearize&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;proj_on_orb&#39;</span> <span class="p">:</span> <span class="n">proj_on_orb</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p><strong>Optional</strong>: for completeness and as a sanity check we quickly take a look at the self-energy. Make sure you provide a physical one!</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">with</span> <span class="n">HDFArchive</span><span class="p">(</span><span class="n">dmft_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">h5</span><span class="p">:</span>
+    <span class="n">sigma_freq</span> <span class="o">=</span> <span class="n">h5</span><span class="p">[</span><span class="s1">&#39;DMFT_results&#39;</span><span class="p">][</span><span class="s1">&#39;last_iter&#39;</span><span class="p">][</span><span class="s1">&#39;Sigma_freq_0&#39;</span><span class="p">]</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="n">squeeze</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+
+<span class="n">orb</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">sp</span> <span class="o">=</span> <span class="s1">&#39;up_0&#39;</span>
+<span class="n">freq_mesh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">w</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">sigma_freq</span><span class="p">[</span><span class="n">sp</span><span class="p">][</span><span class="n">orb</span><span class="p">,</span><span class="n">orb</span><span class="p">]</span><span class="o">.</span><span class="n">mesh</span><span class="p">])</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">freq_mesh</span><span class="p">,</span> <span class="n">sigma_freq</span><span class="p">[</span><span class="n">sp</span><span class="p">][</span><span class="n">orb</span><span class="p">,</span><span class="n">orb</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">real</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">freq_mesh</span><span class="p">,</span> <span class="o">-</span><span class="n">sigma_freq</span><span class="p">[</span><span class="n">sp</span><span class="p">][</span><span class="n">orb</span><span class="p">,</span><span class="n">orb</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">imag</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;Re$\Sigma(\omega)$&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;Im$\Sigma(\omega)$&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">ct</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">ct</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">ct</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">ct</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$\omega$ (eV)&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_correlated_bandstructure_plot_correlated_bands_22_0.png" src="../../_images/tutorials_correlated_bandstructure_plot_correlated_bands_22_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="Plotting-options">
+<h3>Plotting options<a class="headerlink" href="#Plotting-options" title="Permalink to this headline"></a></h3>
+<p>Finally, you can choose colormaps for each of the functionalities from any of the available on matplotlib colormaps. <code class="docutils literal notranslate"><span class="pre">vmin</span></code> determines the scaling of the logarithmically scaled colorplots. The corresponding tight-binding bands will have the maximum value of the colormap. By the way, colormaps can be reversed by appending <code class="docutils literal notranslate"><span class="pre">_r</span></code> to the identifier.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">plot_config</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;colorscheme_alatt&#39;</span><span class="p">:</span> <span class="s1">&#39;coolwarm&#39;</span><span class="p">,</span> <span class="s1">&#39;colorscheme_bands&#39;</span><span class="p">:</span> <span class="s1">&#39;coolwarm&#39;</span><span class="p">,</span> <span class="s1">&#39;colorscheme_kslice&#39;</span><span class="p">:</span> <span class="s1">&#39;PuBuGn&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;colorscheme_qpbands&#39;</span><span class="p">:</span> <span class="s1">&#39;Greens&#39;</span><span class="p">,</span> <span class="s1">&#39;vmin&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="2.-Run-and-Plotting">
+<h2>2. Run and Plotting<a class="headerlink" href="#2.-Run-and-Plotting" title="Permalink to this headline"></a></h2>
+<p>Now that everything is set up we may hit run. Caution, if you use a lot of <span class="math notranslate nohighlight">\(k\)</span>-points, this may take a while! In the current example, it should be done within a second.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">start_time</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
+
+<span class="n">tb_data</span><span class="p">,</span> <span class="n">alatt_k_w</span><span class="p">,</span> <span class="n">freq_dict</span> <span class="o">=</span> <span class="n">pcb</span><span class="o">.</span><span class="n">get_dmft_bands</span><span class="p">(</span><span class="n">fermi_slice</span><span class="o">=</span><span class="n">kslice</span><span class="p">,</span> <span class="n">with_sigma</span><span class="o">=</span><span class="n">bands_config</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">],</span> <span class="n">add_mu_tb</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                   <span class="n">orbital_order_to</span><span class="o">=</span><span class="n">orbital_order_to</span><span class="p">,</span> <span class="n">qp_bands</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;qp_bands&#39;</span><span class="p">],</span>
+                                                   <span class="o">**</span><span class="n">w90_dict</span><span class="p">,</span> <span class="o">**</span><span class="n">tb_config</span><span class="p">,</span> <span class="o">**</span><span class="n">sigma_dict</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Run took </span><span class="si">{0:.3f}</span><span class="s1"> s&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Warning: could not identify MPI environment!
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Starting serial run at: 2022-08-01 11:33:20.627842
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+H(R=0):
+     12.9769  0.0000  0.0000
+      0.0000 12.9769  0.0000
+      0.0000  0.0000 12.9769
+Setting Sigma from ./svo_example.h5
+Adding mu_tb to DMFT μ; assuming DMFT was run with subtracted dft μ.
+μ=12.2143 eV set for calculating A(k,ω)
+Run took 0.588 s
+</pre></div></div>
+</div>
+<p>That’s it. Now you can look at the output:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">if</span> <span class="n">kslice</span><span class="p">:</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+
+    <span class="n">pcb</span><span class="o">.</span><span class="n">plot_kslice</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">alatt_k_w</span><span class="p">,</span> <span class="n">tb_data</span><span class="p">,</span> <span class="n">freq_dict</span><span class="p">,</span> <span class="n">w90_dict</span><span class="p">[</span><span class="s1">&#39;n_orb&#39;</span><span class="p">],</span> <span class="n">tb_config</span><span class="p">,</span>
+                    <span class="n">tb</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tb&#39;</span><span class="p">],</span> <span class="n">alatt</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;alatt&#39;</span><span class="p">],</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">plot_config</span><span class="p">)</span>
+
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+
+    <span class="n">pcb</span><span class="o">.</span><span class="n">plot_bands</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">alatt_k_w</span><span class="p">,</span> <span class="n">tb_data</span><span class="p">,</span> <span class="n">freq_dict</span><span class="p">,</span> <span class="n">w90_dict</span><span class="p">[</span><span class="s1">&#39;n_orb&#39;</span><span class="p">],</span> <span class="n">dft_mu</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
+                   <span class="n">tb</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;tb&#39;</span><span class="p">],</span> <span class="n">alatt</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;alatt&#39;</span><span class="p">],</span> <span class="n">qp_bands</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;qp_bands&#39;</span><span class="p">],</span> <span class="o">**</span><span class="n">plot_config</span><span class="p">)</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">1.25</span><span class="p">,</span><span class="mf">1.75</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_correlated_bandstructure_plot_correlated_bands_30_0.png" src="../../_images/tutorials_correlated_bandstructure_plot_correlated_bands_30_0.png" />
+</div>
+</div>
+<hr class="docutils" />
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../NNO_os_plo_mag/tutorial.html" class="btn btn-neutral float-left" title="4. OS with VASP/PLOs and cthyb: AFM state of NdNiO2" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../issues.html" class="btn btn-neutral float-right" title="Support &amp; contribute" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (C) 2018-2020, ETH Zurich Copyright (C) 2021-2022, The Simons Foundation authors: A. Hampel, M. Merkel, A. Carta, and S. Beck.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

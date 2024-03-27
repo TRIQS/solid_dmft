@@ -1,0 +1,31 @@
+Input
+-------
+
+The aim of this section is to provide a comprehensive listing of all the input flags available for the `dmft_config.ini` input file. We begin by listing the possible sections and follow with the input parameters.
+
+.. toctree::
+    :maxdepth: 1
+
+    general
+    solver
+    dft
+    advanced
+
+Below an exhaustive list containing all the parameters marked by section.
+
+**[general]**
+
+afm_order; beta; block_threshold; broy_max_it; calc_energies; calc_mu_method; csc; dc; dc_dmft; dc_type; enforce_off_diag; eta; fixed_mu_value; g0_conv_crit; g0_mix; g0_mix_type; gimp_conv_crit; h_field; h_field_it; h_int_basis; h_int_type; h5_save_freq; J; jobname; load_sigma; load_sigma_iter; magmom; magnetic; mu_gap_gb2_threshold; mu_gap_occ_deviation; mu_initial_guess; mu_mix_const; mu_mix_per_occupation_offset; mu_update_freq; n_iter_dmft; n_iter_dmft_first; n_iter_dmft_per; n_iw; n_tau; n_w; noise_level_initial_sigma; occ_conv_crit; path_to_sigma; prec_mu; ratio_F4_F2; sampling_h5_save_freq; sampling_iterations; seedname; set_rot; sigma_conv_crit; sigma_mix; store_solver; U; U_prime; w_range; 
+
+**[solver]**
+
+
+type; idx_impurities; delta_interface; fit_max_moment; fit_max_n; fit_max_w; fit_min_n; fit_min_w; imag_threshold; legendre_fit; length_cycle; loc_n_max; loc_n_min; max_time; measure_chi_insertions; measure_chi; measure_density_matrix; measure_G_l; measure_pert_order; move_double; move_shift; n_cycles_tot; n_l; n_warmup_cycles; off_diag_threshold; perform_tail_fit; random_seed; length_cycle; max_time; measure_pert_order; move_double; n_cycles_tot; n_warmup_cycles; random_seed; improved_estimator; legendre_fit; length_cycle; max_time; measure_G_iw; measure_G_l; measure_G_tau; measure_pert_order; n_cycles_tot; n_l; n_warmup_cycles; random_seed; legendre_fit; measure_density_matrix; measure_G_l; measure_G_tau; n_l; bath_fit; calc_me; diag_delta; dmrg_maxm; dmrg_maxmB; dmrg_maxmI; dmrg_maxmIB; dmrg_tw; dt; enforce_gap; ignore_weight; maxm; maxmB; maxmI; maxmIB; n_bath; path_to_gs; ph_symm; refine_factor; state_storage; sweeps; tw; force_real; method; one_shot; tol; with_fock; 
+
+**[dft]**
+
+dft_code; dft_exec; mpi_env; n_cores; n_iter; n_iter_first; plo_cfg; projector_type; store_eigenvals; w90_exec; w90_tolerance; 
+
+**[advanced]**
+
+dc_factor; dc_fixed_occ; dc_fixed_value; dc_nominal; dc_orb_shift; dc_J; dc_U; map_solver_struct; mapped_solver_struct_degeneracies; pick_solver_struct; 

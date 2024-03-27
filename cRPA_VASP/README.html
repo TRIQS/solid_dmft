@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How to do cRPA calculations with VASP &mdash; solid_dmft  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/plot_directive.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script defer="defer" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=default"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Input" href="../input_output/DMFT_input/input.html" />
+    <link rel="prev" title="Interface to VASP" href="../md_notes/vasp_csc.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #7E588A" >
+            <a href="../index.html" class="icon icon-home"> solid_dmft
+            <img src="../_static/logo_no_text.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                3.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../install.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../install.html#installation-via-pip">Installation via pip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../install.html#manual-installation-via-cmake">Manual installation via CMake</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../install.html#docker-files-images">Docker files &amp; images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../install.html#version-compatibility">Version compatibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../install.html#custom-cmake-options">Custom CMake options</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="../documentation.html">Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../documentation.html#code-structure">Code structure</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../documentation.html#dft-interface-notes">DFT interface notes</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../md_notes/w90_interface.html">Wannier90 interface</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../md_notes/w90_interface.html#orbital-order-in-the-w90-converter">orbital order in the W90 converter</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../md_notes/vasp_csc.html">Interface to VASP</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../md_notes/vasp_csc.html#general-remarks">General remarks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../md_notes/vasp_csc.html#locproj-bug-for-individual-projections">LOCPROJ bug for individual projections:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../md_notes/vasp_csc.html#convergence-of-projectors-with-vasp">convergence of projectors with Vasp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../md_notes/vasp_csc.html#enabling-csc-calculations-with-wannier90-projectors">Enabling CSC calculations with Wannier90 projectors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../md_notes/vasp_csc.html#speeding-up-by-not-writing-projectors-at-every-step">Speeding up by not writing projectors at every step</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">How to do cRPA calculations with VASP</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#file-description">file description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#workflow">Workflow:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#important-flags">important flags:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#convergency-tests">convergency tests:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#parameterization-of-u-and-j-from-crpa-calculations">Parameterization of U and J from cRPA calculations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#general-sidemarks">general sidemarks:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#version-and-compilation">version and compilation:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../documentation.html#input-output">Input/Output</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../input_output/DMFT_input/input.html">Input</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../input_output/DMFT_input/general.html">[general]: General parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../input_output/DMFT_input/solver.html">[solver]: solver specific parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../input_output/DMFT_input/dft.html">[dft]: DFT related inputs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../input_output/DMFT_input/advanced.html">[advanced]: Advanced inputs</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../input_output/DMFT_output/results.html">Output / results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../input_output/DMFT_output/results.html#group-structure">Group structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../input_output/DMFT_output/results.html#subgroups">Subgroups</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../documentation.html#further-details-for-running">Further details for running</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../md_notes/docker.html">Docker</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../md_notes/docker.html#building-the-docker-image">Building the docker image</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../md_notes/docker.html#pulling-a-docker-image">Pulling a docker image</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../md_notes/docker.html#getting-docker-images-onto-cscs-daint">Getting docker images onto CSCS daint</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../md_notes/run_locally.html">Run on your machine</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../md_notes/run_locally.html#csc-calculations-locally">CSC calculations locally</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../md_notes/run_cluster.html">Running solid_dmft on a cluster</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../md_notes/run_cluster.html#running-on-cscs-daint">Running on CSCS daint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../md_notes/run_cluster.html#one-shot-job-on-daint">one shot job on daint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../md_notes/run_cluster.html#csc-calculations-on-daint">CSC calculations on daint</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../documentation.html#module-reference-manual">Module reference manual</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../_ref/csc_flow.html">csc_flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_ref/dft_managers.html">dft_managers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/dft_managers.mpi_helpers.html">dft_managers.mpi_helpers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/dft_managers.qe_manager.html">dft_managers.qe_manager</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/dft_managers.vasp_manager.html">dft_managers.vasp_manager</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../_ref/dmft_cycle.html">dmft_cycle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_ref/dmft_tools.html">dmft_tools</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/dmft_tools.afm_mapping.html">dmft_tools.afm_mapping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/dmft_tools.convergence.html">dmft_tools.convergence</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/dmft_tools.formatter.html">dmft_tools.formatter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/dmft_tools.greens_functions_mixer.html">dmft_tools.greens_functions_mixer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/dmft_tools.initial_self_energies.html">dmft_tools.initial_self_energies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/dmft_tools.interaction_hamiltonian.html">dmft_tools.interaction_hamiltonian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/dmft_tools.legendre_filter.html">dmft_tools.legendre_filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/dmft_tools.manipulate_chemical_potential.html">dmft_tools.manipulate_chemical_potential</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/dmft_tools.matheval.html">dmft_tools.matheval</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/dmft_tools.observables.html">dmft_tools.observables</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/dmft_tools.results_to_archive.html">dmft_tools.results_to_archive</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/dmft_tools.solver.html">dmft_tools.solver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../_ref/io_tools.html">io_tools</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/io_tools.dict_to_h5.html">io_tools.dict_to_h5</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/io_tools.postproc_toml_dict.html">io_tools.postproc_toml_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/io_tools.verify_input_params.html">io_tools.verify_input_params</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../_ref/postprocessing.html">postprocessing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/postprocessing.eval_U_cRPA_RESPACK.html">postprocessing.eval_U_cRPA_RESPACK</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/postprocessing.eval_U_cRPA_Vasp.html">postprocessing.eval_U_cRPA_Vasp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/postprocessing.maxent_gf_imp.html">postprocessing.maxent_gf_imp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/postprocessing.maxent_gf_latt.html">postprocessing.maxent_gf_latt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/postprocessing.maxent_sigma.html">postprocessing.maxent_sigma</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/postprocessing.pade_sigma.html">postprocessing.pade_sigma</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/postprocessing.plot_correlated_bands.html">postprocessing.plot_correlated_bands</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../_ref/util.html">util</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/util.symmetrize_gamma_file.html">util.symmetrize_gamma_file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/util.write_kslice_to_h5.html">util.write_kslice_to_h5</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/SVO_os_qe/tutorial.html">1. OS with QE/W90 and cthyb: SrVO3 MIT</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/SVO_os_qe/tutorial.html#1.-Starting-out-with-DMFT">1. Starting out with DMFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/SVO_os_qe/tutorial.html#2.-Looking-at-the-Metal-Insulator-Transition">2. Looking at the Metal-Insulator Transition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/SVO_os_qe/tutorial.html#3.-Refining-the-diagram">3. Refining the diagram</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/SVO_os_qe/tutorial.html#4.-Plotting-the-spectral-function">4. Plotting the spectral function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/SVO_os_qe/tutorial.html#5-Visualizing-the-MIT">5 Visualizing the MIT</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html">2. CSC with VASP PLOs: charge order in PrNiO3</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#1.-Running-the-initial-scf-DFT-calculation">1. Running the initial scf DFT calculation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#2.-Running-the-CSC-DMFT-calculations">2. Running the CSC DMFT calculations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Input-files-for-CSC-DMFT-calculations">Input files for CSC DMFT calculations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Starting-the-calculations">Starting the calculations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Analyzing-the-projectors">Analyzing the projectors</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Plotting-the-results:-observables">3. Plotting the results: observables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green’s-function">4. Plotting the results: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Next-steps-to-try">5. Next steps to try</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/Ce2O3_csc_w90/tutorial.html">3. CSC with QE/W90 and HubbardI: total energy in Ce2O3</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/Ce2O3_csc_w90/tutorial.html#1.-Input-file-preparation">1. Input file preparation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/Ce2O3_csc_w90/tutorial.html#DFT-files">DFT files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/Ce2O3_csc_w90/tutorial.html#DMFT">DMFT</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/Ce2O3_csc_w90/tutorial.html#2.-Running-DFT+DMFT">2. Running DFT+DMFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/Ce2O3_csc_w90/tutorial.html#3.-Non-interacting-Hamiltonian-and-convergence-analysis">3. Non-interacting Hamiltonian and convergence analysis</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/Ce2O3_csc_w90/tutorial.html#Tight-binding-Hamiltonian">Tight-binding Hamiltonian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/Ce2O3_csc_w90/tutorial.html#Convergence">Convergence</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/NNO_os_plo_mag/tutorial.html">4. OS with VASP/PLOs and cthyb: AFM state of NdNiO2</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/NNO_os_plo_mag/tutorial.html#1.-Run-DFT">1. Run DFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/NNO_os_plo_mag/tutorial.html#2.-Creating-the-hdf5-archive-/-DMFT-input">2. Creating the hdf5 archive / DMFT input</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/NNO_os_plo_mag/tutorial.html#3.-Running-the-AFM-calculation">3. Running the AFM calculation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/NNO_os_plo_mag/tutorial.html#5.-Multiplet-analysis">5. Multiplet analysis</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/correlated_bandstructure/plot_correlated_bands.html">5. Plotting the spectral function</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/correlated_bandstructure/plot_correlated_bands.html#1.-Configuration">1. Configuration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/correlated_bandstructure/plot_correlated_bands.html#Basic-options">Basic options</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/correlated_bandstructure/plot_correlated_bands.html#Wannier90">Wannier90</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/correlated_bandstructure/plot_correlated_bands.html#BZ-configuration">BZ configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/correlated_bandstructure/plot_correlated_bands.html#Self-energy">Self-energy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/correlated_bandstructure/plot_correlated_bands.html#Plotting-options">Plotting options</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/correlated_bandstructure/plot_correlated_bands.html#2.-Run-and-Plotting">2. Run and Plotting</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../issues.html">Support &amp; contribute</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../issues.html#seeking-help">Seeking help</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../issues.html#improving-solid-dmft">Improving solid_dmft</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../issues.html#reporting-issues">Reporting issues</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ChangeLog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-3-2-0">Version 3.2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#general">General</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#fix">fix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#build">build</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#feat">feat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#doc">doc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#test">test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-3-1-5">Version 3.1.5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-3-1-4">Version 3.1.4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-3-1-3">Version 3.1.3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-3-1-2">Version 3.1.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-3-1-1">Version 3.1.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-3-1-0">Version 3.1.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-3-0-0">Version 3.0.0</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #7E588A" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">solid_dmft</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../documentation.html">Documentation</a> &raquo;</li>
+      <li>How to do cRPA calculations with VASP</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/cRPA_VASP/README.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="tex2jax_ignore mathjax_ignore section" id="how-to-do-crpa-calculations-with-vasp">
+<h1>How to do cRPA calculations with VASP<a class="headerlink" href="#how-to-do-crpa-calculations-with-vasp" title="Permalink to this headline"></a></h1>
+<p>This is just a small tutorial and help on how to do cRPA calculations within
+VASP (<a class="reference external" href="https://cms.mpi.univie.ac.at/wiki/index.php/CRPA_of_SrVO3" rel="noopener noreferrer" target="_blank">https://cms.mpi.univie.ac.at/wiki/index.php/CRPA_of_SrVO3</a>) . Moreover, the
+python script <code class="docutils literal notranslate"><span class="pre">eval_U.py</span></code> contains helper functions to extract the full
+<span class="math notranslate nohighlight">\(U\)</span> matrix tensor from the <code class="docutils literal notranslate"><span class="pre">Uijkl</span></code> or <code class="docutils literal notranslate"><span class="pre">Vijkl</span></code> file from a VASP cRPA run. There
+are also some general remarks on the notation in VASP for the Coulomb tensor in
+the pdf included in this folder. Moreover, there is a small collection of
+examples for SrVO3 and LuNiO3. For more details please take a look at the PhD
+thesis of Merzuk Kaltak (<a class="reference external" href="http://othes.univie.ac.at/38099/" rel="noopener noreferrer" target="_blank">http://othes.univie.ac.at/38099/</a>).</p>
+<div class="section" id="file-description">
+<h2>file description<a class="headerlink" href="#file-description" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">eval_U.py</span></code> extraction of Coulomb tensor, calculation of reduced two-index matrices, and calculation / fitting of Kanamori or Slater parameters</li>
+<li><code class="docutils literal notranslate"><span class="pre">ext_eps.sh</span></code> a small bash script that can extract <span class="math notranslate nohighlight">\(\epsilon^-1(|q+G|)=[1-VP^r]^-1\)</span> from a given vasprun.xml file</li>
+</ul>
+</div>
+<div class="section" id="workflow">
+<h2>Workflow:<a class="headerlink" href="#workflow" title="Permalink to this headline"></a></h2>
+<ol class="arabic simple">
+<li>DFT NM normal like:<ul>
+<li>SYSTEM = SrVO3</li>
+<li>ISMEAR =  0</li>
+<li>SIGMA =  0.05</li>
+<li>EDIFF = 1E-8</li>
+</ul>
+</li>
+<li>optical part (larger nbands) and optical properties for generating the linear response integrals needed for cRPA or GW<ol class="arabic">
+<li>nbands: ~100 bands per atoms, but not larger than number of plane waves generated from ENCUT</li>
+<li>example:<ul>
+<li>SYSTEM = SrVO3</li>
+<li>ISMEAR =  0</li>
+<li>ENCUT = high value!</li>
+<li>SIGMA =  0.05</li>
+<li>EDIFF = 1E-8</li>
+<li>ALGO = Exact ; NELM=1</li>
+<li>LOPTICS = .TRUE.</li>
+<li>LWAVE = .TRUE.</li>
+<li>NBANDS =96</li>
+<li>LMAXMIX=4</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>if needed generate wannier functions with ALGO=none (read wavecar and chgcar additionally) and do 0 steps to get the wannier functions correct - this step is not needed, if one has already a wannier90.win file</li>
+<li>ALGO=CRPA to make vasp calculate U matrices (bare, screened etc. )<ol class="arabic">
+<li>omegamax=0 (default) for frequency depend U matrix</li>
+<li>NCRPA_BANDS for selecting bands in a non-disentagled workflow (<a class="reference external" href="http://vasp.at/wiki/index.php/NCRPA_BANDS" rel="noopener noreferrer" target="_blank">vasp.at/wiki/index.php/NCRPA_BANDS</a>)</li>
+<li>or set NTARGET STATES= # of target states for using the KUBO formalism for disentanglement. Works directly with the wannier functions as basis. The states not listet will be included in screening.</li>
+<li>example file:<ul>
+<li>SYSTEM = SrVO3</li>
+<li>ISMEAR =  0</li>
+<li>ENCUT = high value!</li>
+<li>VCUTOFF = reasonable high value!</li>
+<li>SIGMA =  0.05</li>
+<li>EDIFF = 1E-8</li>
+<li>NBANDS =96</li>
+<li>ALGO = CRPA</li>
+<li>NTARGET_STATES = 1 2 3</li>
+<li>LWAVE = .FALSE.</li>
+<li>NCSHMEM=1</li>
+<li>LMAXMIX=4</li>
+</ul>
+</li>
+</ol>
+</li>
+</ol>
+</div>
+<div class="section" id="important-flags">
+<h2>important flags:<a class="headerlink" href="#important-flags" title="Permalink to this headline"></a></h2>
+<p>if you get sigsevs while calculating the polarization make sure your local stack
+size is large enough by setting:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ulimit</span> <span class="o">-</span><span class="n">s</span> <span class="n">unlimited</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>ALGO=CRPA (automatically calls wannier90 and calculates the U matrix)</li>
+<li>NTARGET_STATES= # number of target Wannier funcitons if more target states than basis functions for U matrix one specify the one to exclude from screening as integer list: <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">2</span> <span class="pre">3</span></code>. This would build the U matrix for the first 3 Wannier functions in wannier90.win, where 5 Wannier functions are specified there in total and the last 2 are included for the calculation of screening.</li>
+<li>for the disentanglement with <code class="docutils literal notranslate"><span class="pre">NTARGET_STATES</span></code> there are 3 options in cRPA:<ul>
+<li>LPROJECTED (default): Kubo method by Merzuk (<a class="reference external" href="http://othes.univie.ac.at/38099/" rel="noopener noreferrer" target="_blank">http://othes.univie.ac.at/38099/</a>)</li>
+<li>LDISENTANGLED: disentanglement of Miyake (<a class="reference external" href="http://doi.org/10.1103/PhysRevB.80.155134" rel="noopener noreferrer" target="_blank">doi.org/10.1103/PhysRevB.80.155134</a>)</li>
+<li>LWEIGHTED: weighted method of Friedrich and Shih</li>
+</ul>
+</li>
+<li>LOPTICS= TRUE for calculating the necessary response integrals withing the Kohn-Sham Basis W000x.tmp</li>
+<li>NCSHMEM=1 nodody knows, but it is needed!</li>
+<li>VCUTOFF cuttoff for bare interaction V. This tests your convergency
+and is written in the OUTCAR as two sets of bare interaction, where for one of them
+it says: low cutoff result for V_ijkl. Here ENCUT was used and for the one above 1.1*ENCUT or VCUTOFF was used.</li>
+<li>usually a converged ENCUT gives also a reasonably high VCUTOFF, so that explicitly setting VCUTOFF is not necessary. Moreover, the effect of the VCUTOFF convergence is included by subtracting the constant shift between LOW and HIGH VCUTOFF test output in the OUTCAR</li>
+<li>One can see in the convergence plot “debugging_examples/LaTiO3/VCUTOFF_convergence.png” the effect of ENCUT and VCUTOFF:</li>
+</ul>
+<p><img alt="vcutoff_test" src="cRPA_VASP/VCUTOFF_convergence.png" /></p>
+</div>
+<div class="section" id="convergency-tests">
+<h2>convergency tests:<a class="headerlink" href="#convergency-tests" title="Permalink to this headline"></a></h2>
+<p><span class="math notranslate nohighlight">\(`E_{corr}^{RPA}`\)</span>  converges for NBANDS,ENCUT to <span class="math notranslate nohighlight">\(`\infty`\)</span>, where the asymptotic
+behavior goes like <span class="math notranslate nohighlight">\(`1/N_{bands} \approx ENCUT^{-3/2} `\)</span>. The ENCUT for the GW part
+is set automatically by VASP with the ratio: <span class="math notranslate nohighlight">\(`ENCUTGW = 2/3 \ ENCUT`\)</span>. Moreover,
+it is crucial to first converge the bare interaction V that does not depend on the
+polarization. To do these tests set in the INCAR file:</p>
+<ul class="simple">
+<li>ALGO = 2E4W  # calculates only the V</li>
+<li>LWPOT = .FALSE # avoid errors</li>
+<li>VCUTOFF # vary the cut-off until convergency is reached, default is 1.1*ENCUT</li>
+<li>NBANDS # minor effect on V then on W, but nevertheless a reasonable amount of
+bands must be used. A good choice is 3*NELECT (# of electrons in the systems).</li>
+</ul>
+<p>The procedure is then to first convergence KPOINTS and ENCUT, where KPOINTS dependency of the results seems to be weak. Then increase NBANDS until U does not change anymore.</p>
+</div>
+<div class="section" id="parameterization-of-u-and-j-from-crpa-calculations">
+<h2>Parameterization of U and J from cRPA calculations<a class="headerlink" href="#parameterization-of-u-and-j-from-crpa-calculations" title="Permalink to this headline"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">eval_u.py</span></code> provides four different methods:</p>
+<ul class="simple">
+<li>Kanamori: <code class="docutils literal notranslate"><span class="pre">calc_kan_params(...)</span></code> for extracting Kanamori parameters for a cubic system</li>
+<li>Slater 1: <code class="docutils literal notranslate"><span class="pre">calc_u_avg_fulld(...)</span></code> using averaging and symmetries: <span class="math notranslate nohighlight">\(`U_\mathrm{cubic} = \frac1{2l+1} \sum_i (U_{iiii})`\)</span>, <span class="math notranslate nohighlight">\(`J_\mathrm{cubic} = \frac1{2l(2l+1)} \sum_{i, j\neq i} U_{ijji}`\)</span>. Then, the interaction parameters follow from the conversion <span class="math notranslate nohighlight">\(`U = U_\mathrm{cubic} - \frac85 J_\mathrm{cubic}, J = \frac75 J_\mathrm{cubic}`\)</span>.</li>
+<li>Slater 2: <code class="docutils literal notranslate"><span class="pre">calculate_interaction_from_averaging(...)</span></code> using direct averaging: <span class="math notranslate nohighlight">\(`U = \frac1{(2l+1)^2} \sum_{i, j} U_{iijj}`\)</span> and <span class="math notranslate nohighlight">\(`J = U - \frac1{2l(2l+1)} \sum_{i, j} U_{ijij}`\)</span>. This is more straight forward that Slater 1, but ignores the basis in which the cRPA Uijkl matrix is written. For a perfect Slater matrix this gives the same results if applied in cubic or spherical harmonics basis.</li>
+<li>Slater 3: <code class="docutils literal notranslate"><span class="pre">fit_slater_fulld(...)</span> </code>using an least-square fit (summed over the matrix elements) of the two-index matrices <span class="math notranslate nohighlight">\(`U_{iijj}`\)</span> and <span class="math notranslate nohighlight">\(`U_{ijij}`\)</span> to the Slater Hamiltonian.</li>
+</ul>
+<p>These three methods give the same results if the cRPA matrix is of the Slater type already. Be aware of the order of your basis functions and the basis in which the <span class="math notranslate nohighlight">\(U\)</span> tensor is written!</p>
+</div>
+<div class="section" id="general-sidemarks">
+<h2>general sidemarks:<a class="headerlink" href="#general-sidemarks" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li>careful with the averaged U,u,J values in the end of the OUTCAR, because they sum all off-diagonal elements! Also inter-site, if the unit cell contains more than one target atom</li>
+<li>in VASP the two inner indices are exchanged compared to the notation in PRB 86, 165105 (2012): U_ijkl = U_ikjl^VASP</li>
+<li>when specifying bands, always start with 1 not 0.</li>
+<li>GW pseudopotentials can be more accurate, since they provide higher cut-offs e.g. , test this…</li>
+<li>NCRPA_BANDS and NTARGET_STATES gives the same result in non-entangled bands</li>
+</ul>
+</div>
+<div class="section" id="version-and-compilation">
+<h2>version and compilation:<a class="headerlink" href="#version-and-compilation" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li>supported vasp version 6 or higher</li>
+<li>wannier90 upto v3.1 works, if no features exclusively to wannier90 v3 are used</li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../md_notes/vasp_csc.html" class="btn btn-neutral float-left" title="Interface to VASP" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../input_output/DMFT_input/input.html" class="btn btn-neutral float-right" title="Input" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (C) 2018-2020, ETH Zurich Copyright (C) 2021-2022, The Simons Foundation authors: A. Hampel, M. Merkel, A. Carta, and S. Beck.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

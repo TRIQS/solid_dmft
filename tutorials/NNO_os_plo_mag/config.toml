@@ -1,0 +1,47 @@
+[general]
+seedname = "nno"
+jobname = "NNO_lowT"
+
+enforce_off_diag = false
+block_threshold = 0.001
+
+n_iw = 2001
+n_tau = 20001
+
+prec_mu = 0.001
+
+h_int_type = "density_density"
+U = 8.0
+J = 1.0
+
+# temperature ~290 K
+beta = 40
+
+magnetic = true
+magmom = [-0.3, 0.3]
+afm_order = true
+
+n_iter_dmft = 14
+
+g0_mix = 0.9
+
+dc_type = 0
+dc = true
+dc_dmft = false
+
+load_sigma = false
+path_to_sigma = "pre_AFM.h5"
+
+[solver]
+type = "cthyb"
+length_cycle = 2000
+n_warmup_cycles = 5e+3
+n_cycles_tot = 1e+7
+imag_threshold = 1e-5
+
+perform_tail_fit = true
+fit_max_moment = 6
+fit_min_w = 10
+fit_max_w = 16
+measure_density_matrix = true
+

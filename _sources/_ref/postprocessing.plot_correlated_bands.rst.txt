@@ -1,0 +1,21 @@
+postprocessing.plot\_correlated\_bands
+======================================
+
+.. automodule:: postprocessing.plot_correlated_bands
+    :members:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

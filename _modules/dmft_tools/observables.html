@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>dmft_tools.observables &mdash; solid_dmft  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/plot_directive.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #7E588A" >
+            <a href="../../index.html" class="icon icon-home"> solid_dmft
+            <img src="../../_static/logo_no_text.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                3.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#installation-via-pip">Installation via pip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#manual-installation-via-cmake">Manual installation via CMake</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#docker-files-images">Docker files &amp; images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#version-compatibility">Version compatibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#custom-cmake-options">Custom CMake options</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../documentation.html">Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#code-structure">Code structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#dft-interface-notes">DFT interface notes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../md_notes/w90_interface.html">Wannier90 interface</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/w90_interface.html#orbital-order-in-the-w90-converter">orbital order in the W90 converter</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../md_notes/vasp_csc.html">Interface to VASP</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/vasp_csc.html#general-remarks">General remarks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/vasp_csc.html#locproj-bug-for-individual-projections">LOCPROJ bug for individual projections:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/vasp_csc.html#convergence-of-projectors-with-vasp">convergence of projectors with Vasp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/vasp_csc.html#enabling-csc-calculations-with-wannier90-projectors">Enabling CSC calculations with Wannier90 projectors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/vasp_csc.html#speeding-up-by-not-writing-projectors-at-every-step">Speeding up by not writing projectors at every step</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../cRPA_VASP/README.html">How to do cRPA calculations with VASP</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#file-description">file description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#workflow">Workflow:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#important-flags">important flags:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#convergency-tests">convergency tests:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#parameterization-of-u-and-j-from-crpa-calculations">Parameterization of U and J from cRPA calculations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#general-sidemarks">general sidemarks:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#version-and-compilation">version and compilation:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#input-output">Input/Output</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../input_output/DMFT_input/input.html">Input</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_input/general.html">[general]: General parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_input/solver.html">[solver]: solver specific parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_input/dft.html">[dft]: DFT related inputs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_input/advanced.html">[advanced]: Advanced inputs</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../input_output/DMFT_output/results.html">Output / results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_output/results.html#group-structure">Group structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_output/results.html#subgroups">Subgroups</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#further-details-for-running">Further details for running</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../md_notes/docker.html">Docker</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/docker.html#building-the-docker-image">Building the docker image</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/docker.html#pulling-a-docker-image">Pulling a docker image</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/docker.html#getting-docker-images-onto-cscs-daint">Getting docker images onto CSCS daint</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../md_notes/run_locally.html">Run on your machine</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/run_locally.html#csc-calculations-locally">CSC calculations locally</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../md_notes/run_cluster.html">Running solid_dmft on a cluster</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/run_cluster.html#running-on-cscs-daint">Running on CSCS daint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/run_cluster.html#one-shot-job-on-daint">one shot job on daint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/run_cluster.html#csc-calculations-on-daint">CSC calculations on daint</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#module-reference-manual">Module reference manual</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/csc_flow.html">csc_flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/dft_managers.html">dft_managers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dft_managers.mpi_helpers.html">dft_managers.mpi_helpers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dft_managers.qe_manager.html">dft_managers.qe_manager</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dft_managers.vasp_manager.html">dft_managers.vasp_manager</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/dmft_cycle.html">dmft_cycle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/dmft_tools.html">dmft_tools</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.afm_mapping.html">dmft_tools.afm_mapping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.convergence.html">dmft_tools.convergence</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.formatter.html">dmft_tools.formatter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.greens_functions_mixer.html">dmft_tools.greens_functions_mixer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.initial_self_energies.html">dmft_tools.initial_self_energies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.interaction_hamiltonian.html">dmft_tools.interaction_hamiltonian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.legendre_filter.html">dmft_tools.legendre_filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.manipulate_chemical_potential.html">dmft_tools.manipulate_chemical_potential</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.matheval.html">dmft_tools.matheval</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.observables.html">dmft_tools.observables</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.results_to_archive.html">dmft_tools.results_to_archive</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.solver.html">dmft_tools.solver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/io_tools.html">io_tools</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/io_tools.dict_to_h5.html">io_tools.dict_to_h5</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/io_tools.postproc_toml_dict.html">io_tools.postproc_toml_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/io_tools.verify_input_params.html">io_tools.verify_input_params</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/postprocessing.html">postprocessing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.eval_U_cRPA_RESPACK.html">postprocessing.eval_U_cRPA_RESPACK</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.eval_U_cRPA_Vasp.html">postprocessing.eval_U_cRPA_Vasp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.maxent_gf_imp.html">postprocessing.maxent_gf_imp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.maxent_gf_latt.html">postprocessing.maxent_gf_latt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.maxent_sigma.html">postprocessing.maxent_sigma</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.pade_sigma.html">postprocessing.pade_sigma</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.plot_correlated_bands.html">postprocessing.plot_correlated_bands</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/util.html">util</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/util.symmetrize_gamma_file.html">util.symmetrize_gamma_file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/util.write_kslice_to_h5.html">util.write_kslice_to_h5</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/SVO_os_qe/tutorial.html">1. OS with QE/W90 and cthyb: SrVO3 MIT</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/SVO_os_qe/tutorial.html#1.-Starting-out-with-DMFT">1. Starting out with DMFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/SVO_os_qe/tutorial.html#2.-Looking-at-the-Metal-Insulator-Transition">2. Looking at the Metal-Insulator Transition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/SVO_os_qe/tutorial.html#3.-Refining-the-diagram">3. Refining the diagram</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/SVO_os_qe/tutorial.html#4.-Plotting-the-spectral-function">4. Plotting the spectral function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/SVO_os_qe/tutorial.html#5-Visualizing-the-MIT">5 Visualizing the MIT</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html">2. CSC with VASP PLOs: charge order in PrNiO3</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#1.-Running-the-initial-scf-DFT-calculation">1. Running the initial scf DFT calculation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#2.-Running-the-CSC-DMFT-calculations">2. Running the CSC DMFT calculations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Input-files-for-CSC-DMFT-calculations">Input files for CSC DMFT calculations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Starting-the-calculations">Starting the calculations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Analyzing-the-projectors">Analyzing the projectors</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Plotting-the-results:-observables">3. Plotting the results: observables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green’s-function">4. Plotting the results: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Next-steps-to-try">5. Next steps to try</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/Ce2O3_csc_w90/tutorial.html">3. CSC with QE/W90 and HubbardI: total energy in Ce2O3</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/Ce2O3_csc_w90/tutorial.html#1.-Input-file-preparation">1. Input file preparation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/Ce2O3_csc_w90/tutorial.html#DFT-files">DFT files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/Ce2O3_csc_w90/tutorial.html#DMFT">DMFT</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/Ce2O3_csc_w90/tutorial.html#2.-Running-DFT+DMFT">2. Running DFT+DMFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/Ce2O3_csc_w90/tutorial.html#3.-Non-interacting-Hamiltonian-and-convergence-analysis">3. Non-interacting Hamiltonian and convergence analysis</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/Ce2O3_csc_w90/tutorial.html#Tight-binding-Hamiltonian">Tight-binding Hamiltonian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/Ce2O3_csc_w90/tutorial.html#Convergence">Convergence</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/NNO_os_plo_mag/tutorial.html">4. OS with VASP/PLOs and cthyb: AFM state of NdNiO2</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/NNO_os_plo_mag/tutorial.html#1.-Run-DFT">1. Run DFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/NNO_os_plo_mag/tutorial.html#2.-Creating-the-hdf5-archive-/-DMFT-input">2. Creating the hdf5 archive / DMFT input</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/NNO_os_plo_mag/tutorial.html#3.-Running-the-AFM-calculation">3. Running the AFM calculation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/NNO_os_plo_mag/tutorial.html#5.-Multiplet-analysis">5. Multiplet analysis</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/correlated_bandstructure/plot_correlated_bands.html">5. Plotting the spectral function</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/correlated_bandstructure/plot_correlated_bands.html#1.-Configuration">1. Configuration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/correlated_bandstructure/plot_correlated_bands.html#Basic-options">Basic options</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/correlated_bandstructure/plot_correlated_bands.html#Wannier90">Wannier90</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/correlated_bandstructure/plot_correlated_bands.html#BZ-configuration">BZ configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/correlated_bandstructure/plot_correlated_bands.html#Self-energy">Self-energy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/correlated_bandstructure/plot_correlated_bands.html#Plotting-options">Plotting options</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/correlated_bandstructure/plot_correlated_bands.html#2.-Run-and-Plotting">2. Run and Plotting</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../issues.html">Support &amp; contribute</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../issues.html#seeking-help">Seeking help</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../issues.html#improving-solid-dmft">Improving solid_dmft</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../issues.html#reporting-issues">Reporting issues</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../ChangeLog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-2-0">Version 3.2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#general">General</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#fix">fix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#build">build</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#feat">feat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#doc">doc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#test">test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-1-5">Version 3.1.5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-1-4">Version 3.1.4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-1-3">Version 3.1.3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-1-2">Version 3.1.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-1-1">Version 3.1.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-1-0">Version 3.1.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-0-0">Version 3.0.0</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #7E588A" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">solid_dmft</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>dmft_tools.observables</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for dmft_tools.observables</h1><div class="highlight"><pre>
+<span></span><span class="c1">################################################################################</span>
+<span class="c1">#</span>
+<span class="c1"># solid_dmft - A versatile python wrapper to perform DFT+DMFT calculations</span>
+<span class="c1">#              utilizing the TRIQS software library</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (C) 2018-2020, ETH Zurich</span>
+<span class="c1"># Copyright (C) 2021, The Simons Foundation</span>
+<span class="c1">#      authors: A. Hampel, M. Merkel, and S. Beck</span>
+<span class="c1">#</span>
+<span class="c1"># solid_dmft is free software: you can redistribute it and/or modify it under the</span>
+<span class="c1"># terms of the GNU General Public License as published by the Free Software</span>
+<span class="c1"># Foundation, either version 3 of the License, or (at your option) any later</span>
+<span class="c1"># version.</span>
+<span class="c1">#</span>
+<span class="c1"># solid_dmft is distributed in the hope that it will be useful, but WITHOUT ANY</span>
+<span class="c1"># WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A</span>
+<span class="c1"># PARTICULAR PURPOSE. See the GNU General Public License for more details.</span>
+
+<span class="c1"># You should have received a copy of the GNU General Public License along with</span>
+<span class="c1"># solid_dmft (in the file COPYING.txt in this directory). If not, see</span>
+<span class="c1"># &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="c1">#</span>
+<span class="c1">################################################################################</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Contains all functions related to the observables.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># system</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># triqs</span>
+<span class="kn">import</span> <span class="nn">triqs.utility.mpi</span> <span class="k">as</span> <span class="nn">mpi</span>
+<span class="kn">from</span> <span class="nn">triqs.gf</span> <span class="kn">import</span> <span class="n">Gf</span><span class="p">,</span> <span class="n">MeshImTime</span>
+<span class="kn">from</span> <span class="nn">triqs.atom_diag</span> <span class="kn">import</span> <span class="n">trace_rho_op</span>
+<span class="kn">from</span> <span class="nn">triqs.gf.descriptors</span> <span class="kn">import</span> <span class="n">Fourier</span>
+<span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools</span> <span class="kn">import</span> <span class="n">solver</span>
+
+<div class="viewcode-block" id="prep_observables"><a class="viewcode-back" href="../../_ref/dmft_tools.observables.html#dmft_tools.observables.prep_observables">[docs]</a><span class="k">def</span> <span class="nf">prep_observables</span><span class="p">(</span><span class="n">h5_archive</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    prepares the observable arrays and files for the DMFT calculation</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    h5_archive: hdf archive instance</span>
+<span class="sd">        hdf archive for calculation</span>
+<span class="sd">    sum_k : SumK Object instances</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    observables : dict</span>
+<span class="sd">        observable array for calculation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># determine number of impurities</span>
+    <span class="n">n_inequiv_shells</span> <span class="o">=</span> <span class="n">h5_archive</span><span class="p">[</span><span class="s1">&#39;dft_input&#39;</span><span class="p">][</span><span class="s1">&#39;n_inequiv_shells&#39;</span><span class="p">]</span>
+
+    <span class="c1"># check for previous iterations</span>
+    <span class="n">obs_prev</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="s1">&#39;observables&#39;</span> <span class="ow">in</span> <span class="n">h5_archive</span><span class="p">[</span><span class="s1">&#39;DMFT_results&#39;</span><span class="p">]:</span>
+        <span class="n">obs_prev</span> <span class="o">=</span> <span class="n">h5_archive</span><span class="p">[</span><span class="s1">&#39;DMFT_results&#39;</span><span class="p">][</span><span class="s1">&#39;observables&#39;</span><span class="p">]</span>
+
+    <span class="c1"># prepare observable dicts</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">obs_prev</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">observables</span> <span class="o">=</span> <span class="n">obs_prev</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">observables</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;iteration&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_tot&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_bandcorr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_int&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_inequiv_shells</span><span class="p">)]</span>
+        <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_corr_en&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_dft&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_DC&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_inequiv_shells</span><span class="p">)]</span>
+        <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;orb_gb2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[{</span><span class="n">spin</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">spin</span> <span class="ow">in</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">spin_block_names</span><span class="p">[</span><span class="n">sum_k</span><span class="o">.</span><span class="n">SO</span><span class="p">]}</span>
+                                  <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_inequiv_shells</span><span class="p">)]</span>
+        <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;imp_gb2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[{</span><span class="n">spin</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">spin</span> <span class="ow">in</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">spin_block_names</span><span class="p">[</span><span class="n">sum_k</span><span class="o">.</span><span class="n">SO</span><span class="p">]}</span>
+                                  <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_inequiv_shells</span><span class="p">)]</span>
+        <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;orb_occ&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[{</span><span class="n">spin</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">spin</span> <span class="ow">in</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">spin_block_names</span><span class="p">[</span><span class="n">sum_k</span><span class="o">.</span><span class="n">SO</span><span class="p">]}</span>
+                                  <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_inequiv_shells</span><span class="p">)]</span>
+        <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;orb_Z&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[{</span><span class="n">spin</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">spin</span> <span class="ow">in</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">spin_block_names</span><span class="p">[</span><span class="n">sum_k</span><span class="o">.</span><span class="n">SO</span><span class="p">]}</span>
+                                  <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_inequiv_shells</span><span class="p">)]</span>
+        <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[{</span><span class="n">spin</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">spin</span> <span class="ow">in</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">spin_block_names</span><span class="p">[</span><span class="n">sum_k</span><span class="o">.</span><span class="n">SO</span><span class="p">]}</span>
+                                  <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_inequiv_shells</span><span class="p">)]</span>
+
+    <span class="k">return</span> <span class="n">observables</span></div>
+
+<span class="k">def</span> <span class="nf">_generate_header</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates the headers that are used in write_header_to_file.</span>
+<span class="sd">    Returns a dict with {file_name: header_string}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n_orb</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">get_n_orbitals</span><span class="p">(</span><span class="n">sum_k</span><span class="p">)</span>
+
+    <span class="n">header_energy_mask</span> <span class="o">=</span> <span class="s1">&#39; | </span><span class="si">{:&gt;10}</span><span class="s1"> | </span><span class="si">{:&gt;10}</span><span class="s1">   </span><span class="si">{:&gt;10}</span><span class="s1">   </span><span class="si">{:&gt;10}</span><span class="s1">   </span><span class="si">{:&gt;10}</span><span class="s1">&#39;</span>
+    <span class="n">header_energy</span> <span class="o">=</span> <span class="n">header_energy_mask</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;E_tot&#39;</span><span class="p">,</span> <span class="s1">&#39;E_DFT&#39;</span><span class="p">,</span> <span class="s1">&#39;E_bandcorr&#39;</span><span class="p">,</span> <span class="s1">&#39;E_int_imp&#39;</span><span class="p">,</span> <span class="s1">&#39;E_DC&#39;</span><span class="p">)</span>
+
+    <span class="n">headers</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">iineq</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">):</span>
+        <span class="n">number_spaces</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">10</span><span class="o">*</span><span class="n">n_orb</span><span class="p">[</span><span class="n">iineq</span><span class="p">][</span><span class="s1">&#39;up&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">3</span><span class="o">*</span><span class="p">(</span><span class="n">n_orb</span><span class="p">[</span><span class="n">iineq</span><span class="p">][</span><span class="s1">&#39;up&#39;</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="mi">21</span><span class="p">)</span>
+        <span class="n">header_basic_mask</span> <span class="o">=</span> <span class="s1">&#39;{{:&gt;3}} | {{:&gt;10}} | {{:&gt;</span><span class="si">{0}</span><span class="s1">}} | {{:&gt;</span><span class="si">{0}</span><span class="s1">}} | {{:&gt;17}}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">number_spaces</span><span class="p">)</span>
+
+        <span class="c1"># If magnetic calculation is done create two obs files per imp</span>
+        <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;magnetic&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">SO</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">spin</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;up&#39;</span><span class="p">,</span> <span class="s1">&#39;down&#39;</span><span class="p">):</span>
+                <span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;observables_imp</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">.dat&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">iineq</span><span class="p">,</span> <span class="n">spin</span><span class="p">)</span>
+                <span class="n">headers</span><span class="p">[</span><span class="n">file_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">header_basic_mask</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;it&#39;</span><span class="p">,</span> <span class="s1">&#39;mu&#39;</span><span class="p">,</span> <span class="s1">&#39;G(beta/2) per orbital&#39;</span><span class="p">,</span>
+                                                             <span class="s1">&#39;orbital occs &#39;</span><span class="o">+</span><span class="n">spin</span><span class="p">,</span> <span class="s1">&#39;impurity occ &#39;</span><span class="o">+</span><span class="n">spin</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;calc_energies&#39;</span><span class="p">]:</span>
+                    <span class="n">headers</span><span class="p">[</span><span class="n">file_name</span><span class="p">]</span> <span class="o">+=</span> <span class="n">header_energy</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;observables_imp</span><span class="si">{}</span><span class="s1">.dat&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">iineq</span><span class="p">)</span>
+            <span class="n">headers</span><span class="p">[</span><span class="n">file_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">header_basic_mask</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;it&#39;</span><span class="p">,</span> <span class="s1">&#39;mu&#39;</span><span class="p">,</span> <span class="s1">&#39;G(beta/2) per orbital&#39;</span><span class="p">,</span>
+                                                         <span class="s1">&#39;orbital occs up+down&#39;</span><span class="p">,</span> <span class="s1">&#39;impurity occ&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;calc_energies&#39;</span><span class="p">]:</span>
+                <span class="n">headers</span><span class="p">[</span><span class="n">file_name</span><span class="p">]</span> <span class="o">+=</span> <span class="n">header_energy</span>
+
+    <span class="k">return</span> <span class="n">headers</span>
+
+
+<div class="viewcode-block" id="write_header_to_file"><a class="viewcode-back" href="../../_ref/dmft_tools.observables.html#dmft_tools.observables.write_header_to_file">[docs]</a><span class="k">def</span> <span class="nf">write_header_to_file</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Writes the header to the observable files</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    general_params : dict</span>
+<span class="sd">        general parameters as a dict</span>
+<span class="sd">    n_inequiv_shells : int</span>
+<span class="sd">        number of impurities for calculations</span>
+
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    nothing</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">headers</span> <span class="o">=</span> <span class="n">_generate_header</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">header</span> <span class="ow">in</span> <span class="n">headers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;jobname&#39;</span><span class="p">],</span> <span class="n">file_name</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">obs_file</span><span class="p">:</span>
+            <span class="n">obs_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">header</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="add_dft_values_as_zeroth_iteration"><a class="viewcode-back" href="../../_ref/dmft_tools.observables.html#dmft_tools.observables.add_dft_values_as_zeroth_iteration">[docs]</a><span class="k">def</span> <span class="nf">add_dft_values_as_zeroth_iteration</span><span class="p">(</span><span class="n">observables</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">solver_type_per_imp</span><span class="p">,</span> <span class="n">dft_mu</span><span class="p">,</span> <span class="n">dft_energy</span><span class="p">,</span>
+                                       <span class="n">sum_k</span><span class="p">,</span> <span class="n">G_loc_all_dft</span><span class="p">,</span> <span class="n">density_mat_dft</span><span class="p">,</span> <span class="n">shell_multiplicity</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates the DFT observables that should be written as the zeroth iteration.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    observables : observable arrays/dicts</span>
+
+<span class="sd">    general_params : general parameters as a dict</span>
+
+<span class="sd">    dft_mu : dft chemical potential</span>
+
+<span class="sd">    sum_k : SumK Object instances</span>
+
+<span class="sd">    G_loc_all_dft : Gloc from DFT for G(beta/2)</span>
+
+<span class="sd">    density_mat_dft : occupations from DFT</span>
+
+<span class="sd">    shell_multiplicity : degeneracy of impurities</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    observables: list of dicts</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dft_energy</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="k">if</span> <span class="n">dft_energy</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">dft_energy</span>
+    <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;iteration&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">dft_mu</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;calc_energies&#39;</span><span class="p">]:</span>
+        <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_bandcorr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_corr_en&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_dft&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dft_energy</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_bandcorr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+        <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_corr_en&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+        <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_dft&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">iineq</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;calc_energies&#39;</span><span class="p">]:</span>
+            <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_int&#39;</span><span class="p">][</span><span class="n">iineq</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+            <span class="n">double_counting_energy</span> <span class="o">=</span> <span class="n">shell_multiplicity</span><span class="p">[</span><span class="n">iineq</span><span class="p">]</span><span class="o">*</span><span class="n">sum_k</span><span class="o">.</span><span class="n">dc_energ</span><span class="p">[</span><span class="n">sum_k</span><span class="o">.</span><span class="n">inequiv_to_corr</span><span class="p">[</span><span class="n">iineq</span><span class="p">]]</span> <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;dc&#39;</span><span class="p">]</span> <span class="k">else</span> <span class="mf">0.0</span>
+            <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_DC&#39;</span><span class="p">][</span><span class="n">iineq</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">double_counting_energy</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_int&#39;</span><span class="p">][</span><span class="n">iineq</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+            <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_DC&#39;</span><span class="p">][</span><span class="n">iineq</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Collect all occupation and G(beta/2) for spin up and down separately</span>
+        <span class="k">for</span> <span class="n">spin</span> <span class="ow">in</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">spin_block_names</span><span class="p">[</span><span class="n">sum_k</span><span class="o">.</span><span class="n">SO</span><span class="p">]:</span>
+            <span class="n">g_beta_half_per_impurity</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="n">g_beta_half_per_orbital</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">occupation_per_impurity</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="n">occupation_per_orbital</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">Z_per_orbital</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="c1"># iterate over all spin channels and add the to up or down</span>
+            <span class="c1"># we need only the keys of the blocks, but sorted! Otherwise</span>
+            <span class="c1"># orbitals will be mixed up_0 to down_0 etc.</span>
+            <span class="k">for</span> <span class="n">spin_channel</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">gf_struct_solver</span><span class="p">[</span><span class="n">iineq</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">spin</span> <span class="ow">in</span> <span class="n">spin_channel</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="k">if</span> <span class="n">solver_type_per_imp</span><span class="p">[</span><span class="n">iineq</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;ftps&#39;</span><span class="p">:</span>
+                    <span class="n">freq_mesh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">w</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">G_loc_all_dft</span><span class="p">[</span><span class="n">iineq</span><span class="p">][</span><span class="n">spin_channel</span><span class="p">]</span><span class="o">.</span><span class="n">mesh</span><span class="p">])</span>
+                    <span class="n">fermi_idx</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">freq_mesh</span><span class="p">)</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span>
+                    <span class="n">gb2_averaged</span> <span class="o">=</span> <span class="n">G_loc_all_dft</span><span class="p">[</span><span class="n">iineq</span><span class="p">][</span><span class="n">spin_channel</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">fermi_idx</span><span class="p">]</span><span class="o">.</span><span class="n">imag</span>
+
+                    <span class="c1"># Z is not defined without Sigma, adding 1</span>
+                    <span class="n">Z_per_orbital</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span> <span class="o">*</span> <span class="n">G_loc_all_dft</span><span class="p">[</span><span class="n">iineq</span><span class="p">][</span><span class="n">spin_channel</span><span class="p">]</span><span class="o">.</span><span class="n">target_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># G(beta/2)</span>
+                    <span class="n">mesh</span> <span class="o">=</span> <span class="n">MeshImTime</span><span class="p">(</span><span class="n">beta</span><span class="o">=</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">],</span> <span class="n">S</span><span class="o">=</span><span class="s2">&quot;Fermion&quot;</span><span class="p">,</span>
+                                      <span class="n">n_max</span><span class="o">=</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;n_tau&#39;</span><span class="p">])</span>
+                    <span class="n">G_time</span> <span class="o">=</span> <span class="n">Gf</span><span class="p">(</span><span class="n">mesh</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="n">G_loc_all_dft</span><span class="p">[</span><span class="n">iineq</span><span class="p">][</span><span class="n">spin_channel</span><span class="p">]</span><span class="o">.</span><span class="n">indices</span><span class="p">)</span>
+                    <span class="n">G_time</span> <span class="o">&lt;&lt;</span> <span class="n">Fourier</span><span class="p">(</span><span class="n">G_loc_all_dft</span><span class="p">[</span><span class="n">iineq</span><span class="p">][</span><span class="n">spin_channel</span><span class="p">])</span>
+
+                    <span class="c1"># since G(tau) has always 10001 values we are sampling +-10 values</span>
+                    <span class="c1"># hard coded around beta/2, for beta=40 this corresponds to approx +-0.05</span>
+                    <span class="n">mesh_mid</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">G_time</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+                    <span class="n">samp</span> <span class="o">=</span> <span class="mi">10</span>
+                    <span class="n">gg</span> <span class="o">=</span> <span class="n">G_time</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">mesh_mid</span><span class="o">-</span><span class="n">samp</span><span class="p">:</span><span class="n">mesh_mid</span><span class="o">+</span><span class="n">samp</span><span class="p">]</span>
+                    <span class="n">gb2_averaged</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">gg</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+                    <span class="c1"># Z is not defined without Sigma, adding 1</span>
+                    <span class="n">Z_per_orbital</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span> <span class="o">*</span> <span class="n">G_time</span><span class="o">.</span><span class="n">target_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="p">)</span>
+
+                <span class="n">g_beta_half_per_orbital</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">gb2_averaged</span><span class="p">))</span>
+                <span class="n">g_beta_half_per_impurity</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">gb2_averaged</span><span class="p">)</span>
+
+                <span class="c1"># occupation per orbital</span>
+                <span class="n">den_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">density_mat_dft</span><span class="p">[</span><span class="n">iineq</span><span class="p">][</span><span class="n">spin_channel</span><span class="p">])</span>
+                <span class="n">occupation_per_orbital</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">den_mat</span><span class="p">))</span>
+                <span class="n">occupation_per_impurity</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">den_mat</span><span class="p">)</span>
+
+            <span class="c1"># adding those values to the observable object</span>
+            <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;orb_gb2&#39;</span><span class="p">][</span><span class="n">iineq</span><span class="p">][</span><span class="n">spin</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">g_beta_half_per_orbital</span><span class="p">))</span>
+            <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;imp_gb2&#39;</span><span class="p">][</span><span class="n">iineq</span><span class="p">][</span><span class="n">spin</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">g_beta_half_per_impurity</span><span class="p">)</span>
+            <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;orb_occ&#39;</span><span class="p">][</span><span class="n">iineq</span><span class="p">][</span><span class="n">spin</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">occupation_per_orbital</span><span class="p">))</span>
+            <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="n">iineq</span><span class="p">][</span><span class="n">spin</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">occupation_per_impurity</span><span class="p">)</span>
+            <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;orb_Z&#39;</span><span class="p">][</span><span class="n">iineq</span><span class="p">][</span><span class="n">spin</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Z_per_orbital</span><span class="p">))</span>
+
+    <span class="c1"># for it 0 we just subtract E_DC from E_DFT</span>
+    <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;calc_energies&#39;</span><span class="p">]:</span>
+        <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_tot&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dft_energy</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">([</span><span class="n">dc_per_imp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">dc_per_imp</span> <span class="ow">in</span> <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_DC&#39;</span><span class="p">]]))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_tot&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">observables</span></div>
+
+
+<div class="viewcode-block" id="add_dmft_observables"><a class="viewcode-back" href="../../_ref/dmft_tools.observables.html#dmft_tools.observables.add_dmft_observables">[docs]</a><span class="k">def</span> <span class="nf">add_dmft_observables</span><span class="p">(</span><span class="n">observables</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">solver_params</span><span class="p">,</span> <span class="n">map_imp_solver</span><span class="p">,</span> <span class="n">solver_type_per_imp</span><span class="p">,</span> <span class="n">dft_energy</span><span class="p">,</span> <span class="n">it</span><span class="p">,</span> <span class="n">solvers</span><span class="p">,</span> <span class="n">h_int</span><span class="p">,</span>
+                         <span class="n">previous_mu</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span> <span class="n">density_mat</span><span class="p">,</span> <span class="n">shell_multiplicity</span><span class="p">,</span> <span class="n">E_bandcorr</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    calculates the observables for given Input, I decided to calculate the observables</span>
+<span class="sd">    not adhoc since it should be done only once by the master_node</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    observables : observable arrays/dicts</span>
+
+<span class="sd">    general_params : general parameters as a dict</span>
+
+<span class="sd">    solver_params : solver parameters as a dict</span>
+
+<span class="sd">    it : iteration counter</span>
+
+<span class="sd">    solvers : Solver instances</span>
+
+<span class="sd">    h_int : interaction hamiltonian</span>
+
+<span class="sd">    previous_mu : dmft chemical potential for which the calculation was just done</span>
+
+<span class="sd">    sum_k : SumK Object instances</span>
+
+<span class="sd">    density_mat : DMFT occupations</span>
+
+<span class="sd">    shell_multiplicity : degeneracy of impurities</span>
+
+<span class="sd">    E_bandcorr : E_kin_dmft - E_kin_dft, either calculated man or from sum_k method if CSC</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    observables: list of dicts</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># init energy values</span>
+    <span class="n">E_corr_en</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="c1"># Read energy from OSZICAR</span>
+    <span class="n">dft_energy</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="k">if</span> <span class="n">dft_energy</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">dft_energy</span>
+
+    <span class="c1"># now the normal output from each iteration</span>
+    <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;iteration&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
+    <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">previous_mu</span><span class="p">))</span>
+    <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_bandcorr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">E_bandcorr</span><span class="p">)</span>
+    <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_dft&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dft_energy</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;calc_energies&#39;</span><span class="p">]:</span>
+        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Calculating interaction energies&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">icrsh</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">solver_type_per_imp</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;cthyb&#39;</span><span class="p">,</span> <span class="s1">&#39;hubbardI&#39;</span><span class="p">]</span>
+                    <span class="ow">and</span> <span class="n">solver_params</span><span class="p">[</span><span class="n">map_imp_solver</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]][</span><span class="s2">&quot;measure_density_matrix&quot;</span><span class="p">]):</span>
+                <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;    Imp </span><span class="si">{</span><span class="n">icrsh</span><span class="si">}</span><span class="s1">: from impurity density matrix&#39;</span><span class="p">)</span>
+                <span class="c1"># Extract accumulated density matrix</span>
+                <span class="n">density_matrix</span> <span class="o">=</span> <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">density_matrix</span>
+                <span class="c1"># Object containing eigensystem of the local Hamiltonian</span>
+                <span class="n">diag_local_ham</span> <span class="o">=</span> <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">h_loc_diagonalization</span>
+                <span class="n">E_int</span> <span class="o">=</span> <span class="n">trace_rho_op</span><span class="p">(</span><span class="n">density_matrix</span><span class="p">,</span> <span class="n">h_int</span><span class="p">[</span><span class="n">icrsh</span><span class="p">],</span> <span class="n">diag_local_ham</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">solver_type_per_imp</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;hartree&#39;</span><span class="p">:</span>
+                <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;    Imp </span><span class="si">{</span><span class="n">icrsh</span><span class="si">}</span><span class="s1">: from Hartree&#39;</span><span class="p">)</span>
+                <span class="n">E_int</span> <span class="o">=</span> <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">interaction_energy</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;    Imp </span><span class="si">{</span><span class="n">icrsh</span><span class="si">}</span><span class="s1">: from Migdal formula. &#39;</span>
+                           <span class="s1">&#39;WARNING: less stable than measuring density matrix and using trace_rho_op!&#39;</span><span class="p">)</span>
+                <span class="c1"># calc energy for given S and G</span>
+                <span class="c1"># dmft interaction energy with E_int = 0.5 * Tr[Sigma * G]</span>
+                <span class="n">E_int</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">((</span><span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">G_freq</span> <span class="o">*</span> <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">Sigma_freq</span><span class="p">)</span><span class="o">.</span><span class="n">total_density</span><span class="p">())</span>
+
+            <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_int&#39;</span><span class="p">][</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">shell_multiplicity</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">*</span><span class="n">E_int</span><span class="o">.</span><span class="n">real</span><span class="p">)</span>
+            <span class="n">E_corr_en</span> <span class="o">+=</span> <span class="n">shell_multiplicity</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">E_int</span><span class="o">.</span><span class="n">real</span> <span class="o">-</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">dc_energ</span><span class="p">[</span><span class="n">sum_k</span><span class="o">.</span><span class="n">inequiv_to_corr</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]])</span>
+
+    <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_corr_en&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">E_corr_en</span><span class="p">)</span>
+
+    <span class="c1"># calc total energy</span>
+    <span class="n">E_tot</span> <span class="o">=</span> <span class="n">dft_energy</span> <span class="o">+</span> <span class="n">E_bandcorr</span> <span class="o">+</span> <span class="n">E_corr_en</span>
+    <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_tot&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">E_tot</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">icrsh</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;dc&#39;</span><span class="p">]:</span>
+            <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_DC&#39;</span><span class="p">][</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">shell_multiplicity</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">*</span><span class="n">sum_k</span><span class="o">.</span><span class="n">dc_energ</span><span class="p">[</span><span class="n">sum_k</span><span class="o">.</span><span class="n">inequiv_to_corr</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_DC&#39;</span><span class="p">][</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">solver_type_per_imp</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;ftps&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">G_time</span><span class="p">:</span>
+                <span class="n">G_time</span> <span class="o">=</span> <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">G_time</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">G_time</span> <span class="o">=</span> <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">G_time_orig</span>
+
+        <span class="c1"># Collect all occupation and G(beta/2) for spin up and down separately</span>
+        <span class="k">for</span> <span class="n">spin</span> <span class="ow">in</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">spin_block_names</span><span class="p">[</span><span class="n">sum_k</span><span class="o">.</span><span class="n">SO</span><span class="p">]:</span>
+            <span class="n">g_beta_half_per_impurity</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="n">g_beta_half_per_orbital</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">occupation_per_impurity</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="n">occupation_per_orbital</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">Z_per_orbital</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="c1"># iterate over all spin channels and add the to up or down</span>
+            <span class="k">for</span> <span class="n">spin_channel</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">gf_struct_solver</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">spin</span> <span class="ow">in</span> <span class="n">spin_channel</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">solver_type_per_imp</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;ftps&#39;</span><span class="p">:</span>
+                    <span class="n">freq_mesh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">w</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">G_freq</span><span class="p">[</span><span class="n">spin_channel</span><span class="p">]</span><span class="o">.</span><span class="n">mesh</span><span class="p">])</span>
+                    <span class="n">fermi_idx</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">freq_mesh</span><span class="p">)</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span>
+                    <span class="n">gb2_averaged</span> <span class="o">=</span> <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">G_freq</span><span class="p">[</span><span class="n">spin_channel</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">fermi_idx</span><span class="p">]</span><span class="o">.</span><span class="n">imag</span>
+
+                    <span class="c1"># Z is not defined without Sigma, adding 1</span>
+                    <span class="n">Z_per_orbital</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span> <span class="o">*</span> <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">G_freq</span><span class="p">[</span><span class="n">spin_channel</span><span class="p">]</span><span class="o">.</span><span class="n">target_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># G(beta/2)</span>
+                    <span class="c1"># since G(tau) has always 10001 values we are sampling +-10 values</span>
+                    <span class="c1"># hard coded around beta/2, for beta=40 this corresponds to approx +-0.05</span>
+                    <span class="n">mesh_mid</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">G_time</span><span class="p">[</span><span class="n">spin_channel</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+                    <span class="n">samp</span> <span class="o">=</span> <span class="mi">10</span>
+                    <span class="n">gg</span> <span class="o">=</span> <span class="n">G_time</span><span class="p">[</span><span class="n">spin_channel</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">mesh_mid</span><span class="o">-</span><span class="n">samp</span><span class="p">:</span><span class="n">mesh_mid</span><span class="o">+</span><span class="n">samp</span><span class="p">]</span>
+                    <span class="n">gb2_averaged</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">gg</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+                    <span class="c1"># get Z</span>
+                    <span class="n">Z_per_orbital</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span> <span class="n">calc_Z</span><span class="p">(</span><span class="n">Sigma</span><span class="o">=</span> <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">Sigma_freq</span><span class="p">[</span><span class="n">spin_channel</span><span class="p">])</span> <span class="p">)</span>
+
+                <span class="n">g_beta_half_per_orbital</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">gb2_averaged</span><span class="p">))</span>
+                <span class="n">g_beta_half_per_impurity</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">gb2_averaged</span><span class="p">)</span>
+
+                <span class="c1"># occupation per orbital and impurity</span>
+                <span class="n">den_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">density_mat</span><span class="p">[</span><span class="n">icrsh</span><span class="p">][</span><span class="n">spin_channel</span><span class="p">])</span>
+                <span class="n">occupation_per_orbital</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">den_mat</span><span class="p">))</span>
+                <span class="n">occupation_per_impurity</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">den_mat</span><span class="p">)</span>
+
+            <span class="c1"># adding those values to the observable object</span>
+            <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;orb_gb2&#39;</span><span class="p">][</span><span class="n">icrsh</span><span class="p">][</span><span class="n">spin</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">g_beta_half_per_orbital</span><span class="p">))</span>
+            <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;imp_gb2&#39;</span><span class="p">][</span><span class="n">icrsh</span><span class="p">][</span><span class="n">spin</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">g_beta_half_per_impurity</span><span class="p">)</span>
+            <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;orb_occ&#39;</span><span class="p">][</span><span class="n">icrsh</span><span class="p">][</span><span class="n">spin</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">occupation_per_orbital</span><span class="p">))</span>
+            <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="n">icrsh</span><span class="p">][</span><span class="n">spin</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">occupation_per_impurity</span><span class="p">)</span>
+            <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;orb_Z&#39;</span><span class="p">][</span><span class="n">icrsh</span><span class="p">][</span><span class="n">spin</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Z_per_orbital</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">observables</span></div>
+
+<div class="viewcode-block" id="write_obs"><a class="viewcode-back" href="../../_ref/dmft_tools.observables.html#dmft_tools.observables.write_obs">[docs]</a><span class="k">def</span> <span class="nf">write_obs</span><span class="p">(</span><span class="n">observables</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span> <span class="n">general_params</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    writes the last entries of the observable arrays to the files</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    observables : list of dicts</span>
+<span class="sd">        observable arrays/dicts</span>
+
+<span class="sd">    sum_k : SumK Object instances</span>
+
+<span class="sd">    general_params : dict</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    nothing</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">n_orb</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">get_n_orbitals</span><span class="p">(</span><span class="n">sum_k</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">icrsh</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;magnetic&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">SO</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">spin</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;up&#39;</span><span class="p">,</span> <span class="s1">&#39;down&#39;</span><span class="p">):</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{:3d}</span><span class="s1"> | &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">observables</span><span class="p">[</span><span class="s1">&#39;iteration&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">line</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">{:10.5f}</span><span class="s1"> | &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">observables</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+                <span class="k">if</span> <span class="n">n_orb</span><span class="p">[</span><span class="n">icrsh</span><span class="p">][</span><span class="n">spin</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">line</span> <span class="o">+=</span> <span class="s1">&#39; &#39;</span><span class="o">*</span><span class="mi">11</span>
+                <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;orb_gb2&#39;</span><span class="p">][</span><span class="n">icrsh</span><span class="p">][</span><span class="n">spin</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">line</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">{:10.5f}</span><span class="s1">   &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; | &#39;</span>
+
+                <span class="k">if</span> <span class="n">n_orb</span><span class="p">[</span><span class="n">icrsh</span><span class="p">][</span><span class="n">spin</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">line</span> <span class="o">+=</span> <span class="s1">&#39; &#39;</span><span class="o">*</span><span class="mi">11</span>
+                <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">observables</span><span class="p">[</span><span class="s1">&#39;orb_occ&#39;</span><span class="p">][</span><span class="n">icrsh</span><span class="p">][</span><span class="n">spin</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">line</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">{:10.5f}</span><span class="s1">   &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; | &#39;</span>
+
+                <span class="n">line</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">{:17.5f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">observables</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="n">icrsh</span><span class="p">][</span><span class="n">spin</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+                <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;calc_energies&#39;</span><span class="p">]:</span>
+                    <span class="n">line</span> <span class="o">+=</span> <span class="s1">&#39; | </span><span class="si">{:10.5f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_tot&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">line</span> <span class="o">+=</span> <span class="s1">&#39; | </span><span class="si">{:10.5f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_dft&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">line</span> <span class="o">+=</span> <span class="s1">&#39;   </span><span class="si">{:10.5f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_bandcorr&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">line</span> <span class="o">+=</span> <span class="s1">&#39;   </span><span class="si">{:10.5f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_int&#39;</span><span class="p">][</span><span class="n">icrsh</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">line</span> <span class="o">+=</span> <span class="s1">&#39;   </span><span class="si">{:10.5f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_DC&#39;</span><span class="p">][</span><span class="n">icrsh</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+                <span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">/observables_imp</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">.dat&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;jobname&#39;</span><span class="p">],</span> <span class="n">icrsh</span><span class="p">,</span> <span class="n">spin</span><span class="p">)</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">obs_file</span><span class="p">:</span>
+                    <span class="n">obs_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{:3d}</span><span class="s1"> | &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">observables</span><span class="p">[</span><span class="s1">&#39;iteration&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">line</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">{:10.5f}</span><span class="s1"> | &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">observables</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+            <span class="c1"># Adds spaces for header to fit in properly</span>
+            <span class="k">if</span> <span class="n">n_orb</span><span class="p">[</span><span class="n">icrsh</span><span class="p">][</span><span class="s1">&#39;up&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">line</span> <span class="o">+=</span> <span class="s1">&#39; &#39;</span><span class="o">*</span><span class="mi">11</span>
+            <span class="c1"># Adds up the spin channels</span>
+            <span class="k">for</span> <span class="n">iorb</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_orb</span><span class="p">[</span><span class="n">icrsh</span><span class="p">][</span><span class="s1">&#39;up&#39;</span><span class="p">]):</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="n">observables</span><span class="p">[</span><span class="s1">&#39;orb_gb2&#39;</span><span class="p">][</span><span class="n">icrsh</span><span class="p">][</span><span class="n">spin</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">iorb</span><span class="p">]</span> <span class="k">for</span> <span class="n">spin</span> <span class="ow">in</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">spin_block_names</span><span class="p">[</span><span class="n">sum_k</span><span class="o">.</span><span class="n">SO</span><span class="p">]])</span>
+                <span class="n">line</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">{:10.5f}</span><span class="s1">   &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; | &#39;</span>
+
+            <span class="c1"># Adds spaces for header to fit in properly</span>
+            <span class="k">if</span> <span class="n">n_orb</span><span class="p">[</span><span class="n">icrsh</span><span class="p">][</span><span class="s1">&#39;up&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">line</span> <span class="o">+=</span> <span class="s1">&#39; &#39;</span><span class="o">*</span><span class="mi">11</span>
+            <span class="c1"># Adds up the spin channels</span>
+            <span class="k">for</span> <span class="n">iorb</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_orb</span><span class="p">[</span><span class="n">icrsh</span><span class="p">][</span><span class="s1">&#39;up&#39;</span><span class="p">]):</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="n">observables</span><span class="p">[</span><span class="s1">&#39;orb_occ&#39;</span><span class="p">][</span><span class="n">icrsh</span><span class="p">][</span><span class="n">spin</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">iorb</span><span class="p">]</span> <span class="k">for</span> <span class="n">spin</span> <span class="ow">in</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">spin_block_names</span><span class="p">[</span><span class="n">sum_k</span><span class="o">.</span><span class="n">SO</span><span class="p">]])</span>
+                <span class="n">line</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">{:10.5f}</span><span class="s1">   &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; | &#39;</span>
+
+            <span class="c1"># Adds up the spin channels</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="n">observables</span><span class="p">[</span><span class="s1">&#39;imp_occ&#39;</span><span class="p">][</span><span class="n">icrsh</span><span class="p">][</span><span class="n">spin</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">spin</span> <span class="ow">in</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">spin_block_names</span><span class="p">[</span><span class="n">sum_k</span><span class="o">.</span><span class="n">SO</span><span class="p">]])</span>
+            <span class="n">line</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">{:17.5f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;calc_energies&#39;</span><span class="p">]:</span>
+                <span class="n">line</span> <span class="o">+=</span> <span class="s1">&#39; | </span><span class="si">{:10.5f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_tot&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">line</span> <span class="o">+=</span> <span class="s1">&#39; | </span><span class="si">{:10.5f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_dft&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">line</span> <span class="o">+=</span> <span class="s1">&#39;   </span><span class="si">{:10.5f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_bandcorr&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">line</span> <span class="o">+=</span> <span class="s1">&#39;   </span><span class="si">{:10.5f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_int&#39;</span><span class="p">][</span><span class="n">icrsh</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">line</span> <span class="o">+=</span> <span class="s1">&#39;   </span><span class="si">{:10.5f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">observables</span><span class="p">[</span><span class="s1">&#39;E_DC&#39;</span><span class="p">][</span><span class="n">icrsh</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+            <span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">/observables_imp</span><span class="si">{}</span><span class="s1">.dat&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;jobname&#39;</span><span class="p">],</span> <span class="n">icrsh</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">obs_file</span><span class="p">:</span>
+                <span class="n">obs_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="calc_dft_kin_en"><a class="viewcode-back" href="../../_ref/dmft_tools.observables.html#dmft_tools.observables.calc_dft_kin_en">[docs]</a><span class="k">def</span> <span class="nf">calc_dft_kin_en</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span> <span class="n">dft_mu</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates the kinetic energy from DFT for target states</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    general_params : dict</span>
+<span class="sd">        general parameters as a dict</span>
+
+<span class="sd">    sum_k : SumK Object instances</span>
+
+<span class="sd">    dft_mu: float</span>
+<span class="sd">        DFT fermi energy</span>
+
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    E_kin_dft: float</span>
+<span class="sd">        kinetic energy from DFT</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">H_ks</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">hopping</span>
+    <span class="n">num_kpts</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">n_k</span>
+    <span class="n">E_kin</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">ikarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_k</span><span class="p">)))</span>
+    <span class="k">for</span> <span class="n">ik</span> <span class="ow">in</span> <span class="n">mpi</span><span class="o">.</span><span class="n">slice_array</span><span class="p">(</span><span class="n">ikarray</span><span class="p">):</span>
+        <span class="n">nb</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_orbitals</span><span class="p">[</span><span class="n">ik</span><span class="p">])</span>
+        <span class="c1"># calculate lattice greens function need here to set sigma other n_iw is assumend to be 1025!</span>
+        <span class="c1"># TODO: implement here version for FTPS!</span>
+        <span class="n">G_freq_lat</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">lattice_gf</span><span class="p">(</span><span class="n">ik</span><span class="p">,</span> <span class="n">with_Sigma</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">dft_mu</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="c1"># # calculate G(beta) via the function density, which is the same as fourier trafo G(w) and taking G(b)</span>
+        <span class="n">G_freq_lat_beta</span> <span class="o">=</span> <span class="n">G_freq_lat</span><span class="o">.</span><span class="n">density</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">spin</span> <span class="ow">in</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">spin_block_names</span><span class="p">[</span><span class="n">sum_k</span><span class="o">.</span><span class="n">SO</span><span class="p">]:</span>
+            <span class="n">E_kin</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">H_ks</span><span class="p">[</span><span class="n">ik</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:</span><span class="n">nb</span><span class="p">,</span> <span class="p">:</span><span class="n">nb</span><span class="p">],</span> <span class="n">G_freq_lat_beta</span><span class="p">[</span><span class="n">spin</span><span class="p">][:,</span> <span class="p">:]))</span>
+    <span class="n">E_kin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">E_kin</span><span class="p">)</span>
+    <span class="c1"># collect data and put into E_kin_dft</span>
+    <span class="n">E_kin_dft</span> <span class="o">=</span> <span class="n">mpi</span><span class="o">.</span><span class="n">all_reduce</span><span class="p">(</span><span class="n">E_kin</span><span class="p">)</span>
+    <span class="n">mpi</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
+    <span class="c1"># E_kin should be divided by the number of k-points</span>
+    <span class="n">E_kin_dft</span> <span class="o">=</span> <span class="n">E_kin_dft</span><span class="o">/</span><span class="n">num_kpts</span>
+
+    <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Kinetic energy contribution dft part: </span><span class="si">{</span><span class="n">E_kin_dft</span><span class="si">:</span><span class="s1">.8f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">E_kin_dft</span></div>
+
+<div class="viewcode-block" id="calc_bandcorr_man"><a class="viewcode-back" href="../../_ref/dmft_tools.observables.html#dmft_tools.observables.calc_bandcorr_man">[docs]</a><span class="k">def</span> <span class="nf">calc_bandcorr_man</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span> <span class="n">E_kin_dft</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates the correlated kinetic energy from DMFT for target states</span>
+<span class="sd">    and then determines the band correction energy</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    general_params : dict</span>
+<span class="sd">        general parameters as a dict</span>
+
+<span class="sd">    sum_k : SumK Object instances</span>
+
+<span class="sd">    E_kin_dft: float</span>
+<span class="sd">        kinetic energy from DFT</span>
+
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    E_bandcorr: float</span>
+<span class="sd">        band energy correction E_kin_dmft - E_kin_dft</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">E_kin_dmft</span> <span class="o">=</span> <span class="mf">0.0</span><span class="n">j</span>
+    <span class="n">E_kin</span> <span class="o">=</span> <span class="mf">0.0</span><span class="n">j</span>
+    <span class="n">H_ks</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">hopping</span>
+    <span class="n">num_kpts</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">n_k</span>
+
+    <span class="c1"># kinetic energy from dmft lattice Greens functions</span>
+    <span class="n">ikarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_k</span><span class="p">)))</span>
+    <span class="k">for</span> <span class="n">ik</span> <span class="ow">in</span> <span class="n">mpi</span><span class="o">.</span><span class="n">slice_array</span><span class="p">(</span><span class="n">ikarray</span><span class="p">):</span>
+        <span class="n">nb</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_orbitals</span><span class="p">[</span><span class="n">ik</span><span class="p">])</span>
+        <span class="c1"># calculate lattice greens function</span>
+        <span class="n">G_freq_lat</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">lattice_gf</span><span class="p">(</span><span class="n">ik</span><span class="p">,</span> <span class="n">with_Sigma</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">with_dc</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="c1"># calculate G(beta) via the function density, which is the same as fourier trafo G(w) and taking G(b)</span>
+        <span class="n">G_freq_lat_beta</span> <span class="o">=</span> <span class="n">G_freq_lat</span><span class="o">.</span><span class="n">density</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">spin</span> <span class="ow">in</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">spin_block_names</span><span class="p">[</span><span class="n">sum_k</span><span class="o">.</span><span class="n">SO</span><span class="p">]:</span>
+            <span class="n">E_kin</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">H_ks</span><span class="p">[</span><span class="n">ik</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:</span><span class="n">nb</span><span class="p">,</span> <span class="p">:</span><span class="n">nb</span><span class="p">],</span> <span class="n">G_freq_lat_beta</span><span class="p">[</span><span class="n">spin</span><span class="p">][:,</span> <span class="p">:]))</span>
+    <span class="n">E_kin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">E_kin</span><span class="p">)</span>
+
+    <span class="c1"># collect data and put into E_kin_dmft</span>
+    <span class="n">E_kin_dmft</span> <span class="o">=</span> <span class="n">mpi</span><span class="o">.</span><span class="n">all_reduce</span><span class="p">(</span><span class="n">E_kin</span><span class="p">)</span>
+    <span class="n">mpi</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
+    <span class="c1"># E_kin should be divided by the number of k-points</span>
+    <span class="n">E_kin_dmft</span> <span class="o">=</span> <span class="n">E_kin_dmft</span><span class="o">/</span><span class="n">num_kpts</span>
+
+    <span class="k">if</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Kinetic energy contribution dmft part: &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">E_kin_dmft</span><span class="p">))</span>
+
+    <span class="n">E_bandcorr</span> <span class="o">=</span> <span class="n">E_kin_dmft</span> <span class="o">-</span> <span class="n">E_kin_dft</span>
+
+    <span class="k">return</span> <span class="n">E_bandcorr</span></div>
+
+<div class="viewcode-block" id="calc_Z"><a class="viewcode-back" href="../../_ref/dmft_tools.observables.html#dmft_tools.observables.calc_Z">[docs]</a><span class="k">def</span> <span class="nf">calc_Z</span><span class="p">(</span><span class="n">Sigma</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    calculates the inverse mass enhancement from the impurity</span>
+<span class="sd">    self-energy by a simple linear fit estimate:</span>
+<span class="sd">    [ 1 - ((Im S_iw[n_iw0+1]-S_iw[n_iw0])/(iw[n_iw0+1]-iw[n_iw0])) ]^-1</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Sigma: Gf on MeshImFreq</span>
+<span class="sd">        self-energy on Matsubara mesh</span>
+
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    orb_Z: 1d numpy array</span>
+<span class="sd">        list of Z values per orbital in Sigma</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">orb_Z</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">iw</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">Sigma</span><span class="o">.</span><span class="n">mesh</span><span class="p">]</span>
+    <span class="c1"># find smallest iw_n</span>
+    <span class="n">n_iw0</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.5</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">iw</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">orb</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">Sigma</span><span class="o">.</span><span class="n">target_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="n">Im_S_iw</span> <span class="o">=</span> <span class="n">Sigma</span><span class="p">[</span><span class="n">orb</span><span class="p">,</span><span class="n">orb</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">imag</span>
+        <span class="c1"># simple extraction from linear fit to first two Matsubara freq of Sigma</span>
+        <span class="c1"># assuming Fermi liquid like self energy</span>
+        <span class="n">Z</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">Im_S_iw</span><span class="p">[</span><span class="n">n_iw0</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">Im_S_iw</span><span class="p">[</span><span class="n">n_iw0</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">iw</span><span class="p">[</span><span class="n">n_iw0</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">iw</span><span class="p">[</span><span class="n">n_iw0</span><span class="p">])</span> <span class="p">)</span>
+        <span class="n">orb_Z</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">Z</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">orb_Z</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (C) 2018-2020, ETH Zurich Copyright (C) 2021-2022, The Simons Foundation authors: A. Hampel, M. Merkel, A. Carta, and S. Beck.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

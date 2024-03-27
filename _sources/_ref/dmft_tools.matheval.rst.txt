@@ -1,0 +1,29 @@
+dmft\_tools.matheval
+====================
+
+.. automodule:: dmft_tools.matheval
+    :members:
+
+
+
+
+
+
+
+.. rubric:: Classes
+
+.. autosummary::
+    :toctree:                                         
+    :template: autosummary_class_template.rst
+    
+    MathExpr
+
+
+
+
+
+
+
+
+
+

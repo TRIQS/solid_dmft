@@ -1,0 +1,103 @@
+
+[dft]: DFT related inputs
+-------------------------
+
+List of parameters for the DFT calculation in charge-self-consistent calculations.
+The parameters are ignored in one-shot calculations.
+
+
+
+
+
+.. admonition:: dft_code 
+ 	:class: intag  
+ 
+            **type** = string
+
+        choose the DFT code interface, for now Quantum Espresso and Vasp are available.
+        Possible values:
+
+        * 'vasp'
+        * 'qe'
+
+.. admonition:: dft_exec 
+ 	:class: intag  
+ 
+            **type** = string;  **default**  = 'vasp_std'
+
+        command for the DFT executable
+
+.. admonition:: mpi_env 
+ 	:class: intag  
+ 
+            **type** = string;  **default** '
+
+        selection for mpi env for DFT / VASP in default this will only call VASP as mpirun -np n_cores_dft dft_exec
+        Possible values:
+
+        * 'default'
+        * 'openmpi'
+        * 'openmpi-intra'
+        * 'mpich'
+
+.. admonition:: n_cores 
+ 	:class: intag  
+ 
+            **type** = int, None
+
+        number of cores for the DFT code (VASP). Mandatory for charge-self-consistent calculations
+
+.. admonition:: n_iter 
+ 	:class: intag  
+ 
+            **type** = int;  **default**  = 4
+
+        only needed for VASP. Number of DFT iterations to feed the DMFT
+        charge density into DFT, which generally takes multiple Davidson steps.
+        For every DFT iterations, the charge-density correction is recalculated
+        using newly generated projectors and hoppings from the previous DFT run
+
+.. admonition:: n_iter_first 
+ 	:class: intag  
+ 
+            **type** = int;  **default**  = dft.n_iter
+
+        number of DFT iterations in the first charge correction because this
+        first charge correction usually changes the DFT wave functions the most.
+
+.. admonition:: plo_cfg 
+ 	:class: intag  
+ 
+            **type** = str;  **default**  = 'plo.cfg'
+
+        config file for PLOs for the converter
+
+.. admonition:: projector_type 
+ 	:class: intag  
+ 
+            **type** = string;  **default**  = 'w90'
+
+        plo: uses VASP's PLO formalism, requires LOCPROJ in the INCAR
+        w90: uses Wannier90 (for VASP and QuantumEspresso)
+
+.. admonition:: store_eigenvals 
+ 	:class: intag  
+ 
+            **type** = bool;  **default**  = False
+
+        stores the dft eigenvals from LOCPROJ (projector_type=plo) or
+        wannier90.eig (projector_type=w90) file in h5 archive
+
+.. admonition:: w90_exec 
+ 	:class: intag  
+ 
+            **type** = string;  **default**  ='wannier90.x'
+
+        the command to start a single-core wannier run
+
+.. admonition:: w90_tolerance 
+ 	:class: intag  
+ 
+            **type** = float;  **default**  = 1e-6
+
+        threshold for mapping of shells and checks of the Hamiltonian

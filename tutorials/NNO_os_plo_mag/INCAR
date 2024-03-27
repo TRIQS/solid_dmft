@@ -1,0 +1,29 @@
+System  = NdNiO2
+
+EDIFF = 1e-10
+ENCUT = 450
+
+NELMIN = 30
+
+ISMEAR = 0
+SIGMA = 0.1
+PREC = Accurate
+
+# the energy window to optimize projector channels
+EMIN = -5
+EMAX = 15
+
+NBANDS = 64
+LMAXMIX = 6
+NEDOS = 3001
+
+# switch off all symmetries
+ISYM = -1
+
+# project to Ni d
+LORBIT = 14
+LOCPROJ = 3 4 : d : Pr 
+
+# write WAVECAR, CHGCAR
+LWAVE = .FALSE.        
+LCHARG = .FALSE.

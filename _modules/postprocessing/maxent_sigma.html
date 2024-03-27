@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>postprocessing.maxent_sigma &mdash; solid_dmft  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/plot_directive.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #7E588A" >
+            <a href="../../index.html" class="icon icon-home"> solid_dmft
+            <img src="../../_static/logo_no_text.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                3.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#installation-via-pip">Installation via pip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#manual-installation-via-cmake">Manual installation via CMake</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#docker-files-images">Docker files &amp; images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#version-compatibility">Version compatibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#custom-cmake-options">Custom CMake options</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../documentation.html">Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#code-structure">Code structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#dft-interface-notes">DFT interface notes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../md_notes/w90_interface.html">Wannier90 interface</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/w90_interface.html#orbital-order-in-the-w90-converter">orbital order in the W90 converter</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../md_notes/vasp_csc.html">Interface to VASP</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/vasp_csc.html#general-remarks">General remarks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/vasp_csc.html#locproj-bug-for-individual-projections">LOCPROJ bug for individual projections:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/vasp_csc.html#convergence-of-projectors-with-vasp">convergence of projectors with Vasp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/vasp_csc.html#enabling-csc-calculations-with-wannier90-projectors">Enabling CSC calculations with Wannier90 projectors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/vasp_csc.html#speeding-up-by-not-writing-projectors-at-every-step">Speeding up by not writing projectors at every step</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../cRPA_VASP/README.html">How to do cRPA calculations with VASP</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#file-description">file description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#workflow">Workflow:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#important-flags">important flags:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#convergency-tests">convergency tests:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#parameterization-of-u-and-j-from-crpa-calculations">Parameterization of U and J from cRPA calculations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#general-sidemarks">general sidemarks:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#version-and-compilation">version and compilation:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#input-output">Input/Output</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../input_output/DMFT_input/input.html">Input</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_input/general.html">[general]: General parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_input/solver.html">[solver]: solver specific parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_input/dft.html">[dft]: DFT related inputs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_input/advanced.html">[advanced]: Advanced inputs</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../input_output/DMFT_output/results.html">Output / results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_output/results.html#group-structure">Group structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../input_output/DMFT_output/results.html#subgroups">Subgroups</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#further-details-for-running">Further details for running</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../md_notes/docker.html">Docker</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/docker.html#building-the-docker-image">Building the docker image</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/docker.html#pulling-a-docker-image">Pulling a docker image</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/docker.html#getting-docker-images-onto-cscs-daint">Getting docker images onto CSCS daint</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../md_notes/run_locally.html">Run on your machine</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/run_locally.html#csc-calculations-locally">CSC calculations locally</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../md_notes/run_cluster.html">Running solid_dmft on a cluster</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/run_cluster.html#running-on-cscs-daint">Running on CSCS daint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/run_cluster.html#one-shot-job-on-daint">one shot job on daint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/run_cluster.html#csc-calculations-on-daint">CSC calculations on daint</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#module-reference-manual">Module reference manual</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/csc_flow.html">csc_flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/dft_managers.html">dft_managers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dft_managers.mpi_helpers.html">dft_managers.mpi_helpers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dft_managers.qe_manager.html">dft_managers.qe_manager</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dft_managers.vasp_manager.html">dft_managers.vasp_manager</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/dmft_cycle.html">dmft_cycle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/dmft_tools.html">dmft_tools</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.afm_mapping.html">dmft_tools.afm_mapping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.convergence.html">dmft_tools.convergence</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.formatter.html">dmft_tools.formatter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.greens_functions_mixer.html">dmft_tools.greens_functions_mixer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.initial_self_energies.html">dmft_tools.initial_self_energies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.interaction_hamiltonian.html">dmft_tools.interaction_hamiltonian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.legendre_filter.html">dmft_tools.legendre_filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.manipulate_chemical_potential.html">dmft_tools.manipulate_chemical_potential</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.matheval.html">dmft_tools.matheval</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.observables.html">dmft_tools.observables</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.results_to_archive.html">dmft_tools.results_to_archive</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.solver.html">dmft_tools.solver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/io_tools.html">io_tools</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/io_tools.dict_to_h5.html">io_tools.dict_to_h5</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/io_tools.postproc_toml_dict.html">io_tools.postproc_toml_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/io_tools.verify_input_params.html">io_tools.verify_input_params</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/postprocessing.html">postprocessing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.eval_U_cRPA_RESPACK.html">postprocessing.eval_U_cRPA_RESPACK</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.eval_U_cRPA_Vasp.html">postprocessing.eval_U_cRPA_Vasp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.maxent_gf_imp.html">postprocessing.maxent_gf_imp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.maxent_gf_latt.html">postprocessing.maxent_gf_latt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.maxent_sigma.html">postprocessing.maxent_sigma</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.pade_sigma.html">postprocessing.pade_sigma</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.plot_correlated_bands.html">postprocessing.plot_correlated_bands</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/util.html">util</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/util.symmetrize_gamma_file.html">util.symmetrize_gamma_file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/util.write_kslice_to_h5.html">util.write_kslice_to_h5</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/SVO_os_qe/tutorial.html">1. OS with QE/W90 and cthyb: SrVO3 MIT</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/SVO_os_qe/tutorial.html#1.-Starting-out-with-DMFT">1. Starting out with DMFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/SVO_os_qe/tutorial.html#2.-Looking-at-the-Metal-Insulator-Transition">2. Looking at the Metal-Insulator Transition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/SVO_os_qe/tutorial.html#3.-Refining-the-diagram">3. Refining the diagram</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/SVO_os_qe/tutorial.html#4.-Plotting-the-spectral-function">4. Plotting the spectral function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/SVO_os_qe/tutorial.html#5-Visualizing-the-MIT">5 Visualizing the MIT</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html">2. CSC with VASP PLOs: charge order in PrNiO3</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#1.-Running-the-initial-scf-DFT-calculation">1. Running the initial scf DFT calculation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#2.-Running-the-CSC-DMFT-calculations">2. Running the CSC DMFT calculations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Input-files-for-CSC-DMFT-calculations">Input files for CSC DMFT calculations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Starting-the-calculations">Starting the calculations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Analyzing-the-projectors">Analyzing the projectors</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Plotting-the-results:-observables">3. Plotting the results: observables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green’s-function">4. Plotting the results: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Next-steps-to-try">5. Next steps to try</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/Ce2O3_csc_w90/tutorial.html">3. CSC with QE/W90 and HubbardI: total energy in Ce2O3</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/Ce2O3_csc_w90/tutorial.html#1.-Input-file-preparation">1. Input file preparation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/Ce2O3_csc_w90/tutorial.html#DFT-files">DFT files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/Ce2O3_csc_w90/tutorial.html#DMFT">DMFT</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/Ce2O3_csc_w90/tutorial.html#2.-Running-DFT+DMFT">2. Running DFT+DMFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/Ce2O3_csc_w90/tutorial.html#3.-Non-interacting-Hamiltonian-and-convergence-analysis">3. Non-interacting Hamiltonian and convergence analysis</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/Ce2O3_csc_w90/tutorial.html#Tight-binding-Hamiltonian">Tight-binding Hamiltonian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/Ce2O3_csc_w90/tutorial.html#Convergence">Convergence</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/NNO_os_plo_mag/tutorial.html">4. OS with VASP/PLOs and cthyb: AFM state of NdNiO2</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/NNO_os_plo_mag/tutorial.html#1.-Run-DFT">1. Run DFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/NNO_os_plo_mag/tutorial.html#2.-Creating-the-hdf5-archive-/-DMFT-input">2. Creating the hdf5 archive / DMFT input</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/NNO_os_plo_mag/tutorial.html#3.-Running-the-AFM-calculation">3. Running the AFM calculation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/NNO_os_plo_mag/tutorial.html#5.-Multiplet-analysis">5. Multiplet analysis</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/correlated_bandstructure/plot_correlated_bands.html">5. Plotting the spectral function</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/correlated_bandstructure/plot_correlated_bands.html#1.-Configuration">1. Configuration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/correlated_bandstructure/plot_correlated_bands.html#Basic-options">Basic options</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/correlated_bandstructure/plot_correlated_bands.html#Wannier90">Wannier90</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/correlated_bandstructure/plot_correlated_bands.html#BZ-configuration">BZ configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/correlated_bandstructure/plot_correlated_bands.html#Self-energy">Self-energy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/correlated_bandstructure/plot_correlated_bands.html#Plotting-options">Plotting options</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/correlated_bandstructure/plot_correlated_bands.html#2.-Run-and-Plotting">2. Run and Plotting</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../issues.html">Support &amp; contribute</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../issues.html#seeking-help">Seeking help</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../issues.html#improving-solid-dmft">Improving solid_dmft</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../issues.html#reporting-issues">Reporting issues</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../ChangeLog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-2-0">Version 3.2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#general">General</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#fix">fix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#build">build</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#feat">feat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#doc">doc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#test">test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-1-5">Version 3.1.5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-1-4">Version 3.1.4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-1-3">Version 3.1.3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-1-2">Version 3.1.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-1-1">Version 3.1.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-1-0">Version 3.1.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-0-0">Version 3.0.0</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #7E588A" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">solid_dmft</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>postprocessing.maxent_sigma</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for postprocessing.maxent_sigma</h1><div class="highlight"><pre>
+<span></span><span class="c1">################################################################################</span>
+<span class="c1">#</span>
+<span class="c1"># TRIQS: a Toolbox for Research in Interacting Quantum Systems</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (C) 2016-2018, N. Wentzell</span>
+<span class="c1"># Copyright (C) 2018-2019, Simons Foundation</span>
+<span class="c1">#   author: N. Wentzell</span>
+<span class="c1">#</span>
+<span class="c1"># TRIQS is free software: you can redistribute it and/or modify it under the</span>
+<span class="c1"># terms of the GNU General Public License as published by the Free Software</span>
+<span class="c1"># Foundation, either version 3 of the License, or (at your option) any later</span>
+<span class="c1"># version.</span>
+<span class="c1">#</span>
+<span class="c1"># TRIQS is distributed in the hope that it will be useful, but WITHOUT ANY</span>
+<span class="c1"># WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS</span>
+<span class="c1"># FOR A PARTICULAR PURPOSE. See the GNU General Public License for more</span>
+<span class="c1"># details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License along with</span>
+<span class="c1"># TRIQS. If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="c1">#</span>
+<span class="c1">################################################################################</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Analytic continuation of the self-energy using maxent on an auxiliary Green&#39;s</span>
+<span class="sd">function.</span>
+
+<span class="sd">Reads Sigma(i omega) from the h5 archive and writes Sigma(omega) back. See</span>
+<span class="sd">the docstring of main() for more information.</span>
+
+<span class="sd">mpi parallelized for the maxent routine over all blocks and for the continuator</span>
+<span class="sd">extraction over omega points.</span>
+
+<span class="sd">Author: Maximilian Merkel, Materials Theory Group, ETH Zurich, 2020 - 2022</span>
+
+<span class="sd">Warnings:</span>
+<span class="sd">    * When using this on self-energies with SOC, please check that the formalism</span>
+<span class="sd">      is correct, in particular the Kramers-Kronig relation.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">from</span> <span class="nn">triqs.utility</span> <span class="kn">import</span> <span class="n">mpi</span>
+<span class="kn">from</span> <span class="nn">triqs_maxent.sigma_continuator</span> <span class="kn">import</span> <span class="n">InversionSigmaContinuator</span><span class="p">,</span> <span class="n">DirectSigmaContinuator</span>
+<span class="kn">from</span> <span class="nn">triqs_maxent.elementwise_maxent</span> <span class="kn">import</span> <span class="n">PoormanMaxEnt</span>
+<span class="kn">from</span> <span class="nn">triqs_maxent.omega_meshes</span> <span class="kn">import</span> <span class="n">HyperbolicOmegaMesh</span>
+<span class="kn">from</span> <span class="nn">triqs_maxent.alpha_meshes</span> <span class="kn">import</span> <span class="n">LogAlphaMesh</span>
+<span class="kn">from</span> <span class="nn">triqs_maxent.logtaker</span> <span class="kn">import</span> <span class="n">VerbosityFlags</span>
+<span class="kn">from</span> <span class="nn">h5</span> <span class="kn">import</span> <span class="n">HDFArchive</span>
+
+
+<span class="k">def</span> <span class="nf">_read_h5</span><span class="p">(</span><span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reads the h5 archive to get the Matsubara self energy, the double-counting potential</span>
+<span class="sd">    and the chemical potential.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    -----------</span>
+<span class="sd">    external_path : string</span>
+<span class="sd">        path to h5 archive</span>
+<span class="sd">    iteration : int</span>
+<span class="sd">        The iteration that is being read from, None corresponds to &#39;last_iter&#39;</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    --------</span>
+<span class="sd">    sigma_iw : list</span>
+<span class="sd">        Self energy as block Green&#39;s function for each impurity</span>
+<span class="sd">    dc_potential : list</span>
+<span class="sd">        Double counting for each impurity</span>
+<span class="sd">    chemical_potential : float</span>
+<span class="sd">        The chemical potential of the problem. Should be approximately real</span>
+<span class="sd">    chemical_potential_zero : float</span>
+<span class="sd">        The chemical potential at 0 iteration. Should be approximately real</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">h5_internal_path</span> <span class="o">=</span> <span class="s1">&#39;DMFT_results/&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;last_iter&#39;</span> <span class="k">if</span> <span class="n">iteration</span> <span class="ow">is</span> <span class="kc">None</span>
+                                          <span class="k">else</span> <span class="sa">f</span><span class="s1">&#39;it_</span><span class="si">{</span><span class="n">iteration</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">HDFArchive</span><span class="p">(</span><span class="n">external_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">archive</span><span class="p">:</span>
+        <span class="n">impurity_paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">archive</span><span class="p">[</span><span class="n">h5_internal_path</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="s1">&#39;Sigma_freq_&#39;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">]</span>
+        <span class="c1"># Sorts impurity paths by their indices, not sure if necessary</span>
+        <span class="n">impurity_indices</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">:])</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">impurity_paths</span><span class="p">]</span>
+        <span class="n">impurity_paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">impurity_paths</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">impurity_indices</span><span class="p">)]</span>
+        <span class="n">sigma_iw</span> <span class="o">=</span> <span class="p">[</span><span class="n">archive</span><span class="p">[</span><span class="n">h5_internal_path</span><span class="p">][</span><span class="n">p</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">impurity_paths</span><span class="p">]</span>
+
+        <span class="n">inequiv_to_corr</span> <span class="o">=</span> <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;dft_input&#39;</span><span class="p">][</span><span class="s1">&#39;inequiv_to_corr&#39;</span><span class="p">]</span>
+        <span class="n">dc_potential</span> <span class="o">=</span> <span class="p">[</span><span class="n">archive</span><span class="p">[</span><span class="n">h5_internal_path</span><span class="p">][</span><span class="s1">&#39;DC_pot&#39;</span><span class="p">][</span><span class="n">icrsh</span><span class="p">]</span>
+                        <span class="k">for</span> <span class="n">icrsh</span> <span class="ow">in</span> <span class="n">inequiv_to_corr</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="s1">&#39;chemical_potential_post&#39;</span> <span class="ow">in</span> <span class="n">archive</span><span class="p">[</span><span class="n">h5_internal_path</span><span class="p">]:</span>
+            <span class="n">chemical_potential</span> <span class="o">=</span> <span class="n">archive</span><span class="p">[</span><span class="n">h5_internal_path</span><span class="p">][</span><span class="s1">&#39;chemical_potential_post&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Old name for chemical_potential_post</span>
+            <span class="n">chemical_potential</span> <span class="o">=</span> <span class="n">archive</span><span class="p">[</span><span class="n">h5_internal_path</span><span class="p">][</span><span class="s1">&#39;chemical_potential&#39;</span><span class="p">]</span>
+        <span class="n">chemical_potential_zero</span> <span class="o">=</span> <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;DMFT_results/observables&#39;</span><span class="p">][</span><span class="s1">&#39;mu&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">sigma_iw</span><span class="p">,</span> <span class="n">dc_potential</span><span class="p">,</span> <span class="n">chemical_potential</span><span class="p">,</span> <span class="n">chemical_potential_zero</span>
+
+
+<span class="k">def</span> <span class="nf">_create_sigma_continuator</span><span class="p">(</span><span class="n">sigma_iw</span><span class="p">,</span> <span class="n">dc_potential</span><span class="p">,</span> <span class="n">chemical_potential</span><span class="p">,</span> <span class="n">chemical_potential_zero</span><span class="p">,</span> <span class="n">continuator_type</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Initializes the inversion and direct sigma continuator. Returns a list of</span>
+<span class="sd">    continuators. Types of supported auxiliary Green&#39;s functions:</span>
+<span class="sd">    * &#39;inversion_dc&#39;: inversion continuator, constant C = dc_potential for the impurity</span>
+<span class="sd">    * &#39;inversion_sigmainf&#39;: inversion continuator, constant C = Sigma(i infinity) + chemical potential</span>
+<span class="sd">    * &#39;direct&#39;: direct continuator</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">sigma_imp</span> <span class="ow">in</span> <span class="n">sigma_iw</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">sigma_block</span> <span class="ow">in</span> <span class="n">sigma_imp</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">sigma_block</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Continuation of matrix-valued selfenergies &#39;</span>
+                              <span class="o">+</span> <span class="s1">&#39;with nonzero offdiagonal components can be &#39;</span>
+                              <span class="o">+</span> <span class="s1">&#39;unstable since MaxEnt matrix continuation &#39;</span>
+                              <span class="o">+</span> <span class="s1">&#39;does not guarantee a positive semi-definite, &#39;</span>
+                              <span class="o">+</span> <span class="s1">&#39;Hermitian output.&#39;</span><span class="p">)</span>
+
+    <span class="n">n_inequiv_shells</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sigma_iw</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">continuator_type</span> <span class="o">==</span> <span class="s1">&#39;inversion_dc&#39;</span><span class="p">:</span>
+        <span class="n">shifts</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_inequiv_shells</span>
+        <span class="k">for</span> <span class="n">iineq</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_inequiv_shells</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">dc_block</span> <span class="ow">in</span> <span class="n">dc_potential</span><span class="p">[</span><span class="n">iineq</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="c1"># Reads first element from matrix for shift</span>
+                <span class="k">if</span> <span class="n">shifts</span><span class="p">[</span><span class="n">iineq</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">shifts</span><span class="p">[</span><span class="n">iineq</span><span class="p">]</span> <span class="o">=</span> <span class="n">dc_block</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+                <span class="c1"># Checks that matrix for up and down is unit matrix * shift</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">dc_block</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">dc_block</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="n">shifts</span><span class="p">[</span><span class="n">iineq</span><span class="p">]):</span>
+                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Only scalar dc per impurity supported&#39;</span><span class="p">)</span>
+
+        <span class="n">continuators</span> <span class="o">=</span> <span class="p">[</span><span class="n">InversionSigmaContinuator</span><span class="p">(</span><span class="n">sigma_imp</span><span class="p">,</span> <span class="n">shift</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">sigma_imp</span><span class="p">,</span> <span class="n">shift</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">sigma_iw</span><span class="p">,</span> <span class="n">shifts</span><span class="p">)]</span>
+    <span class="k">elif</span> <span class="n">continuator_type</span> <span class="o">==</span> <span class="s1">&#39;inversion_sigmainf&#39;</span><span class="p">:</span>
+        <span class="n">shifts</span> <span class="o">=</span> <span class="p">[{</span><span class="n">key</span><span class="p">:</span> <span class="n">sigma_block</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">real</span> <span class="o">+</span> <span class="p">(</span><span class="n">chemical_potential</span> <span class="o">-</span> <span class="n">chemical_potential_zero</span><span class="p">)</span>
+                   <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">sigma_block</span> <span class="ow">in</span> <span class="n">sigma_imp</span><span class="p">}</span> <span class="k">for</span> <span class="n">sigma_imp</span> <span class="ow">in</span> <span class="n">sigma_iw</span><span class="p">]</span>
+        <span class="n">continuators</span> <span class="o">=</span> <span class="p">[</span><span class="n">InversionSigmaContinuator</span><span class="p">(</span><span class="n">sigma_imp</span><span class="p">,</span> <span class="n">shift</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">sigma_imp</span><span class="p">,</span> <span class="n">shift</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">sigma_iw</span><span class="p">,</span> <span class="n">shifts</span><span class="p">)]</span>
+    <span class="k">elif</span> <span class="n">continuator_type</span> <span class="o">==</span> <span class="s1">&#39;direct&#39;</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">sigma_imp</span> <span class="ow">in</span> <span class="n">sigma_iw</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">sigma_block</span> <span class="ow">in</span> <span class="n">sigma_imp</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">sigma_block</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="c1"># TODO: implement making input diagonal if it is not</span>
+                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Continuing only diagonal elements of non-diagonal &#39;</span>
+                                              <span class="s1">&#39;matrix not implemented yet&#39;</span><span class="p">)</span>
+        <span class="n">continuators</span> <span class="o">=</span> <span class="p">[</span><span class="n">DirectSigmaContinuator</span><span class="p">(</span><span class="n">sigma_imp</span><span class="p">)</span> <span class="k">for</span> <span class="n">sigma_imp</span> <span class="ow">in</span> <span class="n">sigma_iw</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Created sigma continuator of type &quot;</span><span class="si">{</span><span class="n">continuator_type</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">continuators</span>
+
+
+<span class="k">def</span> <span class="nf">_run_maxent</span><span class="p">(</span><span class="n">continuators</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">omega_min</span><span class="p">,</span> <span class="n">omega_max</span><span class="p">,</span> <span class="n">n_points_maxent</span><span class="p">,</span>
+                <span class="n">n_points_alpha</span><span class="p">,</span> <span class="n">analyzer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Uses maxent to continue the auxiliary Green&#39;s function obtained from the</span>
+<span class="sd">    continuator. The range for alpha is set to 1e-6 to 1e2.</span>
+<span class="sd">    Returns the real-frequency auxiliary Green&#39;s function</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Finds blocks of impurities and prints summary</span>
+    <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;Continuing impurities with blocks:&#39;</span><span class="p">)</span>
+    <span class="n">imps_blocks</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">continuator</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">continuators</span><span class="p">):</span>
+        <span class="n">blocks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">continuator</span><span class="o">.</span><span class="n">Gaux_iw</span><span class="o">.</span><span class="n">indices</span><span class="p">)</span>
+        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;- Imp </span><span class="si">{}</span><span class="s1">: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">blocks</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">:</span>
+            <span class="n">imps_blocks</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i</span><span class="p">,</span> <span class="n">block</span><span class="p">))</span>
+
+    <span class="c1"># Initializes arrays to save results in</span>
+    <span class="n">spectral_funcs</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">)]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">imps_blocks</span><span class="p">)</span>
+    <span class="n">opt_alphas</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">imps_blocks</span><span class="p">)</span>
+    <span class="n">omega_mesh</span> <span class="o">=</span> <span class="n">HyperbolicOmegaMesh</span><span class="p">(</span><span class="n">omega_min</span><span class="o">=</span><span class="n">omega_min</span><span class="p">,</span> <span class="n">omega_max</span><span class="o">=</span><span class="n">omega_max</span><span class="p">,</span> <span class="n">n_points</span><span class="o">=</span><span class="n">n_points_maxent</span><span class="p">)</span>
+
+    <span class="c1"># Runs MaxEnt while parallelizing over impurities and blocks</span>
+    <span class="n">imps_blocks_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">imps_blocks</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">mpi</span><span class="o">.</span><span class="n">slice_array</span><span class="p">(</span><span class="n">imps_blocks_indices</span><span class="p">):</span>
+        <span class="n">imp</span><span class="p">,</span> <span class="n">block</span> <span class="o">=</span> <span class="n">imps_blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">g_aux_block</span> <span class="o">=</span> <span class="n">continuators</span><span class="p">[</span><span class="n">imp</span><span class="p">]</span><span class="o">.</span><span class="n">Gaux_iw</span><span class="p">[</span><span class="n">block</span><span class="p">]</span>
+        <span class="n">solver</span> <span class="o">=</span> <span class="n">PoormanMaxEnt</span><span class="p">(</span><span class="n">use_complex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">solver</span><span class="o">.</span><span class="n">set_G_iw</span><span class="p">(</span><span class="n">g_aux_block</span><span class="p">)</span>
+        <span class="n">solver</span><span class="o">.</span><span class="n">set_error</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+        <span class="n">solver</span><span class="o">.</span><span class="n">omega</span> <span class="o">=</span> <span class="n">omega_mesh</span>
+        <span class="n">solver</span><span class="o">.</span><span class="n">alpha_mesh</span> <span class="o">=</span> <span class="n">LogAlphaMesh</span><span class="p">(</span><span class="n">alpha_min</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">alpha_max</span><span class="o">=</span><span class="mf">1e2</span><span class="p">,</span> <span class="n">n_points</span><span class="o">=</span><span class="n">n_points_alpha</span><span class="p">)</span>
+        <span class="c1"># Turns off MaxEnt output, it&#39;s far too messy in the parallel mode</span>
+        <span class="c1"># For some reason, MaxEnt still prints &quot;appending&quot;</span>
+        <span class="n">solver</span><span class="o">.</span><span class="n">maxent_diagonal</span><span class="o">.</span><span class="n">logtaker</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">VerbosityFlags</span><span class="o">.</span><span class="n">Quiet</span>
+        <span class="n">solver</span><span class="o">.</span><span class="n">maxent_offdiagonal</span><span class="o">.</span><span class="n">logtaker</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">VerbosityFlags</span><span class="o">.</span><span class="n">Quiet</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+
+        <span class="n">spectral_funcs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get_A_out</span><span class="p">(</span><span class="n">analyzer</span><span class="p">)</span>
+
+        <span class="n">opt_alphas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">g_aux_block</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">opt_alphas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span> <span class="c1"># loop over complex numbers</span>
+                    <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">analyzer_results</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="n">l</span><span class="p">]</span> <span class="o">==</span> <span class="p">{}:</span>
+                        <span class="k">continue</span>
+                    <span class="n">opt_alphas</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">k</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">analyzer_results</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="n">l</span><span class="p">][</span><span class="n">analyzer</span><span class="p">][</span><span class="s1">&#39;alpha_index&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Synchronizes information between ranks</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">imps_blocks_indices</span><span class="p">:</span>
+        <span class="n">spectral_funcs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">mpi</span><span class="o">.</span><span class="n">all_reduce</span><span class="p">(</span><span class="n">spectral_funcs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">opt_alphas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">mpi</span><span class="o">.</span><span class="n">all_reduce</span><span class="p">(</span><span class="n">opt_alphas</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">block_index</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">imps_blocks</span><span class="p">):</span>
+        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Optimal alphas, block </span><span class="si">{</span><span class="n">block_index</span><span class="si">}</span><span class="s1">:&#39;</span><span class="p">)</span>
+        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;--- Real part ---&#39;</span><span class="p">,</span> <span class="n">opt_alphas</span><span class="p">[</span><span class="n">i</span><span class="p">][:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">opt_alphas</span><span class="p">[</span><span class="n">i</span><span class="p">][:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;--- Imag part ---&#39;</span><span class="p">,</span> <span class="n">opt_alphas</span><span class="p">[</span><span class="n">i</span><span class="p">][:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">])</span>
+
+    <span class="c1"># Sorts results into original order of impurities and blocks</span>
+    <span class="c1"># and adds information from Hermitian conjugate of off-diagonal elements</span>
+    <span class="n">sorted_spectral_funcs</span> <span class="o">=</span> <span class="p">[{}</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">continuators</span><span class="p">))]</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">imp</span><span class="p">,</span> <span class="n">block</span><span class="p">),</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">imps_blocks</span><span class="p">,</span> <span class="n">spectral_funcs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+                <span class="n">val</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">imag</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;The result is complex. This might be correct but comes &#39;</span>
+                       <span class="o">+</span> <span class="s1">&#39;without guarantuee of formal correctness.&#39;</span><span class="p">)</span>
+        <span class="n">sorted_spectral_funcs</span><span class="p">[</span><span class="n">imp</span><span class="p">][</span><span class="n">block</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+
+    <span class="k">return</span> <span class="n">sorted_spectral_funcs</span><span class="p">,</span> <span class="n">omega_mesh</span>
+
+
+<span class="k">def</span> <span class="nf">_get_sigma_omega_from_aux</span><span class="p">(</span><span class="n">continuators</span><span class="p">,</span> <span class="n">aux_spectral_funcs</span><span class="p">,</span> <span class="n">aux_omega_mesh</span><span class="p">,</span>
+                              <span class="n">omega_min</span><span class="p">,</span> <span class="n">omega_max</span><span class="p">,</span> <span class="n">n_points_interp</span><span class="p">,</span> <span class="n">n_points_final</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Extracts the real-frequency self energy from the auxiliary Green&#39;s function. &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">cont_imp</span><span class="p">,</span> <span class="n">spec_imp</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">continuators</span><span class="p">,</span> <span class="n">aux_spectral_funcs</span><span class="p">):</span>
+        <span class="n">cont_imp</span><span class="o">.</span><span class="n">set_Gaux_w_from_Aaux_w</span><span class="p">(</span><span class="n">spec_imp</span><span class="p">,</span> <span class="n">aux_omega_mesh</span><span class="p">,</span> <span class="n">np_interp_A</span><span class="o">=</span><span class="n">n_points_interp</span><span class="p">,</span>
+                                        <span class="n">np_omega</span><span class="o">=</span><span class="n">n_points_final</span><span class="p">,</span> <span class="n">w_min</span><span class="o">=</span><span class="n">omega_min</span><span class="p">,</span> <span class="n">w_max</span><span class="o">=</span><span class="n">omega_max</span><span class="p">)</span>
+
+    <span class="n">g_aux_w</span> <span class="o">=</span> <span class="p">[</span><span class="n">continuator</span><span class="o">.</span><span class="n">Gaux_w</span> <span class="k">for</span> <span class="n">continuator</span> <span class="ow">in</span> <span class="n">continuators</span><span class="p">]</span>
+    <span class="n">sigma_w</span> <span class="o">=</span> <span class="p">[</span><span class="n">continuator</span><span class="o">.</span><span class="n">S_w</span> <span class="k">for</span> <span class="n">continuator</span> <span class="ow">in</span> <span class="n">continuators</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">g_aux_w</span><span class="p">,</span> <span class="n">sigma_w</span>
+
+
+<span class="k">def</span> <span class="nf">_write_sigma_omega_to_h5</span><span class="p">(</span><span class="n">g_aux_w</span><span class="p">,</span> <span class="n">sigma_w</span><span class="p">,</span> <span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Writes real-frequency self energy to h5 archive. &quot;&quot;&quot;</span>
+    <span class="n">h5_internal_path</span> <span class="o">=</span> <span class="s1">&#39;DMFT_results/&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;last_iter&#39;</span> <span class="k">if</span> <span class="n">iteration</span> <span class="ow">is</span> <span class="kc">None</span>
+                                          <span class="k">else</span> <span class="sa">f</span><span class="s1">&#39;it_</span><span class="si">{</span><span class="n">iteration</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">HDFArchive</span><span class="p">(</span><span class="n">external_path</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">archive</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">g_aux_imp</span><span class="p">,</span> <span class="n">sigma_imp</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">g_aux_w</span><span class="p">,</span> <span class="n">sigma_w</span><span class="p">)):</span>
+            <span class="n">archive</span><span class="p">[</span><span class="n">h5_internal_path</span><span class="p">][</span><span class="sa">f</span><span class="s1">&#39;Sigma_maxent_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sigma_imp</span>
+            <span class="n">archive</span><span class="p">[</span><span class="n">h5_internal_path</span><span class="p">][</span><span class="sa">f</span><span class="s1">&#39;G_aux_for_Sigma_maxent_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">g_aux_imp</span>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../_ref/postprocessing.maxent_sigma.html#postprocessing.maxent_sigma.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">continuator_type</span><span class="o">=</span><span class="s1">&#39;inversion_sigmainf&#39;</span><span class="p">,</span> <span class="n">maxent_error</span><span class="o">=</span><span class="mf">.02</span><span class="p">,</span>
+         <span class="n">omega_min</span><span class="o">=-</span><span class="mf">12.</span><span class="p">,</span> <span class="n">omega_max</span><span class="o">=</span><span class="mf">12.</span><span class="p">,</span> <span class="n">n_points_maxent</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">n_points_alpha</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+         <span class="n">analyzer</span><span class="o">=</span><span class="s1">&#39;LineFitAnalyzer&#39;</span><span class="p">,</span> <span class="n">n_points_interp</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">n_points_final</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Main function that reads the Matsubara self-energy from h5, analytically continues it,</span>
+<span class="sd">    writes the results back to the h5 archive and also returns the results.</span>
+
+<span class="sd">    Function parallelizes using MPI over impurities and blocks.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    external_path : string</span>
+<span class="sd">        Path to the h5 archive to read from and write to</span>
+<span class="sd">    iteration : int/string</span>
+<span class="sd">        Iteration to read from and write to. Default to last_iter</span>
+<span class="sd">    continuator_type : string</span>
+<span class="sd">        Type of continuator to use, one of &#39;inversion_sigmainf&#39;, &#39;inversion_dc&#39;, &#39;direct&#39;</span>
+<span class="sd">    maxent_error : float</span>
+<span class="sd">        The error that is used for the analyzers.</span>
+<span class="sd">    omega_min : float</span>
+<span class="sd">        Lower end of range where Sigma is being continued. Range has to comprise</span>
+<span class="sd">        all features of the self-energy because the real part of it comes from</span>
+<span class="sd">        the Kramers-Kronig relation applied to the auxiliary spectral function.</span>
+<span class="sd">        For example, if the real-frequency self-energy bends at omega_min or</span>
+<span class="sd">        omega_max, there are neglegcted features and the range should be extended.</span>
+<span class="sd">    omega_max : float</span>
+<span class="sd">        Upper end of range where Sigma is being continued. See omega_min.</span>
+<span class="sd">    n_points_maxent : int</span>
+<span class="sd">        Number of omega points on the hyperbolic mesh used in analytically</span>
+<span class="sd">        continuing the auxiliary GF</span>
+<span class="sd">    n_points_alpha : int</span>
+<span class="sd">        Number of points that the MaxEnt alpha parameter is varied on logarithmically</span>
+<span class="sd">    analyzer : string</span>
+<span class="sd">        Analyzer used int MaxEnt, one of &#39;LineFitAnalyzer&#39;, &#39;Chi2CurvatureAnalyzer&#39;,</span>
+<span class="sd">        &#39;ClassicAnalyzer&#39;, &#39;EntropyAnalyzer&#39;, &#39;BryanAnalyzer&#39;</span>
+<span class="sd">    n_points_interp : int</span>
+<span class="sd">        Number of points where auxiliary GF is interpolated to integrate over</span>
+<span class="sd">        it for the Kramers-Kronig relation</span>
+<span class="sd">    n_points_final : int</span>
+<span class="sd">        Number of omega points the complex auxiliary GF and therefore the</span>
+<span class="sd">        continued self-energy has on a linear grid between omega_min and omega_max</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    sigma_w : list of triqs.gf.BlockGf</span>
+<span class="sd">        Sigma(omega) per inequivalent shell</span>
+<span class="sd">    g_aux_w : list of triqs.gf.BlockGf</span>
+<span class="sd">        G_aux(omega) per inequivalent shell</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    NotImplementedError</span>
+<span class="sd">        -- When a wrong continuator type or maxent analyzer is chosen</span>
+<span class="sd">        -- For direct continuator: when the self energy contains blocks larger</span>
+<span class="sd">        than 1x1 (no off-diagonal continuation possible)</span>
+<span class="sd">        -- For inversion_dc continuator: when the DC is not a diagonal matrix with</span>
+<span class="sd">        the same entry for all blocks of an impurity. Otherwise, issues like</span>
+<span class="sd">        the global frame violating the block structure would come up.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Checks on input parameters</span>
+    <span class="k">if</span> <span class="n">continuator_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;inversion_sigmainf&#39;</span><span class="p">,</span> <span class="s1">&#39;inversion_dc&#39;</span><span class="p">,</span> <span class="s1">&#39;direct&#39;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Unsupported type of continuator chosen&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">analyzer</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;LineFitAnalyzer&#39;</span><span class="p">,</span> <span class="s1">&#39;Chi2CurvatureAnalyzer&#39;</span><span class="p">,</span> <span class="s1">&#39;ClassicAnalyzer&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;EntropyAnalyzer&#39;</span><span class="p">,</span> <span class="s1">&#39;BryanAnalyzer&#39;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Unsupported type of analyzer chosen&#39;</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">omega_min</span> <span class="o">&lt;</span> <span class="n">omega_max</span>
+
+    <span class="c1"># Reads in data and initializes continuator object</span>
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">continuators</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
+        <span class="n">sigma_iw</span><span class="p">,</span> <span class="n">dc_potential</span><span class="p">,</span> <span class="n">chemical_potential</span><span class="p">,</span> <span class="n">chemical_potential_zero</span> <span class="o">=</span> <span class="n">_read_h5</span><span class="p">(</span><span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="p">)</span>
+        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;Finished reading h5 archive. Found </span><span class="si">{}</span><span class="s1"> impurities.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sigma_iw</span><span class="p">)))</span>
+        <span class="n">continuators</span> <span class="o">=</span> <span class="n">_create_sigma_continuator</span><span class="p">(</span><span class="n">sigma_iw</span><span class="p">,</span> <span class="n">dc_potential</span><span class="p">,</span>
+                                                 <span class="n">chemical_potential</span><span class="p">,</span> <span class="n">chemical_potential_zero</span><span class="p">,</span> <span class="n">continuator_type</span><span class="p">)</span>
+    <span class="n">continuators</span> <span class="o">=</span> <span class="n">mpi</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">continuators</span><span class="p">)</span>
+    <span class="n">init_end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="c1"># Runs MaxEnt</span>
+    <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;Starting run of maxent now.&#39;</span><span class="p">)</span>
+    <span class="n">aux_spectral_funcs</span><span class="p">,</span> <span class="n">aux_omega_mesh</span> <span class="o">=</span> <span class="n">_run_maxent</span><span class="p">(</span><span class="n">continuators</span><span class="p">,</span> <span class="n">maxent_error</span><span class="p">,</span>
+                                                     <span class="n">omega_min</span><span class="p">,</span> <span class="n">omega_max</span><span class="p">,</span>
+                                                     <span class="n">n_points_maxent</span><span class="p">,</span> <span class="n">n_points_alpha</span><span class="p">,</span>
+                                                     <span class="n">analyzer</span><span class="p">)</span>
+    <span class="n">maxent_end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="c1"># Extracts Sigma(omega)</span>
+    <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Extracting Σ(ω) now with </span><span class="si">{</span><span class="n">mpi</span><span class="o">.</span><span class="n">size</span><span class="si">}</span><span class="s1"> process(es).&#39;</span><span class="p">)</span>
+    <span class="n">g_aux_w</span><span class="p">,</span> <span class="n">sigma_w</span> <span class="o">=</span> <span class="n">_get_sigma_omega_from_aux</span><span class="p">(</span><span class="n">continuators</span><span class="p">,</span> <span class="n">aux_spectral_funcs</span><span class="p">,</span>
+                                                 <span class="n">aux_omega_mesh</span><span class="p">,</span> <span class="n">omega_min</span><span class="p">,</span> <span class="n">omega_max</span><span class="p">,</span>
+                                                 <span class="n">n_points_interp</span><span class="p">,</span> <span class="n">n_points_final</span><span class="p">)</span>
+    <span class="n">extract_end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="c1"># Writes results into h5 archive</span>
+    <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;Writing results to h5 archive now.&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
+        <span class="n">_write_sigma_omega_to_h5</span><span class="p">(</span><span class="n">g_aux_w</span><span class="p">,</span> <span class="n">sigma_w</span><span class="p">,</span> <span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="p">)</span>
+    <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;Finished writing Σ(ω) to archive.&#39;</span><span class="p">)</span>
+
+    <span class="n">all_end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="c1"># Prints timing summary</span>
+    <span class="n">run_time_report</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="si">{:&lt;8}</span><span class="s1"> | </span><span class="si">{:&lt;10}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;Task&#39;</span><span class="p">,</span> <span class="s1">&#39;Duration (s)&#39;</span><span class="p">)</span>
+    <span class="n">length_table</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">run_time_report</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span>
+    <span class="n">run_time_report</span> <span class="o">+=</span> <span class="s1">&#39;-&#39;</span><span class="o">*</span><span class="n">length_table</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">run_time_report</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">{:&lt;8}</span><span class="s1"> | </span><span class="si">{:10.4f}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;Reading&#39;</span><span class="p">,</span> <span class="n">init_end_time</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span>
+    <span class="n">run_time_report</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">{:&lt;8}</span><span class="s1"> | </span><span class="si">{:10.4f}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;MaxEnt&#39;</span><span class="p">,</span> <span class="n">maxent_end_time</span> <span class="o">-</span> <span class="n">init_end_time</span><span class="p">)</span>
+    <span class="n">run_time_report</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">{:&lt;8}</span><span class="s1"> | </span><span class="si">{:10.4f}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;Extract.&#39;</span><span class="p">,</span> <span class="n">extract_end_time</span> <span class="o">-</span> <span class="n">maxent_end_time</span><span class="p">)</span>
+    <span class="n">run_time_report</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">{:&lt;8}</span><span class="s1"> | </span><span class="si">{:10.4f}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;Writing&#39;</span><span class="p">,</span> <span class="n">all_end_time</span> <span class="o">-</span> <span class="n">extract_end_time</span><span class="p">)</span>
+    <span class="n">run_time_report</span> <span class="o">+=</span> <span class="s1">&#39;-&#39;</span><span class="o">*</span><span class="n">length_table</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">run_time_report</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">{:&lt;8}</span><span class="s1"> | </span><span class="si">{:10.4f}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;Total&#39;</span><span class="p">,</span> <span class="n">all_end_time</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span>
+
+    <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="n">run_time_report</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sigma_w</span><span class="p">,</span> <span class="n">g_aux_w</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="c1"># Casts input parameters</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;none&#39;</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">6</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">7</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">7</span><span class="p">])</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">8</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">8</span><span class="p">])</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">10</span><span class="p">])</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">11</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">11</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">11</span><span class="p">])</span>
+
+    <span class="n">main</span><span class="p">(</span><span class="o">*</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (C) 2018-2020, ETH Zurich Copyright (C) 2021-2022, The Simons Foundation authors: A. Hampel, M. Merkel, A. Carta, and S. Beck.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

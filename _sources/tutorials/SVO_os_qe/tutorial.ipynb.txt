@@ -1,0 +1,185 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "*Disclaimer:*\n",
+    "\n",
+    "Heavy calculations (~ 800 core hours): Current tutorial is best performed on an HPC facility.\n",
+    "\n",
+    "# 1. OS with QE/W90 and cthyb: SrVO3 MIT"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Hello and welcome to the first part of the tutorial for solid_dmft. Here we will guide to set up and run your first DMFT calculations. \n",
+    "\n",
+    "To begin your DMFT journey we will immediately start a DMFT run on strontium vanadate (SVO). SVO is a member of a family of material known as complex perovskite oxides with 1 electron occupying the t2g manifold. Below, we show the band structure of the frontier (anti-bonding) t2g bands for SVO.\n",
+    "\n",
+    "![svobands](./ref/bnd_structure.png \"SVO band structure\")\n",
+    "\n",
+    "In these materials, the electrons sitting on the transition metal ions (V in this case) are fairly localized, and the fully delocalized picture of DFT is insufficient to describe their physics. DMFT accounts for the electron-electron interaction by providing a fully interacting many body correction to the DFT non-interacting problem.\n",
+    "\n",
+    "If you want to generate the h5 archive `svo.h5` yourself, all the necessary files are in the `./quantum_espresso_files/` folder. We used quantum espresso in this tutorial.\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "---\n",
+    "## 1. Starting out with DMFT\n",
+    "\n",
+    "\n",
+    "To start your first calculation run:\n",
+    "\n",
+    "```\n",
+    "mpirun solid_dmft\n",
+    "\n",
+    "```\n",
+    "\n",
+    "Once the calculation is finished, inspect the `/out/` folder: our file of interest for the moment will be `observables_imp0.dat`, open the file:"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "```\n",
+    " it |        mu |            G(beta/2) per orbital |               orbital occs up+down |impurity occ\n",
+    "  0 |  12.29775 | -0.10489   -0.10489     -0.10489 |  0.33366      0.33366      0.33366 |     1.00097\n",
+    "  1 |  12.29775 | -0.09467   -0.09488     -0.09529 |  0.36155      0.35073      0.36169 |     1.07397\n",
+    "  2 |  12.31989 | -0.08451   -0.08363     -0.08463 |  0.33581      0.34048      0.34488 |     1.02117\n",
+    "  3 |  12.29775 | -0.08282   -0.08296     -0.08254 |  0.32738      0.34572      0.34479 |     1.01789\n",
+    "  4 |  12.28973 | -0.08617   -0.08595     -0.08620 |  0.33546      0.33757      0.33192 |     1.00494\n",
+    "  5 |  12.28825 | -0.08410   -0.08458     -0.08510 |  0.33582      0.33402      0.33759 |     1.00743\n",
+    "  6 |  12.28486 | -0.08474   -0.08549     -0.08618 |  0.32276      0.33028      0.32760 |     0.98063\n",
+    "  7 |  12.29097 | -0.08172   -0.08220     -0.08118 |  0.32072      0.33046      0.33529 |     0.98647\n",
+    "  8 |  12.29497 | -0.08318   -0.08254     -0.08332 |  0.34075      0.32957      0.33089 |     1.00120\n",
+    "```"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The meaning of the column names is the following:\n",
+    "\n",
+    "* **it**: number of the DMFT iteration\n",
+    "* **mu**: value of the chemical potential\n",
+    "* **G(beta/2) per orbital**: Green's function evaluated at $\\tau=\\beta/2$, this value is proportional to the projected density of states at the fermi level, the first objective of this tutorial would be to try and drive this value to 0\n",
+    "* **orbital occs up+down:** occupations of the various states in the manifold\n",
+    "* **impurity occ**: number of electrons in each site\n",
+    "---\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 2. Looking at the Metal-Insulator Transition\n",
+    "\n",
+    "In the following steps we will try to drive the system towards a Mott-insulating state. \n",
+    "\n",
+    "Inspect the script `run_MIT_coarse.sh`, we iterate the same type of calculation that was performed in the last step for a series of value of U {2-10} and J {0.0-1.0}. \n",
+    "\n",
+    "Run the script, sit back and have a long coffee break, this is going to take a while (about 6 hours on 30 cores).\n",
+    "\n",
+    "Once the run is finished run \n",
+    "\n",
+    "`python3 ./collect_results_coarse.py`\n",
+    "\n",
+    "The script will produce a heatmap image of the value of G(beta/2) for each pair of U and J. The darker area corresponds to an insulating state.\n",
+    "\n",
+    "![coarsegrid](./ref/MIT_coarse.jpg \"Coarser grid\")\n",
+    "\n",
+    "Do you notice anything strange? (hint: look at the bottom right corner and check the output file `observables_imp0.dat` for U = 2 J=1.0. )\n",
+    "\n",
+    "We have seen that for 1 electron per system U and J are competing against each other: larger J favor the metallic state. The coulomb integral U wants to repel neighbouring electrons while J would like to bring electrons together on one site,. When the latter component dominates the resulting phase is known as a charge disproportionated state which is also insulating. What is happening in the bottom right corner is that the J favors here charge disproportionation but the unit cell has a single site, therefore the system has trouble converging and oscillates between a high occupation and a low occupation state."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 3. Refining the diagram\n",
+    "\n",
+    "In order to get better resolution in terms of the diagram you can run the script `run_MIT_fine.sh` and plot the result with \n",
+    "\n",
+    "`python3 ./collect_results_fine.py`\n",
+    "\n",
+    "The result is also visible here:\n",
+    "\n",
+    "![finegrid](./ref/MIT_fine.jpg \"Finer grid\")\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 4. Plotting the spectral function\n",
+    "\n",
+    "The spectral function in DMFT represents the local density of states of the impurity site.\n",
+    "In order to plot it we need to use one of the scripts that implements the maximum entropy method ( [Maxent](https://triqs.github.io/maxent/latest/) ), while in the folder run (be aware that you need to substitute `/path_to_solid_dmft/` with the path where you have installed solid_dmft) :\n",
+    "\n",
+    "`mpirun -n 30 python3 /path_to_solid_dmft/python/solid_dmft/postprocessing/maxent_gf_imp.py ./J0.0/U4/out/svo.h5`\n",
+    "\n",
+    "and plot the result by running in the docker container:\n",
+    "\n",
+    "`python3 read_spectral_function.py`\n",
+    "\n",
+    "\n",
+    "![Afunc](./ref/A_func_J=0.0_U=4.jpg \"Afunc\")\n",
+    "\n",
+    "\n",
+    "Take care to edit the values of J and U in the python file. What is happing to the spectral function (density of states) as one cranks U up?\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 5 Visualizing the MIT\n",
+    "\n",
+    "We will now plot the spectral function at different U values for J = 0.0 eV:\n",
+    "\n",
+    "Run the script `run_maxent_scan.sh`.\n",
+    "\n",
+    "Then collect the data:\n",
+    "\n",
+    "`python3 read_spectral_function_transition.py`\n",
+    "\n",
+    "![MIT](./ref/A_func_transition.jpg \"MIT\")\n",
+    "\n",
+    "\n"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}

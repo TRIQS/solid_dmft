@@ -1,0 +1,616 @@
+[solver]: solver specific parameters
+------------------------------------
+
+Here are the parameters that are uniquely dependent on the solver chosen. Some parameters are used within solid_dmft and some are passed directly into the triqs solver.
+To see which parameters were passed to the solver for a given calculation, look at the triqs_solver_params in DMFT_input/solver in the h5 archive.
+Solver-specific parameters are listed in the respective sections.
+
+
+
+
+
+.. admonition:: type 
+ 	:class: intag  
+ 
+            **type** = str;  **mandatory**
+
+        type of solver chosen for the calculation, currently supports:
+
+        * 'cthyb'
+        * 'ctint'
+        * 'ctseg'
+        * 'hubbardI'
+        * 'ftps'
+        * 'hartree'
+
+.. admonition:: idx_impurities 
+ 	:class: intag  
+ 
+            **type** = list of int;  **default**  = None
+
+        list of impurities this solver is supposed to solve
+
+cthyb
+=====
+
+.. admonition:: delta_interface 
+ 	:class: intag  
+ 
+            **type** = bool;  **default**  = False
+
+        use delta interface in cthyb instead of input G0
+
+.. admonition:: fit_max_moment 
+ 	:class: intag  
+ 
+            **type** = int;  **default**  = None
+
+        max moment to be fitted. Only used if solver.perform_tail_fit = True
+
+.. admonition:: fit_max_n 
+ 	:class: intag  
+ 
+            **type** = int;  **default**  = None
+
+        number of highest matsubara frequency to fit. Only used if solver.perform_tail_fit = True
+
+.. admonition:: fit_max_w 
+ 	:class: intag  
+ 
+            **type** = float;  **default**  = None
+
+        highest matsubara frequency to fit. Only used if solver.perform_tail_fit = True
+
+.. admonition:: fit_min_n 
+ 	:class: intag  
+ 
+            **type** = int;  **default**  = None
+
+        number of start matsubara frequency to start with. Only used if solver.perform_tail_fit = True
+
+.. admonition:: fit_min_w 
+ 	:class: intag  
+ 
+            **type** = float;  **default**  = None
+
+        start matsubara frequency to start with. Only used if solver.perform_tail_fit = True
+
+.. admonition:: imag_threshold 
+ 	:class: intag  
+ 
+            **type** = float;  **default**  = 1e-14
+
+        threshold for imag part of G0_tau. be warned if symmetries are off in projection scheme imag parts can occur in G0_tau
+
+.. admonition:: legendre_fit 
+ 	:class: intag  
+ 
+            **type** = bool;  **default**  = False
+
+        filter noise of G(tau) with G_l, cutoff is taken from n_l
+
+.. admonition:: length_cycle 
+ 	:class: intag  
+ 
+            **type** = int;  **mandatory**
+
+        length of each cycle; number of sweeps before measurement is taken
+
+.. admonition:: loc_n_max 
+ 	:class: intag  
+ 
+            **type** = int;  **default**  = None
+
+        Restrict local Hilbert space to states with at most this number of particles
+
+.. admonition:: loc_n_min 
+ 	:class: intag  
+ 
+            **type** = int;  **default**  = None
+
+        Restrict local Hilbert space to states with at least this number of particles
+
+.. admonition:: max_time 
+ 	:class: intag  
+ 
+            **type** = int;  **default**  = -1
+
+        maximum amount the solver is allowed to spend in each iteration
+
+.. admonition:: measure_chi_insertions 
+ 	:class: intag  
+ 
+            **type** = int;  **default**  = 100
+
+        number of insertation for measurement of chi
+
+.. admonition:: measure_chi 
+ 	:class: intag  
+ 
+            **type** = str;  **default**  = None
+
+        measure the dynamic suszeptibility of an operator O, chi(O,O(tau))
+        triqs.github.io/cthyb/unstable/guide/dynamic_susceptibility_notebook.html
+        Possible values for this flag are:
+
+        * 'SzSz': spin susceptibility
+        * 'NN': occupation susceptibility
+
+.. admonition:: measure_density_matrix 
+ 	:class: intag  
+ 
+            **type** = bool;  **default**  = False
+
+        measures the impurity density matrix and sets also
+        use_norm_as_weight to true
+
+.. admonition:: measure_G_l 
+ 	:class: intag  
+ 
+            **type** = bool;  **default**  = False
+
+        measure Legendre Greens function
+
+.. admonition:: measure_pert_order 
+ 	:class: intag  
+ 
+            **type** = bool;  **default**  = False
+
+        measure perturbation order histograms: triqs.github.io/cthyb/latest/guide/perturbation_order_notebook.html.
+        The result is stored in the h5 archive under 'DMFT_results' at every iteration
+        in the subgroups 'pert_order_imp_X' and 'pert_order_total_imp_X'
+
+.. admonition:: move_double 
+ 	:class: intag  
+ 
+            **type** = bool;  **default**  = True
+
+        double moves in solver
+
+.. admonition:: move_shift 
+ 	:class: intag  
+ 
+            **type** = bool;  **default**  = False
+
+        shift moves in solver
+
+.. admonition:: n_cycles_tot 
+ 	:class: intag  
+ 
+            **type** = int;  **mandatory**
+
+        total number of sweeps
+
+.. admonition:: n_l 
+ 	:class: intag  
+ 
+            **type** = int;  **default**  = None
+
+        number of Legendre coefficients.
+        Needed if measure_G_l=True or legendre_fit=True
+
+.. admonition:: n_warmup_cycles 
+ 	:class: intag  
+ 
+            **type** = int;  **mandatory**
+
+        number of warmup cycles before real measurement sets in
+
+.. admonition:: off_diag_threshold 
+ 	:class: intag  
+ 
+            **type** = float;  **default**  = 0.0
+
+        threshold for off-diag elements in Hloc0
+
+.. admonition:: perform_tail_fit 
+ 	:class: intag  
+ 
+            **type** = bool;  **default**  = False
+
+        tail fitting if legendre is off?
+
+.. admonition:: random_seed 
+ 	:class: intag  
+ 
+            **type** = str;  **default**  = None
+
+        if None;  **default**  seed by triqs.
+        If specified the int will be used for random seeds. Careful, this will give the same random
+        numbers on all mpi ranks.
+        You can also pass a string that will convert the keywords it or rank on runtime, e.g.,
+        34788 * it + 928374 * rank will convert each iteration the variables it and rank for the random
+        seed
+
+ctint
+=====
+
+.. admonition:: length_cycle 
+ 	:class: intag  
+ 
+            **type** = int;  **mandatory**
+
+        length of each cycle; number of sweeps before measurement is taken
+
+.. admonition:: max_time 
+ 	:class: intag  
+ 
+            **type** = int;  **default**  = -1
+
+        maximum amount the solver is allowed to spend in each iteration
+
+.. admonition:: measure_pert_order 
+ 	:class: intag  
+ 
+            **type** = bool;  **default**  = False
+
+        measure perturbation order histograms: triqs.github.io/cthyb/latest/guide/perturbation_order_notebook.html.
+        The result is stored in the h5 archive under 'DMFT_results' at every iteration
+        in the subgroups 'pert_order_imp_X' and 'pert_order_total_imp_X'
+
+.. admonition:: move_double 
+ 	:class: intag  
+ 
+            **type** = bool;  **default**  = True
+
+        double moves in solver
+
+.. admonition:: n_cycles_tot 
+ 	:class: intag  
+ 
+            **type** = int;  **mandatory**
+
+        total number of sweeps
+
+.. admonition:: n_warmup_cycles 
+ 	:class: intag  
+ 
+            **type** = int;  **mandatory**
+
+        number of warmup cycles before real measurement sets in
+
+.. admonition:: random_seed 
+ 	:class: intag  
+ 
+            **type** = str;  **default**  = None
+
+        if None;  **default**  seed by triqs.
+        If specified the int will be used for random seeds. Careful, this will give the same random
+        numbers on all mpi ranks.
+        You can also pass a string that will convert the keywords it or rank on runtime, e.g.,
+        34788 * it + 928374 * rank will convert each iteration the variables it and rank for the random
+        seed
+
+ctseg
+=====
+
+.. admonition:: improved_estimator 
+ 	:class: intag  
+ 
+            **type** = bool;  **default**  = False
+
+        measure improved estimators
+        Sigma_iw will automatically be calculated via
+        http://dx.doi.org/10.1103/PhysRevB.85.205106
+
+.. admonition:: legendre_fit 
+ 	:class: intag  
+ 
+            **type** = bool;  **default**  = False
+
+        filter noise of G(tau) with G_l, cutoff is taken from n_l
+
+.. admonition:: length_cycle 
+ 	:class: intag  
+ 
+            **type** = int;  **mandatory**
+
+        length of each cycle; number of sweeps before measurement is taken
+
+.. admonition:: max_time 
+ 	:class: intag  
+ 
+            **type** = int;  **default**  = -1
+
+        maximum amount the solver is allowed to spend in each iteration
+
+.. admonition:: measure_G_iw 
+ 	:class: intag  
+ 
+            **type** = bool;  **default**  = False
+
+        should the solver measure G(iw)?
+
+.. admonition:: measure_G_l 
+ 	:class: intag  
+ 
+            **type** = bool;  **default**  = False
+
+        measure Legendre Greens function
+
+.. admonition:: measure_G_tau 
+ 	:class: intag  
+ 
+            **type** = bool;  **default**  = True
+
+        should the solver measure G(tau)?
+
+.. admonition:: measure_pert_order 
+ 	:class: intag  
+ 
+            **type** = bool;  **default**  = False
+
+        measure perturbation order histograms: triqs.github.io/cthyb/latest/guide/perturbation_order_notebook.html.
+        The result is stored in the h5 archive under 'DMFT_results' at every iteration
+        in the subgroups 'pert_order_imp_X' and 'pert_order_total_imp_X'
+
+.. admonition:: n_cycles_tot 
+ 	:class: intag  
+ 
+            **type** = int;  **mandatory**
+
+        total number of sweeps
+
+.. admonition:: n_l 
+ 	:class: intag  
+ 
+            **type** = int;  **default**  = None
+
+        number of Legendre coefficients.
+        Needed if measure_G_l=True or legendre_fit=True
+
+.. admonition:: n_warmup_cycles 
+ 	:class: intag  
+ 
+            **type** = int;  **mandatory**
+
+        number of warmup cycles before real measurement sets in
+
+.. admonition:: random_seed 
+ 	:class: intag  
+ 
+            **type** = str;  **default**  = None
+
+        if None;  **default**  seed by triqs.
+        If specified the int will be used for random seeds. Careful, this will give the same random
+        numbers on all mpi ranks.
+        You can also pass a string that will convert the keywords it or rank on runtime, e.g.,
+        34788 * it + 928374 * rank will convert each iteration the variables it and rank for the random
+        seed
+
+hubbardI
+========
+
+.. admonition:: legendre_fit 
+ 	:class: intag  
+ 
+            **type** = bool;  **default**  = False
+
+        filter noise of G(tau) with G_l, cutoff is taken from n_l
+
+.. admonition:: measure_density_matrix 
+ 	:class: intag  
+ 
+            **type** = bool;  **default**  = False
+
+        measures the impurity density matrix and sets also
+        use_norm_as_weight to true
+
+.. admonition:: measure_G_l 
+ 	:class: intag  
+ 
+            **type** = bool;  **default**  = False
+
+        measure Legendre Greens function
+
+.. admonition:: measure_G_tau 
+ 	:class: intag  
+ 
+            **type** = bool;  **default**  = True
+
+        should the solver measure G(tau)?
+
+.. admonition:: n_l 
+ 	:class: intag  
+ 
+            **type** = int;  **default**  = None
+
+        number of Legendre coefficients.
+        needed if measure_G_l=True or legendre_fit=True
+
+ftps parameters
+===============
+
+.. admonition:: bath_fit 
+ 	:class: intag  
+ 
+            **type** = bool;  **mandatory**
+
+        DiscretizeBath vs BathFitter
+
+.. admonition:: calc_me 
+ 	:class: intag  
+ 
+            **type** = bool;  **default**  = True
+
+        calculate only symmetry-inequivalent spins/orbitals, symmetrized afterwards
+
+.. admonition:: diag_delta 
+ 	:class: intag  
+ 
+            **type** = bool;  **default**  = False
+
+        option to remove off-diagonal terms in the hybridization function
+        available for ftps
+
+.. admonition:: dmrg_maxm 
+ 	:class: intag  
+ 
+            **type** = int;  **default**  = 100
+
+        TODO: add description
+
+.. admonition:: dmrg_maxmB 
+ 	:class: intag  
+ 
+            **type** = int;  **default**  = 100
+
+        maximal bath-bath bond dimensions
+
+.. admonition:: dmrg_maxmI 
+ 	:class: intag  
+ 
+            **type** = int;  **default**  = 100
+
+        maximal imp-imp bond dimensions
+
+.. admonition:: dmrg_maxmIB 
+ 	:class: intag  
+ 
+            **type** = int;  **default**  = 100
+
+        maximal imp-bath bond dimensions
+
+.. admonition:: dmrg_tw 
+ 	:class: intag  
+ 
+            **type** = float;  **default**  1e-9
+
+        truncated weight for every link
+
+.. admonition:: dt 
+ 	:class: intag  
+ 
+            **type** = float;  **mandatory**
+
+        time step
+
+.. admonition:: enforce_gap 
+ 	:class: intag  
+ 
+            **type** = list of float;  **default**  = None
+
+        enforce gap in DiscretizeBath between interval
+
+.. admonition:: ignore_weight 
+ 	:class: intag  
+ 
+            **type** = float;  **default**  = 0.0
+
+        ignore weight of peaks for bath fitter
+
+.. admonition:: maxm 
+ 	:class: intag  
+ 
+            **type** = int;  **default**  = 100
+
+        TODO: write description
+
+.. admonition:: maxmB 
+ 	:class: intag  
+ 
+            **type** = int;  **default**  = 100
+
+        maximal bath-bath bond dimensions
+
+.. admonition:: maxmI 
+ 	:class: intag  
+ 
+            **type** = int;  **default**  = 100
+
+        maximal imp-imp bond dimensions
+
+.. admonition:: maxmIB 
+ 	:class: intag  
+ 
+            **type** = int;  **default**  = 100
+
+        maximal imp-bath bond dimensions
+
+.. admonition:: n_bath 
+ 	:class: intag  
+ 
+            **type** = int;  **default**  = 0
+
+        number of bath sites
+
+.. admonition:: path_to_gs 
+ 	:class: intag  
+ 
+            **type** = string;  **default**  = None
+
+        location of GS if already present. Use 'postprocess' to skip solver and go directly to post-processing
+        of previously terminated time-evolved state
+
+.. admonition:: ph_symm 
+ 	:class: intag  
+ 
+            **type** = bool;  **default**  = False
+
+        particle-hole symmetric problem
+
+.. admonition:: refine_factor 
+ 	:class: intag  
+ 
+            **type** = int;  **default**  = 1
+
+        rerun ftps cycle with increased accuracy
+
+.. admonition:: state_storage 
+ 	:class: intag  
+ 
+            **type** = string;  **default**  = './'
+
+        location of large MPS states
+
+.. admonition:: sweeps 
+ 	:class: intag  
+ 
+            **type** = int;  **default**  = 10
+
+        Number of DMRG sweeps
+
+.. admonition:: tw 
+ 	:class: intag  
+ 
+            **type** = float;  **default**  1e-9
+
+        truncated weight for every link
+
+hartree
+================
+
+.. admonition:: force_real 
+ 	:class: intag  
+ 
+            **type** = bool;  **default**  = True
+
+        force the self energy from Hartree fock to be real
+
+.. admonition:: method 
+ 	:class: intag  
+ 
+            **type** = str;  **default**  = "krylov"
+
+        method for root finder. Only used if one_shot=False, see scipy.optimize.root for options.
+
+.. admonition:: one_shot 
+ 	:class: intag  
+ 
+            **type** = bool;  **default**  = False
+
+        Perform a one-shot or self-consitent root finding in each DMFT step of the Hartree solver.
+
+.. admonition:: tol 
+ 	:class: intag  
+ 
+            **type** = float;  **default**  = 1e-5
+
+        tolerance for root finder if one_shot=False.
+
+.. admonition:: with_fock 
+ 	:class: intag  
+ 
+            **type** = bool;  **default**  = False
+
+        include Fock exchange terms in the self-energy

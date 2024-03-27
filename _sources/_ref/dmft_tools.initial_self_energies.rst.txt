@@ -1,0 +1,21 @@
+dmft\_tools.initial\_self\_energies
+===================================
+
+.. automodule:: dmft_tools.initial_self_energies
+    :members:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

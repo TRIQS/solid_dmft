@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>[solver]: solver specific parameters &mdash; solid_dmft  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/plot_directive.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="[dft]: DFT related inputs" href="dft.html" />
+    <link rel="prev" title="[general]: General parameters" href="general.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #7E588A" >
+            <a href="../../index.html" class="icon icon-home"> solid_dmft
+            <img src="../../_static/logo_no_text.png" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                3.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#installation-via-pip">Installation via pip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#manual-installation-via-cmake">Manual installation via CMake</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#docker-files-images">Docker files &amp; images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#version-compatibility">Version compatibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#custom-cmake-options">Custom CMake options</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../documentation.html">Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#code-structure">Code structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#dft-interface-notes">DFT interface notes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../md_notes/w90_interface.html">Wannier90 interface</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/w90_interface.html#orbital-order-in-the-w90-converter">orbital order in the W90 converter</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../md_notes/vasp_csc.html">Interface to VASP</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/vasp_csc.html#general-remarks">General remarks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/vasp_csc.html#locproj-bug-for-individual-projections">LOCPROJ bug for individual projections:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/vasp_csc.html#convergence-of-projectors-with-vasp">convergence of projectors with Vasp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/vasp_csc.html#enabling-csc-calculations-with-wannier90-projectors">Enabling CSC calculations with Wannier90 projectors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/vasp_csc.html#speeding-up-by-not-writing-projectors-at-every-step">Speeding up by not writing projectors at every step</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../cRPA_VASP/README.html">How to do cRPA calculations with VASP</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#file-description">file description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#workflow">Workflow:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#important-flags">important flags:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#convergency-tests">convergency tests:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#parameterization-of-u-and-j-from-crpa-calculations">Parameterization of U and J from cRPA calculations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#general-sidemarks">general sidemarks:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../cRPA_VASP/README.html#version-and-compilation">version and compilation:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../documentation.html#input-output">Input/Output</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="input.html">Input</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="general.html">[general]: General parameters</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">[solver]: solver specific parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dft.html">[dft]: DFT related inputs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="advanced.html">[advanced]: Advanced inputs</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../DMFT_output/results.html">Output / results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../DMFT_output/results.html#group-structure">Group structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../DMFT_output/results.html#subgroups">Subgroups</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#further-details-for-running">Further details for running</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../md_notes/docker.html">Docker</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/docker.html#building-the-docker-image">Building the docker image</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/docker.html#pulling-a-docker-image">Pulling a docker image</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/docker.html#getting-docker-images-onto-cscs-daint">Getting docker images onto CSCS daint</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../md_notes/run_locally.html">Run on your machine</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/run_locally.html#csc-calculations-locally">CSC calculations locally</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../md_notes/run_cluster.html">Running solid_dmft on a cluster</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/run_cluster.html#running-on-cscs-daint">Running on CSCS daint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/run_cluster.html#one-shot-job-on-daint">one shot job on daint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../md_notes/run_cluster.html#csc-calculations-on-daint">CSC calculations on daint</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#module-reference-manual">Module reference manual</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/csc_flow.html">csc_flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/dft_managers.html">dft_managers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dft_managers.mpi_helpers.html">dft_managers.mpi_helpers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dft_managers.qe_manager.html">dft_managers.qe_manager</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dft_managers.vasp_manager.html">dft_managers.vasp_manager</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/dmft_cycle.html">dmft_cycle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/dmft_tools.html">dmft_tools</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.afm_mapping.html">dmft_tools.afm_mapping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.convergence.html">dmft_tools.convergence</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.formatter.html">dmft_tools.formatter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.greens_functions_mixer.html">dmft_tools.greens_functions_mixer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.initial_self_energies.html">dmft_tools.initial_self_energies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.interaction_hamiltonian.html">dmft_tools.interaction_hamiltonian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.legendre_filter.html">dmft_tools.legendre_filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.manipulate_chemical_potential.html">dmft_tools.manipulate_chemical_potential</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.matheval.html">dmft_tools.matheval</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.observables.html">dmft_tools.observables</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.results_to_archive.html">dmft_tools.results_to_archive</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.solver.html">dmft_tools.solver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/io_tools.html">io_tools</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/io_tools.dict_to_h5.html">io_tools.dict_to_h5</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/io_tools.postproc_toml_dict.html">io_tools.postproc_toml_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/io_tools.verify_input_params.html">io_tools.verify_input_params</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/postprocessing.html">postprocessing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.eval_U_cRPA_RESPACK.html">postprocessing.eval_U_cRPA_RESPACK</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.eval_U_cRPA_Vasp.html">postprocessing.eval_U_cRPA_Vasp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.maxent_gf_imp.html">postprocessing.maxent_gf_imp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.maxent_gf_latt.html">postprocessing.maxent_gf_latt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.maxent_sigma.html">postprocessing.maxent_sigma</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.pade_sigma.html">postprocessing.pade_sigma</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/postprocessing.plot_correlated_bands.html">postprocessing.plot_correlated_bands</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/util.html">util</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/util.symmetrize_gamma_file.html">util.symmetrize_gamma_file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/util.write_kslice_to_h5.html">util.write_kslice_to_h5</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/SVO_os_qe/tutorial.html">1. OS with QE/W90 and cthyb: SrVO3 MIT</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/SVO_os_qe/tutorial.html#1.-Starting-out-with-DMFT">1. Starting out with DMFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/SVO_os_qe/tutorial.html#2.-Looking-at-the-Metal-Insulator-Transition">2. Looking at the Metal-Insulator Transition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/SVO_os_qe/tutorial.html#3.-Refining-the-diagram">3. Refining the diagram</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/SVO_os_qe/tutorial.html#4.-Plotting-the-spectral-function">4. Plotting the spectral function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/SVO_os_qe/tutorial.html#5-Visualizing-the-MIT">5 Visualizing the MIT</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html">2. CSC with VASP PLOs: charge order in PrNiO3</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#1.-Running-the-initial-scf-DFT-calculation">1. Running the initial scf DFT calculation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#2.-Running-the-CSC-DMFT-calculations">2. Running the CSC DMFT calculations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Input-files-for-CSC-DMFT-calculations">Input files for CSC DMFT calculations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Starting-the-calculations">Starting the calculations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#Analyzing-the-projectors">Analyzing the projectors</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Plotting-the-results:-observables">3. Plotting the results: observables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green’s-function">4. Plotting the results: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Next-steps-to-try">5. Next steps to try</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/Ce2O3_csc_w90/tutorial.html">3. CSC with QE/W90 and HubbardI: total energy in Ce2O3</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/Ce2O3_csc_w90/tutorial.html#1.-Input-file-preparation">1. Input file preparation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/Ce2O3_csc_w90/tutorial.html#DFT-files">DFT files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/Ce2O3_csc_w90/tutorial.html#DMFT">DMFT</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/Ce2O3_csc_w90/tutorial.html#2.-Running-DFT+DMFT">2. Running DFT+DMFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/Ce2O3_csc_w90/tutorial.html#3.-Non-interacting-Hamiltonian-and-convergence-analysis">3. Non-interacting Hamiltonian and convergence analysis</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/Ce2O3_csc_w90/tutorial.html#Tight-binding-Hamiltonian">Tight-binding Hamiltonian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/Ce2O3_csc_w90/tutorial.html#Convergence">Convergence</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/NNO_os_plo_mag/tutorial.html">4. OS with VASP/PLOs and cthyb: AFM state of NdNiO2</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/NNO_os_plo_mag/tutorial.html#1.-Run-DFT">1. Run DFT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/NNO_os_plo_mag/tutorial.html#2.-Creating-the-hdf5-archive-/-DMFT-input">2. Creating the hdf5 archive / DMFT input</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/NNO_os_plo_mag/tutorial.html#3.-Running-the-AFM-calculation">3. Running the AFM calculation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/NNO_os_plo_mag/tutorial.html#5.-Multiplet-analysis">5. Multiplet analysis</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/correlated_bandstructure/plot_correlated_bands.html">5. Plotting the spectral function</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/correlated_bandstructure/plot_correlated_bands.html#1.-Configuration">1. Configuration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/correlated_bandstructure/plot_correlated_bands.html#Basic-options">Basic options</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/correlated_bandstructure/plot_correlated_bands.html#Wannier90">Wannier90</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/correlated_bandstructure/plot_correlated_bands.html#BZ-configuration">BZ configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/correlated_bandstructure/plot_correlated_bands.html#Self-energy">Self-energy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tutorials/correlated_bandstructure/plot_correlated_bands.html#Plotting-options">Plotting options</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/correlated_bandstructure/plot_correlated_bands.html#2.-Run-and-Plotting">2. Run and Plotting</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../issues.html">Support &amp; contribute</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../issues.html#seeking-help">Seeking help</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../issues.html#improving-solid-dmft">Improving solid_dmft</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../issues.html#reporting-issues">Reporting issues</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../ChangeLog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-2-0">Version 3.2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#general">General</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#fix">fix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#build">build</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#feat">feat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#doc">doc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#test">test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-1-5">Version 3.1.5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-1-4">Version 3.1.4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-1-3">Version 3.1.3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-1-2">Version 3.1.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-1-1">Version 3.1.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-1-0">Version 3.1.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-0-0">Version 3.0.0</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #7E588A" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">solid_dmft</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../documentation.html">Documentation</a> &raquo;</li>
+          <li><a href="input.html">Input</a> &raquo;</li>
+      <li>[solver]: solver specific parameters</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/input_output/DMFT_input/solver.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="solver-solver-specific-parameters">
+<h1>[solver]: solver specific parameters<a class="headerlink" href="#solver-solver-specific-parameters" title="Permalink to this headline"></a></h1>
+<p>Here are the parameters that are uniquely dependent on the solver chosen. Some parameters are used within solid_dmft and some are passed directly into the triqs solver.
+To see which parameters were passed to the solver for a given calculation, look at the triqs_solver_params in DMFT_input/solver in the h5 archive.
+Solver-specific parameters are listed in the respective sections.</p>
+<div class="intag admonition">
+<p class="first admonition-title">type</p>
+<blockquote>
+<div><strong>type</strong> = str;  <strong>mandatory</strong></div></blockquote>
+<p>type of solver chosen for the calculation, currently supports:</p>
+<ul class="last simple">
+<li>‘cthyb’</li>
+<li>‘ctint’</li>
+<li>‘ctseg’</li>
+<li>‘hubbardI’</li>
+<li>‘ftps’</li>
+<li>‘hartree’</li>
+</ul>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">idx_impurities</p>
+<blockquote>
+<div><strong>type</strong> = list of int;  <strong>default</strong>  = None</div></blockquote>
+<p class="last">list of impurities this solver is supposed to solve</p>
+</div>
+<div class="section" id="cthyb">
+<h2>cthyb<a class="headerlink" href="#cthyb" title="Permalink to this headline"></a></h2>
+<div class="intag admonition">
+<p class="first admonition-title">delta_interface</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = False</div></blockquote>
+<p class="last">use delta interface in cthyb instead of input G0</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">fit_max_moment</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = None</div></blockquote>
+<p class="last">max moment to be fitted. Only used if solver.perform_tail_fit = True</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">fit_max_n</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = None</div></blockquote>
+<p class="last">number of highest matsubara frequency to fit. Only used if solver.perform_tail_fit = True</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">fit_max_w</p>
+<blockquote>
+<div><strong>type</strong> = float;  <strong>default</strong>  = None</div></blockquote>
+<p class="last">highest matsubara frequency to fit. Only used if solver.perform_tail_fit = True</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">fit_min_n</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = None</div></blockquote>
+<p class="last">number of start matsubara frequency to start with. Only used if solver.perform_tail_fit = True</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">fit_min_w</p>
+<blockquote>
+<div><strong>type</strong> = float;  <strong>default</strong>  = None</div></blockquote>
+<p class="last">start matsubara frequency to start with. Only used if solver.perform_tail_fit = True</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">imag_threshold</p>
+<blockquote>
+<div><strong>type</strong> = float;  <strong>default</strong>  = 1e-14</div></blockquote>
+<p class="last">threshold for imag part of G0_tau. be warned if symmetries are off in projection scheme imag parts can occur in G0_tau</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">legendre_fit</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = False</div></blockquote>
+<p class="last">filter noise of G(tau) with G_l, cutoff is taken from n_l</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">length_cycle</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>mandatory</strong></div></blockquote>
+<p class="last">length of each cycle; number of sweeps before measurement is taken</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">loc_n_max</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = None</div></blockquote>
+<p class="last">Restrict local Hilbert space to states with at most this number of particles</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">loc_n_min</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = None</div></blockquote>
+<p class="last">Restrict local Hilbert space to states with at least this number of particles</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">max_time</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = -1</div></blockquote>
+<p class="last">maximum amount the solver is allowed to spend in each iteration</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">measure_chi_insertions</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = 100</div></blockquote>
+<p class="last">number of insertation for measurement of chi</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">measure_chi</p>
+<blockquote>
+<div><strong>type</strong> = str;  <strong>default</strong>  = None</div></blockquote>
+<p>measure the dynamic suszeptibility of an operator O, chi(O,O(tau))
+triqs.github.io/cthyb/unstable/guide/dynamic_susceptibility_notebook.html
+Possible values for this flag are:</p>
+<ul class="last simple">
+<li>‘SzSz’: spin susceptibility</li>
+<li>‘NN’: occupation susceptibility</li>
+</ul>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">measure_density_matrix</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = False</div></blockquote>
+<p class="last">measures the impurity density matrix and sets also
+use_norm_as_weight to true</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">measure_G_l</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = False</div></blockquote>
+<p class="last">measure Legendre Greens function</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">measure_pert_order</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = False</div></blockquote>
+<p class="last">measure perturbation order histograms: triqs.github.io/cthyb/latest/guide/perturbation_order_notebook.html.
+The result is stored in the h5 archive under ‘DMFT_results’ at every iteration
+in the subgroups ‘pert_order_imp_X’ and ‘pert_order_total_imp_X’</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">move_double</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = True</div></blockquote>
+<p class="last">double moves in solver</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">move_shift</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = False</div></blockquote>
+<p class="last">shift moves in solver</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">n_cycles_tot</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>mandatory</strong></div></blockquote>
+<p class="last">total number of sweeps</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">n_l</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = None</div></blockquote>
+<p class="last">number of Legendre coefficients.
+Needed if measure_G_l=True or legendre_fit=True</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">n_warmup_cycles</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>mandatory</strong></div></blockquote>
+<p class="last">number of warmup cycles before real measurement sets in</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">off_diag_threshold</p>
+<blockquote>
+<div><strong>type</strong> = float;  <strong>default</strong>  = 0.0</div></blockquote>
+<p class="last">threshold for off-diag elements in Hloc0</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">perform_tail_fit</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = False</div></blockquote>
+<p class="last">tail fitting if legendre is off?</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">random_seed</p>
+<blockquote>
+<div><strong>type</strong> = str;  <strong>default</strong>  = None</div></blockquote>
+<p class="last">if None;  <strong>default</strong>  seed by triqs.
+If specified the int will be used for random seeds. Careful, this will give the same random
+numbers on all mpi ranks.
+You can also pass a string that will convert the keywords it or rank on runtime, e.g.,
+34788 * it + 928374 * rank will convert each iteration the variables it and rank for the random
+seed</p>
+</div>
+</div>
+<div class="section" id="ctint">
+<h2>ctint<a class="headerlink" href="#ctint" title="Permalink to this headline"></a></h2>
+<div class="intag admonition">
+<p class="first admonition-title">length_cycle</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>mandatory</strong></div></blockquote>
+<p class="last">length of each cycle; number of sweeps before measurement is taken</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">max_time</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = -1</div></blockquote>
+<p class="last">maximum amount the solver is allowed to spend in each iteration</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">measure_pert_order</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = False</div></blockquote>
+<p class="last">measure perturbation order histograms: triqs.github.io/cthyb/latest/guide/perturbation_order_notebook.html.
+The result is stored in the h5 archive under ‘DMFT_results’ at every iteration
+in the subgroups ‘pert_order_imp_X’ and ‘pert_order_total_imp_X’</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">move_double</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = True</div></blockquote>
+<p class="last">double moves in solver</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">n_cycles_tot</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>mandatory</strong></div></blockquote>
+<p class="last">total number of sweeps</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">n_warmup_cycles</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>mandatory</strong></div></blockquote>
+<p class="last">number of warmup cycles before real measurement sets in</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">random_seed</p>
+<blockquote>
+<div><strong>type</strong> = str;  <strong>default</strong>  = None</div></blockquote>
+<p class="last">if None;  <strong>default</strong>  seed by triqs.
+If specified the int will be used for random seeds. Careful, this will give the same random
+numbers on all mpi ranks.
+You can also pass a string that will convert the keywords it or rank on runtime, e.g.,
+34788 * it + 928374 * rank will convert each iteration the variables it and rank for the random
+seed</p>
+</div>
+</div>
+<div class="section" id="ctseg">
+<h2>ctseg<a class="headerlink" href="#ctseg" title="Permalink to this headline"></a></h2>
+<div class="intag admonition">
+<p class="first admonition-title">improved_estimator</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = False</div></blockquote>
+<p class="last">measure improved estimators
+Sigma_iw will automatically be calculated via
+<a class="reference external" href="http://dx.doi.org/10.1103/PhysRevB.85.205106" rel="noopener noreferrer" target="_blank">http://dx.doi.org/10.1103/PhysRevB.85.205106</a></p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">legendre_fit</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = False</div></blockquote>
+<p class="last">filter noise of G(tau) with G_l, cutoff is taken from n_l</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">length_cycle</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>mandatory</strong></div></blockquote>
+<p class="last">length of each cycle; number of sweeps before measurement is taken</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">max_time</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = -1</div></blockquote>
+<p class="last">maximum amount the solver is allowed to spend in each iteration</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">measure_G_iw</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = False</div></blockquote>
+<p class="last">should the solver measure G(iw)?</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">measure_G_l</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = False</div></blockquote>
+<p class="last">measure Legendre Greens function</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">measure_G_tau</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = True</div></blockquote>
+<p class="last">should the solver measure G(tau)?</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">measure_pert_order</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = False</div></blockquote>
+<p class="last">measure perturbation order histograms: triqs.github.io/cthyb/latest/guide/perturbation_order_notebook.html.
+The result is stored in the h5 archive under ‘DMFT_results’ at every iteration
+in the subgroups ‘pert_order_imp_X’ and ‘pert_order_total_imp_X’</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">n_cycles_tot</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>mandatory</strong></div></blockquote>
+<p class="last">total number of sweeps</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">n_l</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = None</div></blockquote>
+<p class="last">number of Legendre coefficients.
+Needed if measure_G_l=True or legendre_fit=True</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">n_warmup_cycles</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>mandatory</strong></div></blockquote>
+<p class="last">number of warmup cycles before real measurement sets in</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">random_seed</p>
+<blockquote>
+<div><strong>type</strong> = str;  <strong>default</strong>  = None</div></blockquote>
+<p class="last">if None;  <strong>default</strong>  seed by triqs.
+If specified the int will be used for random seeds. Careful, this will give the same random
+numbers on all mpi ranks.
+You can also pass a string that will convert the keywords it or rank on runtime, e.g.,
+34788 * it + 928374 * rank will convert each iteration the variables it and rank for the random
+seed</p>
+</div>
+</div>
+<div class="section" id="hubbardi">
+<h2>hubbardI<a class="headerlink" href="#hubbardi" title="Permalink to this headline"></a></h2>
+<div class="intag admonition">
+<p class="first admonition-title">legendre_fit</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = False</div></blockquote>
+<p class="last">filter noise of G(tau) with G_l, cutoff is taken from n_l</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">measure_density_matrix</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = False</div></blockquote>
+<p class="last">measures the impurity density matrix and sets also
+use_norm_as_weight to true</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">measure_G_l</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = False</div></blockquote>
+<p class="last">measure Legendre Greens function</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">measure_G_tau</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = True</div></blockquote>
+<p class="last">should the solver measure G(tau)?</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">n_l</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = None</div></blockquote>
+<p class="last">number of Legendre coefficients.
+needed if measure_G_l=True or legendre_fit=True</p>
+</div>
+</div>
+<div class="section" id="ftps-parameters">
+<h2>ftps parameters<a class="headerlink" href="#ftps-parameters" title="Permalink to this headline"></a></h2>
+<div class="intag admonition">
+<p class="first admonition-title">bath_fit</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>mandatory</strong></div></blockquote>
+<p class="last">DiscretizeBath vs BathFitter</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">calc_me</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = True</div></blockquote>
+<p class="last">calculate only symmetry-inequivalent spins/orbitals, symmetrized afterwards</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">diag_delta</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = False</div></blockquote>
+<p class="last">option to remove off-diagonal terms in the hybridization function
+available for ftps</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">dmrg_maxm</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = 100</div></blockquote>
+<p class="last">TODO: add description</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">dmrg_maxmB</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = 100</div></blockquote>
+<p class="last">maximal bath-bath bond dimensions</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">dmrg_maxmI</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = 100</div></blockquote>
+<p class="last">maximal imp-imp bond dimensions</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">dmrg_maxmIB</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = 100</div></blockquote>
+<p class="last">maximal imp-bath bond dimensions</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">dmrg_tw</p>
+<blockquote>
+<div><strong>type</strong> = float;  <strong>default</strong>  1e-9</div></blockquote>
+<p class="last">truncated weight for every link</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">dt</p>
+<blockquote>
+<div><strong>type</strong> = float;  <strong>mandatory</strong></div></blockquote>
+<p class="last">time step</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">enforce_gap</p>
+<blockquote>
+<div><strong>type</strong> = list of float;  <strong>default</strong>  = None</div></blockquote>
+<p class="last">enforce gap in DiscretizeBath between interval</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">ignore_weight</p>
+<blockquote>
+<div><strong>type</strong> = float;  <strong>default</strong>  = 0.0</div></blockquote>
+<p class="last">ignore weight of peaks for bath fitter</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">maxm</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = 100</div></blockquote>
+<p class="last">TODO: write description</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">maxmB</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = 100</div></blockquote>
+<p class="last">maximal bath-bath bond dimensions</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">maxmI</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = 100</div></blockquote>
+<p class="last">maximal imp-imp bond dimensions</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">maxmIB</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = 100</div></blockquote>
+<p class="last">maximal imp-bath bond dimensions</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">n_bath</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = 0</div></blockquote>
+<p class="last">number of bath sites</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">path_to_gs</p>
+<blockquote>
+<div><strong>type</strong> = string;  <strong>default</strong>  = None</div></blockquote>
+<p class="last">location of GS if already present. Use ‘postprocess’ to skip solver and go directly to post-processing
+of previously terminated time-evolved state</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">ph_symm</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = False</div></blockquote>
+<p class="last">particle-hole symmetric problem</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">refine_factor</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = 1</div></blockquote>
+<p class="last">rerun ftps cycle with increased accuracy</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">state_storage</p>
+<blockquote>
+<div><strong>type</strong> = string;  <strong>default</strong>  = ‘./’</div></blockquote>
+<p class="last">location of large MPS states</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">sweeps</p>
+<blockquote>
+<div><strong>type</strong> = int;  <strong>default</strong>  = 10</div></blockquote>
+<p class="last">Number of DMRG sweeps</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">tw</p>
+<blockquote>
+<div><strong>type</strong> = float;  <strong>default</strong>  1e-9</div></blockquote>
+<p class="last">truncated weight for every link</p>
+</div>
+</div>
+<div class="section" id="hartree">
+<h2>hartree<a class="headerlink" href="#hartree" title="Permalink to this headline"></a></h2>
+<div class="intag admonition">
+<p class="first admonition-title">force_real</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = True</div></blockquote>
+<p class="last">force the self energy from Hartree fock to be real</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">method</p>
+<blockquote>
+<div><strong>type</strong> = str;  <strong>default</strong>  = “krylov”</div></blockquote>
+<p class="last">method for root finder. Only used if one_shot=False, see scipy.optimize.root for options.</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">one_shot</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = False</div></blockquote>
+<p class="last">Perform a one-shot or self-consitent root finding in each DMFT step of the Hartree solver.</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">tol</p>
+<blockquote>
+<div><strong>type</strong> = float;  <strong>default</strong>  = 1e-5</div></blockquote>
+<p class="last">tolerance for root finder if one_shot=False.</p>
+</div>
+<div class="intag admonition">
+<p class="first admonition-title">with_fock</p>
+<blockquote>
+<div><strong>type</strong> = bool;  <strong>default</strong>  = False</div></blockquote>
+<p class="last">include Fock exchange terms in the self-energy</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="general.html" class="btn btn-neutral float-left" title="[general]: General parameters" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="dft.html" class="btn btn-neutral float-right" title="[dft]: DFT related inputs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (C) 2018-2020, ETH Zurich Copyright (C) 2021-2022, The Simons Foundation authors: A. Hampel, M. Merkel, A. Carta, and S. Beck.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
