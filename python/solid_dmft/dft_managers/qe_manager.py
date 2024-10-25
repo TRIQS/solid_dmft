@@ -82,7 +82,7 @@ def _start_with_piping(mpi_exe, mpi_arguments, qe_file_ext, env_vars, seedname):
         subprocess.check_call(mpi_arguments + [seedname], env=env_vars, shell=False)
 
 
-def run(number_cores, qe_file_ext, qe_exec, mpi_profile, seedname):
+def run(number_cores, qe_file_ext, qe_exec, mpi_profile, mpi_exe_param, seedname):
     """
     Starts the VASP child process. Takes care of initializing a clean
     environment for the child process. This is needed so that VASP does not
@@ -111,7 +111,8 @@ def run(number_cores, qe_file_ext, qe_exec, mpi_profile, seedname):
                 env_vars[var_name] = var
 
         # assuming that mpirun points to the correct mpi env
-        mpi_exe = mpi_helpers.find_path_to_mpi_command(env_vars, 'mpirun')
+        mpi_exe = mpi_helpers.find_path_to_mpi_command(env_vars, mpi_exe_param)
+        print('\nMPI executable for QE:', mpi_exe)
 
         if qe_file_ext in ['scf', 'nscf', 'mod_scf', 'bnd']:
             qe_exec += f'pw.x -nk {number_cores}'

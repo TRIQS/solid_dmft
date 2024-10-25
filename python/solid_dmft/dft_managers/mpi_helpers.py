@@ -93,6 +93,11 @@ def find_path_to_mpi_command(env_vars, mpi_exe):
     string: absolute path to mpi command
     """
 
+    # first check if mpi_exe is already full path to executable
+    if os.path.isfile(mpi_exe):
+        return mpi_exe
+
+    # otherwise, check if mpi_exe is in PATH
     for path_directory in env_vars.get('PATH').split(os.pathsep):
         if path_directory:
             potential_path = os.path.join(path_directory, mpi_exe)

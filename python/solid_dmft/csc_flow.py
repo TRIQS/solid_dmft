@@ -98,7 +98,7 @@ def _full_qe_run(seedname, dft_params, mode):
 
     # runs a full iteration of DFT
     qe_wrapper = lambda calc_type: qe.run(dft_params['n_cores'], calc_type, dft_params['dft_exec'],
-                                          dft_params['mpi_env'], seedname)
+                                          dft_params['mpi_env'], dft_params['mpi_exe'], seedname)
 
     # Initially run an scf calculation
     if mode == 'initial':
@@ -179,15 +179,23 @@ def _full_vasp_run(general_params, dft_params, initial_run, n_iter_dft=1, sum_k=
     if initial_run:
         assert n_iter_dft == 1
     else:
+        dft_iter_init = vasp.read_dft_iter()
         assert n_iter_dft == 1 or sum_k is not None, 'Sumk object needed to run multiple DFT iterations'
 
     for i in range(n_iter_dft):
         if initial_run:
             vasp_process_id = vasp.run_initial_scf(dft_params['n_cores'], dft_params['dft_exec'],
-                                                   dft_params['mpi_env'])
+                                                   dft_params['mpi_exe'], dft_params['mpi_env'])
         else:
             vasp_process_id = None
             vasp.run_charge_update()
+            dft_iter = vasp.read_dft_iter()
+            mpi.report(f'\nDFT SCF iteration {dft_iter} finished. Running converter:')
+            if not dft_iter == dft_iter_init+i+1:
+                mpi.report(f'DFT iteration number did not increase. Aborting.\n \
+                        DFT iteration {dft_iter} != {dft_iter_init+i+1}')
+                vasp.kill(vasp_process_id)
+                exit()
 
         if dft_params['projector_type'] == 'plo':
             _run_plo_converter(general_params, dft_params)
@@ -221,7 +229,7 @@ def _full_vasp_run(general_params, dft_params, initial_run, n_iter_dft=1, sum_k=
         sum_k.calc_mu(precision=general_params['prec_mu'])
 
         # Writes out GAMMA file
-        sum_k.calc_density_correction(dm_type='vasp',  kpts_to_write=irred_indices)
+        sum_k.calc_density_correction(dm_type='vasp', kpts_to_write=irred_indices)
 
     return vasp_process_id, irred_indices
 

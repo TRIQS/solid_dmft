@@ -178,6 +178,7 @@ with_fock = false
 dft_code = "<none>"
 dft_exec = "vasp_std"
 mpi_env = "default"
+mpi_exe = "mpirun"
 n_cores = "<none>"
 n_iter = 4
 n_iter_first = "<dft.n_iter>"

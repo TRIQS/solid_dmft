@@ -99,7 +99,7 @@ def remove_legacy_projections_suppressed():
     mpi.barrier()
 
 
-def run_initial_scf(number_cores, vasp_command, cluster_name):
+def run_initial_scf(number_cores, vasp_command, mpi_exe_param, cluster_name):
     """
     Starts the VASP child process. Takes care of initializing a clean
     environment for the child process. This is needed so that VASP does not
@@ -133,7 +133,8 @@ def run_initial_scf(number_cores, vasp_command, cluster_name):
                 env_vars[var_name] = var
 
         # assuming that mpirun points to the correct mpi env
-        mpi_exe = mpi_helpers.find_path_to_mpi_command(env_vars, 'mpirun')
+        mpi_exe = mpi_helpers.find_path_to_mpi_command(env_vars, mpi_exe_param)
+        print('\nMPI executable for Vasp:', mpi_exe)
 
         arguments = mpi_helpers.get_mpi_arguments(cluster_name, mpi_exe, number_cores, vasp_command, hostfile)
         vasp_process_id = _fork_and_start_vasp(mpi_exe, arguments, env_vars)
@@ -171,17 +172,44 @@ def run_charge_update():
 
 def read_dft_energy():
     """
-    Reads DFT energy from the last line of Vasp's OSZICAR.
+    Reads DFT energy from the last line of Vasp's OSZICAR or from vasptriqs.h5
     """
-    with open('OSZICAR', 'r') as file:
-        nextline = file.readline()
-        while nextline.strip():
-            line = nextline
+    h5_energy = False
+    if os.path.isfile('vaspout.h5'):
+        with HDFArchive('vaspout.h5', 'r') as h5:
+            if 'oszicar' in h5['intermediate/ion_dynamics']:
+                dft_energy = h5['intermediate/ion_dynamics/oszicar'][-1,1]
+                h5_energy = True
+
+    # as backup use OSZICAR file
+    if not h5_energy:
+        with open('OSZICAR', 'r') as file:
             nextline = file.readline()
     dft_energy = float(line.split()[2])
 
     return dft_energy
 
+def read_dft_iter():
+    """
+    Reads DFT iteration number from the last line of the OSZICAR or from Vasp's vasptriqs.h5
+    """
+    h5_iter = False
+    if os.path.isfile('vaspout.h5'):
+        with HDFArchive('vaspout.h5', 'r') as h5:
+            if 'oszicar' in h5['intermediate/ion_dynamics']:
+                dft_iter = int(h5['intermediate/ion_dynamics/oszicar'][-1,0])
+                h5_iter = True
+
+    # as backup use OSZICAR file
+    if not h5_iter:
+        with open('OSZICAR', 'r') as file:
+            nextline = file.readline()
+            while nextline.strip():
+                line = nextline
+                nextline = file.readline()
+        dft_iter = int(line.split()[1])
+
+    return dft_iter
 
 def read_irred_kpoints(kpts):
     """ Reads the indices of the irreducible k-points from the OUTCAR. """
