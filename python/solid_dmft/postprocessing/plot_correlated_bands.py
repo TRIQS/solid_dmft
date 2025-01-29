@@ -494,7 +494,7 @@ def get_kx_ky_FS(lower_right, upper_left, Z, tb, select=None, N_kxy=10, kz=0.0, 
             for ct_k, k_on_sheet in enumerate(FS_kx_ky_prim[sheet_ct]):
                 E_mat = tb.fourier(k_on_sheet)
                 e_val, e_vec = np.linalg.eigh(E_mat[select[:, np.newaxis], select])
-                orb_on_FS = np.argmin(np.abs(e_val))
+                orb_on_FS = np.argmin(np.abs(e_val - fermi))
 
                 band_char[sheet_ct][ct_k] = [np.round(np.real(e_vec[orb, orb_on_FS]*np.conjugate(e_vec[orb, orb_on_FS])), 4) for orb in range(len(select))]
             sheet_ct += 1
