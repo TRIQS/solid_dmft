@@ -1,8 +1,8 @@
 # See ../triqs/packaging for other options
-FROM flatironinstitute/cthyb:master-ubuntu-clang
+FROM cthyb:ubuntu-gcc
 ARG APPNAME=solid_dmft
 
-RUN apt-get install -y meson ninja-build python3-setuptools python3-skimage python3-tomli
+RUN apt-get update && apt-get install -y meson ninja-build python3-setuptools python3-skimage python3-tomli
 
 ENV OMP_NUM_THREADS=1
 
