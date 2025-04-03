@@ -9,7 +9,7 @@ where = ["python"]
 name = "solid_dmft"
 version = "@PROJECT_VERSION@"
 authors = [
-  { name="Alexander Hampel", email="ahampel@flatironinstitute.org" }
+  { name="Alexander Hampel", email="mail@alexander-hampel.de" }
 ]
 description = "solid_dmft: a versatile python wrapper to perform DFT+DMFT calculations utilizing the TRIQS software library"
 readme = "README.md"

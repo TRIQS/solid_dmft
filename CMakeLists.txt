@@ -27,7 +27,7 @@ endif()
 
 # ############
 # Define Project
-project(solid_dmft VERSION 3.3.1 LANGUAGES CXX)
+project(solid_dmft VERSION 3.3.2 LANGUAGES CXX)
 get_directory_property(IS_SUBPROJECT PARENT_DIRECTORY)
 
 # ############

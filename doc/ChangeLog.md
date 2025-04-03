@@ -2,6 +2,42 @@
 
 # Changelog
 
+## Version 3.3.2
+
+solid_dmft version 3.3.2 is a minor patch release that fixes a few small bugs and improves documentation:
+
+### doc
+* update Ce2O3 tutorials input file
+
+### fix
+* wrong error message for tail treatment in cthyb
+* pcb projection on orb feat for Fermi surfaces in TB only mode was not giving correct results
+* cthyb measure_chi was not passed into solve params since 3.3.x
+* small bug in SOC calculation
+
+We thank all contributors: Thomas Hahn, Nils Wentzell, Ina Park, Alexander Hampel
+
+## Version 3.3.1
+
+solid_dmft version 3.3.1 is a minor release that fixes bugs in the new triqs/ctseg interface and improves the interface to GW:
+
+### fix
+* small bug in dc initialization
+* dynamic U tensor corrections
+* initial self-energy from dc for magnetic calculation
+* align ctseg interface with triqs/ctseg release
+* ctseg hartree_shift rename in triqs
+
+### feat
+* add print of avg order for ctseg
+* use symmetric meshes for DLR
+* fix delta_interface in ctseg
+
+### build
+* add missing default.toml to pypi packaging
+
+We thank all contributors: Alexander Hampel, Nils Wentzell, Chia-Nan Yeh
+
 ## Version 3.3.0
 
 solid_dmft 3.3.0 is a major release, compatible with TRIQS 3.3, updated to the latest app4triqs skeleton, and bringing major changes to the code:
