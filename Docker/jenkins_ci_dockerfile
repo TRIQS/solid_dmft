@@ -2,7 +2,7 @@
 FROM flatironinstitute/cthyb:master-ubuntu-clang
 ARG APPNAME=solid_dmft
 
-RUN apt-get install -y meson ninja-build python3-setuptools python3-skimage
+RUN apt-get update && apt-get install -y meson ninja-build python3-setuptools python3-skimage
 
 ENV OMP_NUM_THREADS=1
 
