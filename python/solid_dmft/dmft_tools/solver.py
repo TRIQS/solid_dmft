@@ -30,12 +30,13 @@ from triqs.gf.tools import inverse, make_zero_tail
 from triqs.gf.descriptors import Fourier
 from triqs.operators import c_dag, c, Operator, util
 from triqs.operators.util.U_matrix import reduce_4index_to_2index
-from triqs.operators.util.extractors import block_matrix_from_op
+from triqs.operators.util.extractors import block_matrix_from_op, extract_U_dict2, dict_to_matrix
 import triqs.utility.mpi as mpi
 import itertools
 from h5 import HDFArchive
 
 from solid_dmft.io_tools.dict_to_h5 import prep_params_for_h5
+from solid_dmft.postprocessing.eval_U_cRPA_RESPACK import construct_Uijkl
 
 from . import legendre_filter
 from .matheval import MathExpr
