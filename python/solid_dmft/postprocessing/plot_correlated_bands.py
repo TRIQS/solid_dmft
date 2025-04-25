@@ -265,6 +265,27 @@ def _calc_alatt(n_orb, mu, eta, e_mat, sigma, qp_bands=False, e_vecs=None,
                 alatt_k_w[ik, :] = invert_and_trace(w_vec, eta, mu, e_mat[:, :, ik], sigma, trace)
 
     else:
+        def search_for_extrema(data):
+            # return None for no extrema, [] if ends of interval are the only extrema,
+            # list of indices if local extrema are present
+            answer = np.all(data > 0) or np.all(data < 0)
+            if answer:
+                return
+            else:
+                # find all extrema
+                extrema = [[0, len(data)-1]]
+                extrema.append(list(argrelextrema(data, np.greater)[0]))
+                extrema.append(list(argrelextrema(data, np.less)[0]))
+                extrema = sorted([item for sublist in extrema for item in sublist])
+                # sort out extrema that have a sign change
+                roots = []
+                for i in range(len(extrema) - 1):
+                    i1, i2 = extrema[i], extrema[i + 1]
+                    if data[i1] * data[i2] < 0:
+                        roots.extend([i1, i2])
+                roots = sorted(set(roots))
+            return roots
+
         alatt_k_w = np.zeros((n_k, n_orb))
         kslice = np.zeros((freq_dict['n_w'], n_orb))
         def kslice_interp(orb): return interp1d(freq_dict['w_mesh'], kslice[:, orb])
@@ -277,12 +298,28 @@ def _calc_alatt(n_orb, mu, eta, e_mat, sigma, qp_bands=False, e_vecs=None,
 
             for orb in range(n_orb):
                 w_min, w_max = freq_dict['window']
-                try:
-                    x0 = brentq(kslice_interp(orb), w_min, w_max)
-                    w_bin = int((x0 - w_min) / ((w_max - w_min) / freq_dict['n_w']))
-                    alatt_k_w[ik, orb] = freq_dict['w_mesh'][w_bin]
-                except ValueError:
-                    pass
+                temp_kslice = kslice[:,orb]
+                roots = search_for_extrema(temp_kslice)
+                if roots is not None:
+                    idx_1 = 0
+                    for root_ct in range(len(roots) + 1):
+                        idx_2 = roots[root_ct] if root_ct < len(roots) else n_k
+                        root_section = temp_kslice[idx_1:idx_2+1]
+                        try:
+                            x0 = brentq(interp1d(np.linspace(idx_1, idx_2, len(root_section)), root_section), idx_1, idx_2)
+                            w_bin = int(np.floor(x0))
+                            alatt_k_w[ik, orb] = freq_dict['w_mesh'][w_bin]
+                        except(ValueError):
+                            pass
+                        idx_1 = idx_2
+                #try:
+                #    x0 = brentq(kslice_interp(orb), w_min, w_max)
+                #    w_bin = int((x0 - w_min) / ((w_max - w_min) / freq_dict['n_w']))
+                #    print(w_min, w_max, kslice_interp(orb)(np.linspace(w_min, w_max, freq_dict['n_w'])))
+                #    print(ik, orb, f'{x0:.3f}', w_bin, f'{freq_dict["w_mesh"][w_bin]:.2f}')
+                #    alatt_k_w[ik, orb] = freq_dict['w_mesh'][w_bin]
+                #except ValueError:
+                #    pass
 
     return alatt_k_w
 
