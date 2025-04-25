@@ -287,10 +287,12 @@ def _calc_alatt(n_orb, mu, eta, e_mat, sigma, qp_bands=False, e_vecs=None,
             return roots
 
         alatt_k_w = np.zeros((n_k, n_orb))
+        alatt_k_w = []
         kslice = np.zeros((freq_dict['n_w'], n_orb))
         def kslice_interp(orb): return interp1d(freq_dict['w_mesh'], kslice[:, orb])
 
         for ik in range(n_k):
+            temp_alatt_k_w = []
             for iw, w in enumerate(freq_dict['w_mesh']):
                 np.fill_diagonal(sigma[:, :, iw], np.diag(sigma[:, :, iw]).real)
                 #sigma[:,:,iw] = sigma[:,:,iw].real
@@ -308,18 +310,11 @@ def _calc_alatt(n_orb, mu, eta, e_mat, sigma, qp_bands=False, e_vecs=None,
                         try:
                             x0 = brentq(interp1d(np.linspace(idx_1, idx_2, len(root_section)), root_section), idx_1, idx_2)
                             w_bin = int(np.floor(x0))
-                            alatt_k_w[ik, orb] = freq_dict['w_mesh'][w_bin]
+                            temp_alatt_k_w.append(freq_dict['w_mesh'][w_bin])
                         except(ValueError):
                             pass
                         idx_1 = idx_2
-                #try:
-                #    x0 = brentq(kslice_interp(orb), w_min, w_max)
-                #    w_bin = int((x0 - w_min) / ((w_max - w_min) / freq_dict['n_w']))
-                #    print(w_min, w_max, kslice_interp(orb)(np.linspace(w_min, w_max, freq_dict['n_w'])))
-                #    print(ik, orb, f'{x0:.3f}', w_bin, f'{freq_dict["w_mesh"][w_bin]:.2f}')
-                #    alatt_k_w[ik, orb] = freq_dict['w_mesh'][w_bin]
-                #except ValueError:
-                #    pass
+            alatt_k_w.append(temp_alatt_k_w)
 
     return alatt_k_w
 
@@ -586,8 +581,9 @@ def plot_bands(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb, tb=True, alatt=Fal
         if alatt_k_w is None:
             raise ValueError('A(k,w) unknown. Specify "with_sigma = True"')
         if qp_bands:
-            for orb in range(n_orb):
-                ax.scatter(tb_data['k_mesh'], alatt_k_w[:, orb].T, c=np.array([eval('cm.'+plot_dict['colorscheme_qpbands'])(1.0)]), zorder=2., s=1.)
+            for ik in range(len(tb_data['k_mesh'])):
+                norb_temp = np.shape(alatt_k_w[ik])[0]
+                ax.scatter([tb_data['k_mesh'][ik]] * norb_temp, alatt_k_w[ik], c=np.array([eval('cm.'+plot_dict['colorscheme_qpbands'])(1.0)]), zorder=2., s=1.)
         else:
             kw_x, kw_y = np.meshgrid(tb_data['k_mesh'], freq_dict['w_mesh'])
 
