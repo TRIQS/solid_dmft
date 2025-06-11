@@ -312,6 +312,12 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
 
     iteration_offset = 0
 
+    # if magnetic field is set we make sure that this is a magnetic calculation
+    if general_params['h_field'] != 0.0:
+        if not general_params['magnetic']:
+            mpi.report('WARNING: Magnetic field set but general.magnetic is False. Setting it to True now.')
+            general_params['magnetic'] = True
+
     # determine chemical potential for bare DFT sum_k object
     if mpi.is_master_node():
         archive = HDFArchive(general_params['jobname']+'/'+general_params['seedname']+'.h5', 'a')
@@ -559,7 +565,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
     for it in range(iteration_offset + 1, iteration_offset + n_iter + 1):
 
         # remove h_field when number of iterations is reached
-        if sum_k.h_field != 0.0 and general_params['h_field_it'] != 0 and it > general_params['h_field_it']:
+        if sum_k.h_field != 0.0 and general_params['h_field_it'] != -1 and it > general_params['h_field_it']:
             mpi.report('\nRemoving magnetic field now.\n')
             sum_k.h_field = 0.0
             # enforce recomputation of eff_atomic_levels

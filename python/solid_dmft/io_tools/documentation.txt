@@ -73,9 +73,10 @@ gimp_conv_crit : float, default = -1.0
 gw_embedding : bool, default = False
         use GW embedding workflow module (gw_flow.py) instead of dmft_cycle for aimbes GW embedding, see section gw
 h_field : float, default = 0.0
-        magnetic field
-h_field_it : int, default = 0
+        magnetic field, turns on magnetic calculation if not zero
+h_field_it : int, default = -1
         number of iterations the magnetic field is kept on
+        -1 : do not turn off the magnetic field
 h_int_basis : string, default = 'triqs'
         cubic basis convention to compute the interaction U matrix
 
