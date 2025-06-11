@@ -1,6 +1,7 @@
 ![logo_soliDMFT](https://raw.githubusercontent.com/triqs/solid_dmft/unstable/doc/logos/logo_solid_dmft.png)
 
-![CI](https://github.com/triqs/solid_dmft/actions/workflows/build.yml/badge.svg)
+![CI dev](https://github.com/triqs/solid_dmft/actions/workflows/build_unstable_doc.yml/badge.svg)
+![CI stable](https://github.com/triqs/solid_dmft/actions/workflows/build_release.yml/badge.svg)
 [![PyPI version](https://badge.fury.io/py/solid_dmft.svg)](https://badge.fury.io/py/solid_dmft)
 [![status](https://joss.theoj.org/papers/48eb529b08c6bb464b235ba919d78922/status.svg)](https://joss.theoj.org/papers/48eb529b08c6bb464b235ba919d78922)
 
