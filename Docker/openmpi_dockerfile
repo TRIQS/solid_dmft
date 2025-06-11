@@ -1,5 +1,5 @@
 FROM ubuntu:24.04 AS base
-ARG LLVM=16
+ARG LLVM=18
 
 # This platform includes dependencies for building docs
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
