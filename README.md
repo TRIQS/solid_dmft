@@ -44,3 +44,12 @@ and the Center for Computational Quantum Physics, Flatiron Institute.
 If you are using this code for your research, please cite it with this
 [bib file](https://github.com/TRIQS/solid_dmft/blob/unstable/cite_solid_dmft.bib).
 
+## Support
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" width="20%" srcset="doc/_static/CCQ-dark.png">
+  <img alt="Flatiron Center for Computational Quantum Physics logo." width="20%" src="doc/_static/CCQ.png">
+</picture>
+
+TRIQS/solid_dmft is supported by the Flatiron Institute, a division of the Simons Foundation.
+
