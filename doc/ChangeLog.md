@@ -2,6 +2,22 @@
 
 # Changelog
 
+## Version 3.3.x
+
+solid_dmft version 3.3.3 is a minor patch release that fixes a few small bugs:
+
+### fix
+* missing imports in _ctseg_postprocessing
+* magnetic calc enforced if h_field set
+* hartree interface postprocessing stored unsymmetrized Gfimp
+* fix tail fitting for ctseg
+* add LCO ctseg test
+
+### build
+* add ctseg to docker images for testing
+
+We thank all contributors: jmmshn, Thomas Hahn, and Alexander Hampel
+
 ## Version 3.3.2
 
 solid_dmft version 3.3.2 is a minor patch release that fixes a few small bugs and improves documentation:
