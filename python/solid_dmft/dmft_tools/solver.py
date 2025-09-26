@@ -30,13 +30,11 @@ from triqs.gf.tools import inverse, make_zero_tail
 from triqs.gf.descriptors import Fourier
 from triqs.operators import c_dag, c, Operator, util
 from triqs.operators.util.U_matrix import reduce_4index_to_2index
-from triqs.operators.util.extractors import block_matrix_from_op, extract_U_dict2, dict_to_matrix
 import triqs.utility.mpi as mpi
 import itertools
 from h5 import HDFArchive
 
 from solid_dmft.io_tools.dict_to_h5 import prep_params_for_h5
-from solid_dmft.postprocessing.eval_U_cRPA_RESPACK import construct_Uijkl
 
 from . import legendre_filter
 from .matheval import MathExpr
@@ -106,12 +104,7 @@ def _gf_fit_tail_fraction(Gf, fraction=0.4, replace=None, known_moments=[]):
 
     return Gf_fit
 
-def _fit_tail_window(
-        Sigma_iw,
-        fit_min_n=None, fit_max_n=None,
-        fit_min_w=None, fit_max_w=None,
-        fit_max_moment=None, fit_known_moments=None
-        ):
+def _fit_tail_window(Sigma_iw, fit_min_n=None, fit_max_n=None, fit_min_w=None, fit_max_w=None, fit_max_moment=None, fit_known_moments=None):
     """
     Fit a high frequency 1/(iw)^n expansion of Sigma_iw
     and replace the high frequency part with the fitted high frequency expansion.
@@ -122,7 +115,7 @@ def _fit_tail_window(
     Parameters
     ----------
     Sigma_iw : Gf
-               Self-energy.
+            Self-energy.
     fit_min_n : int, optional, default=int(0.8*len(Sigma_iw.mesh))
                 Matsubara frequency index from which tail fitting should start.
     fit_max_n : int, optional, default=int(len(Sigma_iw.mesh))
@@ -132,7 +125,7 @@ def _fit_tail_window(
     fit_max_w : float, optional
                 Matsubara frequency at which tail fitting should end.
     fit_max_moment : int, optional
-                     Highest moment to fit in the tail of Sigma_iw.
+                    Highest moment to fit in the tail of Sigma_iw.
     fit_known_moments : ``ndarray.shape[order, Sigma_iw[0].target_shape]``, optional, default = None
                         Known moments of Sigma_iw, given as an numpy ndarray
 
@@ -141,17 +134,17 @@ def _fit_tail_window(
     tail_barr : dict of arr
                 fitted tail of Sigma_iw
     """
-    from triqs.gf import fit_hermitian_tail_on_window
+    from triqs.gf.gf_fnt import fit_hermitian_tail_on_window, replace_by_tail
 
     # Define default tail quantities
     if fit_min_w is not None:
-        fit_min_n = int(0.5*(fit_min_w*Sigma_iw.mesh.beta/np.pi - 1.0))
+        fit_min_n = int(0.5 * (fit_min_w * Sigma_iw.mesh.beta / np.pi - 1.0))
     if fit_max_w is not None:
-        fit_max_n = int(0.5*(fit_max_w*Sigma_iw.mesh.beta/np.pi - 1.0))
+        fit_max_n = int(0.5 * (fit_max_w * Sigma_iw.mesh.beta / np.pi - 1.0))
     if fit_min_n is None:
-        fit_min_n = int(0.8*len(Sigma_iw.mesh)/2)
+        fit_min_n = int(0.8 * len(Sigma_iw.mesh) / 2)
     if fit_max_n is None:
-        fit_max_n = int(len(Sigma_iw.mesh)/2)
+        fit_max_n = int(len(Sigma_iw.mesh) / 2)
     if fit_max_moment is None:
         fit_max_moment = 3
 
@@ -159,24 +152,25 @@ def _fit_tail_window(
         fit_known_moments = {}
         for name, sig in Sigma_iw:
             shape = [0] + list(sig.target_shape)
-            fit_known_moments[name] = np.zeros(shape, dtype=complex) # no known moments
+            fit_known_moments[name] = np.zeros(shape, dtype=complex)  # no known moments
 
     # Now fit the tails of Sigma_iw and replace the high frequency part with the tail expansion
     tail_barr = {}
-    for name, sig in Sigma_iw:
-
+    Sigma_fit = Sigma_iw.copy()
+    for name, sig in Sigma_fit:
         tail, err = fit_hermitian_tail_on_window(
             sig,
-            n_min = fit_min_n,
-            n_max = fit_max_n,
-            known_moments = fit_known_moments[name],
+            n_min=fit_min_n,
+            n_max=fit_max_n,
+            known_moments=fit_known_moments[name],
             # set max number of pts used in fit larger than mesh size, to use all data in fit
-            n_tail_max = 10 * len(sig.mesh),
-            expansion_order = fit_max_moment
-            )
+            n_tail_max=10 * len(sig.mesh),
+            expansion_order=fit_max_moment,
+        )
         tail_barr[name] = tail
+        replace_by_tail(sig, tail, n_min=fit_min_n)
 
-    return tail_barr
+    return Sigma_fit, tail_barr
 
 class SolverStructure:
 
@@ -1347,6 +1341,8 @@ class SolverStructure:
         r'''
         Organize G_freq, G_time, Sigma_freq and G_l from ctseg solver
         '''
+        from solid_dmft.postprocessing.eval_U_cRPA_RESPACK import construct_Uijkl
+        from triqs.operators.util.extractors import extract_U_dict2, dict_to_matrix
 
         def set_Gs_from_G_l():
 
@@ -1443,7 +1439,7 @@ class SolverStructure:
             # get G_time, G_freq, Sigma_freq from G_l
             set_Gs_from_G_l()
         # if improved estimators are turned on calc Sigma from F_tau, otherwise:
-        elif self.solver_params['improved_estimator']:
+        elif self.solver_params['improved_estimator'] and not self.solver_params['perform_tail_fit']:
             self.F_freq = self.G_freq.copy()
             self.F_freq << 0.0
             self.F_time = self.G_time.copy()
@@ -1461,6 +1457,42 @@ class SolverStructure:
             for block, fw in self.F_freq:
                 for iw in fw.mesh:
                     self.Sigma_freq[block][iw] = self.F_freq[block][iw] / self.G_freq[block][iw]
+        elif self.solver_params['perform_tail_fit']:
+            if not self.solver_params['improved_estimator']:
+                mpi.report('Self-energy post-processing algorithm: tail fitting with analytic static impurity self-energy')
+                self.Sigma_freq = inverse(self.G0_freq) - inverse(self.G_freq)
+            else:
+                mpi.report('Self-energy post-processing algorithm: '
+                           'improved estimator + tail fitting with analytic static imppurity self-energy')
+                self.F_freq = self.G_freq.copy()
+                self.F_freq << 0.0
+                self.F_time = self.G_time.copy()
+                self.F_time << self.triqs_solver.results.F_tau
+                F_known_moments = make_zero_tail(self.F_freq, n_moments=1)
+                for i, bl in enumerate(self.F_freq.indices):
+                    self.F_freq[bl] << Fourier(self.triqs_solver.results.F_tau[bl], F_known_moments[i])
+
+                for block, fw in self.F_freq:
+                    for iw in fw.mesh:
+                        self.Sigma_freq[block][iw] = self.F_freq[block][iw] / self.G_freq[block][iw]
+
+            # without any degenerate shells we run the minimization for all blocks
+            if mpi.is_master_node():
+                self.Sigma_freq, tail = _fit_tail_window(
+                    self.Sigma_freq,
+                    fit_min_n=self.solver_params['fit_min_n'],
+                    fit_max_n=self.solver_params['fit_max_n'],
+                    fit_min_w=self.solver_params['fit_min_w'],
+                    fit_max_w=self.solver_params['fit_max_w'],
+                    fit_max_moment=self.solver_params['fit_max_moment'],
+                    fit_known_moments=self.Sigma_moments,
+                )
+
+                # recompute G_freq from Sigma with fitted tail
+                self.G_freq = inverse(inverse(self.G0_freq) - self.Sigma_freq)
+
+            self.Sigma_freq << mpi.bcast(self.Sigma_freq)
+            self.G_freq << mpi.bcast(self.G_freq)
 
         elif self.solver_params['crm_dyson_solver']:
             from triqs.gf.dlr_crm_dyson_solver import minimize_dyson
@@ -1491,7 +1523,7 @@ class SolverStructure:
                 # minimize dyson for the first entry of each deg shell
                 self.Sigma_dlr = self.sum_k.block_structure.create_gf(ish=self.icrsh, gf_function=Gf, mesh=mesh_dlr_iw, space='solver')
                 # without any degenerate shells we run the minimization for all blocks
-                tail = _fit_tail_window(Sigma_iw,
+                _, tail = _fit_tail_window(Sigma_iw,
                                         fit_min_n=self.solver_params['fit_min_n'],
                                         fit_max_n=self.solver_params['fit_max_n'],
                                         fit_min_w=self.solver_params['fit_min_w'],
