@@ -35,16 +35,17 @@ for (int i = 0; i < dockerPlatforms.size(); i++) {
       checkout scm
       /* construct a Dockerfile for this base */
       sh """
-      ( echo "FROM flatironinstitute/cthyb:${triqsBranch}-${env.STAGE_NAME}" ; sed '0,/^FROM /d' Docker/jenkins_ci_dockerfile ) > Dockerfile.jenkins
-        mv -f Dockerfile.jenkins Dockerfile
+      ( echo "FROM flatironjenkins/cthyb:${triqsBranch}-${env.STAGE_NAME}" ; sed '0,/^FROM /d' Docker/jenkins_ci_dockerfile ) > Dockerfile.${env.STAGE_NAME}
+        cp -f Dockerfile.${env.STAGE_NAME} Dockerfile
       """
+      archiveArtifacts(artifacts: "Dockerfile.${env.STAGE_NAME}")
       /* build and tag */
       def args = ''
       if (platform == documentationPlatform)
         args = '-DBuild_Documentation=0'
       else if (platform == "sanitize")
         args = '-DASAN=ON -DUBSAN=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo'
-      def img = docker.build("flatironinstitute/${dockerName}:${env.BRANCH_NAME}-${env.STAGE_NAME}", "--build-arg APPNAME=${projectName} --build-arg BUILD_ID=${env.BUILD_TAG} --build-arg CMAKE_ARGS='${args}' .")
+      def img = docker.build("flatironjenkins/${dockerName}:${env.BRANCH_NAME}-${env.STAGE_NAME}", "--build-arg APPNAME=${projectName} --build-arg BUILD_ID=${env.BUILD_TAG} --build-arg CMAKE_ARGS='${args}' .")
       catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
         img.inside("--shm-size=4gb") {
           sh "make -C \$BUILD/${projectName} test CTEST_OUTPUT_ON_FAILURE=1"

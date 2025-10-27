@@ -75,7 +75,7 @@ html_theme_options = {
     # Toc options
     'collapse_navigation': False,
     'sticky_navigation': True,
-    'navigation_depth': 4,
+    'navigation_depth': 5,
     'includehidden': True,
     'titles_only': False
 }
@@ -95,8 +95,12 @@ plot_html_show_formats = False
 
 intersphinx_mapping = {'python': ('https://docs.python.org/3.11', None), 'triqslibs': ('https://triqs.github.io/triqs/latest', None)}
 
+# numpydoc options
+numpydoc_show_class_members = False
+numpydoc_show_inherited_class_members = False
+numpydoc_class_members_toctree = False
 
-# open links in new tab instead
+# open links in new tab instead of same window
 from sphinx.writers.html import HTMLTranslator
 from docutils import nodes
 from docutils.nodes import Element
