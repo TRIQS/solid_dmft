@@ -86,6 +86,15 @@ def apply(general_params, icrsh, gf_struct_solver, solvers):
     mpi.report('\ncopying the self-energy for shell {} from shell {}'.format(icrsh, imp_source))
     mpi.report('inverting spin channels: '+str(invert_spin))
 
+    if solvers[icrsh].solver_params.get('measure_density_matrix'):
+        solvers[icrsh].density_matrix = solvers[imp_source].density_matrix
+        solvers[icrsh].h_loc_diagonalization = solvers[imp_source].h_loc_diagonalization
+        solvers[icrsh].Sigma_moments = solvers[imp_source].Sigma_moments
+        solvers[icrsh].Sigma_Hartree = solvers[imp_source].Sigma_Hartree
+        solvers[icrsh].G_moments = solvers[imp_source].G_moments
+        # copy orbital occupations dict with deep copy of arrays
+        solvers[icrsh].orbital_occupations = {key: occ.copy() for key, occ in solvers[imp_source].orbital_occupations.items()}
+
     if invert_spin:
         for spin_channel in gf_struct_solver.keys():
             if 'up' in spin_channel:
@@ -99,11 +108,13 @@ def apply(general_params, icrsh, gf_struct_solver, solvers):
             solvers[icrsh].G0_freq[spin_channel] << solvers[imp_source].G0_freq[target_channel]
             solvers[icrsh].G_time[spin_channel] << solvers[imp_source].G_time[target_channel]
 
-            if solvers[icrsh].solver_params['measure_pert_order']:
-                if not hasattr(solvers[icrsh], 'perturbation_order'):
-                    solvers[icrsh].perturbation_order = {}
+            if solvers[icrsh].solver_params.get('measure_pert_order'):
                 solvers[icrsh].perturbation_order[spin_channel] = solvers[imp_source].perturbation_order[target_channel]
                 solvers[icrsh].perturbation_order_total = solvers[imp_source].perturbation_order_total
+
+            # we also need to swap the orbital occupations, but we skip moments since the whole self-energy is copied anyway
+            if solvers[icrsh].solver_params.get('measure_density_matrix'):
+                solvers[icrsh].orbital_occupations[spin_channel] = solvers[imp_source].orbital_occupations[target_channel]
 
     else:
         solvers[icrsh].Sigma_freq << solvers[imp_source].Sigma_freq
@@ -112,15 +123,11 @@ def apply(general_params, icrsh, gf_struct_solver, solvers):
         solvers[icrsh].G0_freq << solvers[imp_source].G0_freq
         solvers[icrsh].G_time << solvers[imp_source].G_time
 
-        if solvers[icrsh].solver_params['measure_pert_order']:
+        if solvers[icrsh].solver_params.get('measure_pert_order'):
             solvers[icrsh].perturbation_order = solvers[imp_source].perturbation_order
             solvers[icrsh].perturbation_order_total = solvers[imp_source].perturbation_order_total
 
-    if solvers[icrsh].solver_params['measure_density_matrix']:
-        solvers[icrsh].density_matrix = solvers[imp_source].density_matrix
-        solvers[icrsh].h_loc_diagonalization = solvers[imp_source].h_loc_diagonalization
-
-    if 'measure_chi' in solvers[icrsh].solver_params and solvers[icrsh].solver_params['measure_chi'] is not None:
+    if solvers[icrsh].solver_params.get('measure_chi'):
         solvers[icrsh].O_time = solvers[imp_source].O_time
 
     return solvers
