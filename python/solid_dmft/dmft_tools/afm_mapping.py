@@ -54,9 +54,9 @@ def determine(general_params, archive, n_inequiv_shells):
                     # determine if we need to switch up and down channel
                     switch = np.isclose(general_params['magmom'][icrsh], -general_params['magmom'][source])
 
-                    afm_mapping[icrsh] = [True, source, switch]
+                    afm_mapping[icrsh] = [True, int(source), bool(switch)]
                 else:
-                    afm_mapping[icrsh] = [False, icrsh, False]
+                    afm_mapping[icrsh] = [False, int(icrsh), False]
 
 
             print('AFM calculation selected, mapping self energies as follows:')

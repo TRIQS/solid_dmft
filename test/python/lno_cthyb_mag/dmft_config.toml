@@ -12,12 +12,13 @@ n_tau = 10001
 
 prec_mu = 0.001
 
-h_int_type = "kanamori_den_den"
+h_int_type = "kanamori"
 U = 1.83
 J = 0.37
 
 magnetic = true
 magmom = [-0.2, 0.2]
+afm_order = true
 
 n_iter_dmft = 1
 
