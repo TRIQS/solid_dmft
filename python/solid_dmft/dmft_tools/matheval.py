@@ -4,8 +4,12 @@ import ast
 import math
 
 
+# Determine numeric/constant node for compatibility across Python versions
+_AST_CONSTANT = getattr(ast, "Constant", None)
+
 class MathExpr(object):
-    allowed_nodes = (
+    # Base allowed nodes (version-agnostic)
+    _base_allowed = (
         ast.Module,
         ast.Expr,
         ast.Load,
@@ -13,7 +17,6 @@ class MathExpr(object):
         ast.Add,
         ast.Sub,
         ast.UnaryOp,
-        ast.Num,
         ast.BinOp,
         ast.Mult,
         ast.Div,
@@ -30,6 +33,11 @@ class MathExpr(object):
         ast.Invert,
         ast.Call,
         ast.Name,
+    )
+
+    # Extend allowed nodes with version-specific constant node
+    allowed_nodes = _base_allowed + (
+        _AST_CONSTANT if _AST_CONSTANT is not None else ast.Num,
     )
 
     functions = {
