@@ -1163,6 +1163,7 @@ class SolverStructure:
             self.Sigma_moments = self.triqs_solver.Sigma_moments
             self.Sigma_Hartree = self.triqs_solver.Sigma_Hartree
             self.G_moments = self.triqs_solver.G_moments
+            self.orbital_occupations = self.triqs_solver.orbital_occupations
 
         if self.solver_params['measure_pert_order']:
             self.perturbation_order = self.triqs_solver.perturbation_order
