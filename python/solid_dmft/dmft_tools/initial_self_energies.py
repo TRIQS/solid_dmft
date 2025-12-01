@@ -533,9 +533,9 @@ def determine_dc_and_initial_sigma(general_params, gw_params, advanced_params, s
                     # if magmom positive the up channel will be favored
                     for spin_channel in sum_k.gf_struct_solver[icrsh].keys():
                         if 'up' in spin_channel:
-                            start_sigma[icrsh][spin_channel] << -np.eye(dc_pot[spin_channel].shape[0])*fac + dc_pot[spin_channel]
+                            start_sigma[icrsh][spin_channel] <<  dc_pot[spin_channel] - fac*np.eye(dc_pot[spin_channel].shape[0])
                         else:
-                            start_sigma[icrsh][spin_channel] << np.eye(dc_pot[spin_channel].shape[0])*fac + dc_pot[spin_channel]
+                            start_sigma[icrsh][spin_channel] << dc_pot[spin_channel] + fac*np.eye(dc_pot[spin_channel].shape[0])
                 else:
                     for spin_channel in sum_k.gf_struct_solver[icrsh].keys():
                         start_sigma[icrsh][spin_channel] << dc_pot[spin_channel]
@@ -554,9 +554,9 @@ def determine_dc_and_initial_sigma(general_params, gw_params, advanced_params, s
                     # if magmom positive the up channel will be favored
                     for spin_channel in sum_k.gf_struct_solver[icrsh].keys():
                         if 'up' in spin_channel:
-                            start_sigma[icrsh][spin_channel] << -fac
+                            start_sigma[icrsh][spin_channel] << -fac*np.eye(start_sigma[icrsh][spin_channel].target_shape[0])
                         else:
-                            start_sigma[icrsh][spin_channel] << fac
+                            start_sigma[icrsh][spin_channel] << fac*np.eye(start_sigma[icrsh][spin_channel].target_shape[0])
         else:
             start_sigma = [sum_k.block_structure.create_gf(ish=iineq, gf_function=Gf, space='solver', mesh=sum_k.mesh)
                            for iineq in range(sum_k.n_inequiv_shells)]
