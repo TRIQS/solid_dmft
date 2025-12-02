@@ -9,7 +9,6 @@ n_iw = 2001
 n_tau = 20001
 
 prec_mu = 0.001
-mu_initial_guess = -0.003526
 
 h_int_type = "density_density"
 U = 8.0
@@ -22,7 +21,7 @@ magnetic = true
 magmom = [-0.3, 0.3]
 afm_order = true
 
-n_iter_dmft = 1
+n_iter_dmft = 14
 
 g0_mix = 0.9
 
@@ -36,8 +35,8 @@ path_to_sigma = "pre_AFM.h5"
 [solver]
 type = "cthyb"
 length_cycle = 2000
-n_warmup_cycles = 5e+2
-n_cycles_tot = 1e+4
+n_warmup_cycles = 5e+3
+n_cycles_tot = 1e+7
 imag_threshold = 1e-5
 
 perform_tail_fit = true
