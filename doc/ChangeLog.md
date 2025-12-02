@@ -2,7 +2,27 @@
 
 # Changelog
 
-## Version 3.3.x
+## Version 3.3.4
+
+solid_dmft version 3.3.4 is a minor patch release that fixes several bugs and improves documentation:
+
+### fix
+* afm mapping did not work with G and Sigma moments and occupations attributes of cthyb
+* make n_orb initialization for self-energy safer
+* add check for n_iter_dmft not None and =>0
+* fix deprecated ast features
+
+### doc
+* change name of config.toml to dmft_config.toml in NNO afm tutorial
+
+### test
+* add missing test for afm order and cthyb for better test coverage
+
+### build
+* update GitHub Actions dependencies (actions/checkout from 5 to 6)
+* merge dev app4triqs updates
+
+We thank all contributors: Alexander Hampel
 
 solid_dmft version 3.3.3 is a minor patch release that fixes a few small bugs:
 
