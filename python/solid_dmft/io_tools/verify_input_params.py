@@ -28,6 +28,11 @@ def _verify_input_params_general(params: FullConfig) -> None:
     if params['general']['calc_energies'] and any(entry['type'] == 'ftps' for entry in params['solver']):
         raise ValueError('"calc_energies" is not valid for solver of type = "ftps"')
 
+    if params['general']['n_iter_dmft'] is None:
+        raise ValueError('"n_iter_dmft" must be specified.')
+    elif params['general']['n_iter_dmft'] < 0:
+        raise ValueError('"n_iter_dmft" must be at least 0.')
+
     # Checks validity of other general params
     h_int_type_options = (
         'density_density',
