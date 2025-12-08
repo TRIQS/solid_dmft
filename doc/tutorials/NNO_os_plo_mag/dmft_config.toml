@@ -9,6 +9,7 @@ n_iw = 2001
 n_tau = 20001
 
 prec_mu = 0.001
+mu_initial_guess = 0.0
 
 h_int_type = "density_density"
 U = 8.0

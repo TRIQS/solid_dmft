@@ -1,13 +1,18 @@
 System  = NdNiO2
 
-EDIFF = 1e-10
+EDIFF = 1e-9
 ENCUT = 450
 
 NELMIN = 30
+KPAR = 8
+KSPACING = 0.2
 
 ISMEAR = 0
 SIGMA = 0.1
 PREC = Accurate
+
+# turn off symmetries for VASP ver < 6.5 or dft_tools 3.3.x or earlier
+# ISYM = -1
 
 # the energy window to optimize projector channels
 EMIN = -5
@@ -16,9 +21,6 @@ EMAX = 15
 NBANDS = 64
 LMAXMIX = 6
 NEDOS = 3001
-
-# switch off all symmetries
-ISYM = -1
 
 # project to Ni d
 LORBIT = 14

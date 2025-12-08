@@ -86,19 +86,27 @@ def apply(general_params, icrsh, gf_struct_solver, solvers):
     mpi.report('\ncopying the self-energy for shell {} from shell {}'.format(icrsh, imp_source))
     mpi.report('inverting spin channels: '+str(invert_spin))
 
-    if solvers[icrsh].solver_params.get('measure_density_matrix'):
-        solvers[icrsh].density_matrix = solvers[imp_source].density_matrix
-        solvers[icrsh].h_loc_diagonalization = solvers[imp_source].h_loc_diagonalization
+    if solvers[icrsh].solver_params.get('measure_density_matrix') or solvers[icrsh].solver_params.get('type') == 'ctseg':
         solvers[icrsh].Sigma_moments = solvers[imp_source].Sigma_moments
         solvers[icrsh].Sigma_Hartree = solvers[imp_source].Sigma_Hartree
-        solvers[icrsh].G_moments = solvers[imp_source].G_moments
         # copy orbital occupations dict with deep copy of arrays
         solvers[icrsh].orbital_occupations = {key: occ.copy() for key, occ in solvers[imp_source].orbital_occupations.items()}
+        if solvers[icrsh].solver_params.get('type') == 'cthyb':
+            solvers[icrsh].G_moments = solvers[imp_source].G_moments
+            solvers[icrsh].density_matrix = solvers[imp_source].density_matrix
+            solvers[icrsh].h_loc_diagonalization = solvers[imp_source].h_loc_diagonalization
+
+    if solvers[icrsh].solver_params.get('type') == 'ctseg' and solvers[icrsh].solver_params.get('measure_state_hist'):
+        solvers[icrsh].state_histogram = solvers[imp_source].state_histogram
 
     # and the same for the perturbation order if measured
     if solvers[icrsh].solver_params.get('measure_pert_order'):
-        solvers[icrsh].perturbation_order = {key: hist for key, hist in solvers[imp_source].perturbation_order.items()}
-        solvers[icrsh].perturbation_order_total = solvers[imp_source].perturbation_order_total
+        if solvers[icrsh].solver_params.get('type') == 'cthyb':
+            solvers[icrsh].perturbation_order = {key: hist for key, hist in solvers[imp_source].perturbation_order.items()}
+            solvers[icrsh].perturbation_order_total = solvers[imp_source].perturbation_order_total
+        elif solvers[icrsh].solver_params.get('type') == 'ctseg':
+            solvers[icrsh].perturbation_order_histo = solvers[imp_source].perturbation_order_histo
+            solvers[icrsh].avg_pert_order = solvers[imp_source].avg_pert_order
 
     if invert_spin:
         for spin_channel in gf_struct_solver.keys():
@@ -113,11 +121,11 @@ def apply(general_params, icrsh, gf_struct_solver, solvers):
             solvers[icrsh].G0_freq[spin_channel] << solvers[imp_source].G0_freq[target_channel]
             solvers[icrsh].G_time[spin_channel] << solvers[imp_source].G_time[target_channel]
 
-            if solvers[icrsh].solver_params.get('measure_pert_order'):
+            if solvers[icrsh].solver_params.get('measure_pert_order') and solvers[icrsh].solver_params.get('type') == 'cthyb':
                 solvers[icrsh].perturbation_order[spin_channel] = solvers[imp_source].perturbation_order[target_channel]
 
             # we also need to swap the orbital occupations, but we skip moments since the whole self-energy is copied anyway
-            if solvers[icrsh].solver_params.get('measure_density_matrix'):
+            if solvers[icrsh].solver_params.get('measure_density_matrix') or solvers[icrsh].solver_params.get('type') == 'ctseg':
                 solvers[icrsh].orbital_occupations[spin_channel] = solvers[imp_source].orbital_occupations[target_channel]
 
     else:
