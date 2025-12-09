@@ -293,15 +293,19 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
         updated observable array for calculation
     """
 
+    # print version info and git hashes
+    mpi.report('\nsolid_dmft version: {} (git hash: {})'.format(solid_dmft_version, solid_dmft_hash))
+    mpi.report('TRIQS version: {} (git hash: {})\n'.format(triqs_version, triqs_hash))
+
     # Creates real- or imaginary-frequency mesh to store Green functions on
     if general_params['beta'] is not None:
-        mpi.report('Running solid_dmft on imag-freq grid because "general.beta" specified')
+        mpi.report('Running solid_dmft on imag-freq grid because "general.beta" specified\n')
         sumk_mesh = MeshImFreq(beta=general_params['beta'],
                                S='Fermion',
                                n_iw=general_params['n_iw'])
         broadening = None
     else:
-        mpi.report('Running solid_dmft on real-freq grid because "general.beta" not specified')
+        mpi.report('Running solid_dmft on real-freq grid because "general.beta" not specified\n')
         sumk_mesh = MeshReFreq(window=general_params['w_range'],
                                n_w=general_params['n_w'])
         broadening = general_params['eta']
@@ -315,7 +319,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
     # if magnetic field is set we make sure that this is a magnetic calculation
     if general_params['h_field'] != 0.0:
         if not general_params['magnetic']:
-            mpi.report('WARNING: Magnetic field set but general.magnetic is False. Setting it to True now.')
+            mpi.report('WARNING: Magnetic field set but general.magnetic is False. Setting it to True now.\n')
             general_params['magnetic'] = True
 
     # determine chemical potential for bare DFT sum_k object
