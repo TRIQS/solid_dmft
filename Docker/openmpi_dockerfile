@@ -1,5 +1,5 @@
-FROM ubuntu:24.04 AS base
-ARG LLVM=18
+FROM --platform=linux/amd64 ubuntu:24.04 AS base
+ARG LLVM=19
 
 # This platform includes dependencies for building docs
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -103,7 +103,6 @@ ENV MKL_THREADING_LAYER=SEQUENTIAL
 ENV OMPI_ALLOW_RUN_AS_ROOT=1
 ENV OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 ENV OMPI_MCA_rmaps_base_oversubscribe="yes"
-ENV OMPI_MCA_btl_vader_single_copy_mechanism=none
 ARG NCORES=4
 
 # create source dirs
@@ -121,12 +120,11 @@ RUN cd /source && curl -Lo wannier90.tar.gz https://github.com/wannier-developer
     && cp src/obj/* /triqs/include/
 
 # install qe
-RUN cd /source && curl -LO https://gitlab.com/QEF/q-e/-/archive/qe-7.2/q-e-qe-7.2.tar.gz \
-   && tar -xf q-e-qe-7.2.tar.gz \
-   && cd q-e-qe-7.2 \
+RUN cd /source && curl -LO https://gitlab.com/QEF/q-e/-/archive/qe-7.5/q-e-qe-7.5.tar.gz \
+   && tar -xf q-e-qe-7.5.tar.gz \
+   && cd q-e-qe-7.5 \
    && mkdir -p build && cd build \
    && cmake -D CMAKE_C_COMPILER=mpicc -D CMAKE_Fortran_COMPILER=mpif90 \
-        -D CMAKE_VERBOSE_MAKEFILE=ON \
         -D BLA_VENDOR=Intel10_64lp_seq \
         -D QE_ENABLE_HDF5=ON \
         -D QE_FFTW_VENDOR=FFTW3 \
