@@ -59,6 +59,9 @@ def create_hostfile(number_cores, cluster_name):
         return None
 
     hostnames = mpi.world.gather(socket.gethostname(), root=0)
+    if cluster_name == 'slurm':
+        slurm_hostnames = [hostname.split('.')[0] for hostname in hostnames]  # TODO: please find a better solution
+        hostnames = slurm_hostnames
     if mpi.is_master_node():
         # create hostfile based on first number_cores ranks
         hosts = defaultdict(int)
