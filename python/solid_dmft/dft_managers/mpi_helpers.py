@@ -153,7 +153,7 @@ def get_mpi_arguments(mpi_profile, mpi_exe, number_cores, dft_exe, hostfile):
         return [
             mpi_exe, '-n', str(number_cores), '--export=PATH',
             '-N', os.getenv("SLURM_JOB_NUM_NODES"), '-A', os.getenv("SLURM_JOB_ACCOUNT"),
-            '-p', os.getenv("SLURM_JOB_PARTITION"),
+            '-p', os.getenv("SLURM_JOB_PARTITION"), '-t', '05:00', #TODO: decide way to get time limit
             '-w', f"./{hostfile}",
         ] + shlex.split(dft_exe)
 
