@@ -151,9 +151,10 @@ def get_mpi_arguments(mpi_profile, mpi_exe, number_cores, dft_exe, hostfile):
 
     if mpi_profile == 'slurm':
         return [
-            mpi_exe, '-w', hostfile, '-n', str(number_cores), '--export=PATH',
+            mpi_exe, '-n', str(number_cores), '--export=PATH',
             '-N', os.getenv("SLURM_JOB_NUM_NODES"), '-A', os.getenv("SLURM_JOB_ACCOUNT"),
-            '-p', os.getenv("SLURM_JOB_PARTITION")
+            '-p', os.getenv("SLURM_JOB_PARTITION"),
+            '-w', f"./{hostfile}",
         ] + shlex.split(dft_exe)
 
     return None
