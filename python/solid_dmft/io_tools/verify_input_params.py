@@ -72,7 +72,7 @@ def _verify_input_params_dft(params: FullConfig) -> None:
     if params['dft']['dft_code'] not in ('vasp', 'qe', None):
         raise ValueError(f'Invalid "dft.dft_code" = {params["dft"]["dft_code"]}.')
 
-    if params['dft']['mpi_env'] not in ('default', 'openmpi', 'openmpi-intra', 'mpich'):
+    if params['dft']['mpi_env'] not in ('default', 'openmpi', 'openmpi-intra', 'mpich', 'slurm'):
         raise ValueError(f'Invalid "dft.mpi_env" = {params["dft"]["mpi_env"]}.')
 
     if params['dft']['projector_type'] not in ('w90', 'plo'):

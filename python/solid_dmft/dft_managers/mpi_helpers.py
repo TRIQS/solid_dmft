@@ -68,6 +68,7 @@ def create_hostfile(number_cores, cluster_name):
         mask_hostfile = {'openmpi': '{} slots={}',  # OpenMPI format
                          'openmpi-intra': '{} slots={}',  # OpenMPI format
                          'mpich': '{}:{}',  # MPICH format
+                         'slurm': '{}', # SLURM format
                          }[cluster_name]
 
         hostfile = 'dft.hostfile'
@@ -147,6 +148,13 @@ def get_mpi_arguments(mpi_profile, mpi_exe, number_cores, dft_exe, hostfile):
     if mpi_profile == 'mpich':
         return [mpi_exe, '-launcher', 'ssh', '-hostfile', hostfile,
                 '-np', str(number_cores), '-envlist', 'PATH'] + shlex.split(dft_exe)
+
+    if mpi_profile == 'slurm':
+        return [
+            mpi_exe, '-w', hostfile, '-n', str(number_cores), '--export=PATH',
+            '-N', os.getenv("SLURM_JOB_NUM_NODES"), '-A', os.getenv("SLURM_JOB_ACCOUNT"),
+            '-p', os.getenv("SLURM_JOB_PARTITION")
+        ] + shlex.split(dft_exe)
 
     return None
 
