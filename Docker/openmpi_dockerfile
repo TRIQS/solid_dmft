@@ -188,7 +188,7 @@ RUN cd /source && git clone -b 3.3.x --depth 1 https://github.com/TRIQS/cthyb.gi
     && make -j$NCORES && ctest -j$NCORES && make install
 
 # ctseg
-RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/ctseg.git ctseg.src \
+RUN cd /source && git clone -b 3.3.x --depth 1 https://github.com/TRIQS/ctseg.git ctseg.src \
     && mkdir -p ctseg.build && cd ctseg.build \
     && cmake ../ctseg.src \
     && make -j$NCORES && ctest -j$NCORES && make install
