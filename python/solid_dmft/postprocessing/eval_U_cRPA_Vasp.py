@@ -140,8 +140,8 @@ def red_to_2ind(uijkl, n_sites, n_orb, out=False):
     np.set_printoptions(precision=3, suppress=True)
 
     if out:
-        print('reduced U anti-parallel = U_mm\'\^oo\' = U_mm\'mm\' matrix : \n', Uij_anti)
-        print('reduced U parallel = U_mm\'\^oo = U_mm\'mm\' - U_mm\'m\'m matrix : \n', Uij_par)
+        print(r"reduced U anti-parallel = U_mm'\^oo' = U_mm'mm' matrix : \n", Uij_anti)
+        print(r"reduced U parallel = U_mm'\^oo = U_mm'mm' - U_mm'm'm matrix : \n", Uij_par)
         print('reduced Uijji : \n', Uijji)
         print('reduced Uiijj : \n', Uiijj)
 
