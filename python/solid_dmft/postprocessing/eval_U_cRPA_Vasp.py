@@ -124,18 +124,21 @@ def red_to_2ind(uijkl, n_sites, n_orb, out=False):
     dim = n_sites*n_orb
 
     # create 2 index matrix
-    Uij_anti = np.zeros((dim, dim))
-    Uij_par = np.zeros((dim, dim))
-    Uiijj = np.zeros((dim, dim))
-    Uijji = np.zeros((dim, dim))
+    # Coulomb matrices are expected to be real. If uijkl happens to be complex
+    # (e.g. numerical noise), take the real part explicitly to avoid
+    # ComplexWarning about discarding the imaginary part.
+    Uij_anti = np.zeros((dim, dim), dtype=float)
+    Uij_par = np.zeros((dim, dim), dtype=float)
+    Uiijj = np.zeros((dim, dim), dtype=float)
+    Uijji = np.zeros((dim, dim), dtype=float)
 
     for i in range(0, dim):
         for j in range(0, dim):
             # the indices in VASP are switched: U_ijkl ---VASP--> U_ikjl
-            Uij_anti[i, j] = uijkl[i, i, j, j]
-            Uij_par[i, j] = uijkl[i, i, j, j]-uijkl[i, j, j, i]
-            Uiijj[i, j] = uijkl[i, j, i, j]
-            Uijji[i, j] = uijkl[i, j, j, i]
+            Uij_anti[i, j] = np.real(uijkl[i, i, j, j])
+            Uij_par[i, j] = np.real(uijkl[i, i, j, j] - uijkl[i, j, j, i])
+            Uiijj[i, j] = np.real(uijkl[i, j, i, j])
+            Uijji[i, j] = np.real(uijkl[i, j, j, i])
 
     np.set_printoptions(precision=3, suppress=True)
 
