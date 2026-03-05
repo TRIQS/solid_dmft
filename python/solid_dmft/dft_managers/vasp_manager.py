@@ -36,6 +36,7 @@ import signal
 import time
 import numpy as np
 
+from h5 import HDFArchive
 import triqs.utility.mpi as mpi
 
 from solid_dmft.dft_managers import mpi_helpers
@@ -174,42 +175,54 @@ def read_dft_energy():
     """
     Reads DFT energy from the last line of Vasp's OSZICAR or from vasptriqs.h5
     """
-    h5_energy = False
     if os.path.isfile('vaspout.h5'):
         with HDFArchive('vaspout.h5', 'r') as h5:
             if 'oszicar' in h5['intermediate/ion_dynamics']:
-                dft_energy = h5['intermediate/ion_dynamics/oszicar'][-1,1]
-                h5_energy = True
+                # h5 access returns a numpy scalar/array; cast defensively
+                return float(np.asarray(h5['intermediate/ion_dynamics/oszicar'][-1, 1]).item())
 
-    # as backup use OSZICAR file
-    if not h5_energy:
-        with open('OSZICAR', 'r') as file:
-            nextline = file.readline()
-    dft_energy = float(line.split()[2])
+    # Backup: use OSZICAR file
+    last_nonempty_line = None
+    with open('OSZICAR', 'r') as file:
+        for line in file:
+            if line.strip():
+                last_nonempty_line = line
 
-    return dft_energy
+    if last_nonempty_line is None:
+        raise RuntimeError('OSZICAR is empty (cannot read DFT energy).')
+
+    parts = last_nonempty_line.split()
+    try:
+        # Typical OSZICAR line: "  1 F= -10.123 E0= ..." -> energy at index 2
+        return float(parts[2])
+    except (IndexError, ValueError) as err:
+        raise RuntimeError(f'Failed to parse DFT energy from OSZICAR line: {last_nonempty_line!r}') from err
 
 def read_dft_iter():
     """
     Reads DFT iteration number from the last line of the OSZICAR or from Vasp's vasptriqs.h5
     """
-    h5_iter = False
     if os.path.isfile('vaspout.h5'):
         with HDFArchive('vaspout.h5', 'r') as h5:
             if 'oszicar' in h5['intermediate/ion_dynamics']:
-                dft_iter = int(h5['intermediate/ion_dynamics/oszicar'][-1,0])
-                h5_iter = True
+                return int(np.asarray(h5['intermediate/ion_dynamics/oszicar'][-1, 0]).item())
 
-    # as backup use OSZICAR file
-    if not h5_iter:
-        with open('OSZICAR', 'r') as file:
-            nextline = file.readline()
-            while nextline.strip():
-                line = nextline
-                nextline = file.readline()
-        dft_iter = int(line.split()[1])
+    # Backup: use OSZICAR file
+    last_nonempty_line = None
+    with open('OSZICAR', 'r') as file:
+        for line in file:
+            if line.strip():
+                last_nonempty_line = line
 
-    return dft_iter
+    if last_nonempty_line is None:
+        raise RuntimeError('OSZICAR is empty (cannot read DFT iteration).')
+
+    parts = last_nonempty_line.split()
+    try:
+        # Typical OSZICAR line: "  1 F= -10.123 ..." -> iteration at index 1
+        return int(parts[1])
+    except (IndexError, ValueError) as err:
+        raise RuntimeError(f'Failed to parse DFT iteration from OSZICAR line: {last_nonempty_line!r}') from err
 
 def read_irred_kpoints(kpts):
     """ Reads the indices of the irreducible k-points from the OUTCAR. """
@@ -242,6 +255,7 @@ def read_irred_kpoints(kpts):
         symmetry_mapping = np.full(outcar_kpoints.shape[0], -1, dtype=int)
 
         for i, (kpt_outcar, outcar_index) in enumerate(zip(outcar_kpoints, outcar_indices)):
+            found_match = False
             for j, kpt in enumerate(kpts):
                 if np.allclose(kpt_outcar, kpt):
                     # Symmetry-irreducible k points
@@ -250,10 +264,11 @@ def read_irred_kpoints(kpts):
                     # Symmetry-reducible
                     else:
                         symmetry_mapping[j] = outcar_index
+                    found_match = True
                     break
 
-            # Asserts that loop left through break, i.e. a pair was found
-            assert np.allclose(kpt_outcar, kpt)
+            # Assert that a matching k-point was found
+            assert found_match, f'OUTCAR k-point {kpt_outcar} not found in provided kpts.'
 
         irreds, irred_indices = np.unique(symmetry_mapping, return_index=True)
         assert np.all(np.diff(irreds) == 1)
