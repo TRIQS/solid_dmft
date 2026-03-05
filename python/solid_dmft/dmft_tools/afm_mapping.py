@@ -108,6 +108,9 @@ def apply(general_params, icrsh, gf_struct_solver, solvers):
             solvers[icrsh].perturbation_order_histo = solvers[imp_source].perturbation_order_histo
             solvers[icrsh].avg_pert_order = solvers[imp_source].avg_pert_order
 
+    if solvers[icrsh].solver_params.get('type') == 'hartree':
+        solvers[icrsh].DC_energy = solvers[imp_source].DC_energy
+
     if invert_spin:
         for spin_channel in gf_struct_solver.keys():
             if 'up' in spin_channel:
