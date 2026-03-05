@@ -229,7 +229,7 @@ def _full_vasp_run(general_params, dft_params, initial_run, n_iter_dft=1, sum_k=
         sum_k.calc_mu(precision=general_params['prec_mu'])
 
         # Writes out GAMMA file
-        sum_k.calc_density_correction(dm_type='vasp', kpts_to_write=irred_indices)
+        sum_k.calc_density_correction(dm_type='vasp', kpts_to_write=irred_indices, spinave=True)
 
     return vasp_process_id, irred_indices
 
