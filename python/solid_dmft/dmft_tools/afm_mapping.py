@@ -131,6 +131,10 @@ def apply(general_params, icrsh, gf_struct_solver, solvers):
             if solvers[icrsh].solver_params.get('measure_density_matrix') or solvers[icrsh].solver_params.get('type') == 'ctseg':
                 solvers[icrsh].orbital_occupations[spin_channel] = solvers[imp_source].orbital_occupations[target_channel]
 
+            # and for the hartree solver we also need to copy the real frequency self-energy for the correct spin channel
+            if solvers[icrsh].solver_params.get('type') == 'hartree':
+                solvers[icrsh].Sigma_Refreq[spin_channel] = solvers[imp_source].Sigma_Refreq[target_channel]
+
     else:
         solvers[icrsh].Sigma_freq << solvers[imp_source].Sigma_freq
         solvers[icrsh].G_freq << solvers[imp_source].G_freq
