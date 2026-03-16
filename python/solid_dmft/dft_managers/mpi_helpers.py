@@ -60,8 +60,8 @@ def create_hostfile(number_cores, cluster_name):
 
     hostnames = mpi.world.gather(socket.gethostname(), root=0)
     if cluster_name == 'slurm':
-        slurm_hostnames = [hostname.split('.')[0] for hostname in hostnames]  # TODO: please find a better solution
-        hostnames = slurm_hostnames
+        # SLURM nodefile requires short hostnames (strip domain suffix if FQDN is returned)
+        hostnames = [hostname.split('.')[0] for hostname in hostnames]
     if mpi.is_master_node():
         # create hostfile based on first number_cores ranks
         hosts = defaultdict(int)
@@ -153,12 +153,15 @@ def get_mpi_arguments(mpi_profile, mpi_exe, number_cores, dft_exe, hostfile):
                 '-np', str(number_cores), '-envlist', 'PATH'] + shlex.split(dft_exe)
 
     if mpi_profile == 'slurm':
-        return [
-            mpi_exe, '-n', str(number_cores), '--export=PATH',
-            '-N', os.getenv("SLURM_JOB_NUM_NODES"), '-A', os.getenv("SLURM_JOB_ACCOUNT"),
-            '-p', os.getenv("SLURM_JOB_PARTITION"), '-t', '05:00', #TODO: decide way to get time limit
-            '-w', f"./{hostfile}",
-        ] + shlex.split(dft_exe)
+        # Default to srun when using SLURM; can be overridden via dft.mpi_exe in the config
+        if os.path.basename(mpi_exe) == 'mpirun':
+            mpi_exe = 'srun'
+        # srun inherits the remaining time of the allocation automatically when -t is omitted
+        return [mpi_exe, '-n', str(number_cores), '--export=PATH',
+                '-N', os.getenv("SLURM_JOB_NUM_NODES"),
+                '-A', os.getenv("SLURM_JOB_ACCOUNT"),
+                '-p', os.getenv("SLURM_JOB_PARTITION"),
+                '-w', f"./{hostfile}"] + shlex.split(dft_exe)
 
     return None
 
