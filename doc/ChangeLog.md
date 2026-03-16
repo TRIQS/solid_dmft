@@ -2,6 +2,34 @@
 
 # Changelog
 
+## Version 3.3.5
+
+solid_dmft version 3.3.5 is a minor patch release that fixes several bugs and adds small features:
+
+### fix
+* afm mapping with hartree solver was missing copy of `Sigma_Refreq`
+* afm calc with hartree solver was missing copy of `DC_energy`
+* fix ctseg afm calculations
+* reading DFT energy and iteration count from `vaspout.h5` was broken
+* numpy 2.x compatibility: explicit int cast for single-element arrays in observables
+* explicit float cast in `eval_U_cRPA_Vasp.py` to remove spurious complex warning
+* invalid escape sequence warnings in `eval_U_cRPA_Vasp.py`
+
+### feat
+* enable averaging of density correction by default for magnetic CSC calculations
+* add `mpi_exe` config flag in `[dft]` section and update to latest VASP h5 interface
+* add version printouts to stdout at the start of a calculation
+
+### doc
+* update NiO tutorial for ctseg afm calculations
+
+### build
+* use ctseg 3.3.x instead of unstable branch for 3.3.x docker image
+* fix docker OpenMPI build by removing `OMPI_MCA_btl_vader_single_copy_mechanism`
+* update GitHub Actions dependencies (docker actions, artifact upload/download actions)
+
+We thank all contributors: Alexander Hampel
+
 ## Version 3.3.4
 
 solid_dmft version 3.3.4 is a minor patch release that fixes several bugs and improves documentation:
