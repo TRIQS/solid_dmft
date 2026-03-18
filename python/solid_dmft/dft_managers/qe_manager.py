@@ -98,8 +98,13 @@ def run(number_cores, qe_file_ext, qe_exec, mpi_profile, mpi_exe_param, seedname
 
     # get MPI env
     hostfile = mpi_helpers.create_hostfile(number_cores, mpi_profile)
-    qe_exec_path = qe_exec.strip(qe_exec.rsplit('/')[-1])
-    qe_exec = qe_exec_path
+
+    if type(qe_exec) is str:
+        qe_exec_path = qe_exec.strip(qe_exec.rsplit('/')[-1])
+        qe_select = { "path": qe_exec_path }
+    else:
+        qe_select = qe_exec
+    qe_exec = qe_select.get("path", "")
 
     if mpi.is_master_node():
         # clean environment
@@ -115,17 +120,19 @@ def run(number_cores, qe_file_ext, qe_exec, mpi_profile, mpi_exe_param, seedname
         print('\nMPI executable for QE:', mpi_exe)
 
         if qe_file_ext in ['scf', 'nscf', 'mod_scf', 'bnd']:
-            qe_exec += f'pw.x -nk {number_cores}'
+            qe_exec += qe_select.get("pw", "pw.x -nk {number_cores}")
         elif qe_file_ext in ['pw2wan']:
-            qe_exec += 'pw2wannier90.x -nk 1 -pd .true.'
+            qe_exec += qe_select.get("pw2wan", "pw2wannier90.x -nk 1 -pd .true.")
         elif qe_file_ext in ['bands']:
-            qe_exec += f'bands.x -nk {number_cores}'
+            qe_exec += qe_select.get("bands", "bands.x -nk {number_cores}")
         elif qe_file_ext in ['proj']:
-            qe_exec += f'projwfc.x -nk {number_cores}'
+            qe_exec += qe_select.get("proj", "projwfc.x -nk {number_cores}")
         elif qe_file_ext in ['win_pp']:
-            qe_exec += 'wannier90.x -pp'
+            qe_exec += qe_select.get("win_pp", "wannier90.x -pp")
         elif qe_file_ext in ['win']:
-            qe_exec += 'wannier90.x'
+            qe_exec += qe_select.get("win", "wannier90.x")
+
+        qe_exec = qe_exec.format(number_cores=number_cores)
 
         arguments = mpi_helpers.get_mpi_arguments(mpi_profile, mpi_exe, number_cores, qe_exec, hostfile)
         _start_with_piping(mpi_exe, arguments, qe_file_ext, env_vars, seedname)
