@@ -29,11 +29,11 @@ dc_dmft = true
 calc_energies = true
 
 h5_save_freq = 1
+store_solver = false
 
 [solver]
 type = "hubbardI"
 n_l = 15
-store_solver = false
 measure_G_l = false
 measure_density_matrix = true
 
@@ -42,5 +42,12 @@ dft_code = "qe"
 n_cores = 10
 mpi_env = "default"
 projector_type = "w90"
-dft_exec = "pw.x"
 w90_tolerance = 1e-1
+
+[dft.dft_exec]
+pw = "pw.x -nk {number_cores}"
+pw2wan = "pw2wannier90.x -nk 1 -pd .true."
+bands = "bands.x -nk {number_cores}"
+proj = "projwfc.x -nk {number_cores}"
+win_pp = "wannier90.x -pp"
+win = "wannier90.x"
