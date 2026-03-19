@@ -477,8 +477,21 @@ dft_code : string
 
         * 'vasp'
         * 'qe'
-dft_exec : string, default = 'vasp_std'
-        command for the DFT executable
+dft_exec : string or table, default = 'vasp_std'
+        command for the DFT executable. For VASP this is a simple string.
+        For QE this can be a string (path to QE executables) or a TOML table
+        ``[dft.dft_exec]`` with per-executable overrides. Available keys:
+
+        * ``path`` — base path prepended to all executables (default: '')
+        * ``pw`` — pw.x command (default: 'pw.x -nk {number_cores}')
+        * ``pw2wan`` — pw2wannier90.x command (default: 'pw2wannier90.x -nk 1 -pd .true.')
+        * ``bands`` — bands.x command (default: 'bands.x -nk {number_cores}')
+        * ``proj`` — projwfc.x command (default: 'projwfc.x -nk {number_cores}')
+        * ``win_pp`` — wannier90.x preprocessing command (default: 'wannier90.x -pp')
+        * ``win`` — wannier90.x command (default: 'wannier90.x')
+
+        Use ``{number_cores}`` as a placeholder in commands, it will be replaced
+        with the value of ``n_cores``.
 mpi_env : string, default = 'default'
         selection for mpi env for DFT / VASP in default this will only call VASP as mpirun -np n_cores_dft dft_exec
         Possible values:

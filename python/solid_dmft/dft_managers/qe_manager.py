@@ -99,10 +99,16 @@ def run(number_cores, qe_file_ext, qe_exec, mpi_profile, mpi_exe_param, seedname
     # get MPI env
     hostfile = mpi_helpers.create_hostfile(number_cores, mpi_profile)
 
-    if type(qe_exec) is str:
-        qe_exec_path = qe_exec.strip(qe_exec.rsplit('/')[-1])
-        qe_select = { "path": qe_exec_path }
+    valid_exec_keys = {"path", "pw", "pw2wan", "bands", "proj", "win_pp", "win"}
+    if isinstance(qe_exec, str):
+        qe_exec_path = os.path.dirname(qe_exec)
+        if qe_exec_path:
+            qe_exec_path += '/'
+        qe_select = {"path": qe_exec_path}
     else:
+        unknown_keys = set(qe_exec.keys()) - valid_exec_keys
+        if unknown_keys:
+            raise ValueError(f"Unknown keys in dft_exec: {unknown_keys}. Valid keys: {valid_exec_keys}")
         qe_select = qe_exec
     qe_exec = qe_select.get("path", "")
 
