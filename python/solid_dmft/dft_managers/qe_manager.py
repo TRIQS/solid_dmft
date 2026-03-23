@@ -112,6 +112,8 @@ def run(number_cores, qe_file_ext, qe_exec, mpi_profile, mpi_exe_param, seedname
             raise ValueError(f"Unknown keys in dft_exec: {unknown_keys}. Valid keys: {valid_exec_keys}")
         qe_select = qe_exec
     qe_exec = qe_select.get("path", "")
+    if qe_exec and not qe_exec.endswith('/'):
+        qe_exec += '/'
 
     if mpi.is_master_node():
         # clean environment
