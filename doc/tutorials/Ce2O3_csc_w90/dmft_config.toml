@@ -15,7 +15,7 @@ enforce_off_diag = false
 block_threshold = 1e-03
 
 h_int_type = "density_density"
-h_int_basis = "qe"
+h_int_basis = "triqs"
 U = 6.46
 J = 0.46
 beta = 10
@@ -41,10 +41,12 @@ measure_density_matrix = true
 dft_code = "qe"
 n_cores = 10
 mpi_env = "default"
+mpi_exe = "mpirun"
 projector_type = "w90"
 w90_tolerance = 1e-1
 
 [dft.dft_exec]
+path = '/path/to/q-e/bin'
 pw = "pw.x -nk {number_cores}"
 pw2wan = "pw2wannier90.x -nk 1 -pd .true."
 bands = "bands.x -nk {number_cores}"
