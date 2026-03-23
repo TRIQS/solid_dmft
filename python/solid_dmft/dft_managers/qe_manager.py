@@ -106,6 +106,7 @@ def run(number_cores, qe_file_ext, qe_exec, mpi_profile, mpi_exe_param, seedname
             qe_exec_path += '/'
         qe_select = {"path": qe_exec_path}
     else:
+        assert "path" in qe_exec, "If dft_exec is not a string it must at least specify the path key"
         unknown_keys = set(qe_exec.keys()) - valid_exec_keys
         if unknown_keys:
             raise ValueError(f"Unknown keys in dft_exec: {unknown_keys}. Valid keys: {valid_exec_keys}")
@@ -138,7 +139,10 @@ def run(number_cores, qe_file_ext, qe_exec, mpi_profile, mpi_exe_param, seedname
         elif qe_file_ext in ['win']:
             qe_exec += qe_select.get("win", "wannier90.x")
 
-        qe_exec = qe_exec.format(number_cores=number_cores)
+        try:
+            qe_exec = qe_exec.format(**{**os.environ, "number_cores": number_cores})
+        except KeyError as e:
+            raise ValueError(f"Unknown placeholder {e} in dft_exec. Available: 'number_cores' and environment variables.") from None
 
         arguments = mpi_helpers.get_mpi_arguments(mpi_profile, mpi_exe, number_cores, qe_exec, hostfile)
         _start_with_piping(mpi_exe, arguments, qe_file_ext, env_vars, seedname)
