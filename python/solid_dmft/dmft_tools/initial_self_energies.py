@@ -521,7 +521,8 @@ def determine_dc_and_initial_sigma(general_params, gw_params, advanced_params, s
                            for iineq in range(sum_k.n_inequiv_shells)]
             for icrsh in range(sum_k.n_inequiv_shells):
                 dc_pot = sum_k.block_structure.convert_matrix(sum_k.dc_imp[sum_k.inequiv_to_corr[icrsh]],
-                                                               ish_from=icrsh,
+                                                               ish_from=sum_k.inequiv_to_corr[icrsh],
+                                                               ish_to =icrsh,
                                                                space_from='sumk', space_to='solver')
 
                 if (general_params['magnetic'] and general_params['magmom'] and sum_k.SO == 0):
