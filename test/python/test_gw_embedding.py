@@ -20,7 +20,7 @@ import numpy as np
 from h5 import HDFArchive
 import unittest
 
-from triqs.gf import MeshDLRImFreq, Gf, BlockGf, make_gf_dlr, make_gf_imfreq, make_gf_dlr_imfreq
+from triqs.gfs import MeshDLRImFreq, Gf, BlockGf, make_gf_dlr, make_gf_imfreq, make_gf_dlr_imfreq
 
 from solid_dmft.gw_embedding.bdft_converter import convert_gw_output, calc_Sigma_DC_gw, calc_W_from_Gloc
 

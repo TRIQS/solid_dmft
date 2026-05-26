@@ -32,7 +32,7 @@ import numpy as np
 
 from h5 import HDFArchive
 from triqs.utility import mpi
-from triqs.gf import (
+from triqs.gfs import (
     iOmega_n,
     inverse,
     fit_hermitian_tail,
@@ -46,7 +46,7 @@ from triqs.gf import (
 )
 from triqs.version import git_hash as triqs_hash
 from triqs.version import version as triqs_version
-from triqs.gf.meshes import MeshImFreq
+from triqs.mesh import MeshImFreq
 from triqs.operators import c_dag, c, Operator
 from triqs_dft_tools.block_structure import BlockStructure
 from triqs_dft_tools.sumk_dft import SumkDFT

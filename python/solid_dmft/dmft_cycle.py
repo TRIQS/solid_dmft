@@ -39,8 +39,8 @@ from triqs.version import version as triqs_version
 from h5 import HDFArchive
 import triqs.utility.mpi as mpi
 from triqs.operators import c_dag, c, Operator
-from triqs.gf import make_hermitian, fit_hermitian_tail, MeshReFreq, MeshImFreq, make_gf_from_fourier, iOmega_n
-from triqs.gf.tools import inverse, make_zero_tail
+from triqs.gfs import make_hermitian, fit_hermitian_tail, MeshReFreq, MeshImFreq, make_gf_from_fourier, iOmega_n
+from triqs.gfs.tools import inverse, make_zero_tail
 from triqs_dft_tools.sumk_dft import SumkDFT
 
 # own modules

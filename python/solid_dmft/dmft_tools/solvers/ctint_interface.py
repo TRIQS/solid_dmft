@@ -28,9 +28,9 @@ ctint solver class for solid_dmft
 '''
 from itertools import product
 
-from triqs.gf import make_hermitian
-from triqs.gf.tools import inverse
-from triqs.gf.descriptors import Fourier
+from triqs.gfs import make_hermitian
+from triqs.gfs.tools import inverse
+from triqs.gfs.descriptors import Fourier
 import triqs.utility.mpi as mpi
 from h5 import HDFArchive
 

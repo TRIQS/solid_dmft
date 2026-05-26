@@ -29,9 +29,9 @@ ctseg solver class for solid_dmft
 import numpy as np
 from itertools import product
 
-from triqs.gf import MeshDLRImFreq, Gf, BlockGf, make_gf_imfreq, make_hermitian, make_gf_dlr, fit_gf_dlr, make_gf_dlr_imtime, make_gf_imtime
-from triqs.gf.tools import inverse, make_zero_tail
-from triqs.gf.descriptors import Fourier
+from triqs.gfs import MeshDLRImFreq, Gf, BlockGf, make_gf_imfreq, make_hermitian, make_gf_dlr, fit_gf_dlr, make_gf_dlr_imtime, make_gf_imtime
+from triqs.gfs.tools import inverse, make_zero_tail
+from triqs.gfs.descriptors import Fourier
 from triqs.operators.util.U_matrix import reduce_4index_to_2index
 import triqs.utility.mpi as mpi
 from h5 import HDFArchive
@@ -356,7 +356,7 @@ class CTSEGInterface(AbstractDMFTSolver):
         # should this be moved to abstract class?
         elif self.solver_params['crm_dyson_solver']:
             mpi.report('Self-energy post-processing algorithm: crm dyson solver')
-            from triqs.gf.dlr_crm_dyson_solver import minimize_dyson
+            from triqs.gfs.dlr_crm_dyson_solver import minimize_dyson
 
             mpi.report('\nCRM Dyson solver to extract Σ impurity\n')
             # fit QMC G_tau to DLR

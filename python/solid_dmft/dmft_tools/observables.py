@@ -32,9 +32,9 @@ import numpy as np
 # triqs
 import triqs.utility.mpi as mpi
 from h5 import HDFArchive
-from triqs.gf import Gf, MeshImTime
+from triqs.gfs import Gf, MeshImTime
 from triqs.atom_diag import trace_rho_op
-from triqs.gf.descriptors import Fourier
+from triqs.gfs.descriptors import Fourier
 from solid_dmft.dmft_tools import common
 
 def prep_observables(h5_archive, sum_k):

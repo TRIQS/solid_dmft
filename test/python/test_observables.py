@@ -4,8 +4,8 @@
 Contains unit tests for observables.py
 """
 
-from triqs.gf import BlockGf, Gf, SemiCircular, MeshImFreq, MeshImTime
-from triqs.gf.descriptors import Fourier
+from triqs.gfs import BlockGf, Gf, SemiCircular, MeshImFreq, MeshImTime
+from triqs.gfs.descriptors import Fourier
 
 from solid_dmft.dmft_tools.observables import add_dft_values_as_zeroth_iteration, add_dmft_observables, _generate_header
 from helper import are_iterables_equal, Dummy

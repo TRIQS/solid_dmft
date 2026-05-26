@@ -47,7 +47,7 @@ import skimage.measure
 from warnings import warn
 
 from h5 import HDFArchive
-from triqs.gf import BlockGf, MeshReFreq, Gf
+from triqs.gfs import BlockGf, MeshReFreq, Gf
 from triqs.lattice.utils import TB_from_wannier90, k_space_path
 from triqs_dft_tools.sumk_dft import SumkDFT
 

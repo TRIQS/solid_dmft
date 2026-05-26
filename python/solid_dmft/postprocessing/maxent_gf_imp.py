@@ -42,7 +42,7 @@ from triqs_maxent.alpha_meshes import LogAlphaMesh
 from triqs_maxent.logtaker import VerbosityFlags
 from h5 import HDFArchive
 from triqs.utility import mpi
-from triqs.gf import BlockGf
+from triqs.gfs import BlockGf
 
 
 def _read_h5(external_path, iteration):

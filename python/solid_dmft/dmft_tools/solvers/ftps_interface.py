@@ -29,8 +29,8 @@ FTPS solver class for solid_dmft
 import numpy as np
 from itertools import product
 
-from triqs.gf import MeshReTime, Gf, Omega
-from triqs.gf.tools import inverse
+from triqs.gfs import MeshReTime, Gf, Omega
+from triqs.gfs.tools import inverse
 import triqs.utility.mpi as mpi
 from h5 import HDFArchive
 

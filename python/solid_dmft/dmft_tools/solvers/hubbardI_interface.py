@@ -26,7 +26,7 @@
 '''
 hubbardI solver class for solid_dmft
 '''
-from triqs.gf import MeshReFreq, Gf, make_hermitian
+from triqs.gfs import MeshReFreq, Gf, make_hermitian
 
 # import of the abstract class
 from solid_dmft.dmft_tools.solvers.abstractdmftsolver import AbstractDMFTSolver

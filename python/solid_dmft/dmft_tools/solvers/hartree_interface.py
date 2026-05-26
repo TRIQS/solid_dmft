@@ -26,8 +26,8 @@
 '''
 hartree solver class for solid_dmft
 '''
-from triqs.gf import MeshReFreq, Gf
-from triqs.gf.descriptors import Fourier
+from triqs.gfs import MeshReFreq, Gf
+from triqs.gfs.descriptors import Fourier
 import triqs.utility.mpi as mpi
 
 # import of the abstract class

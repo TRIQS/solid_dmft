@@ -28,7 +28,7 @@ abstract DMFT solver class for solid_dmft
 '''
 import numpy as np
 
-from triqs.gf import MeshImTime, MeshReTime, MeshReFreq, MeshLegendre, Gf, BlockGf
+from triqs.gfs import MeshImTime, MeshReTime, MeshReFreq, MeshLegendre, Gf, BlockGf
 from triqs.operators import Operator
 
 # import abc
@@ -250,7 +250,7 @@ class AbstractDMFTSolver(ABC):
         tail_barr : dict of arr
                     fitted tail of Sigma_iw
         """
-        from triqs.gf.gf_fnt import fit_hermitian_tail_on_window, replace_by_tail
+        from triqs.gfs.gf_fnt import fit_hermitian_tail_on_window, replace_by_tail
 
         # Define default tail quantities
         if fit_min_w is not None:

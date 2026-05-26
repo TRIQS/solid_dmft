@@ -29,9 +29,9 @@ import numpy as np
 # triqs
 import triqs.utility.mpi as mpi
 from h5 import HDFArchive
-from triqs.gf import MeshImFreq, MeshImTime, Gf, make_gf_from_fourier
-from triqs.gf.descriptors import Fourier
-from triqs.gf.tools import inverse
+from triqs.gfs import MeshImFreq, MeshImTime, Gf, make_gf_from_fourier
+from triqs.gfs.descriptors import Fourier
+from triqs.gfs.tools import inverse
 
 from . import legendre_filter
 

@@ -32,14 +32,14 @@ from scipy.constants import physical_constants
 
 from h5 import HDFArchive
 from triqs.utility import mpi
-from triqs.gf import (
+from triqs.gfs import (
     Gf,
     BlockGf,
     make_gf_dlr_imtime,
     make_gf_dlr,
     make_gf_dlr_imfreq,
 )
-from triqs.gf.meshes import MeshDLRImFreq, MeshDLRImTime
+from triqs.mesh import MeshDLRImFreq, MeshDLRImTime
 import itertools
 
 from solid_dmft.gw_embedding.iaft import IAFT

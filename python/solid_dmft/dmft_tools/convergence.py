@@ -30,7 +30,7 @@ import numpy as np
 
 # triqs
 from h5 import HDFArchive
-from triqs.gf import MeshImFreq, MeshImTime, MeshReFreq, BlockGf
+from triqs.gfs import MeshImFreq, MeshImTime, MeshReFreq, BlockGf
 from solid_dmft.dmft_tools import common
 
 def _generate_header(general_params, sum_k):

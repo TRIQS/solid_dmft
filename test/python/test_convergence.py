@@ -16,7 +16,7 @@
 # Authors: Alexander Hampel
 
 import numpy as np
-from triqs.gf import MeshImFreq, MeshImTime, iOmega_n, inverse, BlockGf, Gf, SemiCircular, make_gf_from_fourier
+from triqs.gfs import MeshImFreq, MeshImTime, iOmega_n, inverse, BlockGf, Gf, SemiCircular, make_gf_from_fourier
 from triqs.utility.comparison_tests import assert_arrays_are_close
 from solid_dmft.dmft_tools.convergence import max_G_diff
 

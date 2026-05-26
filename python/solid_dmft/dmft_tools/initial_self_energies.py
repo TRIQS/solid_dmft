@@ -34,7 +34,7 @@ import numpy as np
 # triqs
 from h5 import HDFArchive
 import triqs.utility.mpi as mpi
-from triqs.gf import BlockGf, Gf, make_gf_imfreq, MeshDLRImFreq, make_gf_dlr, MeshReFreq
+from triqs.gfs import BlockGf, Gf, make_gf_imfreq, MeshDLRImFreq, make_gf_dlr, MeshReFreq
 import itertools
 
 def calculate_double_counting(sum_k, density_matrix, general_params, gw_params, advanced_params, solver_type_per_imp, G_loc_all=None):

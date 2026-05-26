@@ -24,8 +24,8 @@
 import numpy as np
 
 # triqs
-from triqs.gf import BlockGf
-from triqs.gf.tools import fit_legendre
+from triqs.gfs import BlockGf
+from triqs.gfs.tools import fit_legendre
 
 
 def apply(G_tau, order=100, G_l_cut=1e-19):

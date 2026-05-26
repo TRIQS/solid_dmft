@@ -32,7 +32,7 @@ import numpy as np
 
 import triqs.utility.mpi as mpi
 from h5 import HDFArchive
-from triqs.gf import BlockGf, GfImFreq, GfImTime, Fourier, MeshImFreq
+from triqs.gfs import BlockGf, GfImFreq, GfImTime, Fourier, MeshImFreq
 try:
     if mpi.is_master_node():
         from solid_dmft.postprocessing import maxent_gf_latt
@@ -95,7 +95,7 @@ def _initialize_lattice_gf(sum_k, general_params):
 
     Returns
     -------
-    gf_lattice_iw : triqs.gf.BlockGf
+    gf_lattice_iw : triqs.gfs.BlockGf
         trace of the lattice GF over all blocks, orbitals and spins in
         Matsubara frequency.
     g_betahalf : complex

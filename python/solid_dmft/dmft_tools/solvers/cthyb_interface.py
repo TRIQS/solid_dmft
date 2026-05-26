@@ -27,8 +27,8 @@
 cthyb solver class for solid_dmft
 '''
 import numpy as np
-from triqs.gf import MeshDLRImFreq, Gf, make_gf_imfreq, make_hermitian, fit_gf_dlr, make_gf_dlr_imtime
-from triqs.gf.tools import inverse
+from triqs.gfs import MeshDLRImFreq, Gf, make_gf_imfreq, make_hermitian, fit_gf_dlr, make_gf_dlr_imtime
+from triqs.gfs.tools import inverse
 import triqs.utility.mpi as mpi
 from h5 import HDFArchive
 
@@ -235,7 +235,7 @@ class CTHYBInterface(AbstractDMFTSolver):
                 # if tailfit has been used replace Sigma with the tail fitted Sigma from cthyb
                 self.Sigma_freq << self.triqs_solver.Sigma_iw
             elif self.solver_params['crm_dyson_solver']:
-                from triqs.gf.dlr_crm_dyson_solver import minimize_dyson
+                from triqs.gfs.dlr_crm_dyson_solver import minimize_dyson
 
                 mpi.report('\nCRM Dyson solver to extract Σ impurity\n')
                 # fit QMC G_tau to DLR

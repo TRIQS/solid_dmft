@@ -303,9 +303,9 @@ def main(external_path, iteration=None, continuator_type='inversion_sigmainf', m
 
     Returns
     -------
-    sigma_w : list of triqs.gf.BlockGf
+    sigma_w : list of triqs.gfs.BlockGf
         Sigma(omega) per inequivalent shell
-    g_aux_w : list of triqs.gf.BlockGf
+    g_aux_w : list of triqs.gfs.BlockGf
         G_aux(omega) per inequivalent shell
 
     Raises

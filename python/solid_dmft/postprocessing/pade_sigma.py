@@ -4,7 +4,7 @@ import numpy as np
 
 from triqs.utility import mpi
 from h5 import HDFArchive
-from triqs.gf import Gf, MeshReFreq, BlockGf
+from triqs.gfs import Gf, MeshReFreq, BlockGf
 
 from solid_dmft.postprocessing.maxent_sigma import _read_h5
 
@@ -85,7 +85,7 @@ def main(external_path, n_w, w_min, w_max, n_iw, iteration=None, eta=0.0):
 
     Returns
     -------
-    sigma_w : list of triqs.gf.BlockGf
+    sigma_w : list of triqs.gfs.BlockGf
         Sigma(omega) per inequivalent shell
     """
 

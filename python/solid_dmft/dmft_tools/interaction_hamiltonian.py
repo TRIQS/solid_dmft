@@ -35,7 +35,7 @@ from itertools import product
 # triqs
 from h5 import HDFArchive
 import triqs.utility.mpi as mpi
-from triqs.gf import make_gf_imfreq
+from triqs.gfs import make_gf_imfreq
 from triqs.operators import util, n, c, c_dag, Operator
 from solid_dmft.dmft_tools import common
 

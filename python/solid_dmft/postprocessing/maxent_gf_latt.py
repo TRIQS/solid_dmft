@@ -43,7 +43,7 @@ from triqs_maxent.alpha_meshes import LogAlphaMesh
 from triqs_dft_tools.sumk_dft import SumkDFT
 from h5 import HDFArchive
 from triqs.utility import mpi
-from triqs.gf import Gf, BlockGf
+from triqs.gfs import Gf, BlockGf
 
 
 def _read_h5(external_path, iteration):
