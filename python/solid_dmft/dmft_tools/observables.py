@@ -222,8 +222,8 @@ def add_dft_values_as_zeroth_iteration(observables, general_params, solver_type_
                     Z_per_orbital.extend( [1.0] * G_loc_all_dft[iineq][spin_channel].target_shape[0]  )
                 else:
                     # G(beta/2)
-                    mesh = MeshImTime(beta=general_params['beta'], S="Fermion",
-                                      n_max=general_params['n_tau'])
+                    mesh = MeshImTime(beta=general_params['beta'], statistic="Fermion",
+                                      n_tau=general_params['n_tau'])
                     G_time = Gf(mesh=mesh, indices=G_loc_all_dft[iineq][spin_channel].indices)
                     G_time << Fourier(G_loc_all_dft[iineq][spin_channel])
 

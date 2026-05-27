@@ -51,7 +51,7 @@ class test_observables(unittest.TestCase):
         general_params['solver_type'] = 'cthyb'
         general_params['n_tau'] = 10001
 
-        mesh_iw = MeshImFreq(beta=general_params['beta'], S='Fermion', n_iw = 1025)
+        mesh_iw = MeshImFreq(beta=general_params['beta'], statistic='Fermion', n_iw = 1025)
         gf_up = Gf(mesh=mesh_iw, target_shape=[1,1])
         gf_down = gf_up.copy()
         gf_up << SemiCircular(2, 0)
@@ -98,7 +98,7 @@ class test_observables(unittest.TestCase):
         general_params['solver_type'] = 'cthyb'
         general_params['n_tau'] = 10001
 
-        mesh_iw = MeshImFreq(beta=general_params['beta'], S='Fermion', n_iw = 1025)
+        mesh_iw = MeshImFreq(beta=general_params['beta'], statistic='Fermion', n_iw = 1025)
         gf_up_one_band = Gf(mesh=mesh_iw, target_shape=[1,1])
         gf_down_one_band = gf_up_one_band.copy()
         gf_up_one_band << SemiCircular(2, 1)
@@ -164,14 +164,14 @@ class test_observables(unittest.TestCase):
         shell_multiplicity = [4]
         E_bandcorr = 10.43
 
-        mesh_iw = MeshImFreq(beta=general_params['beta'], S='Fermion', n_iw = 1025)
+        mesh_iw = MeshImFreq(beta=general_params['beta'], statistic='Fermion', n_iw = 1025)
         gf_up = Gf(mesh=mesh_iw, target_shape=[1,1])
         gf_down = gf_up.copy()
         gf_up << SemiCircular(2, 0)
         gf_down << SemiCircular(1, 0)
         gf_iw = [BlockGf(name_list=('up_0', 'down_0'), block_list=(gf_up, gf_down), make_copies=True)]
 
-        mesh_tau = MeshImTime(beta=general_params['beta'], S='Fermion', n_tau = 10001)
+        mesh_tau = MeshImTime(beta=general_params['beta'], statistic='Fermion', n_tau = 10001)
         gf_imtime = Gf(mesh=mesh_tau, target_shape=[1,1])
         gf_tau = [BlockGf(name_list=('up_0', 'down_0'), block_list=(gf_imtime, gf_imtime), make_copies=True)]
         gf_tau[0] << Fourier(gf_iw[0])

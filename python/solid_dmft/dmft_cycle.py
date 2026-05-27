@@ -303,7 +303,7 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
     if general_params['beta'] is not None:
         mpi.report('Running solid_dmft on imag-freq grid because "general.beta" specified\n')
         sumk_mesh = MeshImFreq(beta=general_params['beta'],
-                               S='Fermion',
+                               statistic='Fermion',
                                n_iw=general_params['n_iw'])
         broadening = None
     else:

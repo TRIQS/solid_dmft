@@ -111,7 +111,7 @@ class AbstractDMFTSolver(ABC):
         # create all ImTime instances
         self.n_tau = self.general_params['n_tau']
         self.G_time = self.sum_k.block_structure.create_gf(
-            ish=self.icrsh, gf_function=Gf, space='solver', mesh=MeshImTime(beta=self.sum_k.mesh.beta, S='Fermion', n_tau=self.n_tau)
+            ish=self.icrsh, gf_function=Gf, space='solver', mesh=MeshImTime(beta=self.sum_k.mesh.beta, statistic='Fermion', n_tau=self.n_tau)
         )
         # copy
         self.Delta_time = self.G_time.copy()
@@ -123,7 +123,7 @@ class AbstractDMFTSolver(ABC):
                 ish=self.icrsh,
                 gf_function=Gf,
                 space='solver',
-                mesh=MeshLegendre(beta=self.general_params['beta'], max_n=self.n_l, S='Fermion'),
+                mesh=MeshLegendre(beta=self.general_params['beta'], max_n=self.n_l, statistic='Fermion'),
             )
             # move original G_freq to G_freq_orig
             self.G_time_orig = self.G_time.copy()

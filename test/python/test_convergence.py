@@ -30,8 +30,8 @@ class test_convergence(unittest.TestCase):
         beta = 10.0
         n_iw = 50
         n_tau = 6*n_iw + 1
-        self.iw_mesh = MeshImFreq(beta=beta, S="Fermion", n_max=n_iw)
-        self.tau_mesh = MeshImTime(beta=beta, S="Fermion", n_max=n_tau)
+        self.iw_mesh = MeshImFreq(beta=beta, statistic="Fermion", n_iw=n_iw)
+        self.tau_mesh = MeshImTime(beta=beta, statistic="Fermion", n_tau=n_tau)
         self.norb = 2
 
         self.G1_iw = Gf(mesh=self.iw_mesh, target_shape=(self.norb, self.norb))
