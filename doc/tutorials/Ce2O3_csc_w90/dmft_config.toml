@@ -15,7 +15,7 @@ enforce_off_diag = false
 block_threshold = 1e-03
 
 h_int_type = "density_density"
-h_int_basis = "triqs"
+h_int_basis = "qe"
 U = 6.46
 J = 0.46
 beta = 10
