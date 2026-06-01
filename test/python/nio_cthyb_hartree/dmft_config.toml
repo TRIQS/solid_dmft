@@ -5,7 +5,7 @@ jobname = "out"
 mu_initial_guess = 13.751
 enforce_off_diag = [false, true]
 
-n_iw = 201
+n_iw = 401
 beta = 10
 w_range = [-10, 10]
 eta = 0.05

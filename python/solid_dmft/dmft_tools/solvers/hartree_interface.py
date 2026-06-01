@@ -26,7 +26,7 @@
 '''
 hartree solver class for solid_dmft
 '''
-from triqs.gfs import MeshReFreq, Gf
+from triqs.gfs import MeshReFreq, Gf, inverse, make_gf_dlr_imfreq, make_gf_imfreq, find_w_max
 from triqs.gfs.descriptors import Fourier
 import triqs.utility.mpi as mpi
 
@@ -61,12 +61,24 @@ class HartreeInterface(AbstractDMFTSolver):
         # take care of changing the parameters
         gf_struct = self.sum_k.gf_struct_solver_list[self.icrsh]
 
+        # The Hartree solver now stores its Green's functions on a DLR Matsubara mesh
+        # (triqs_hartree_fock commit c948fe7). solid_dmft still works with full Matsubara
+        # meshes for the lattice Green's function, so we bridge between the two with the
+        # triqs functions make_gf_dlr_imfreq / make_gf_imfreq / find_w_max (commit a43d8cc):
+        # the regular-mesh Weiss field G0 is sampled onto a DLR mesh in solve() and the
+        # solver's DLR outputs are converted back in postprocess(). These two attributes
+        # fully define that DLR mesh and are kept on the instance so they are available if
+        # the lattice Green's function is itself moved onto a DLR mesh in the future.
+        self.dlr_eps = self.solver_params['eps_dlr']
+        self.dlr_w_max = None  # set in solve() via find_w_max from the Weiss field G0
+
+        # w_max here is only a placeholder for the initial (empty) construction; the actual
+        # DLR mesh is built in solve() once the Weiss field is known.
         self.triqs_solver = hartree_solver(
             beta=self.general_params['beta'],
             gf_struct=gf_struct,
-            n_iw=self.general_params['n_iw'],
-            #eps=self.solver_params.get('eps_dlr', 1e-13),  # these will need to be added for the new DLR interface of the Hartree solver unstable branch 
-            #w_max = self.solver_params.get("w_max", 30),
+            w_max=1.0,
+            eps=self.dlr_eps,
             force_real=self.solver_params['force_real'],
             symmetries=[self._make_spin_equal],
             dc_U=self.general_params['U'][self.icrsh],
@@ -143,13 +155,66 @@ class HartreeInterface(AbstractDMFTSolver):
             ish=self.icrsh, gf_function=Gf, space='solver', mesh=MeshReFreq(n_w=self.n_w, window=self.general_params['w_range'])
         )
 
-    def solve(self, **kwargs):
-        # fill G0_freq from sum_k to solver
-        self.triqs_solver.G0_iw << self.G0_freq
+    def _largest_fitting_dlr_w_max(self, g):
+        # Largest DLR cutoff whose Matsubara nodes still fit inside the n_iw mesh of g.
+        # find_w_max(G0) is guaranteed to fit (G0 lives on the same mesh), so grow from
+        # there by 1.5x until make_gf_dlr_imfreq can no longer sample g.
+        w_max = find_w_max(self.G0_freq, self.dlr_eps)
+        trial = w_max * 1.5
+        while trial <= 200.0:
+            try:
+                make_gf_dlr_imfreq(g, trial, self.dlr_eps)
+            except RuntimeError:
+                break
+            w_max = trial
+            trial *= 1.5
+        return w_max
 
-        # Solve the impurity problem for icrsh shell
+    def _set_dlr_G0(self, w_max):
+        # Sample the regular-mesh Weiss field onto a DLR Matsubara mesh of cutoff w_max
+        # and hand it to the solver (G_iw is allocated on the same mesh for the solver).
+        self.triqs_solver.w_max = w_max
+        self.triqs_solver.G0_iw = make_gf_dlr_imfreq(self.G0_freq, w_max, self.dlr_eps)
+        self.triqs_solver.G_iw = self.triqs_solver.G0_iw.copy()
+
+    def solve(self, **kwargs):
+        # The DLR mesh must be sized to the impurity Green's function, not just the Weiss
+        # field G0: in Hartree-Fock the self energy is a constant matrix that shifts G's
+        # spectral weight away from G0, so a mesh sized to G0 alone under-resolves G (and
+        # hence its density). Sigma_HF is unknown before solving, and on the first iteration
+        # the seeded guess is zero (the Hartree DC is computed inside the solver), so we run
+        # a cheap estimate solve on a G0-sized mesh to obtain the actual (constant) Sigma_HF,
+        # build a guesstimate G from it, and size the real DLR mesh from that via find_w_max.
+        # The estimate solve overwrites Sigma_HF, so we restart the final solve from the
+        # original guess to leave the one_shot result unchanged.
+        sigma_hf_init = {bl: s.copy() for bl, s in self.triqs_solver.Sigma_HF.items()}
+
+        self._set_dlr_G0(find_w_max(self.G0_freq, self.dlr_eps))
+        self.triqs_solver.solve(h_int=self.h_int, **self.triqs_solver_params)
+        sigma_est = {bl: s.copy() for bl, s in self.triqs_solver.Sigma_HF.items()}
+
+        G_guess = self.G0_freq.copy()
+        for bl, g in G_guess:
+            g << inverse(inverse(self.G0_freq[bl]) - sigma_est[bl])
+        try:
+            self.dlr_w_max = find_w_max(G_guess, self.dlr_eps)
+        except RuntimeError:
+            # The impurity G shifted by the Hartree self energy cannot be represented by a
+            # DLR mesh whose nodes fit inside the current n_iw range. Fall back to the
+            # largest mesh-fitting cutoff (best effort) and warn that n_iw limits accuracy.
+            self.dlr_w_max = self._largest_fitting_dlr_w_max(G_guess)
+            mpi.report('HARTREE SOLVER: warning, n_iw is too small to fully represent the '
+                       'impurity Green function for the Hartree self energy shift; falling '
+                       f'back to the largest mesh-fitting DLR cutoff w_max = {self.dlr_w_max:.4f}. '
+                       'Increase n_iw for higher accuracy.')
+
+        mpi.report(f'HARTREE SOLVER: using DLR mesh with w_max = {self.dlr_w_max:.4f}, eps = {self.dlr_eps:.1e}')
+
+        # final solve on the properly sized mesh, restarting from the original guess
         # *************************************
         # this is done on every node due to very slow bcast
+        self.triqs_solver.Sigma_HF = {bl: s.copy() for bl, s in sigma_hf_init.items()}
+        self._set_dlr_G0(self.dlr_w_max)
         self.triqs_solver.solve(h_int=self.h_int, **self.triqs_solver_params)
 
         # call postprocessing
@@ -162,10 +227,12 @@ class HartreeInterface(AbstractDMFTSolver):
         Organize G_freq, G_time, Sigma_freq and G_l from hartree solver
         """
 
-        # get everything from solver
-        self.G0_freq << self.triqs_solver.G0_iw
-        self.G_freq_unsym << self.triqs_solver.G_iw
-        self.G_freq << self.triqs_solver.G_iw
+        # get everything from solver, converting the solver's DLR Matsubara Green's
+        # functions back onto the full Matsubara mesh used throughout solid_dmft
+        n_iw = self.general_params['n_iw']
+        self.G0_freq << make_gf_imfreq(self.triqs_solver.G0_iw, n_iw)
+        self.G_freq_unsym << make_gf_imfreq(self.triqs_solver.G_iw, n_iw)
+        self.G_freq << make_gf_imfreq(self.triqs_solver.G_iw, n_iw)
         self.sum_k.symm_deg_gf(self.G_freq, ish=self.icrsh)
         for bl, gf in self.Sigma_freq:
             self.Sigma_freq[bl] << self.triqs_solver.Sigma_HF[bl]

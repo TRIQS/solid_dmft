@@ -468,6 +468,10 @@ tol : float, default = 1e-5
         tolerance for root finder if one_shot=False.
 with_fock : bool, default = False
         include Fock exchange terms in the self-energy
+eps_dlr : float, default = 1e-10
+        DLR accuracy used to build the DLR Matsubara mesh of the Hartree solver. The DLR
+        energy cutoff w_max is determined automatically each DMFT iteration from the full
+        Matsubara Weiss field via triqs' find_w_max for this accuracy.
 
 [  dft  ]
 ---------

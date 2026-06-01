@@ -181,6 +181,7 @@ method = "krylov"
 one_shot = false
 tol = 1e-5
 with_fock = false
+eps_dlr = 1e-10
 
 [dft]
 dft_code = "<none>"
