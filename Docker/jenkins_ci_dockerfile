@@ -20,7 +20,7 @@ RUN cd / && git clone -b unstable --depth 1 https://github.com/TRIQS/hubbardI.gi
     && make install
 
 # Hartree-Fock solver
-RUN cd / && git clone -b 3.3.x --depth 1 https://github.com/TRIQS/hartree_fock.git hartree.src \
+RUN cd / && git clone -b unstable --depth 1 https://github.com/TRIQS/hartree_fock.git hartree.src \
     && mkdir -p hartree.build && cd hartree.build \
     && cmake ../hartree.src \
     && make install

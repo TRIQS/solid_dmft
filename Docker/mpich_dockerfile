@@ -171,8 +171,8 @@ RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hubba
     && cmake ../hubbardI.src -DCMAKE_INSTALL_PREFIX=/triqs \
     && make -j$NCORES && make -j$NCORES test && make install
 
-# hartree_fock, 3.3.x needs to be changed to unstable eventually
-RUN cd /source && git clone -b 3.3.x --depth 1 https://github.com/TRIQS/hartree_fock.git hartree_fock.src \
+# hartree_fock
+RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hartree_fock.git hartree_fock.src \
     && mkdir -p hartree_fock.build && cd hartree_fock.build \
     && cmake ../hartree_fock.src -DCMAKE_INSTALL_PREFIX=/triqs \
     && make -j$NCORES && ctest -j$NCORES && make install

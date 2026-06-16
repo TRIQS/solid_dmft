@@ -157,7 +157,7 @@ RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hubba
     && make -j2 && make -j2 test && make install
 
 # Hartree-Fock
-RUN cd /source && git clone -b 3.3.x --depth 1 https://github.com/TRIQS/hartree_fock hartree.src \
+RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hartree_fock hartree.src \
     && mkdir -p hartree.build && cd hartree.build \
     && cmake ../hartree.src -DCMAKE_INSTALL_PREFIX=/triqs \
     && make -j2 && make -j2 test && make install

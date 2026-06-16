@@ -218,8 +218,8 @@ RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hubba
     && cmake ../hubbardI.src \
     && make -j$NCORES && ctest -j$NCORES && make install
 
-# hartree_fock, 3.3.x works, but eventually this needs to be moved to unstable
-RUN cd /source && git clone -b 3.3.x --depth 1 https://github.com/TRIQS/hartree_fock.git hartree_fock.src \
+# hartree_fock
+RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hartree_fock.git hartree_fock.src \
     && mkdir -p hartree_fock.build && cd hartree_fock.build \
     && cmake ../hartree_fock.src \
     && make -j$NCORES && ctest -j$NCORES && make install

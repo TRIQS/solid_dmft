@@ -61,12 +61,12 @@ class HartreeInterface(AbstractDMFTSolver):
         # take care of changing the parameters
         gf_struct = self.sum_k.gf_struct_solver_list[self.icrsh]
 
+        # The hartree solver now takes a ready-made mesh (MeshImFreq or MeshDLRImFreq)
+        # and derives beta/n_iw from it. Reuse the sum_k Matsubara mesh so that the
+        # solver's G0_iw lives on the same mesh as self.G0_freq (see solve()).
         self.triqs_solver = hartree_solver(
-            beta=self.general_params['beta'],
+            mesh=self.sum_k.mesh,
             gf_struct=gf_struct,
-            n_iw=self.general_params['n_iw'],
-            #eps=self.solver_params.get('eps_dlr', 1e-13),  # these will need to be added for the new DLR interface of the Hartree solver unstable branch 
-            #w_max = self.solver_params.get("w_max", 30),
             force_real=self.solver_params['force_real'],
             symmetries=[self._make_spin_equal],
             dc_U=self.general_params['U'][self.icrsh],
