@@ -1,7 +1,19 @@
 version: 2
 updates:
+  # Default branch (3.3.x)
   - package-ecosystem: "github-actions"
     directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      batch:
+        patterns:
+          - "*"
+
+  # unstable branch
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: "unstable"
     schedule:
       interval: "weekly"
     groups:
