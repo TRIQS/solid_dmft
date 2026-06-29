@@ -1,0 +1,34 @@
+﻿gw\_embedding
+=============
+
+.. automodule:: gw_embedding
+    :members:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+    :toctree:
+    :template: autosummary_module_template.rst 
+    :recursive:
+
+    
+    gw_embedding.bdft_converter
+    gw_embedding.gw_flow
+    gw_embedding.iaft
+    gw_embedding.qp_evs_to_eig
+
+

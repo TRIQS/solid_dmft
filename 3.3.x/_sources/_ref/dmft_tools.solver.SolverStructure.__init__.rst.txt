@@ -1,0 +1,6 @@
+dmft\_tools.solver.SolverStructure.\_\_init\_\_
+===============================================
+
+.. currentmodule:: dmft_tools.solver
+
+.. automethod:: SolverStructure.__init__

@@ -1,0 +1,21 @@
+gw\_embedding.qp\_evs\_to\_eig
+==============================
+
+.. automodule:: gw_embedding.qp_evs_to_eig
+    :members:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

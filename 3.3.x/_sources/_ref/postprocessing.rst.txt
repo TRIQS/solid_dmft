@@ -1,0 +1,37 @@
+﻿postprocessing
+==============
+
+.. automodule:: postprocessing
+    :members:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+    :toctree:
+    :template: autosummary_module_template.rst 
+    :recursive:
+
+    
+    postprocessing.eval_U_cRPA_RESPACK
+    postprocessing.eval_U_cRPA_Vasp
+    postprocessing.maxent_gf_imp
+    postprocessing.maxent_gf_latt
+    postprocessing.maxent_sigma
+    postprocessing.pade_sigma
+    postprocessing.plot_correlated_bands
+
+

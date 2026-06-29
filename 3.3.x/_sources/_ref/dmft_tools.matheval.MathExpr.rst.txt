@@ -1,0 +1,31 @@
+dmft\_tools.matheval.MathExpr
+=============================
+
+.. currentmodule:: dmft_tools.matheval
+
+.. autoclass:: MathExpr
+    :members:                               
+    :show-inheritance:                     
+    :inherited-members:                   
+    :special-members: __init__
+    :noindex:
+
+
+
+.. autosummary::
+    :toctree:                             
+    
+      ~MathExpr.__init__
+
+
+
+
+
+.. rubric:: Attributes
+
+.. autosummary::
+    :toctree:                             
+    
+      ~MathExpr.allowed_nodes
+      ~MathExpr.functions
+

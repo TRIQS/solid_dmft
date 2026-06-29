@@ -1,0 +1,29 @@
+dmft\_tools.solver
+==================
+
+.. automodule:: dmft_tools.solver
+    :members:
+
+
+
+
+
+
+
+.. rubric:: Classes
+
+.. autosummary::
+    :toctree:                                         
+    :template: autosummary_class_template.rst
+    
+    SolverStructure
+
+
+
+
+
+
+
+
+
+

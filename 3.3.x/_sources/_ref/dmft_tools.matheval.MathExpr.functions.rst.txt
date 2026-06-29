@@ -1,0 +1,6 @@
+dmft\_tools.matheval.MathExpr.functions
+=======================================
+
+.. currentmodule:: dmft_tools.matheval
+
+.. autoattribute:: MathExpr.functions
