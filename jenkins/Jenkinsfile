@@ -162,25 +162,13 @@ catchError {
           def commit = sh(returnStdout: true, script: "git rev-parse HEAD").trim()
           def release = env.BRANCH_NAME == "master" || env.BRANCH_NAME == "unstable" || sh(returnStdout: true, script: "git describe --exact-match HEAD || true").trim()
           lock(resource: 'triqs_publish') {
-            /* Update documention on gh-pages branch */
-            dir("$WORKSPACE_TMP/gh-pages") {
-              def subdir = "$projectName/${env.BRANCH_NAME}"
-              def ghp = scmGit(branches: [[name: 'refs/heads/master']],
-                extensions: [cloneOption(shallow: true, depth: 1, noTags: true)],
-                userRemoteConfigs: [[credentialsId: 'github-jenkins', url: 'https://github.com/TRIQS/TRIQS.github.io.git']])
-              checkout scm: ghp, changelog: false, poll: false
-              sh "rm -rf ${subdir}"
-              def installDir = "$installBase/install/$JOB_NAME/$documentationPlatform"
-              sh """#!/bin/bash -ex
-                base=$installDir/share/doc
-                dir="$projectName"
-                [[ -d \$base/triqs_\$dir ]] && dir=triqs_\$dir || [[ -d \$base/\$dir ]]
-                cp -r \$base/\$dir ${subdir}
-                git add -A ${subdir}
-                GIT_COMMITTER_EMAIL="jenkins@flatironinstitute.org" GIT_COMMITTER_NAME="Flatiron Jenkins" git commit --author='Flatiron Jenkins <jenkins@flatironinstitute.org>' --allow-empty -m 'Generated documentation for ${subdir}' -m '${env.BUILD_TAG} ${commit}'
-              """
-              gitPush(gitScm: ghp, targetBranch: 'master', targetRepo: 'origin')
-            }
+            /* Documentation is published per-branch to the repo's own gh-pages
+               branch (https://triqs.github.io/solid_dmft/<branch>/) by the GitHub
+               Actions workflows (.github/workflows/build_{unstable_doc,release}.yml
+               + update_doc_index.yml). It is intentionally NOT pushed to the
+               central TRIQS.github.io repo from here: a project gh-pages page
+               shadows a same-named folder in the org page, so such a push would be
+               unreachable. */
             /* Update packaging repo submodule */
             if (release) {
               dir("$WORKSPACE_TMP/packaging") {
