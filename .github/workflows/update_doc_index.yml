@@ -1,0 +1,83 @@
+name: update doc index
+
+# Reusable workflow: regenerates the root index.html on the gh-pages branch so
+# that visiting https://triqs.github.io/solid_dmft/ redirects to latest/ and
+# lists every published version folder. Called after a docs deploy.
+
+on:
+  workflow_call:
+
+permissions:
+  contents: write
+
+jobs:
+  regenerate:
+    name: regenerate root index.html
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout gh-pages
+        uses: actions/checkout@v7
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+
+      - name: Generate root index.html
+        shell: bash
+        run: |
+          set -e
+          # Top-level directories are the version folders (latest, unstable,
+          # 3.3.x, ...). List them all except "latest" in the navigation list,
+          # newest first via version sort. Use globbing (not `ls` parsing) so
+          # folder names are taken verbatim.
+          shopt -s nullglob
+          dirs=()
+          releases=()
+          for p in */; do
+            name="${p%/}"
+            case "$name" in [0-9]*.[0-9]*.x) releases+=("$name");; esac
+            [ "$name" = "latest" ] && continue
+            dirs+=("$name")
+          done
+          sorted=$(printf '%s\n' "${dirs[@]}" | sort -Vr)
+          # Redirect target: latest/ if it exists, else the newest release
+          # folder, else unstable/. Avoids a broken root before any release is
+          # published.
+          if [ -d latest ]; then
+            target=latest
+          elif [ ${#releases[@]} -gt 0 ]; then
+            target=$(printf '%s\n' "${releases[@]}" | sort -Vr | head -n1)
+          else
+            target=unstable
+          fi
+          {
+            echo '<html>'
+            echo '<head>'
+            echo "  <meta http-equiv=\"refresh\" content=\"0; url=${target}/\">"
+            echo '</head>'
+            echo '<body>'
+            echo '  <ul>'
+            while IFS= read -r d; do
+              [ -z "$d" ] && continue
+              echo "    <li><a href=\"$d/\">$d</a></li>"
+            done <<< "$sorted"
+            echo '  </ul>'
+            echo '</body>'
+            echo '</html>'
+          } > index.html
+          cat index.html
+
+      - name: Commit and push index
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --quiet --cached && { echo "index unchanged"; exit 0; }
+          git commit -m "Update root doc index"
+          # Retry on a concurrent gh-pages write (e.g. parallel doc deploy).
+          for i in 1 2 3; do
+            git push && exit 0
+            echo "push failed, rebasing and retrying ($i)..."
+            git pull --rebase origin gh-pages
+          done
+          git push

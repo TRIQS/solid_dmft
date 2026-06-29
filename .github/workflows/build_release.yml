@@ -30,10 +30,43 @@ jobs:
 
       - name: Build solid_dmft
         run: |
-          cmake -S . -B build/
+          cmake -S . -B build/ -DBuild_Documentation=ON
           cmake --build build/ --verbose
 
       - name: Test solid_dmft
         run: |
           cmake --build build/ --target test
+
+      - name: Determine latest release branch
+        id: latest
+        run: |
+          # Highest-version X.Y.x branch is treated as the stable release that
+          # "latest" points to. Query the remote by explicit URL: inside the CI
+          # container the checkout has no usable "origin" remote.
+          latest=$(git ls-remote --heads "https://github.com/${{ github.repository }}.git" '[0-9]*.[0-9]*.x' \
+            | sed 's#.*refs/heads/##' | sort -V | tail -n1)
+          echo "latest_branch=$latest" >> "$GITHUB_OUTPUT"
+          echo "Latest release branch: '$latest' (building: '${{ github.ref_name }}')"
+
+      - name: Deploy docs for this release 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          # Each release line gets its own folder (e.g. 3.3.x/). `clean` is scoped
+          # to this target-folder, so sibling branch folders survive.
+          folder: build/doc/html/
+          target-folder: ${{ github.ref_name }}
+
+      - name: Deploy docs to latest 🚀
+        if: steps.latest.outputs.latest_branch == github.ref_name
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: build/doc/html/
+          target-folder: latest
+
+  doc-index:
+    name: doc index
+    needs: build
+    uses: ./.github/workflows/update_doc_index.yml
 
