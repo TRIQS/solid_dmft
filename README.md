@@ -13,10 +13,10 @@ This program allows to perform DFT+DMFT one-shot and charge self-consistent (CSC
 ### Documentation & tutorials
 
 To learn how to use solid_dmft, take a look at the [online documentation](https://triqs.github.io/solid_dmft/). There you can find:
-* [input / output documentation](https://triqs.github.io/solid_dmft/documentation.html#input-output)
-* [reference manual of functions](https://triqs.github.io/solid_dmft/documentation.html#module-reference-manual)
-* [code structure](https://triqs.github.io/solid_dmft/documentation.html#code-structure)
-* [tutorials](https://triqs.github.io/solid_dmft/tutorials.html)
+* [input / output documentation](https://triqs.github.io/solid_dmft/latest/documentation.html#input-output)
+* [reference manual of functions](https://triqs.github.io/solid_dmft/latest/documentation.html#module-reference-manual)
+* [code structure](https://triqs.github.io/solid_dmft/latest/documentation.html#code-structure)
+* [tutorials](https://triqs.github.io/solid_dmft/latest/tutorials.html)
 
 Check also the [solid_dmft publication](https://doi.org/10.21105/joss.04623) in the JOSS journal for more information and further references.
 
@@ -30,7 +30,7 @@ However, please make sure that you have a valid TRIQS and TRIQS/DFTTools install
 
 A more thorough installation can be performed manually via `cmake`, which will also check if you have a working and matching TRIQS installation.
 
-Please check the [installation page](https://triqs.github.io/solid_dmft/install.html) on the online documentation for more detailed instructions.
+Please check the [installation page](https://triqs.github.io/solid_dmft/latest/install.html) on the online documentation for more detailed instructions.
 
 ---
 

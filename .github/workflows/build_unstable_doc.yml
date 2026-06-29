@@ -41,5 +41,13 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
+          # Publish the unstable docs into their own subfolder so the per-branch
+          # folders (latest, 3.3.x, ...) coexist on gh-pages. `clean` is scoped to
+          # this target-folder, so sibling folders survive. Do NOT set
+          # single-commit here: it would wipe the whole branch (and all siblings).
           folder: build/doc/html/
-          single-commit: true
+          target-folder: unstable
+
+  update-index:
+    needs: build
+    uses: ./.github/workflows/update_doc_index.yml
