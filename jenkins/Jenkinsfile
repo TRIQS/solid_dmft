@@ -89,7 +89,8 @@ def runBuild = { String platform, String prefix, List<String> envs ->
       """
       catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
         try {
-          sh "ctest --output-on-failure -j\$PARALLEL"
+          /* run tests in a single rank since they use MPI */
+          sh "ctest --output-on-failure -j1"
         } catch (exc) {
           archiveArtifacts(artifacts: 'Testing/Temporary/LastTest.log')
           throw exc
