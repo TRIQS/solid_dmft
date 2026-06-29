@@ -1,0 +1,26 @@
+dmft\_tools.solvers.hubbardI\_interface.HubbardIInterface
+=========================================================
+
+.. currentmodule:: dmft_tools.solvers.hubbardI_interface
+
+.. autoclass:: HubbardIInterface
+    :members:                               
+    :private-members:
+    :show-inheritance:                     
+    :inherited-members:                   
+    :special-members: __init__
+    :noindex:
+
+
+
+.. autosummary::
+    :toctree:                             
+    
+      ~HubbardIInterface.__init__
+      ~HubbardIInterface.postprocess
+      ~HubbardIInterface.solve
+
+
+
+
+

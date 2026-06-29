@@ -1,0 +1,38 @@
+dmft\_tools.solvers
+===================
+
+.. automodule:: dmft_tools.solvers
+    :members:
+    :private-members:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+    :toctree:
+    :template: autosummary_module_template.rst 
+    :recursive:
+
+    
+    dmft_tools.solvers.abstractdmftsolver
+    dmft_tools.solvers.cthyb_interface
+    dmft_tools.solvers.ctint_interface
+    dmft_tools.solvers.ctseg_interface
+    dmft_tools.solvers.ftps_interface
+    dmft_tools.solvers.hartree_interface
+    dmft_tools.solvers.hubbardI_interface
+
+

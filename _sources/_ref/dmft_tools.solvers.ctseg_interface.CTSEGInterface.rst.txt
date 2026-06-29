@@ -1,0 +1,26 @@
+dmft\_tools.solvers.ctseg\_interface.CTSEGInterface
+===================================================
+
+.. currentmodule:: dmft_tools.solvers.ctseg_interface
+
+.. autoclass:: CTSEGInterface
+    :members:                               
+    :private-members:
+    :show-inheritance:                     
+    :inherited-members:                   
+    :special-members: __init__
+    :noindex:
+
+
+
+.. autosummary::
+    :toctree:                             
+    
+      ~CTSEGInterface.__init__
+      ~CTSEGInterface.postprocess
+      ~CTSEGInterface.solve
+
+
+
+
+

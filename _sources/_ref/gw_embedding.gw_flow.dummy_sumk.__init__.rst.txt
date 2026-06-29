@@ -1,0 +1,6 @@
+gw\_embedding.gw\_flow.dummy\_sumk.\_\_init\_\_
+===============================================
+
+.. currentmodule:: gw_embedding.gw_flow
+
+.. automethod:: dummy_sumk.__init__

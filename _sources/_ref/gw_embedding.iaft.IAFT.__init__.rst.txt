@@ -1,0 +1,6 @@
+gw\_embedding.iaft.IAFT.\_\_init\_\_
+====================================
+
+.. currentmodule:: gw_embedding.iaft
+
+.. automethod:: IAFT.__init__

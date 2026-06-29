@@ -1,0 +1,6 @@
+dmft\_tools.solvers.hubbardI\_interface.HubbardIInterface.solve
+===============================================================
+
+.. currentmodule:: dmft_tools.solvers.hubbardI_interface
+
+.. automethod:: HubbardIInterface.solve

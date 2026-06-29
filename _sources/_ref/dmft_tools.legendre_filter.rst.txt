@@ -1,0 +1,22 @@
+dmft\_tools.legendre\_filter
+============================
+
+.. automodule:: dmft_tools.legendre_filter
+    :members:
+    :private-members:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

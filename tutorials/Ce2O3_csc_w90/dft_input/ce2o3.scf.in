@@ -1,0 +1,45 @@
+&control
+   calculation        = 'scf',
+   restart_mode       = 'from_scratch',
+   wf_collect         = .false.,
+   prefix             = 'ce2o3_soliddmft', 
+   tstress            = .true., 
+   tprnfor            = .true., 
+   pseudo_dir         = 'pseudo/',
+   outdir             = 'QE_tmp/',
+/ 
+&system 
+   ibrav              = 0,
+   celldm(1)          = 7.3510340956,
+   nat                = 5,
+   ntyp               = 2,
+   ecutwfc            = 70.0,
+   ecutrho            = 840.0,
+   occupations        = 'smearing',
+   degauss            = 0.01,
+   smearing           = 'm-p',
+/ 
+&electrons 
+   conv_thr           = 1.0d-8,
+   mixing_beta        = 0.7,
+   mixing_mode        = 'local-TF'
+/
+
+ATOMIC_SPECIES 
+   Ce	140.116		  Ce.pbe-spdfn-rrkjus_psl.1.0.0.UPF
+   O    15.9994       o_pbe_v1.2.uspp.F.UPF
+
+CELL_PARAMETERS {alat}
+     1.0000000000   0.0000000000   0.0000000000
+    -0.5000000000   0.8660254038   0.0000000000
+     0.0000000000   0.0000000000   1.5574077247
+
+ATOMIC_POSITIONS crystal
+Ce      0.66666700000000      0.33333300000000      0.75412000000000
+Ce      0.33333300000000      0.66666700000000      0.24588000000000
+ O      0.66666700000000      0.33333300000000      0.35741800000000
+ O      0.33333300000000      0.66666700000000      0.64258200000000
+ O      0.00000000000000      0.00000000000000      0.00000000000000
+
+K_POINTS automatic
+  4 4 3 0 0 0 
