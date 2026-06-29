@@ -1,6 +1,0 @@
-gw\_embedding.iaft.IAFT.check\_leakage
-======================================
-
-.. currentmodule:: gw_embedding.iaft
-
-.. automethod:: IAFT.check_leakage

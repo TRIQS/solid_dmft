@@ -1,6 +1,0 @@
-dmft\_tools.solvers.hartree\_interface.HartreeInterface.solve
-=============================================================
-
-.. currentmodule:: dmft_tools.solvers.hartree_interface
-
-.. automethod:: HartreeInterface.solve

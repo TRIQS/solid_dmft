@@ -1,6 +1,0 @@
-dmft\_tools.matheval.MathExpr.allowed\_nodes
-============================================
-
-.. currentmodule:: dmft_tools.matheval
-
-.. autoattribute:: MathExpr.allowed_nodes
