@@ -1,0 +1,6 @@
+dmft\_tools.solvers.cthyb\_interface.CTHYBInterface.postprocess
+===============================================================
+
+.. currentmodule:: dmft_tools.solvers.cthyb_interface
+
+.. automethod:: CTHYBInterface.postprocess

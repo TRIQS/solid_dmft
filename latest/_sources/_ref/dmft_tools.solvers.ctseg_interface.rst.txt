@@ -1,0 +1,30 @@
+dmft\_tools.solvers.ctseg\_interface
+====================================
+
+.. automodule:: dmft_tools.solvers.ctseg_interface
+    :members:
+    :private-members:
+
+
+
+
+
+
+
+.. rubric:: Classes
+
+.. autosummary::
+    :toctree:                                         
+    :template: autosummary_class_template.rst
+    
+    CTSEGInterface
+
+
+
+
+
+
+
+
+
+

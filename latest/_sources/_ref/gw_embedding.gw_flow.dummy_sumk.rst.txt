@@ -1,0 +1,25 @@
+gw\_embedding.gw\_flow.dummy\_sumk
+==================================
+
+.. currentmodule:: gw_embedding.gw_flow
+
+.. autoclass:: dummy_sumk
+    :members:                               
+    :private-members:
+    :show-inheritance:                     
+    :inherited-members:                   
+    :special-members: __init__
+    :noindex:
+
+
+
+.. autosummary::
+    :toctree:                             
+    
+      ~dummy_sumk.__init__
+      ~dummy_sumk.symm_deg_gf
+
+
+
+
+

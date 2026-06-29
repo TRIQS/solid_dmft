@@ -1,0 +1,6 @@
+gw\_embedding.iaft.IAFT.tau\_to\_w
+==================================
+
+.. currentmodule:: gw_embedding.iaft
+
+.. automethod:: IAFT.tau_to_w

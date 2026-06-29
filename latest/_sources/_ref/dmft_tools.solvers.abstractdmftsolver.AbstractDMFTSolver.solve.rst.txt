@@ -1,0 +1,6 @@
+dmft\_tools.solvers.abstractdmftsolver.AbstractDMFTSolver.solve
+===============================================================
+
+.. currentmodule:: dmft_tools.solvers.abstractdmftsolver
+
+.. automethod:: AbstractDMFTSolver.solve

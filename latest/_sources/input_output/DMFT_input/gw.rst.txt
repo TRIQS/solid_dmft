@@ -1,0 +1,44 @@
+
+[GW]: GW embedding inputs
+-------------------------
+
+List of parameters for the GW embedding calculation. The parameters are ignored unless gw_embedding=true, or interactions are read from cRPA.
+
+
+
+
+
+.. admonition:: code 
+ 	:class: intag  
+ 
+            **type** = str;  **default**  = None
+
+        GW embedding code: aimbes or Vasp to load screened interaction
+
+.. admonition:: h5_file 
+ 	:class: intag  
+ 
+            **type** = str;  **default**  = None
+
+        path to h5 file in which the aimbes results are stored (checkpoint file)
+
+.. admonition:: use_rot 
+ 	:class: intag  
+ 
+            **type** = bool;  **default**  = False
+
+        use rotations of sum_k object to rotate 2 particle objects
+
+.. admonition:: it_1 
+ 	:class: intag  
+ 
+            **type** = int;  **default**  = 0
+
+        iteration to load 1 particle objects from aimbes
+
+.. admonition:: it_2 
+ 	:class: intag  
+ 
+            **type** = int;  **default**  = 0
+
+        iteration to load 2 particle objects from aimbes

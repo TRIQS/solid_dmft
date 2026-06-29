@@ -1,0 +1,6 @@
+gw\_embedding.iaft.IAFT.wn\_mesh
+================================
+
+.. currentmodule:: gw_embedding.iaft
+
+.. automethod:: IAFT.wn_mesh
