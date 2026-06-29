@@ -48,6 +48,7 @@ jobs:
           folder: build/doc/html/
           target-folder: unstable
 
-  update-index:
+  doc-index:
+    name: doc index
     needs: build
     uses: ./.github/workflows/update_doc_index.yml

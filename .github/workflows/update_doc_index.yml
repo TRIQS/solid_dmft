@@ -11,7 +11,8 @@ permissions:
   contents: write
 
 jobs:
-  update-index:
+  regenerate:
+    name: regenerate root index.html
     runs-on: ubuntu-latest
 
     steps:
@@ -31,16 +32,28 @@ jobs:
           # folder names are taken verbatim.
           shopt -s nullglob
           dirs=()
+          releases=()
           for p in */; do
             name="${p%/}"
+            case "$name" in [0-9]*.[0-9]*.x) releases+=("$name");; esac
             [ "$name" = "latest" ] && continue
             dirs+=("$name")
           done
           sorted=$(printf '%s\n' "${dirs[@]}" | sort -Vr)
+          # Redirect target: latest/ if it exists, else the newest release
+          # folder, else unstable/. Avoids a broken root before any release is
+          # published.
+          if [ -d latest ]; then
+            target=latest
+          elif [ ${#releases[@]} -gt 0 ]; then
+            target=$(printf '%s\n' "${releases[@]}" | sort -Vr | head -n1)
+          else
+            target=unstable
+          fi
           {
             echo '<html>'
             echo '<head>'
-            echo '  <meta http-equiv="refresh" content="0; url=latest/">'
+            echo "  <meta http-equiv=\"refresh\" content=\"0; url=${target}/\">"
             echo '</head>'
             echo '<body>'
             echo '  <ul>'

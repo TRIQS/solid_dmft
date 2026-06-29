@@ -64,7 +64,8 @@ jobs:
           folder: build/doc/html/
           target-folder: latest
 
-  update-index:
+  doc-index:
+    name: doc index
     needs: build
     uses: ./.github/workflows/update_doc_index.yml
 
