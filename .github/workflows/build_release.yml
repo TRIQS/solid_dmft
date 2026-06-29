@@ -40,9 +40,10 @@ jobs:
       - name: Determine latest release branch
         id: latest
         run: |
-          # Highest-version X.Y.x branch on origin is treated as the stable
-          # release that "latest" points to.
-          latest=$(git ls-remote --heads origin '[0-9]*.[0-9]*.x' \
+          # Highest-version X.Y.x branch is treated as the stable release that
+          # "latest" points to. Query the remote by explicit URL: inside the CI
+          # container the checkout has no usable "origin" remote.
+          latest=$(git ls-remote --heads "https://github.com/${{ github.repository }}.git" '[0-9]*.[0-9]*.x' \
             | sed 's#.*refs/heads/##' | sort -V | tail -n1)
           echo "latest_branch=$latest" >> "$GITHUB_OUTPUT"
           echo "Latest release branch: '$latest' (building: '${{ github.ref_name }}')"
