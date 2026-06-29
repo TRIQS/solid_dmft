@@ -1,0 +1,46 @@
+[general]
+seedname = "ce2o3"
+jobname = "b10-U6.46-J0.46"
+csc = true
+
+eta = 0.5
+n_iw = 100
+n_tau = 5001
+
+n_iter_dmft_first = 2
+n_iter_dmft_per = 1
+n_iter_dmft = 5
+
+enforce_off_diag = false
+block_threshold = 1e-03
+
+h_int_type = "density_density"
+h_int_basis = "qe"
+U = 6.46
+J = 0.46
+beta = 10
+prec_mu = 0.1
+
+sigma_mix = 1.0
+g0_mix = 1.0
+dc_type = 0
+dc = true
+dc_dmft = true
+calc_energies = true
+
+h5_save_freq = 1
+
+[solver]
+type = "hubbardI"
+n_l = 15
+store_solver = false
+measure_G_l = false
+measure_density_matrix = true
+
+[dft]
+dft_code = "qe"
+n_cores = 10
+mpi_env = "default"
+projector_type = "w90"
+dft_exec = "pw.x"
+w90_tolerance = 1e-1

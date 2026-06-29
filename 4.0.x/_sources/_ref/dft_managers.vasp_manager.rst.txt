@@ -1,0 +1,22 @@
+dft\_managers.vasp\_manager
+===========================
+
+.. automodule:: dft_managers.vasp_manager
+    :members:
+    :private-members:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,33 @@
+﻿util
+====
+
+.. automodule:: util
+    :members:
+    :private-members:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+    :toctree:
+    :template: autosummary_module_template.rst 
+    :recursive:
+
+    
+    util.symmetrize_gamma_file
+    util.write_kslice_to_h5
+
+

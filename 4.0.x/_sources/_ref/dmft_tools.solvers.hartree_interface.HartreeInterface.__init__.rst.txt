@@ -1,0 +1,6 @@
+dmft\_tools.solvers.hartree\_interface.HartreeInterface.\_\_init\_\_
+====================================================================
+
+.. currentmodule:: dmft_tools.solvers.hartree_interface
+
+.. automethod:: HartreeInterface.__init__

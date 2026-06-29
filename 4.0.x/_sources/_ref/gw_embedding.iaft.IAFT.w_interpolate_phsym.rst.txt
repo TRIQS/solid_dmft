@@ -1,0 +1,6 @@
+gw\_embedding.iaft.IAFT.w\_interpolate\_phsym
+=============================================
+
+.. currentmodule:: gw_embedding.iaft
+
+.. automethod:: IAFT.w_interpolate_phsym

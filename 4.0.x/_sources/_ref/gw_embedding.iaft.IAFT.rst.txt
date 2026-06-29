@@ -1,0 +1,34 @@
+gw\_embedding.iaft.IAFT
+=======================
+
+.. currentmodule:: gw_embedding.iaft
+
+.. autoclass:: IAFT
+    :members:                               
+    :private-members:
+    :show-inheritance:                     
+    :inherited-members:                   
+    :special-members: __init__
+    :noindex:
+
+
+
+.. autosummary::
+    :toctree:                             
+    
+      ~IAFT.__init__
+      ~IAFT.check_leakage
+      ~IAFT.tau_interpolate
+      ~IAFT.tau_interpolate_phsym
+      ~IAFT.tau_to_w
+      ~IAFT.tau_to_w_phsym
+      ~IAFT.w_interpolate
+      ~IAFT.w_interpolate_phsym
+      ~IAFT.w_to_tau
+      ~IAFT.w_to_tau_phsym
+      ~IAFT.wn_mesh
+
+
+
+
+

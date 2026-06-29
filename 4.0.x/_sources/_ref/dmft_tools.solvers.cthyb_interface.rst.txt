@@ -1,0 +1,30 @@
+dmft\_tools.solvers.cthyb\_interface
+====================================
+
+.. automodule:: dmft_tools.solvers.cthyb_interface
+    :members:
+    :private-members:
+
+
+
+
+
+
+
+.. rubric:: Classes
+
+.. autosummary::
+    :toctree:                                         
+    :template: autosummary_class_template.rst
+    
+    CTHYBInterface
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,30 @@
+dmft\_tools.solvers.hubbardI\_interface
+=======================================
+
+.. automodule:: dmft_tools.solvers.hubbardI_interface
+    :members:
+    :private-members:
+
+
+
+
+
+
+
+.. rubric:: Classes
+
+.. autosummary::
+    :toctree:                                         
+    :template: autosummary_class_template.rst
+    
+    HubbardIInterface
+
+
+
+
+
+
+
+
+
+

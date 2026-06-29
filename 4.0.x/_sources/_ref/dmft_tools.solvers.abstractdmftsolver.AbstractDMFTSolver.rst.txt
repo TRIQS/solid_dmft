@@ -1,0 +1,26 @@
+dmft\_tools.solvers.abstractdmftsolver.AbstractDMFTSolver
+=========================================================
+
+.. currentmodule:: dmft_tools.solvers.abstractdmftsolver
+
+.. autoclass:: AbstractDMFTSolver
+    :members:                               
+    :private-members:
+    :show-inheritance:                     
+    :inherited-members:                   
+    :special-members: __init__
+    :noindex:
+
+
+
+.. autosummary::
+    :toctree:                             
+    
+      ~AbstractDMFTSolver.__init__
+      ~AbstractDMFTSolver.postprocess
+      ~AbstractDMFTSolver.solve
+
+
+
+
+

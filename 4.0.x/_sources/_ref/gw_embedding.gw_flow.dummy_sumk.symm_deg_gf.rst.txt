@@ -1,0 +1,6 @@
+gw\_embedding.gw\_flow.dummy\_sumk.symm\_deg\_gf
+================================================
+
+.. currentmodule:: gw_embedding.gw_flow
+
+.. automethod:: dummy_sumk.symm_deg_gf

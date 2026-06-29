@@ -1,0 +1,6 @@
+gw\_embedding.iaft.IAFT.tau\_interpolate
+========================================
+
+.. currentmodule:: gw_embedding.iaft
+
+.. automethod:: IAFT.tau_interpolate

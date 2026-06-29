@@ -1,0 +1,6 @@
+dmft\_tools.solvers.abstractdmftsolver.AbstractDMFTSolver.postprocess
+=====================================================================
+
+.. currentmodule:: dmft_tools.solvers.abstractdmftsolver
+
+.. automethod:: AbstractDMFTSolver.postprocess

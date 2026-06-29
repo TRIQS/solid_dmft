@@ -1,0 +1,30 @@
+dmft\_tools.solvers.abstractdmftsolver
+======================================
+
+.. automodule:: dmft_tools.solvers.abstractdmftsolver
+    :members:
+    :private-members:
+
+
+
+
+
+
+
+.. rubric:: Classes
+
+.. autosummary::
+    :toctree:                                         
+    :template: autosummary_class_template.rst
+    
+    AbstractDMFTSolver
+
+
+
+
+
+
+
+
+
+

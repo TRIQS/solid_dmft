@@ -1,0 +1,6 @@
+dmft\_tools.solvers.cthyb\_interface.CTHYBInterface.\_\_init\_\_
+================================================================
+
+.. currentmodule:: dmft_tools.solvers.cthyb_interface
+
+.. automethod:: CTHYBInterface.__init__
