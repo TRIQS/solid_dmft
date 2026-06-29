@@ -1,0 +1,26 @@
+dmft\_tools.solvers.hartree\_interface.HartreeInterface
+=======================================================
+
+.. currentmodule:: dmft_tools.solvers.hartree_interface
+
+.. autoclass:: HartreeInterface
+    :members:                               
+    :private-members:
+    :show-inheritance:                     
+    :inherited-members:                   
+    :special-members: __init__
+    :noindex:
+
+
+
+.. autosummary::
+    :toctree:                             
+    
+      ~HartreeInterface.__init__
+      ~HartreeInterface.postprocess
+      ~HartreeInterface.solve
+
+
+
+
+

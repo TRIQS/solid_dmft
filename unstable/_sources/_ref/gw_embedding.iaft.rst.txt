@@ -1,0 +1,30 @@
+gw\_embedding.iaft
+==================
+
+.. automodule:: gw_embedding.iaft
+    :members:
+    :private-members:
+
+
+
+
+
+
+
+.. rubric:: Classes
+
+.. autosummary::
+    :toctree:                                         
+    :template: autosummary_class_template.rst
+    
+    IAFT
+
+
+
+
+
+
+
+
+
+

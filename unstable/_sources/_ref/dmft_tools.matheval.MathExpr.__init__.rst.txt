@@ -1,0 +1,6 @@
+dmft\_tools.matheval.MathExpr.\_\_init\_\_
+==========================================
+
+.. currentmodule:: dmft_tools.matheval
+
+.. automethod:: MathExpr.__init__

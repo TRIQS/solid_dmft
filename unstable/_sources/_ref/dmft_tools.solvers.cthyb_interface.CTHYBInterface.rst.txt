@@ -1,0 +1,26 @@
+dmft\_tools.solvers.cthyb\_interface.CTHYBInterface
+===================================================
+
+.. currentmodule:: dmft_tools.solvers.cthyb_interface
+
+.. autoclass:: CTHYBInterface
+    :members:                               
+    :private-members:
+    :show-inheritance:                     
+    :inherited-members:                   
+    :special-members: __init__
+    :noindex:
+
+
+
+.. autosummary::
+    :toctree:                             
+    
+      ~CTHYBInterface.__init__
+      ~CTHYBInterface.postprocess
+      ~CTHYBInterface.solve
+
+
+
+
+

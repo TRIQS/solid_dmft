@@ -1,0 +1,30 @@
+gw\_embedding.gw\_flow
+======================
+
+.. automodule:: gw_embedding.gw_flow
+    :members:
+    :private-members:
+
+
+
+
+
+
+
+.. rubric:: Classes
+
+.. autosummary::
+    :toctree:                                         
+    :template: autosummary_class_template.rst
+    
+    dummy_sumk
+
+
+
+
+
+
+
+
+
+

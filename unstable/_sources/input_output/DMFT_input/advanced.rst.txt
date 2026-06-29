@@ -1,0 +1,85 @@
+[advanced]: Advanced inputs
+---------------------------
+
+Advanced parameters, do not modify the default value unless you know what you are doing.
+
+
+
+
+
+.. admonition:: dc_factor 
+ 	:class: intag  
+ 
+            **type** = float;  **default**  = None
+
+        If given, scales the dc energy by multiplying with this factor, usually < 1.
+        If None, the dc is left unchanged, which is equivalent to dc_factor=1.
+
+.. admonition:: dc_fixed_occ 
+ 	:class: intag  
+ 
+            **type** = list of float;  **default**  = None
+
+        If given, the occupation for the DC for each impurity is set to the provided value.
+        Still uses the same kind of DC!
+
+.. admonition:: dc_fixed_value 
+ 	:class: intag  
+ 
+            **type** = float;  **default**  = None
+
+        If given, it sets the DC (energy/imp) to this fixed value. Overwrites EVERY other DC configuration parameter if DC is turned on
+
+.. admonition:: dc_nominal 
+ 	:class: intag  
+ 
+            **type** = bool;  **default**  = False
+
+        TODO: write
+
+.. admonition:: dc_orb_shift 
+ 	:class: intag  
+ 
+            **type** = list of float;  **default**  = None
+
+        extra potential shift per orbital per impurity added to the DC
+
+.. admonition:: dc_J 
+ 	:class: intag  
+ 
+            **type** = float or list of float;  **default**  = general.J
+
+        J values for DC determination. If only one value is given, the same J is assumed for all impurities
+
+.. admonition:: dc_U 
+ 	:class: intag  
+ 
+            **type** = float or list of float;  **default**  = general.U
+
+        U values for DC determination. If only one value is given, the same U is assumed for all impurities
+
+.. admonition:: map_solver_struct 
+ 	:class: intag  
+ 
+            **type** = list of dict;  **default**  = None
+
+        Additional manual mapping of the solver block structure, applied
+        after the block structure finder for each impurity.
+        Give exactly one dict per ineq impurity.
+        see also triqs.github.io/dft_tools/latest/_python_api/triqs_dft_tools.block_structure.BlockStructure.map_gf_struct_solver.html
+
+.. admonition:: mapped_solver_struct_degeneracies 
+ 	:class: intag  
+ 
+            **type** = list;  **default**  = None
+
+        Degeneracies applied when using map_solver_struct, for each impurity.
+        If not given and map_solver_struct is used, no symmetrization will happen.
+
+.. admonition:: pick_solver_struct 
+ 	:class: intag  
+ 
+            **type** = list of dict;  **default**  = None
+
+        input a solver dictionary for each ineq impurity to reduce dimensionality of
+        solver block structure. Similar to to map_solver_struct, but with simpler syntax.

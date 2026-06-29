@@ -1,0 +1,6 @@
+dmft\_tools.solvers.ctseg\_interface.CTSEGInterface.\_\_init\_\_
+================================================================
+
+.. currentmodule:: dmft_tools.solvers.ctseg_interface
+
+.. automethod:: CTSEGInterface.__init__

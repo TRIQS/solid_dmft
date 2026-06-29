@@ -1,0 +1,6 @@
+dmft\_tools.solvers.hubbardI\_interface.HubbardIInterface.postprocess
+=====================================================================
+
+.. currentmodule:: dmft_tools.solvers.hubbardI_interface
+
+.. automethod:: HubbardIInterface.postprocess
