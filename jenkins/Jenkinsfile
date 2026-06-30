@@ -37,7 +37,14 @@ def runBuild = { String platform, String prefix, List<String> envs ->
   envs += [
     "OPENBLAS_NUM_THREADS=1",
     "MKL_NUM_THREADS=1",
-    "OMP_NUM_THREADS=1"]
+    "OMP_NUM_THREADS=1",
+    /* Tests run concurrently via `ctest -j`, each launching its own mpirun.
+       OpenMPI binds-to-core by default and every mpirun starts binding at
+       core 0, so all concurrent tests pile onto the same few cores while the
+       rest idle (8x slowdowns observed). Disable binding so the scheduler
+       spreads ranks, and allow oversubscription as a safety net. */
+    "OMPI_MCA_hwloc_base_binding_policy=none",
+    "OMPI_MCA_rmaps_base_oversubscribe=yes"]
   /* the triqs venv on macOS is built from the brew python, which may differ from the system python3 */
   def python3 = macos ? "${env.BREW}/bin/python3" : "python3"
   def pythonVer = sh(returnStdout: true, script: """$python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")'""").trim()
@@ -84,13 +91,19 @@ def runBuild = { String platform, String prefix, List<String> envs ->
       args += ' -DASAN=ON -DUBSAN=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo'
     dir(buildDir) {
       sh """#!/bin/sh -ex
-        cmake $WORKSPACE -DCMAKE_INSTALL_PREFIX=$installDir -DTRIQS_ROOT=$triqsDir $args
+        cmake $WORKSPACE -DCMAKE_INSTALL_PREFIX=$installDir -DTRIQS_ROOT=$triqsDir -DTEST_NUM_PROC=4 $args
         make -j\$PARALLEL || make -j1 VERBOSE=1
       """
       catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
         try {
-          /* run tests in a single rank since they use MPI */
-          sh "ctest --output-on-failure -j1"
+          /* Tests run 4 MPI ranks each (PROCESSORS property) with binding
+             disabled (see envs), so ctest -j is a core budget. The Linux build
+             pod requests cpus:16 (HT cores) = 8 physical cores, so -j8 runs 2
+             concurrent 4-rank tests = 8 ranks, one per physical core, with no
+             HT oversubscription. macOS m1 nodes have ~10 cores, so -j8 = 2
+             concurrent 4-rank tests too. */
+          def ctestJobs = 8
+          sh "ctest --output-on-failure -j${ctestJobs}"
         } catch (exc) {
           archiveArtifacts(artifacts: 'Testing/Temporary/LastTest.log')
           throw exc
@@ -124,8 +137,10 @@ for (int i = 0; i < dockerPlatforms.size(); i++) {
   platforms[platform] = { ->
     stage(platform) {
       timeout(time: 2, unit: 'HOURS') {
+        /* cpus: 16 HT cores = 8 physical; tests run at ctest -j8 (see runBuild). */
         runPod(tag: platform,
           devShm: true,
+          cpus: 16,
           mounts: mounts) {
           runBuild(platform, installBase, [])
         }

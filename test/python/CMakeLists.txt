@@ -36,6 +36,21 @@ endforeach()
 
 # ------------------------------#
 
+# MPI ranks per integration test = min(4, cores). Not the raw core count:
+# FindMPI's MPIEXEC_MAX_NUMPROCS = physical cores would spawn 96 ranks/test on
+# the CI box (OOM/timeouts); the cap avoids that, and never exceeding the cores
+# keeps mpirun from requesting more slots than exist. The PROCESSORS property
+# below lets `ctest -j` schedule concurrently. Override with
+# -DTEST_NUM_PROC=N.
+include(ProcessorCount)
+ProcessorCount(_solid_dmft_ncores)
+if(_solid_dmft_ncores GREATER 0 AND _solid_dmft_ncores LESS 4)
+  set(_solid_dmft_default_nproc ${_solid_dmft_ncores})
+else()
+  set(_solid_dmft_default_nproc 4)
+endif()
+set(TEST_NUM_PROC ${_solid_dmft_default_nproc} CACHE STRING "MPI ranks launched per integration test")
+
 # integration tests
 set (integration_tests
      svo_hubbardI_basic
@@ -62,12 +77,13 @@ foreach(test ${integration_tests})
 
   add_test(NAME ${test}
            # COMMAND bash ${test}.sh
-           COMMAND ${MPIEXEC_EXECUTABLE} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${MPIEXEC_PREFLAGS} ${TRIQS_PYTHON_EXECUTABLE} test.py
+           COMMAND ${MPIEXEC_EXECUTABLE} ${MPIEXEC_NUMPROC_FLAG} ${TEST_NUM_PROC} ${MPIEXEC_PREFLAGS} ${TRIQS_PYTHON_EXECUTABLE} test.py
            # COMMAND ${TRIQS_PYTHON_EXECUTABLE} test.py
            WORKING_DIRECTORY ${test_dir}
           )
 
   set_property(TEST ${test} APPEND PROPERTY ENVIRONMENT PYTHONPATH=${PROJECT_BINARY_DIR}/python:$ENV{PYTHONPATH})
+  set_property(TEST ${test} PROPERTY PROCESSORS ${TEST_NUM_PROC})
 endforeach()
 
 # ------------------------------#
@@ -80,11 +96,12 @@ foreach(file test_maxent.py helper.py)
 endforeach()
 
 add_test(NAME maxent_${test}
-         COMMAND ${MPIEXEC_EXECUTABLE} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${MPIEXEC_PREFLAGS} ${TRIQS_PYTHON_EXECUTABLE} test_maxent.py
+         COMMAND ${MPIEXEC_EXECUTABLE} ${MPIEXEC_NUMPROC_FLAG} ${TEST_NUM_PROC} ${MPIEXEC_PREFLAGS} ${TRIQS_PYTHON_EXECUTABLE} test_maxent.py
          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         )
 
 set_property(TEST maxent_${test} APPEND PROPERTY ENVIRONMENT PYTHONPATH=${PROJECT_BINARY_DIR}/python:$ENV{PYTHONPATH})
+set_property(TEST maxent_${test} PROPERTY PROCESSORS ${TEST_NUM_PROC})
 set_property(TEST maxent_${test} APPEND PROPERTY DEPENDS "svo_hubbardI_basic")
 
 # ------------------------------#
@@ -101,11 +118,12 @@ foreach(test ${restart_integration_test})
   endforeach()
 
   add_test(NAME restart_${test}
-           COMMAND ${MPIEXEC_EXECUTABLE} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${MPIEXEC_PREFLAGS} ${TRIQS_PYTHON_EXECUTABLE} test_restart.py
+           COMMAND ${MPIEXEC_EXECUTABLE} ${MPIEXEC_NUMPROC_FLAG} ${TEST_NUM_PROC} ${MPIEXEC_PREFLAGS} ${TRIQS_PYTHON_EXECUTABLE} test_restart.py
            WORKING_DIRECTORY ${test_dir}
           )
 
   set_property(TEST restart_${test} APPEND PROPERTY ENVIRONMENT PYTHONPATH=${PROJECT_BINARY_DIR}/python:$ENV{PYTHONPATH})
+  set_property(TEST restart_${test} PROPERTY PROCESSORS ${TEST_NUM_PROC})
 endforeach()
 set_property(TEST maxent_${test} APPEND PROPERTY DEPENDS "svo_hubbardI_basic")
 
@@ -142,12 +160,13 @@ foreach(test ${gw_emb_integration_tests})
 
   add_test(NAME ${test}
            # COMMAND bash ${test}.sh
-           COMMAND ${MPIEXEC_EXECUTABLE} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${MPIEXEC_PREFLAGS} ${TRIQS_PYTHON_EXECUTABLE} test.py
+           COMMAND ${MPIEXEC_EXECUTABLE} ${MPIEXEC_NUMPROC_FLAG} ${TEST_NUM_PROC} ${MPIEXEC_PREFLAGS} ${TRIQS_PYTHON_EXECUTABLE} test.py
            # COMMAND ${TRIQS_PYTHON_EXECUTABLE} test.py
            WORKING_DIRECTORY ${test_dir}
           )
 
   set_property(TEST ${test} APPEND PROPERTY ENVIRONMENT PYTHONPATH=${PROJECT_BINARY_DIR}/python:$ENV{PYTHONPATH})
+  set_property(TEST ${test} PROPERTY PROCESSORS ${TEST_NUM_PROC})
 endforeach()
 
 endif()
