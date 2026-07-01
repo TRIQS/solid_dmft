@@ -491,7 +491,8 @@ dft_exec : string or table, default = 'vasp_std'
         * ``win`` — wannier90.x command (default: 'wannier90.x')
 
         Use ``{number_cores}`` as a placeholder in commands, it will be replaced
-        with the value of ``n_cores``.
+        with the value of ``n_cores``. Environment variables can be used the same
+        way, e.g. ``{HOME}`` or ``{SLURM_NTASKS}``, and are expanded at run time.
 mpi_env : string, default = 'default'
         selection for mpi env for DFT / VASP in default this will only call VASP as mpirun -np n_cores_dft dft_exec
         Possible values:
