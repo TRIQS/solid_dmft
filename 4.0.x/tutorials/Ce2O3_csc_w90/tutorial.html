@@ -976,9 +976,11 @@ n_iter_dmft_first = 2
 n_iter_dmft_per = 1
 n_iter_dmft = 5
 
+enforce_off_diag = false
 block_threshold = 1e-03
 
 h_int_type = &#34;density_density&#34;
+h_int_basis = &#34;qe&#34;
 U = 6.46
 J = 0.46
 beta = 10
@@ -992,11 +994,11 @@ dc_dmft = true
 calc_energies = true
 
 h5_save_freq = 1
+store_solver = false
 
 [solver]
 type = &#34;hubbardI&#34;
 n_l = 15
-store_solver = false
 measure_G_l = false
 measure_density_matrix = true
 
@@ -1004,14 +1006,24 @@ measure_density_matrix = true
 dft_code = &#34;qe&#34;
 n_cores = 10
 mpi_env = &#34;default&#34;
+mpi_exe = &#34;mpirun&#34;
 projector_type = &#34;w90&#34;
-dft_exec = &#34;pw.x&#34;
-w90_tolerance = 1.e-1
+w90_tolerance = 1e-1
+
+[dft.dft_exec]
+path = &#39;/path/to/q-e/bin&#39;
+pw = &#34;pw.x -nk {number_cores}&#34;
+pw2wan = &#34;pw2wannier90.x -nk 1 -pd .true.&#34;
+bands = &#34;bands.x -nk {number_cores}&#34;
+proj = &#34;projwfc.x -nk {number_cores}&#34;
+win_pp = &#34;wannier90.x -pp&#34;
+win = &#34;wannier90.x&#34;
 </pre></div></div>
 </div>
-<p>Of course you’ll have to switch <code class="docutils literal notranslate"><span class="pre">csc</span></code> on to perform the charge self-consistent calculations. Then we choose the HubbardI Solver, set the number of Legendre polynomials, Matsubara frequencies <span class="math notranslate nohighlight">\(i\omega_n\)</span> and imaginary time grid points <span class="math notranslate nohighlight">\(\tau\)</span>. In this calculation we perform five iterations in total, of which the two first ones are one-shot DMFT iterations, followed by three DFT and three DMFT steps. For the interaction Hamiltonian we use <code class="docutils literal notranslate"><span class="pre">density_density</span></code>. Note that you unlike the
-Kanamori Hamiltonian, this one is not rotationally invariant, so the correct order of the orbitals must be set (inspect the projections card in <code class="docutils literal notranslate"><span class="pre">ce2o3.win</span></code>). We must also use <code class="docutils literal notranslate"><span class="pre">dc_dmft</span></code> and <code class="docutils literal notranslate"><span class="pre">calc_energies</span></code>, since we are interested in total energies. Finally, we will specify some details for the DFT manager, i.e. to use QE, W90 and the tolerance for the mapping of shells. Note that this value should in general be <span class="math notranslate nohighlight">\(1e-6\)</span>, but for demonstration purposes we reduce it here. If <code class="docutils literal notranslate"><span class="pre">dft_exec</span></code>
-is empty, it will assume that <code class="docutils literal notranslate"><span class="pre">pw.x</span></code> and other QE executables are available.</p>
+<p>Of course you’ll have to switch <code class="docutils literal notranslate"><span class="pre">csc</span></code> on to perform the charge self-consistent calculations. Then we choose the HubbardI Solver, set the number of Legendre polynomials, Matsubara frequencies <span class="math notranslate nohighlight">\(i\omega_n\)</span> and imaginary time grid points <span class="math notranslate nohighlight">\(\tau\)</span>. In this calculation we perform five iterations in total, of which the two first ones are one-shot DMFT iterations, followed by three DFT and three DMFT steps. For the interaction Hamiltonian we use <code class="docutils literal notranslate"><span class="pre">density_density</span></code>. Unlike the Kanamori
+Hamiltonian this one is not rotationally invariant, so the interaction matrix must be built in the same cubic-harmonic convention as the Wannier projections. We therefore set <code class="docutils literal notranslate"><span class="pre">h_int_basis</span> <span class="pre">=</span> <span class="pre">&quot;qe&quot;</span></code> to match the Wannier90/QE convention and simply request the full <span class="math notranslate nohighlight">\(f\)</span> shell with <code class="docutils literal notranslate"><span class="pre">Ce1:l=3</span></code> / <code class="docutils literal notranslate"><span class="pre">Ce2:l=3</span></code> in the projections card of <code class="docutils literal notranslate"><span class="pre">ce2o3.win</span></code>, which yields the orbitals in the natural Wannier90 order <code class="docutils literal notranslate"><span class="pre">mr=1..7</span></code>. Note that solid_dmft rotates the local problem into the local-Hamiltonian
+eigenbasis (<code class="docutils literal notranslate"><span class="pre">rot_mat_type='hloc_diag'</span></code>). We must also use <code class="docutils literal notranslate"><span class="pre">dc_dmft</span></code> and <code class="docutils literal notranslate"><span class="pre">calc_energies</span></code>, since we are interested in total energies. Finally, we will specify some details for the DFT manager, i.e. to use QE, W90 and the tolerance for the mapping of shells. Note that this value should in general be <span class="math notranslate nohighlight">\(1e-6\)</span>, but for demonstration purposes we reduce it here.</p>
+<p>Here, we demonstarte how for QE <code class="docutils literal notranslate"><span class="pre">dft_exec</span></code> can be a dictionary in toml formatting style. You can very flexibly add custom commands for each part of the QE executables used if you like. You can also just simply write <code class="docutils literal notranslate"><span class="pre">dft_exec=/path/to/qe/bin/pw.x</span></code> and it will simply pick other executables for QE from there. If <code class="docutils literal notranslate"><span class="pre">dft_exec</span></code> is empty, it will assume that <code class="docutils literal notranslate"><span class="pre">pw.x</span></code> and other QE executables are available.</p>
 </section>
 </section>
 <section id="2.-Running-DFT+DMFT">

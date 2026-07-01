@@ -23,9 +23,23 @@ The parameters are ignored in one-shot calculations.
 .. admonition:: dft_exec 
  	:class: intag  
  
-            **type** = string;  **default**  = 'vasp_std'
+            **type** = string or table;  **default**  = 'vasp_std'
 
-        command for the DFT executable
+        command for the DFT executable. For VASP this is a simple string.
+        For QE this can be a string (path to QE executables) or a TOML table
+        ``[dft.dft_exec]`` with per-executable overrides. Available keys:
+
+        * ``path`` — base path prepended to all executables (default: '')
+        * ``pw`` — pw.x command (default: 'pw.x -nk {number_cores}')
+        * ``pw2wan`` — pw2wannier90.x command (default: 'pw2wannier90.x -nk 1 -pd .true.')
+        * ``bands`` — bands.x command (default: 'bands.x -nk {number_cores}')
+        * ``proj`` — projwfc.x command (default: 'projwfc.x -nk {number_cores}')
+        * ``win_pp`` — wannier90.x preprocessing command (default: 'wannier90.x -pp')
+        * ``win`` — wannier90.x command (default: 'wannier90.x')
+
+        Use ``{number_cores}`` as a placeholder in commands, it will be replaced
+        with the value of ``n_cores``. Environment variables can be used the same
+        way, e.g. ``{HOME}`` or ``{SLURM_NTASKS}``, and are expanded at run time.
 
 .. admonition:: mpi_env 
  	:class: intag  
