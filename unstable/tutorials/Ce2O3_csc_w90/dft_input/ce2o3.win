@@ -79,20 +79,8 @@ dos_kmesh = 50
 !dos_smr_fixed_en_width = 0.05
 
 begin projections
-Ce1:l=3,mr=4:x=1,0,0
-Ce1:l=3,mr=3:x=1,0,0
-Ce1:l=3,mr=5:x=1,0,0
-Ce1:l=3,mr=2:x=1,0,0
-Ce1:l=3,mr=6:x=1,0,0
-Ce1:l=3,mr=1:x=1,0,0
-Ce1:l=3,mr=7:x=1,0,0
-Ce2:l=3,mr=4:x=1,0,0
-Ce2:l=3,mr=3:x=1,0,0
-Ce2:l=3,mr=5:x=1,0,0
-Ce2:l=3,mr=2:x=1,0,0
-Ce2:l=3,mr=6:x=1,0,0
-Ce2:l=3,mr=1:x=1,0,0
-Ce2:l=3,mr=7:x=1,0,0
+Ce1:l=3
+Ce2:l=3
 end projections
 
 begin kpoints
