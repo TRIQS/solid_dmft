@@ -31,7 +31,6 @@ n_warmup_cycles = 10000
 n_cycles_tot = 10e+6
 imag_threshold = 1e-5
 measure_G_l = true
-measure_G_tau = true
 measure_density_matrix = true
 
 [dft]
