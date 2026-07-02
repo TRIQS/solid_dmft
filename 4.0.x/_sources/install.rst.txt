@@ -8,7 +8,7 @@ Prerequisites
 -------------
 
 #. The :ref:`TRIQS <triqslibs:welcome>` library, see `TRIQS installation instruction <https://triqs.github.io/triqs/latest/install.html>`_.
-   In the following, we assume that :ref:`TRIQS <triqslibs:welcome>`, `triqs/dft_tools <https://triqs.github.io/dft_tools>`_, and at least one of the impurity solvers `available in TRIQS <https://triqs.github.io/triqs/latest/applications.html>`_, e.g. cthyb, HubbardI, ctseg, FTPS, or ctint is installed in the directory ``path_to_triqs``.
+   In the following, we assume that :ref:`TRIQS <triqslibs:welcome>`, `triqs/dft_tools <https://triqs.github.io/dft_tools>`_, and at least one of the impurity solvers `available in TRIQS <https://triqs.github.io/triqs/latest/applications.html>`_, e.g. cthyb, HubbardI, ctseg, FTPS, or ctint is installed in the directory ``path_to_triqs``. Additionally, if you want to run charge self-consistent DFT+DMFT calculations you need the `triqs/dftkit <https://triqs.github.io/dftkit>`_ package installed.
 
 #. Make sure to install besides the triqs requirements also the python packages::
 
@@ -105,6 +105,8 @@ The compilation of ``solid_dmft`` can be configured using CMake-options::
 | Build in Debugging Mode                                         | -DCMAKE_BUILD_TYPE=Debug                      |
 +-----------------------------------------------------------------+-----------------------------------------------+
 | Disable testing (not recommended)                               | -DBuild_Tests=OFF                             |
++-----------------------------------------------------------------+-----------------------------------------------+
+| MPI ranks per integration test = min(4, cores)                  | -DTEST_NUM_PROC=N                             |
 +-----------------------------------------------------------------+-----------------------------------------------+
 | Build the documentation                                         | -DBuild_Documentation=ON                      |
 +-----------------------------------------------------------------+-----------------------------------------------+
