@@ -36,10 +36,7 @@ endforeach()
 
 # ------------------------------#
 
-# MPI ranks per integration test = min(4, cores). Not the raw core count:
-# FindMPI's MPIEXEC_MAX_NUMPROCS = physical cores would spawn 96 ranks/test on
-# the CI box (OOM/timeouts); the cap avoids that, and never exceeding the cores
-# keeps mpirun from requesting more slots than exist. The PROCESSORS property
+# MPI ranks per integration test = min(4, cores). The PROCESSORS property
 # below lets `ctest -j` schedule concurrently. Override with
 # -DTEST_NUM_PROC=N.
 include(ProcessorCount)
