@@ -12,10 +12,15 @@ Find below an itemized list of changes in this release.
 * port to the TRIQS 4.0 API: run the `port_to_triqs4` script and replace `triqs.gf` imports with `triqs.gfs`
 * use the modern mesh constructor keyword arguments (`statistic`, `n_iw`, `n_tau`)
 * add SLURM support for the OLCF CADES Baseline cluster (walltime, hostfile path, and hostname configuration)
+* allow the `[dft]` section `dft_exec` to be a TOML table with per-executable overrides for QE (keys `path`, `pw`, `pw2wan`, `bands`, `proj`, `win_pp`, `win`), and validate unknown keys
+* expand environment variables (e.g. `{HOME}`, `{SLURM_NTASKS}`) in `dft_exec` commands at run time, in addition to `{number_cores}`
 
 ### fix
 * fix a startup failure when correlated shells of different size were not unique (e.g. two equivalent Ni 3d and two equivalent O 2p shells)
 * adapt to the updated TRIQS Hartree-Fock solver interface
+
+### doc
+* update the Ce2O3 QE CSC tutorial to use the `h_int_basis=qe` tag and the natural Wannier90 f-orbital order
 
 ### build
 * build `triqs_dftkit` before `dft_tools` in the CI docker images and adapt the Dockerfiles for `dftkit` compatibility
