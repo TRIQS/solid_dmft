@@ -602,7 +602,7 @@
 <h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading"></a></h2>
 <ol class="arabic">
 <li><p>The <a class="reference external" href="https://triqs.github.io/triqs/latest/index.html#welcome" rel="noopener noreferrer" target="_blank" title="(in TRIQS v4.0.0)"><span class="xref std std-ref">TRIQS</span></a> library, see <a class="reference external" href="https://triqs.github.io/triqs/latest/install.html" rel="noopener noreferrer" target="_blank">TRIQS installation instruction</a>.
-In the following, we assume that <a class="reference external" href="https://triqs.github.io/triqs/latest/index.html#welcome" rel="noopener noreferrer" target="_blank" title="(in TRIQS v4.0.0)"><span class="xref std std-ref">TRIQS</span></a>, <a class="reference external" href="https://triqs.github.io/dft_tools" rel="noopener noreferrer" target="_blank">triqs/dft_tools</a>, and at least one of the impurity solvers <a class="reference external" href="https://triqs.github.io/triqs/latest/applications.html" rel="noopener noreferrer" target="_blank">available in TRIQS</a>, e.g. cthyb, HubbardI, ctseg, FTPS, or ctint is installed in the directory <code class="docutils literal notranslate"><span class="pre">path_to_triqs</span></code>.</p></li>
+In the following, we assume that <a class="reference external" href="https://triqs.github.io/triqs/latest/index.html#welcome" rel="noopener noreferrer" target="_blank" title="(in TRIQS v4.0.0)"><span class="xref std std-ref">TRIQS</span></a>, <a class="reference external" href="https://triqs.github.io/dft_tools" rel="noopener noreferrer" target="_blank">triqs/dft_tools</a>, and at least one of the impurity solvers <a class="reference external" href="https://triqs.github.io/triqs/latest/applications.html" rel="noopener noreferrer" target="_blank">available in TRIQS</a>, e.g. cthyb, HubbardI, ctseg, FTPS, or ctint is installed in the directory <code class="docutils literal notranslate"><span class="pre">path_to_triqs</span></code>. Additionally, if you want to run charge self-consistent DFT+DMFT calculations you need the <a class="reference external" href="https://triqs.github.io/dftkit" rel="noopener noreferrer" target="_blank">triqs/dftkit</a> package installed.</p></li>
 <li><p>Make sure to install besides the triqs requirements also the python packages:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pip3<span class="w"> </span>install<span class="w"> </span>--user<span class="w"> </span>scipy<span class="w"> </span>numpy<span class="w"> </span>scikit-image
 </pre></div>
@@ -702,7 +702,10 @@ To use a particular version, go into the directory with the sources, and look at
 <tr class="row-even"><td><p>Disable testing (not recommended)</p></td>
 <td><p>-DBuild_Tests=OFF</p></td>
 </tr>
-<tr class="row-odd"><td><p>Build the documentation</p></td>
+<tr class="row-odd"><td><p>MPI ranks per integration test = min(4, cores)</p></td>
+<td><p>-DTEST_NUM_PROC=N</p></td>
+</tr>
+<tr class="row-even"><td><p>Build the documentation</p></td>
 <td><p>-DBuild_Documentation=ON</p></td>
 </tr>
 </tbody>
