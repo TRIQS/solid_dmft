@@ -1,5 +1,5 @@
-FROM --platform=linux/amd64 ubuntu:24.04 AS base
-ARG LLVM=20
+FROM --platform=linux/amd64 ubuntu:26.04 AS base
+ARG LLVM=22
 
 # This platform includes dependencies for building docs
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -16,6 +16,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
       debhelper \
       dh-python \
       g++ \
+      g++-16 \
       gfortran \
       git \
       hdf5-tools \
@@ -90,9 +91,9 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
 #     && rm -rf openmpi-4.1.5.tar.gz openmpi-4.1.5
 
 # install sparse-ir into triqs pythonpath
-RUN pip install --no-deps --target /triqs/lib/python3.12/site-packages sparse-ir xprec
+RUN pip install --no-deps --break-system-packages --target /triqs/lib/python3.14/site-packages sparse-ir xprec
 
-ENV PYTHON_VERSION=3.12 \
+ENV PYTHON_VERSION=3.14 \
     CC=clang-${LLVM} CXX=clang++-${LLVM} CXXFLAGS="-stdlib=libc++"
 RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-${LLVM} 60 --slave /usr/bin/clang++ clang++ /usr/bin/clang++-${LLVM} --slave /usr/bin/clang-cpp clang-cpp /usr/bin/clang-cpp-${LLVM}
 
@@ -102,7 +103,10 @@ ENV MKL_INTERFACE_LAYER=GNU,LP64
 ENV MKL_THREADING_LAYER=SEQUENTIAL
 ENV OMPI_ALLOW_RUN_AS_ROOT=1
 ENV OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
-ENV OMPI_MCA_rmaps_base_oversubscribe="yes"
+# OpenMPI 5 moved mapping/oversubscribe from ORTE to PRRTE; the old
+# OMPI_MCA_rmaps_base_oversubscribe is ignored and np>cores would fail with
+# "not enough slots". PRRTE also fixes the concurrent-mpirun session-dir race.
+ENV PRTE_MCA_rmaps_default_mapping_policy=:oversubscribe
 ARG NCORES=4
 
 # create source dirs
@@ -160,7 +164,7 @@ ENV CPATH=/triqs/include:/usr/include/mkl:${CPATH} \
     PATH=/triqs/bin:${PATH} \
     LIBRARY_PATH=/triqs/lib:${LIBRARY_PATH} \
     LD_LIBRARY_PATH=/triqs/lib:${LD_LIBRARY_PATH} \
-    PYTHONPATH=/triqs/lib/python3.12/site-packages:/triqs/lib/python3.12/dist-packages:${PYTHONPATH} \
+    PYTHONPATH=/triqs/lib/python${PYTHON_VERSION}/site-packages:/triqs/lib/python${PYTHON_VERSION}/dist-packages:${PYTHONPATH} \
     CMAKE_PREFIX_PATH=/triqs/share/cmake:${CMAKE_PREFIX_PATH} \
     CMAKE_BUILD_PARALLEL_LEVEL=${NCORES} \
     CTEST_OUTPUT_ON_FAILURE=1 \
