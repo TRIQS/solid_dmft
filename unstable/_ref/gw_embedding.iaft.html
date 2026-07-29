@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../">
 <head>
@@ -5,20 +7,19 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>gw_embedding.iaft &mdash; solid_dmft  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=2d0451a4" />
       <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
 
   
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
     <link rel="canonical" href="https://triqs.github.io/solid_dmft/latest/_ref/gw_embedding.iaft.html" />
-  
-        <script src="../_static/jquery.js?v=8dae8fb0"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="../_static/doctools.js?v=888ff710"></script>
-        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="../_static/jquery.js?v=958b65b0"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -38,9 +39,6 @@
             solid_dmft
               <img src="../_static/logo_no_text.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                unstable
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -435,7 +433,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Plotting-the-results:-observables">3. Plotting the results: observables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green’s-function">4. Plotting the results: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green's-function">4. Plotting the results: the Legendre Green’s function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Next-steps-to-try">5. Next steps to try</a></li>
 </ul>
 </li>
@@ -574,35 +572,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  
-<style>
-/* CSS overrides for sphinx_rtd_theme */
-
-/* 24px margin */
-.nbinput.nblast.container,
-.nboutput.nblast.container {
-    margin-bottom: 19px;  /* padding has already 5px */
-}
-
-/* ... except between code cells! */
-.nblast.container + .nbinput.container {
-    margin-top: -19px;
-}
-
-.admonition > p:before {
-    margin-right: 4px;  /* make room for the exclamation icon */
-}
-
-/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
-.math {
-    text-align: unset;
-}
-</style>
-<section id="module-gw_embedding.iaft">
+  <section id="module-gw_embedding.iaft">
 <span id="gw-embedding-iaft"></span><h1>gw_embedding.iaft<a class="headerlink" href="#module-gw_embedding.iaft" title="Link to this heading"></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="gw_embedding.iaft.IAFT">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gw_embedding.iaft.</span></span><span class="sig-name descname"><span class="pre">IAFT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" rel="noopener noreferrer" target="_blank" title="(in Python v3.11)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">lmbda</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" rel="noopener noreferrer" target="_blank" title="(in Python v3.11)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">prec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" rel="noopener noreferrer" target="_blank" title="(in Python v3.11)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" rel="noopener noreferrer" target="_blank" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gw_embedding/iaft.html#IAFT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gw_embedding.iaft.IAFT" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gw_embedding.iaft.</span></span><span class="sig-name descname"><span class="pre">IAFT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" rel="noopener noreferrer" target="_blank" title="(in Python v3.11)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">lmbda</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" rel="noopener noreferrer" target="_blank" title="(in Python v3.11)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">prec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#float" rel="noopener noreferrer" target="_blank" title="(in Python v3.11)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" rel="noopener noreferrer" target="_blank" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gw_embedding/iaft.html#IAFT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gw_embedding.iaft.IAFT" title="Link to this definition"></a></dt>
 <dd><p>Driver for FT on the imaginary axis.
 Given inverse temperature, lambda and precision, the IAFT class evaluate the corresponding
 IR basis and sparse sampling points on-the-fly.</p>
@@ -653,10 +627,10 @@ The coefficients should decay exponentially, and the leakage is defined as:</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>Ot</strong> – </p></li>
-<li><p><strong>stats</strong> – </p></li>
-<li><p><strong>name</strong> – </p></li>
-<li><p><strong>w_input</strong> – </p></li>
+<li><p><strong>Ot</strong></p></li>
+<li><p><strong>stats</strong></p></li>
+<li><p><strong>name</strong></p></li>
+<li><p><strong>w_input</strong></p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

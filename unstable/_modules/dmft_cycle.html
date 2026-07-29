@@ -1,23 +1,24 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>dmft_cycle &mdash; solid_dmft  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=2d0451a4" />
       <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
 
   
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
     <link rel="canonical" href="https://triqs.github.io/solid_dmft/latest/_modules/dmft_cycle.html" />
-  
-        <script src="../_static/jquery.js?v=8dae8fb0"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="../_static/doctools.js?v=888ff710"></script>
-        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="../_static/jquery.js?v=958b65b0"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
@@ -35,9 +36,6 @@
             solid_dmft
               <img src="../_static/logo_no_text.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                unstable
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -432,7 +430,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Plotting-the-results:-observables">3. Plotting the results: observables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green’s-function">4. Plotting the results: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green's-function">4. Plotting the results: the Legendre Green’s function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Next-steps-to-try">5. Next steps to try</a></li>
 </ul>
 </li>
@@ -599,41 +597,41 @@
 
 
 <span class="c1"># system</span>
-<span class="kn">import</span> <span class="nn">gc</span>
-<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
-<span class="kn">from</span> <span class="nn">timeit</span> <span class="kn">import</span> <span class="n">default_timer</span> <span class="k">as</span> <span class="n">timer</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">timeit</span><span class="w"> </span><span class="kn">import</span> <span class="n">default_timer</span> <span class="k">as</span> <span class="n">timer</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="c1"># triqs</span>
-<span class="kn">from</span> <span class="nn">triqs.operators.util.observables</span> <span class="kn">import</span> <span class="n">S_op</span><span class="p">,</span> <span class="n">N_op</span>
-<span class="kn">from</span> <span class="nn">triqs.version</span> <span class="kn">import</span> <span class="n">git_hash</span> <span class="k">as</span> <span class="n">triqs_hash</span>
-<span class="kn">from</span> <span class="nn">triqs.version</span> <span class="kn">import</span> <span class="n">version</span> <span class="k">as</span> <span class="n">triqs_version</span>
-<span class="kn">from</span> <span class="nn">h5</span> <span class="kn">import</span> <span class="n">HDFArchive</span>
-<span class="kn">import</span> <span class="nn">triqs.utility.mpi</span> <span class="k">as</span> <span class="nn">mpi</span>
-<span class="kn">from</span> <span class="nn">triqs.operators</span> <span class="kn">import</span> <span class="n">c_dag</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">Operator</span>
-<span class="kn">from</span> <span class="nn">triqs.gfs</span> <span class="kn">import</span> <span class="n">make_hermitian</span><span class="p">,</span> <span class="n">fit_hermitian_tail</span><span class="p">,</span> <span class="n">MeshReFreq</span><span class="p">,</span> <span class="n">MeshImFreq</span><span class="p">,</span> <span class="n">make_gf_from_fourier</span><span class="p">,</span> <span class="n">iOmega_n</span>
-<span class="kn">from</span> <span class="nn">triqs.gfs.tools</span> <span class="kn">import</span> <span class="n">inverse</span><span class="p">,</span> <span class="n">make_zero_tail</span>
-<span class="kn">from</span> <span class="nn">triqs_dft_tools.sumk_dft</span> <span class="kn">import</span> <span class="n">SumkDFT</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.operators.util.observables</span><span class="w"> </span><span class="kn">import</span> <span class="n">S_op</span><span class="p">,</span> <span class="n">N_op</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.version</span><span class="w"> </span><span class="kn">import</span> <span class="n">git_hash</span> <span class="k">as</span> <span class="n">triqs_hash</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.version</span><span class="w"> </span><span class="kn">import</span> <span class="n">version</span> <span class="k">as</span> <span class="n">triqs_version</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">h5</span><span class="w"> </span><span class="kn">import</span> <span class="n">HDFArchive</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">triqs.utility.mpi</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mpi</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.operators</span><span class="w"> </span><span class="kn">import</span> <span class="n">c_dag</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">Operator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.gfs</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_hermitian</span><span class="p">,</span> <span class="n">fit_hermitian_tail</span><span class="p">,</span> <span class="n">MeshReFreq</span><span class="p">,</span> <span class="n">MeshImFreq</span><span class="p">,</span> <span class="n">make_gf_from_fourier</span><span class="p">,</span> <span class="n">iOmega_n</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.gfs.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">inverse</span><span class="p">,</span> <span class="n">make_zero_tail</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs_dft_tools.sumk_dft</span><span class="w"> </span><span class="kn">import</span> <span class="n">SumkDFT</span>
 
 <span class="c1"># own modules</span>
-<span class="kn">from</span> <span class="nn">solid_dmft.version</span> <span class="kn">import</span> <span class="n">solid_dmft_hash</span>
-<span class="kn">from</span> <span class="nn">solid_dmft.version</span> <span class="kn">import</span> <span class="n">version</span> <span class="k">as</span> <span class="n">solid_dmft_version</span>
-<span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools.observables</span> <span class="kn">import</span> <span class="p">(</span><span class="n">calc_dft_kin_en</span><span class="p">,</span> <span class="n">add_dmft_observables</span><span class="p">,</span> <span class="n">calc_bandcorr_man</span><span class="p">,</span> <span class="n">write_obs</span><span class="p">,</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.version</span><span class="w"> </span><span class="kn">import</span> <span class="n">solid_dmft_hash</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.version</span><span class="w"> </span><span class="kn">import</span> <span class="n">version</span> <span class="k">as</span> <span class="n">solid_dmft_version</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.dmft_tools.observables</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">calc_dft_kin_en</span><span class="p">,</span> <span class="n">add_dmft_observables</span><span class="p">,</span> <span class="n">calc_bandcorr_man</span><span class="p">,</span> <span class="n">write_obs</span><span class="p">,</span>
                                          <span class="n">add_dft_values_as_zeroth_iteration</span><span class="p">,</span> <span class="n">write_header_to_file</span><span class="p">,</span> <span class="n">prep_observables</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools.solver</span> <span class="kn">import</span> <span class="n">create_solver</span>
-<span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools</span> <span class="kn">import</span> <span class="n">convergence</span>
-<span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools</span> <span class="kn">import</span> <span class="n">formatter</span>
-<span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools</span> <span class="kn">import</span> <span class="n">interaction_hamiltonian</span>
-<span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools</span> <span class="kn">import</span> <span class="n">results_to_archive</span>
-<span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools</span> <span class="kn">import</span> <span class="n">afm_mapping</span>
-<span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools</span> <span class="kn">import</span> <span class="n">manipulate_chemical_potential</span> <span class="k">as</span> <span class="n">manipulate_mu</span>
-<span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools</span> <span class="kn">import</span> <span class="n">initial_self_energies</span> <span class="k">as</span> <span class="n">initial_sigma</span>
-<span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools</span> <span class="kn">import</span> <span class="n">greens_functions_mixer</span> <span class="k">as</span> <span class="n">gf_mixer</span>
-<span class="kn">from</span> <span class="nn">solid_dmft.io_tools</span> <span class="kn">import</span> <span class="n">verify_input_params</span><span class="p">,</span> <span class="n">dict_to_h5</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.dmft_tools.solver</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_solver</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.dmft_tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">convergence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.dmft_tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">formatter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.dmft_tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">interaction_hamiltonian</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.dmft_tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">results_to_archive</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.dmft_tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">afm_mapping</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.dmft_tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">manipulate_chemical_potential</span> <span class="k">as</span> <span class="n">manipulate_mu</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.dmft_tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">initial_self_energies</span> <span class="k">as</span> <span class="n">initial_sigma</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.dmft_tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">greens_functions_mixer</span> <span class="k">as</span> <span class="n">gf_mixer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.io_tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">verify_input_params</span><span class="p">,</span> <span class="n">dict_to_h5</span>
 
 <div class="viewcode-block" id="_extract_quantity_per_inequiv">
 <a class="viewcode-back" href="../_ref/dmft_cycle.html#dmft_cycle._extract_quantity_per_inequiv">[docs]</a>
-<span class="k">def</span> <span class="nf">_extract_quantity_per_inequiv</span><span class="p">(</span><span class="n">param_name</span><span class="p">,</span> <span class="n">n_inequiv_shells</span><span class="p">,</span> <span class="n">general_params</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_extract_quantity_per_inequiv</span><span class="p">(</span><span class="n">param_name</span><span class="p">,</span> <span class="n">n_inequiv_shells</span><span class="p">,</span> <span class="n">general_params</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    For quantities that can be different for each inequivalent shell, this</span>
 <span class="sd">    function checks if the quantity is a single value or a list of the correct</span>
@@ -656,7 +654,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
 
-    <span class="k">def</span> <span class="nf">formatter</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">formatter</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
             <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{:.2f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
@@ -679,7 +677,7 @@
 
 <div class="viewcode-block" id="_determine_block_structure">
 <a class="viewcode-back" href="../_ref/dmft_cycle.html#dmft_cycle._determine_block_structure">[docs]</a>
-<span class="k">def</span> <span class="nf">_determine_block_structure</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">advanced_params</span><span class="p">,</span> <span class="n">solver_type_per_imp</span><span class="p">,</span> <span class="n">dens_mat</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_determine_block_structure</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">advanced_params</span><span class="p">,</span> <span class="n">solver_type_per_imp</span><span class="p">,</span> <span class="n">dens_mat</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Determines block structrure and degenerate deg_shells</span>
 <span class="sd">    computes first DFT density matrix to determine block structure and changes</span>
@@ -754,7 +752,7 @@
 
 <div class="viewcode-block" id="_calculate_rotation_matrix">
 <a class="viewcode-back" href="../_ref/dmft_cycle.html#dmft_cycle._calculate_rotation_matrix">[docs]</a>
-<span class="k">def</span> <span class="nf">_calculate_rotation_matrix</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_calculate_rotation_matrix</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Applies rotation matrix to make the DMFT calculations easier for the solver.</span>
 <span class="sd">    Possible are rotations diagonalizing either the local Hamiltonian or the</span>
@@ -813,7 +811,7 @@
 
 <div class="viewcode-block" id="_chi_setup">
 <a class="viewcode-back" href="../_ref/dmft_cycle.html#dmft_cycle._chi_setup">[docs]</a>
-<span class="k">def</span> <span class="nf">_chi_setup</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">solver_params</span><span class="p">,</span> <span class="n">map_imp_solver</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_chi_setup</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">solver_params</span><span class="p">,</span> <span class="n">map_imp_solver</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">    Parameters</span>
@@ -852,7 +850,7 @@
 
 <div class="viewcode-block" id="dmft_cycle">
 <a class="viewcode-back" href="../_ref/dmft_cycle.html#dmft_cycle.dmft_cycle">[docs]</a>
-<span class="k">def</span> <span class="nf">dmft_cycle</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">solver_params</span><span class="p">,</span> <span class="n">advanced_params</span><span class="p">,</span> <span class="n">dft_params</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">dmft_cycle</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">solver_params</span><span class="p">,</span> <span class="n">advanced_params</span><span class="p">,</span> <span class="n">dft_params</span><span class="p">,</span>
                <span class="n">gw_params</span><span class="p">,</span> <span class="n">n_iter</span><span class="p">,</span> <span class="n">dft_irred_kpt_indices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dft_energy</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    main dmft cycle that works for one shot and CSC equally</span>
@@ -1221,7 +1219,7 @@
 
 <div class="viewcode-block" id="_dmft_step">
 <a class="viewcode-back" href="../_ref/dmft_cycle.html#dmft_cycle._dmft_step">[docs]</a>
-<span class="k">def</span> <span class="nf">_dmft_step</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">solvers</span><span class="p">,</span> <span class="n">it</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">solver_params</span><span class="p">,</span> <span class="n">gw_params</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_dmft_step</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">solvers</span><span class="p">,</span> <span class="n">it</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">solver_params</span><span class="p">,</span> <span class="n">gw_params</span><span class="p">,</span>
                <span class="n">advanced_params</span><span class="p">,</span> <span class="n">dft_params</span><span class="p">,</span> <span class="n">map_imp_solver</span><span class="p">,</span> <span class="n">solver_type_per_imp</span><span class="p">,</span> <span class="n">h_int</span><span class="p">,</span>
                <span class="n">archive</span><span class="p">,</span> <span class="n">shell_multiplicity</span><span class="p">,</span> <span class="n">E_kin_dft</span><span class="p">,</span> <span class="n">observables</span><span class="p">,</span> <span class="n">conv_obs</span><span class="p">,</span>
                <span class="n">ops_chi_measure</span><span class="p">,</span> <span class="n">dft_irred_kpt_indices</span><span class="p">,</span> <span class="n">dft_energy</span><span class="p">,</span> <span class="n">broadening</span><span class="p">,</span>

@@ -1,23 +1,24 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>postprocessing.eval_U_cRPA_Vasp &mdash; solid_dmft  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=2d0451a4" />
       <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
 
   
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
     <link rel="canonical" href="https://triqs.github.io/solid_dmft/latest/_modules/postprocessing/eval_U_cRPA_Vasp.html" />
-  
-        <script src="../../_static/jquery.js?v=8dae8fb0"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="../../_static/jquery.js?v=958b65b0"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -35,9 +36,6 @@
             solid_dmft
               <img src="../../_static/logo_no_text.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                unstable
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -432,7 +430,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Plotting-the-results:-observables">3. Plotting the results: observables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green’s-function">4. Plotting the results: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green's-function">4. Plotting the results: the Legendre Green’s function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Next-steps-to-try">5. Next steps to try</a></li>
 </ul>
 </li>
@@ -572,9 +570,9 @@
   <h1>Source code for postprocessing.eval_U_cRPA_Vasp</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!@TRIQS_PYTHON_EXECUTABLE@</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">collections</span>
-<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">product</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">collections</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">product</span>
 
 <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">python functions for reading Uijkl from a VASP cRPA run and the evaluating the matrix</span>
@@ -587,7 +585,7 @@
 
 <div class="viewcode-block" id="read_uijkl">
 <a class="viewcode-back" href="../../_ref/postprocessing.eval_U_cRPA_Vasp.html#postprocessing.eval_U_cRPA_Vasp.read_uijkl">[docs]</a>
-<span class="k">def</span> <span class="nf">read_uijkl</span><span class="p">(</span><span class="n">path_to_uijkl</span><span class="p">,</span> <span class="n">n_sites</span><span class="p">,</span> <span class="n">n_orb</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_uijkl</span><span class="p">(</span><span class="n">path_to_uijkl</span><span class="p">,</span> <span class="n">n_sites</span><span class="p">,</span> <span class="n">n_orb</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    reads the VASP UIJKL files or the vijkl file if wanted</span>
 
@@ -623,7 +621,7 @@
 
 <div class="viewcode-block" id="construct_U_kan">
 <a class="viewcode-back" href="../../_ref/postprocessing.eval_U_cRPA_Vasp.html#postprocessing.eval_U_cRPA_Vasp.construct_U_kan">[docs]</a>
-<span class="k">def</span> <span class="nf">construct_U_kan</span><span class="p">(</span><span class="n">n_orb</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">Up</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Jc</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">construct_U_kan</span><span class="p">(</span><span class="n">n_orb</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">Up</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Jc</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    construct Kanamori Uijkl tensor for given U, J, Up, and Jc</span>
 
@@ -670,7 +668,7 @@
 
 <div class="viewcode-block" id="red_to_2ind">
 <a class="viewcode-back" href="../../_ref/postprocessing.eval_U_cRPA_Vasp.html#postprocessing.eval_U_cRPA_Vasp.red_to_2ind">[docs]</a>
-<span class="k">def</span> <span class="nf">red_to_2ind</span><span class="p">(</span><span class="n">uijkl</span><span class="p">,</span> <span class="n">n_sites</span><span class="p">,</span> <span class="n">n_orb</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">red_to_2ind</span><span class="p">(</span><span class="n">uijkl</span><span class="p">,</span> <span class="n">n_sites</span><span class="p">,</span> <span class="n">n_orb</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    reduces the 4index coulomb matrix to a 2index matrix and</span>
 <span class="sd">    follows the procedure given in PRB96 seth,peil,georges:</span>
@@ -734,7 +732,7 @@
 
 <div class="viewcode-block" id="calc_kan_params">
 <a class="viewcode-back" href="../../_ref/postprocessing.eval_U_cRPA_Vasp.html#postprocessing.eval_U_cRPA_Vasp.calc_kan_params">[docs]</a>
-<span class="k">def</span> <span class="nf">calc_kan_params</span><span class="p">(</span><span class="n">uijkl</span><span class="p">,</span> <span class="n">n_sites</span><span class="p">,</span> <span class="n">n_orb</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_kan_params</span><span class="p">(</span><span class="n">uijkl</span><span class="p">,</span> <span class="n">n_sites</span><span class="p">,</span> <span class="n">n_orb</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    calculates the kanamori interaction parameters from a</span>
 <span class="sd">    given Uijkl matrix. Follows the procedure given in</span>
@@ -796,7 +794,7 @@
 
 <div class="viewcode-block" id="fit_kanamori">
 <a class="viewcode-back" href="../../_ref/postprocessing.eval_U_cRPA_Vasp.html#postprocessing.eval_U_cRPA_Vasp.fit_kanamori">[docs]</a>
-<span class="k">def</span> <span class="nf">fit_kanamori</span><span class="p">(</span><span class="n">uijkl</span><span class="p">,</span> <span class="n">n_orb</span><span class="p">,</span> <span class="n">switch_jk</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fit_2</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fit_3</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fit_4</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">fit_kanamori</span><span class="p">(</span><span class="n">uijkl</span><span class="p">,</span> <span class="n">n_orb</span><span class="p">,</span> <span class="n">switch_jk</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fit_2</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fit_3</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fit_4</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Fit Kanamori Hamiltonian with scipy to 2,3, and / or 4 parameters</span>
 
@@ -820,23 +818,23 @@
 <span class="sd">    Uijkl_fit: np.array (n_orb x n_orb x n_orb x n_orb)</span>
 <span class="sd">            fitted Uijkl tensor</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">minimize</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">minimize</span>
 
-    <span class="k">def</span> <span class="nf">minimizer_2params</span><span class="p">(</span><span class="n">parameters</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">minimizer_2params</span><span class="p">(</span><span class="n">parameters</span><span class="p">):</span>
         <span class="n">U</span><span class="p">,</span> <span class="n">J</span> <span class="o">=</span> <span class="n">parameters</span>
 
         <span class="n">Uijkl_fit</span> <span class="o">=</span> <span class="n">construct_U_kan</span><span class="p">(</span><span class="n">n_orb</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">J</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">uijkl</span> <span class="o">-</span> <span class="n">Uijkl_fit</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">minimizer_3params</span><span class="p">(</span><span class="n">parameters</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">minimizer_3params</span><span class="p">(</span><span class="n">parameters</span><span class="p">):</span>
         <span class="n">U</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">Up</span> <span class="o">=</span> <span class="n">parameters</span>
 
         <span class="n">Uijkl_fit</span> <span class="o">=</span> <span class="n">construct_U_kan</span><span class="p">(</span><span class="n">n_orb</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">Up</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">uijkl</span> <span class="o">-</span> <span class="n">Uijkl_fit</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">minimizer_4params</span><span class="p">(</span><span class="n">parameters</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">minimizer_4params</span><span class="p">(</span><span class="n">parameters</span><span class="p">):</span>
         <span class="n">U</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">Up</span><span class="p">,</span> <span class="n">Jc</span> <span class="o">=</span> <span class="n">parameters</span>
 
         <span class="n">Uijkl_fit</span> <span class="o">=</span> <span class="n">construct_U_kan</span><span class="p">(</span><span class="n">n_orb</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">Up</span><span class="p">,</span> <span class="n">Jc</span><span class="p">)</span>
@@ -898,7 +896,7 @@
 
 <div class="viewcode-block" id="calc_u_avg_fulld">
 <a class="viewcode-back" href="../../_ref/postprocessing.eval_U_cRPA_Vasp.html#postprocessing.eval_U_cRPA_Vasp.calc_u_avg_fulld">[docs]</a>
-<span class="k">def</span> <span class="nf">calc_u_avg_fulld</span><span class="p">(</span><span class="n">uijkl</span><span class="p">,</span> <span class="n">n_sites</span><span class="p">,</span> <span class="n">n_orb</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_u_avg_fulld</span><span class="p">(</span><span class="n">uijkl</span><span class="p">,</span> <span class="n">n_sites</span><span class="p">,</span> <span class="n">n_orb</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    calculates the coulomb integrals from a</span>
 <span class="sd">    given Uijkl matrix for full d shells. Follows the procedure given</span>
@@ -974,7 +972,7 @@
 
 <div class="viewcode-block" id="calculate_interaction_from_averaging">
 <a class="viewcode-back" href="../../_ref/postprocessing.eval_U_cRPA_Vasp.html#postprocessing.eval_U_cRPA_Vasp.calculate_interaction_from_averaging">[docs]</a>
-<span class="k">def</span> <span class="nf">calculate_interaction_from_averaging</span><span class="p">(</span><span class="n">uijkl</span><span class="p">,</span> <span class="n">n_sites</span><span class="p">,</span> <span class="n">n_orb</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate_interaction_from_averaging</span><span class="p">(</span><span class="n">uijkl</span><span class="p">,</span> <span class="n">n_sites</span><span class="p">,</span> <span class="n">n_orb</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    calculates U,J by averaging directly the Uijkl matrix</span>
 <span class="sd">    ignoring if tensor is given in spherical or cubic basis.</span>
@@ -1027,21 +1025,21 @@
 
 <div class="viewcode-block" id="fit_slater_fulld">
 <a class="viewcode-back" href="../../_ref/postprocessing.eval_U_cRPA_Vasp.html#postprocessing.eval_U_cRPA_Vasp.fit_slater_fulld">[docs]</a>
-<span class="k">def</span> <span class="nf">fit_slater_fulld</span><span class="p">(</span><span class="n">uijkl</span><span class="p">,</span> <span class="n">n_sites</span><span class="p">,</span> <span class="n">U_init</span><span class="p">,</span> <span class="n">J_init</span><span class="p">,</span> <span class="n">fixed_F4_F2</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">fit_slater_fulld</span><span class="p">(</span><span class="n">uijkl</span><span class="p">,</span> <span class="n">n_sites</span><span class="p">,</span> <span class="n">U_init</span><span class="p">,</span> <span class="n">J_init</span><span class="p">,</span> <span class="n">fixed_F4_F2</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    finds best Slater parameters U, J for given Uijkl tensor</span>
 <span class="sd">    using the triqs U_matrix operator routine</span>
 <span class="sd">    assumes F4/F2=0.625</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
-    <span class="kn">from</span> <span class="nn">triqs.operators.util.U_matrix</span> <span class="kn">import</span> <span class="n">U_matrix_slater</span><span class="p">,</span> <span class="n">reduce_4index_to_2index</span>
-    <span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">minimize</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">triqs.operators.util.U_matrix</span><span class="w"> </span><span class="kn">import</span> <span class="n">U_matrix_slater</span><span class="p">,</span> <span class="n">reduce_4index_to_2index</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">minimize</span>
     <span class="c1"># transform U matrix orbital basis ijkl to nmop, note the last two indices need to be switched in the T matrices</span>
 
-    <span class="k">def</span> <span class="nf">transformU</span><span class="p">(</span><span class="n">U_matrix</span><span class="p">,</span> <span class="n">T</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">transformU</span><span class="p">(</span><span class="n">U_matrix</span><span class="p">,</span> <span class="n">T</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s2">&quot;im,jn,ijkl,lo,kp-&gt;mnpo&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">T</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">T</span><span class="p">),</span> <span class="n">U_matrix</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">minimizer</span><span class="p">(</span><span class="n">parameters</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">minimizer</span><span class="p">(</span><span class="n">parameters</span><span class="p">):</span>
         <span class="n">U_int</span><span class="p">,</span> <span class="n">J_hund</span> <span class="o">=</span> <span class="n">parameters</span>
         <span class="n">Umat_full</span> <span class="o">=</span> <span class="n">U_matrix_slater</span><span class="p">(</span><span class="n">l</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">U_int</span><span class="o">=</span><span class="n">U_int</span><span class="p">,</span> <span class="n">J_hund</span><span class="o">=</span><span class="n">J_hund</span><span class="p">,</span> <span class="n">basis</span><span class="o">=</span><span class="s1">&#39;cubic&#39;</span><span class="p">)</span>
         <span class="n">Umat_full</span> <span class="o">=</span> <span class="n">transformU</span><span class="p">(</span><span class="n">Umat_full</span><span class="p">,</span> <span class="n">rot_def_to_w90</span><span class="p">)</span>
@@ -1053,7 +1051,7 @@
         <span class="n">u_ijij_slater</span> <span class="o">=</span> <span class="n">Upmat</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">u_iijj_crpa</span> <span class="o">-</span> <span class="n">u_iijj_slater</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">u_ijij_crpa</span> <span class="o">-</span> <span class="n">u_ijij_slater</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">minimizer_radial</span><span class="p">(</span><span class="n">parameters</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">minimizer_radial</span><span class="p">(</span><span class="n">parameters</span><span class="p">):</span>
         <span class="n">F0</span><span class="p">,</span> <span class="n">F2</span><span class="p">,</span> <span class="n">F4</span> <span class="o">=</span> <span class="n">parameters</span>
         <span class="n">Umat_full</span> <span class="o">=</span> <span class="n">U_matrix_slater</span><span class="p">(</span><span class="n">l</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">radial_integrals</span><span class="o">=</span><span class="p">[</span><span class="n">F0</span><span class="p">,</span> <span class="n">F2</span><span class="p">,</span> <span class="n">F4</span><span class="p">],</span> <span class="n">basis</span><span class="o">=</span><span class="s1">&#39;cubic&#39;</span><span class="p">)</span>
         <span class="n">Umat_full</span> <span class="o">=</span> <span class="n">transformU</span><span class="p">(</span><span class="n">Umat_full</span><span class="p">,</span> <span class="n">rot_def_to_w90</span><span class="p">)</span>

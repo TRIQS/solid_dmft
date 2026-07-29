@@ -1,23 +1,24 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>dft_managers.qe_manager &mdash; solid_dmft  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=2d0451a4" />
       <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
 
   
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
     <link rel="canonical" href="https://triqs.github.io/solid_dmft/latest/_modules/dft_managers/qe_manager.html" />
-  
-        <script src="../../_static/jquery.js?v=8dae8fb0"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="../../_static/jquery.js?v=958b65b0"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -35,9 +36,6 @@
             solid_dmft
               <img src="../../_static/logo_no_text.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                unstable
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -432,7 +430,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Plotting-the-results:-observables">3. Plotting the results: observables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green’s-function">4. Plotting the results: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green's-function">4. Plotting the results: the Legendre Green’s function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Next-steps-to-try">5. Next steps to try</a></li>
 </ul>
 </li>
@@ -600,18 +598,18 @@
 <span class="sd">Contains the function to run a QuantumEspresso iteration. Needed for CSC calculations.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">subprocess</span>
-<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 
-<span class="kn">import</span> <span class="nn">triqs.utility.mpi</span> <span class="k">as</span> <span class="nn">mpi</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">triqs.utility.mpi</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mpi</span>
 
-<span class="kn">from</span> <span class="nn">solid_dmft.dft_managers</span> <span class="kn">import</span> <span class="n">mpi_helpers</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.dft_managers</span><span class="w"> </span><span class="kn">import</span> <span class="n">mpi_helpers</span>
 
 
 <div class="viewcode-block" id="_start_with_piping">
 <a class="viewcode-back" href="../../_ref/dft_managers.qe_manager.html#dft_managers.qe_manager._start_with_piping">[docs]</a>
-<span class="k">def</span> <span class="nf">_start_with_piping</span><span class="p">(</span><span class="n">mpi_exe</span><span class="p">,</span> <span class="n">mpi_arguments</span><span class="p">,</span> <span class="n">qe_file_ext</span><span class="p">,</span> <span class="n">env_vars</span><span class="p">,</span> <span class="n">seedname</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_start_with_piping</span><span class="p">(</span><span class="n">mpi_exe</span><span class="p">,</span> <span class="n">mpi_arguments</span><span class="p">,</span> <span class="n">qe_file_ext</span><span class="p">,</span> <span class="n">env_vars</span><span class="p">,</span> <span class="n">seedname</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Handles the piping of the output when starting QE.</span>
 
@@ -659,7 +657,7 @@
 
 <div class="viewcode-block" id="run">
 <a class="viewcode-back" href="../../_ref/dft_managers.qe_manager.html#dft_managers.qe_manager.run">[docs]</a>
-<span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">number_cores</span><span class="p">,</span> <span class="n">qe_file_ext</span><span class="p">,</span> <span class="n">qe_exec</span><span class="p">,</span> <span class="n">mpi_profile</span><span class="p">,</span> <span class="n">mpi_exe_param</span><span class="p">,</span> <span class="n">seedname</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="n">number_cores</span><span class="p">,</span> <span class="n">qe_file_ext</span><span class="p">,</span> <span class="n">qe_exec</span><span class="p">,</span> <span class="n">mpi_profile</span><span class="p">,</span> <span class="n">mpi_exe_param</span><span class="p">,</span> <span class="n">seedname</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Starts the VASP child process. Takes care of initializing a clean</span>
 <span class="sd">    environment for the child process. This is needed so that VASP does not</span>
@@ -721,7 +719,7 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">qe_exec</span> <span class="o">=</span> <span class="n">qe_exec</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="o">**</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">,</span> <span class="s2">&quot;number_cores&quot;</span><span class="p">:</span> <span class="n">number_cores</span><span class="p">})</span>
         <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown placeholder </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2"> in dft_exec. Available: &#39;number_cores&#39; and environment variables.&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="kc">None</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown placeholder </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2"> in dft_exec. Available: &#39;number_cores&#39; and environment variables.&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
 
         <span class="n">arguments</span> <span class="o">=</span> <span class="n">mpi_helpers</span><span class="o">.</span><span class="n">get_mpi_arguments</span><span class="p">(</span><span class="n">mpi_profile</span><span class="p">,</span> <span class="n">mpi_exe</span><span class="p">,</span> <span class="n">number_cores</span><span class="p">,</span> <span class="n">qe_exec</span><span class="p">,</span> <span class="n">hostfile</span><span class="p">)</span>
         <span class="n">_start_with_piping</span><span class="p">(</span><span class="n">mpi_exe</span><span class="p">,</span> <span class="n">arguments</span><span class="p">,</span> <span class="n">qe_file_ext</span><span class="p">,</span> <span class="n">env_vars</span><span class="p">,</span> <span class="n">seedname</span><span class="p">)</span>
@@ -732,7 +730,7 @@
 
 <div class="viewcode-block" id="read_dft_energy">
 <a class="viewcode-back" href="../../_ref/dft_managers.qe_manager.html#dft_managers.qe_manager.read_dft_energy">[docs]</a>
-<span class="k">def</span> <span class="nf">read_dft_energy</span><span class="p">(</span><span class="n">seedname</span><span class="p">,</span> <span class="n">iter_dmft</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_dft_energy</span><span class="p">(</span><span class="n">seedname</span><span class="p">,</span> <span class="n">iter_dmft</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Reads DFT energy from quantum espresso&#39;s out files</span>
 

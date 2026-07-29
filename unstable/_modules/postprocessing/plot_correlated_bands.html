@@ -1,23 +1,24 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>postprocessing.plot_correlated_bands &mdash; solid_dmft  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=2d0451a4" />
       <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
 
   
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
     <link rel="canonical" href="https://triqs.github.io/solid_dmft/latest/_modules/postprocessing/plot_correlated_bands.html" />
-  
-        <script src="../../_static/jquery.js?v=8dae8fb0"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="../../_static/jquery.js?v=958b65b0"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -35,9 +36,6 @@
             solid_dmft
               <img src="../../_static/logo_no_text.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                unstable
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -432,7 +430,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Plotting-the-results:-observables">3. Plotting the results: observables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green’s-function">4. Plotting the results: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green's-function">4. Plotting the results: the Legendre Green’s function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Next-steps-to-try">5. Next steps to try</a></li>
 </ul>
 </li>
@@ -606,25 +604,25 @@
 <span class="sd">- make proper use of rot_mat from DFT_Tools (atm it assumed that wannier_hr and Sigma are written in the same basis)</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">matplotlib.ticker</span> <span class="kn">import</span> <span class="n">MaxNLocator</span>
-<span class="kn">from</span> <span class="nn">matplotlib.colors</span> <span class="kn">import</span> <span class="n">Normalize</span>
-<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">cm</span>
-<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">brentq</span>
-<span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="kn">import</span> <span class="n">interp1d</span>
-<span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">argrelextrema</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">itertools</span>
-<span class="kn">import</span> <span class="nn">skimage.measure</span>
-<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.ticker</span><span class="w"> </span><span class="kn">import</span> <span class="n">MaxNLocator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.colors</span><span class="w"> </span><span class="kn">import</span> <span class="n">Normalize</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">cm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">brentq</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.interpolate</span><span class="w"> </span><span class="kn">import</span> <span class="n">interp1d</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.signal</span><span class="w"> </span><span class="kn">import</span> <span class="n">argrelextrema</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">skimage.measure</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">warnings</span><span class="w"> </span><span class="kn">import</span> <span class="n">warn</span>
 
-<span class="kn">from</span> <span class="nn">h5</span> <span class="kn">import</span> <span class="n">HDFArchive</span>
-<span class="kn">from</span> <span class="nn">triqs.gfs</span> <span class="kn">import</span> <span class="n">BlockGf</span><span class="p">,</span> <span class="n">MeshReFreq</span><span class="p">,</span> <span class="n">Gf</span>
-<span class="kn">from</span> <span class="nn">triqs.lattice.utils</span> <span class="kn">import</span> <span class="n">TB_from_wannier90</span><span class="p">,</span> <span class="n">k_space_path</span>
-<span class="kn">from</span> <span class="nn">triqs_dft_tools.sumk_dft</span> <span class="kn">import</span> <span class="n">SumkDFT</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">h5</span><span class="w"> </span><span class="kn">import</span> <span class="n">HDFArchive</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.gfs</span><span class="w"> </span><span class="kn">import</span> <span class="n">BlockGf</span><span class="p">,</span> <span class="n">MeshReFreq</span><span class="p">,</span> <span class="n">Gf</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.lattice.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">TB_from_wannier90</span><span class="p">,</span> <span class="n">k_space_path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs_dft_tools.sumk_dft</span><span class="w"> </span><span class="kn">import</span> <span class="n">SumkDFT</span>
 
 
-<span class="k">def</span> <span class="nf">lambda_matrix_w90_t2g</span><span class="p">(</span><span class="n">add_lambda</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">lambda_matrix_w90_t2g</span><span class="p">(</span><span class="n">add_lambda</span><span class="p">):</span>
 
     <span class="n">lambda_x</span><span class="p">,</span> <span class="n">lambda_y</span><span class="p">,</span> <span class="n">lambda_z</span> <span class="o">=</span> <span class="n">add_lambda</span>
 
@@ -640,7 +638,7 @@
     <span class="k">return</span> <span class="n">lambda_matrix</span>
 
 
-<span class="k">def</span> <span class="nf">change_basis</span><span class="p">(</span><span class="n">n_orb</span><span class="p">,</span> <span class="n">orbital_order_to</span><span class="p">,</span> <span class="n">orbital_order_from</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">change_basis</span><span class="p">(</span><span class="n">n_orb</span><span class="p">,</span> <span class="n">orbital_order_to</span><span class="p">,</span> <span class="n">orbital_order_from</span><span class="p">):</span>
 
     <span class="n">change_of_basis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">n_orb</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">ct</span><span class="p">,</span> <span class="n">orb</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">orbital_order_to</span><span class="p">):</span>
@@ -650,7 +648,7 @@
     <span class="k">return</span> <span class="n">change_of_basis</span>
 
 
-<span class="k">def</span> <span class="nf">print_matrix</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="n">n_orb</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">print_matrix</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="n">n_orb</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">:&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
 
@@ -664,7 +662,7 @@
         <span class="nb">print</span><span class="p">((</span><span class="s1">&#39; &#39;</span><span class="o">*</span><span class="mi">4</span> <span class="o">+</span> <span class="n">fmt</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">row</span><span class="p">))</span>
 
 
-<span class="k">def</span> <span class="nf">_sigma_from_dmft</span><span class="p">(</span><span class="n">n_orb</span><span class="p">,</span> <span class="n">orbital_order</span><span class="p">,</span> <span class="n">with_sigma</span><span class="p">,</span> <span class="n">spin</span><span class="p">,</span> <span class="n">orbital_order_dmft</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">specs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_sigma_from_dmft</span><span class="p">(</span><span class="n">n_orb</span><span class="p">,</span> <span class="n">orbital_order</span><span class="p">,</span> <span class="n">with_sigma</span><span class="p">,</span> <span class="n">spin</span><span class="p">,</span> <span class="n">orbital_order_dmft</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">specs</span><span class="p">):</span>
 
     <span class="k">if</span> <span class="n">orbital_order_dmft</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">orbital_order_dmft</span> <span class="o">=</span> <span class="n">orbital_order</span>
@@ -747,7 +745,7 @@
     <span class="n">sigma_interpolated</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_orb</span><span class="p">,</span> <span class="n">n_orb</span><span class="p">,</span> <span class="n">freq_dict</span><span class="p">[</span><span class="s1">&#39;n_w&#39;</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
 
     <span class="c1"># interpolate sigma</span>
-    <span class="k">def</span> <span class="nf">interpolate_sigma</span><span class="p">(</span><span class="n">w_mesh</span><span class="p">,</span> <span class="n">w_mesh_dmft</span><span class="p">,</span> <span class="n">orb1</span><span class="p">,</span> <span class="n">orb2</span><span class="p">):</span> <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">w_mesh</span><span class="p">,</span> <span class="n">w_mesh_dmft</span><span class="p">,</span> <span class="n">sigma_mat</span><span class="p">[:,</span> <span class="n">orb1</span><span class="p">,</span> <span class="n">orb2</span><span class="p">])</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">interpolate_sigma</span><span class="p">(</span><span class="n">w_mesh</span><span class="p">,</span> <span class="n">w_mesh_dmft</span><span class="p">,</span> <span class="n">orb1</span><span class="p">,</span> <span class="n">orb2</span><span class="p">):</span> <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">w_mesh</span><span class="p">,</span> <span class="n">w_mesh_dmft</span><span class="p">,</span> <span class="n">sigma_mat</span><span class="p">[:,</span> <span class="n">orb1</span><span class="p">,</span> <span class="n">orb2</span><span class="p">])</span>
 
     <span class="k">for</span> <span class="n">ct1</span><span class="p">,</span> <span class="n">ct2</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_orb</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_orb</span><span class="p">)):</span>
         <span class="n">sigma_interpolated</span><span class="p">[</span><span class="n">ct1</span><span class="p">,</span> <span class="n">ct2</span><span class="p">]</span> <span class="o">=</span> <span class="n">interpolate_sigma</span><span class="p">(</span><span class="n">w_mesh</span><span class="p">,</span> <span class="n">w_mesh_dmft</span><span class="p">,</span> <span class="n">ct1</span><span class="p">,</span> <span class="n">ct2</span><span class="p">)</span>
@@ -755,7 +753,7 @@
     <span class="k">return</span> <span class="n">sigma_interpolated</span><span class="p">,</span> <span class="n">mu_dmft</span><span class="p">,</span> <span class="n">freq_dict</span>
 
 
-<span class="k">def</span> <span class="nf">sigma_FL</span><span class="p">(</span><span class="n">n_orb</span><span class="p">,</span> <span class="n">orbital_order</span><span class="p">,</span> <span class="n">Sigma_0</span><span class="p">,</span> <span class="n">Sigma_Z</span><span class="p">,</span> <span class="n">freq_dict</span><span class="p">,</span> <span class="n">eta</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">mu_dmft</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sigma_FL</span><span class="p">(</span><span class="n">n_orb</span><span class="p">,</span> <span class="n">orbital_order</span><span class="p">,</span> <span class="n">Sigma_0</span><span class="p">,</span> <span class="n">Sigma_Z</span><span class="p">,</span> <span class="n">freq_dict</span><span class="p">,</span> <span class="n">eta</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">mu_dmft</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Setting Re[Sigma] with Fermi liquid approximation&#39;</span><span class="p">)</span>
 
@@ -772,7 +770,7 @@
 
     <span class="c1"># setting up sigma</span>
     <span class="n">sigma_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_orb</span><span class="p">,</span> <span class="n">n_orb</span><span class="p">,</span> <span class="n">freq_dict</span><span class="p">[</span><span class="s1">&#39;n_w&#39;</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">approximate_sigma</span><span class="p">(</span><span class="n">orb</span><span class="p">):</span> <span class="k">return</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="n">Sigma_Z</span><span class="p">[</span><span class="n">orb</span><span class="p">])</span> <span class="o">*</span> <span class="n">freq_dict</span><span class="p">[</span><span class="s1">&#39;w_mesh&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">Sigma_0</span><span class="p">[</span><span class="n">orb</span><span class="p">]</span> <span class="o">-</span> <span class="n">mu_dmft</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">approximate_sigma</span><span class="p">(</span><span class="n">orb</span><span class="p">):</span> <span class="k">return</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="n">Sigma_Z</span><span class="p">[</span><span class="n">orb</span><span class="p">])</span> <span class="o">*</span> <span class="n">freq_dict</span><span class="p">[</span><span class="s1">&#39;w_mesh&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">Sigma_0</span><span class="p">[</span><span class="n">orb</span><span class="p">]</span> <span class="o">-</span> <span class="n">mu_dmft</span>
     <span class="k">for</span> <span class="n">ct</span><span class="p">,</span> <span class="n">orb</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">orbital_order</span><span class="p">):</span>
         <span class="n">sigma_array</span><span class="p">[</span><span class="n">ct</span><span class="p">,</span> <span class="n">ct</span><span class="p">]</span> <span class="o">=</span> <span class="n">approximate_sigma</span><span class="p">(</span><span class="n">ct</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">eta</span>
 
@@ -781,7 +779,7 @@
 
 <div class="viewcode-block" id="_calc_alatt">
 <a class="viewcode-back" href="../../_ref/postprocessing.plot_correlated_bands.html#postprocessing.plot_correlated_bands._calc_alatt">[docs]</a>
-<span class="k">def</span> <span class="nf">_calc_alatt</span><span class="p">(</span><span class="n">n_orb</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">e_mat</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">qp_bands</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">e_vecs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_calc_alatt</span><span class="p">(</span><span class="n">n_orb</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">e_mat</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">qp_bands</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">e_vecs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                 <span class="n">proj_nuk</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">trace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">freq_dict</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    calculate slice of lattice spectral function for given TB dispersion / e_mat and self-energy</span>
@@ -801,7 +799,7 @@
 <span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="c1"># adjust to system size</span>
-    <span class="k">def</span> <span class="nf">upscale</span><span class="p">(</span><span class="n">quantity</span><span class="p">,</span> <span class="n">n_orb</span><span class="p">):</span> <span class="k">return</span> <span class="n">quantity</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">n_orb</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">upscale</span><span class="p">(</span><span class="n">quantity</span><span class="p">,</span> <span class="n">n_orb</span><span class="p">):</span> <span class="k">return</span> <span class="n">quantity</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">n_orb</span><span class="p">)</span>
     <span class="n">mu</span> <span class="o">=</span> <span class="n">upscale</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">n_orb</span><span class="p">)</span>
     <span class="n">eta</span> <span class="o">=</span> <span class="n">upscale</span><span class="p">(</span><span class="n">eta</span><span class="p">,</span> <span class="n">n_orb</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e_vecs</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
@@ -816,7 +814,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">alatt_k_w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_k</span><span class="p">,</span> <span class="n">freq_dict</span><span class="p">[</span><span class="s1">&#39;n_w&#39;</span><span class="p">],</span> <span class="n">n_orb</span><span class="p">))</span>
 
-        <span class="k">def</span> <span class="nf">invert_and_trace</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">e_mat</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">trace</span><span class="p">,</span> <span class="n">proj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">invert_and_trace</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">e_mat</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">trace</span><span class="p">,</span> <span class="n">proj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
             <span class="c1"># inversion is automatically vectorized over first axis of 3D array (omega first index now)</span>
             <span class="n">Glatt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">w</span> <span class="o">+</span> <span class="n">eta</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">+</span> <span class="n">mu</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">-</span> <span class="n">e_mat</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">-</span> <span class="n">sigma</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
             <span class="n">A_w_nu</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span><span class="o">/</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">diagonal</span><span class="p">(</span><span class="n">Glatt</span> <span class="o">-</span> <span class="n">Glatt</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">conj</span><span class="p">(),</span> <span class="n">axis1</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">axis2</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">imag</span>
@@ -841,7 +839,7 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">alatt_k_w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_k</span><span class="p">,</span> <span class="n">n_orb</span><span class="p">))</span>
         <span class="n">kslice</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">freq_dict</span><span class="p">[</span><span class="s1">&#39;n_w&#39;</span><span class="p">],</span> <span class="n">n_orb</span><span class="p">))</span>
-        <span class="k">def</span> <span class="nf">kslice_interp</span><span class="p">(</span><span class="n">orb</span><span class="p">):</span> <span class="k">return</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">freq_dict</span><span class="p">[</span><span class="s1">&#39;w_mesh&#39;</span><span class="p">],</span> <span class="n">kslice</span><span class="p">[:,</span> <span class="n">orb</span><span class="p">])</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">kslice_interp</span><span class="p">(</span><span class="n">orb</span><span class="p">):</span> <span class="k">return</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">freq_dict</span><span class="p">[</span><span class="s1">&#39;w_mesh&#39;</span><span class="p">],</span> <span class="n">kslice</span><span class="p">[:,</span> <span class="n">orb</span><span class="p">])</span>
 
         <span class="k">for</span> <span class="n">ik</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_k</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">iw</span><span class="p">,</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">freq_dict</span><span class="p">[</span><span class="s1">&#39;w_mesh&#39;</span><span class="p">]):</span>
@@ -864,7 +862,7 @@
 
 <div class="viewcode-block" id="_calc_kslice">
 <a class="viewcode-back" href="../../_ref/postprocessing.plot_correlated_bands.html#postprocessing.plot_correlated_bands._calc_kslice">[docs]</a>
-<span class="k">def</span> <span class="nf">_calc_kslice</span><span class="p">(</span><span class="n">n_orb</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">e_mat</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">qp_bands</span><span class="p">,</span> <span class="n">e_vecs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">proj_nuk</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">freq_dict</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_calc_kslice</span><span class="p">(</span><span class="n">n_orb</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">e_mat</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">qp_bands</span><span class="p">,</span> <span class="n">e_vecs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">proj_nuk</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">freq_dict</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    calculate lattice spectral function for given TB dispersion / e_mat and self-energy</span>
 
@@ -883,7 +881,7 @@
 <span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="c1"># adjust to system size</span>
-    <span class="k">def</span> <span class="nf">upscale</span><span class="p">(</span><span class="n">quantity</span><span class="p">,</span> <span class="n">n_orb</span><span class="p">):</span> <span class="k">return</span> <span class="n">quantity</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">n_orb</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">upscale</span><span class="p">(</span><span class="n">quantity</span><span class="p">,</span> <span class="n">n_orb</span><span class="p">):</span> <span class="k">return</span> <span class="n">quantity</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">n_orb</span><span class="p">)</span>
     <span class="n">mu</span> <span class="o">=</span> <span class="n">upscale</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">n_orb</span><span class="p">)</span>
     <span class="n">eta</span> <span class="o">=</span> <span class="n">upscale</span><span class="p">(</span><span class="n">eta</span><span class="p">,</span> <span class="n">n_orb</span><span class="p">)</span>
 
@@ -898,7 +896,7 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">qp_bands</span><span class="p">:</span>
         <span class="n">alatt_k_w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_kx</span><span class="p">,</span> <span class="n">n_ky</span><span class="p">))</span>
 
-        <span class="k">def</span> <span class="nf">invert_and_trace</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">e_mat</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">proj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">invert_and_trace</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">e_mat</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">proj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
             <span class="c1"># inversion is automatically vectorized over first axis of 3D array (omega first index now)</span>
             <span class="n">Glatt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">w</span> <span class="o">+</span> <span class="n">eta</span> <span class="o">+</span> <span class="n">mu</span> <span class="o">-</span> <span class="n">e_mat</span> <span class="o">-</span> <span class="n">sigma</span><span class="p">)</span>
             <span class="n">A_nu</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span><span class="o">/</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">diagonal</span><span class="p">(</span><span class="n">Glatt</span> <span class="o">-</span> <span class="n">Glatt</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span><span class="o">.</span><span class="n">conj</span><span class="p">())</span><span class="o">.</span><span class="n">imag</span>
@@ -923,7 +921,7 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">assert</span> <span class="n">n_kx</span> <span class="o">==</span> <span class="n">n_ky</span><span class="p">,</span> <span class="s1">&#39;Not implemented for N_kx != N_ky&#39;</span>
 
-        <span class="k">def</span> <span class="nf">search_for_extrema</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">search_for_extrema</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
             <span class="c1"># return None for no extrema, [] if ends of interval are the only extrema,</span>
             <span class="c1"># list of indices if local extrema are present</span>
             <span class="n">answer</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">data</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">data</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
@@ -973,7 +971,7 @@
 
 <div class="viewcode-block" id="get_tb_bands">
 <a class="viewcode-back" href="../../_ref/postprocessing.plot_correlated_bands.html#postprocessing.plot_correlated_bands.get_tb_bands">[docs]</a>
-<span class="k">def</span> <span class="nf">get_tb_bands</span><span class="p">(</span><span class="n">e_mat</span><span class="p">,</span> <span class="n">proj_on_orb</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">],</span> <span class="o">**</span><span class="n">specs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_tb_bands</span><span class="p">(</span><span class="n">e_mat</span><span class="p">,</span> <span class="n">proj_on_orb</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">],</span> <span class="o">**</span><span class="n">specs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    calculate eigenvalues and eigenvectors for given list of e_mat on kmesh</span>
 
@@ -1014,7 +1012,7 @@
 
 
 
-<span class="k">def</span> <span class="nf">get_tb_kslice</span><span class="p">(</span><span class="n">tb</span><span class="p">,</span> <span class="n">mu_tb</span><span class="p">,</span> <span class="o">**</span><span class="n">specs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_tb_kslice</span><span class="p">(</span><span class="n">tb</span><span class="p">,</span> <span class="n">mu_tb</span><span class="p">,</span> <span class="o">**</span><span class="n">specs</span><span class="p">):</span>
 
     <span class="n">w90_paths</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">section</span><span class="p">:</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">specs</span><span class="p">[</span><span class="n">section</span><span class="p">[</span><span class="mi">0</span><span class="p">]]),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">specs</span><span class="p">[</span><span class="n">section</span><span class="p">[</span><span class="mi">1</span><span class="p">]])),</span> <span class="n">specs</span><span class="p">[</span><span class="s1">&#39;bands_path&#39;</span><span class="p">]))</span>
     <span class="n">upper_left</span> <span class="o">=</span> <span class="n">w90_paths</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
@@ -1035,14 +1033,14 @@
     <span class="k">return</span> <span class="n">FS_kx_ky</span><span class="p">,</span> <span class="n">band_char</span>
 
 
-<span class="k">def</span> <span class="nf">_fract_ind_to_val</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ind</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_fract_ind_to_val</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ind</span><span class="p">):</span>
     <span class="n">ind</span><span class="p">[</span><span class="n">ind</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="mf">1e-6</span>
     <span class="n">int_ind</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">indi</span><span class="p">)</span> <span class="k">for</span> <span class="n">indi</span> <span class="ow">in</span> <span class="n">ind</span><span class="p">]</span>
     <span class="n">int_ind_p1</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">indi</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span> <span class="k">for</span> <span class="n">indi</span> <span class="ow">in</span> <span class="n">ind</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">x</span><span class="p">[</span><span class="n">int_ind</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">int_ind_p1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="n">int_ind</span><span class="p">])</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">int_ind</span><span class="p">))</span>
 
 
-<span class="k">def</span> <span class="nf">get_kx_ky_FS</span><span class="p">(</span><span class="n">lower_right</span><span class="p">,</span> <span class="n">upper_left</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">tb</span><span class="p">,</span> <span class="n">select</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">N_kxy</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">kz</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">fermi</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_kx_ky_FS</span><span class="p">(</span><span class="n">lower_right</span><span class="p">,</span> <span class="n">upper_left</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">tb</span><span class="p">,</span> <span class="n">select</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">N_kxy</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">kz</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">fermi</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
 
     <span class="c1"># create mesh</span>
     <span class="n">kx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">N_kxy</span><span class="p">)</span>
@@ -1091,7 +1089,7 @@
     <span class="k">return</span> <span class="n">FS_kx_ky</span><span class="p">,</span> <span class="n">band_char</span>
 
 
-<span class="k">def</span> <span class="nf">_setup_plot_bands</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">special_k</span><span class="p">,</span> <span class="n">k_points_labels</span><span class="p">,</span> <span class="n">freq_dict</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_setup_plot_bands</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">special_k</span><span class="p">,</span> <span class="n">k_points_labels</span><span class="p">,</span> <span class="n">freq_dict</span><span class="p">):</span>
 
     <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$\epsilon - \mu$ (eV)&#39;</span><span class="p">)</span>
@@ -1104,7 +1102,7 @@
     <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">k_points_labels</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">setup_plot_kslice</span><span class="p">(</span><span class="n">ax</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">setup_plot_kslice</span><span class="p">(</span><span class="n">ax</span><span class="p">):</span>
 
     <span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="c1"># ax.set_xlim(0,1)</span>
@@ -1115,7 +1113,7 @@
     <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$k_y\pi/b$&#39;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">plot_bands</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">alatt_k_w</span><span class="p">,</span> <span class="n">tb_data</span><span class="p">,</span> <span class="n">freq_dict</span><span class="p">,</span> <span class="n">n_orb</span><span class="p">,</span> <span class="n">tb</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">alatt</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">qp_bands</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">plot_dict</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_bands</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">alatt_k_w</span><span class="p">,</span> <span class="n">tb_data</span><span class="p">,</span> <span class="n">freq_dict</span><span class="p">,</span> <span class="n">n_orb</span><span class="p">,</span> <span class="n">tb</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">alatt</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">qp_bands</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">plot_dict</span><span class="p">):</span>
 
     <span class="k">assert</span> <span class="n">tb_data</span><span class="p">[</span><span class="s1">&#39;special_k&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;a regular k point mesh has been used, please call plot_dos&#39;</span>
 
@@ -1169,7 +1167,7 @@
     <span class="n">_setup_plot_bands</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">tb_data</span><span class="p">[</span><span class="s1">&#39;special_k&#39;</span><span class="p">],</span> <span class="n">tb_data</span><span class="p">[</span><span class="s1">&#39;k_points_labels&#39;</span><span class="p">],</span> <span class="n">freq_dict</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">plot_dos</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">alatt_k_w</span><span class="p">,</span> <span class="n">tb_data</span><span class="p">,</span> <span class="n">freq_dict</span><span class="p">,</span> <span class="n">tb</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">alatt</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_dos</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">alatt_k_w</span><span class="p">,</span> <span class="n">tb_data</span><span class="p">,</span> <span class="n">freq_dict</span><span class="p">,</span> <span class="n">tb</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">alatt</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
     <span class="k">assert</span> <span class="n">tb</span> <span class="o">==</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;plotting TB DOS is not supported yet.&#39;</span>
 
@@ -1192,7 +1190,7 @@
 
     <span class="k">return</span>
 
-<span class="k">def</span> <span class="nf">plot_kslice</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">alatt_k_w</span><span class="p">,</span> <span class="n">tb_data</span><span class="p">,</span> <span class="n">freq_dict</span><span class="p">,</span> <span class="n">n_orb</span><span class="p">,</span> <span class="n">tb_dict</span><span class="p">,</span> <span class="n">tb</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">alatt</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">plot_dict</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_kslice</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">alatt_k_w</span><span class="p">,</span> <span class="n">tb_data</span><span class="p">,</span> <span class="n">freq_dict</span><span class="p">,</span> <span class="n">n_orb</span><span class="p">,</span> <span class="n">tb_dict</span><span class="p">,</span> <span class="n">tb</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">alatt</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">plot_dict</span><span class="p">):</span>
 
     <span class="n">proj_on_orb</span> <span class="o">=</span> <span class="n">tb_data</span><span class="p">[</span><span class="s1">&#39;proj_on_orb&#39;</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">quarter</span><span class="p">:</span>
@@ -1258,7 +1256,7 @@
 
 <div class="viewcode-block" id="get_dmft_bands">
 <a class="viewcode-back" href="../../_ref/postprocessing.plot_correlated_bands.html#postprocessing.plot_correlated_bands.get_dmft_bands">[docs]</a>
-<span class="k">def</span> <span class="nf">get_dmft_bands</span><span class="p">(</span><span class="n">n_orb</span><span class="p">,</span> <span class="n">mu_tb</span><span class="p">,</span> <span class="n">w90_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">w90_seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">TB_obj</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_spin</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">add_lambda</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_local</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_dmft_bands</span><span class="p">(</span><span class="n">n_orb</span><span class="p">,</span> <span class="n">mu_tb</span><span class="p">,</span> <span class="n">w90_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">w90_seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">TB_obj</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_spin</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">add_lambda</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_local</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                    <span class="n">with_sigma</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fermi_slice</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">qp_bands</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">orbital_order_to</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                    <span class="n">add_mu_tb</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">band_basis</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">proj_on_orb</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">trace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">eta</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
                    <span class="n">mu_shift</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">proj_nuk</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">specs</span><span class="p">):</span>

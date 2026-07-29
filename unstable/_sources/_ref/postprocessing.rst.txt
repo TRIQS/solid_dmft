@@ -27,12 +27,12 @@
     :recursive:
 
     
-    postprocessing.eval_U_cRPA_RESPACK
-    postprocessing.eval_U_cRPA_Vasp
-    postprocessing.maxent_gf_imp
-    postprocessing.maxent_gf_latt
-    postprocessing.maxent_sigma
-    postprocessing.pade_sigma
-    postprocessing.plot_correlated_bands
+    eval_U_cRPA_RESPACK
+    eval_U_cRPA_Vasp
+    maxent_gf_imp
+    maxent_gf_latt
+    maxent_sigma
+    pade_sigma
+    plot_correlated_bands
 
 

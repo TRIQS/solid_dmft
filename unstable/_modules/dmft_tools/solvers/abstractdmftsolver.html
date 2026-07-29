@@ -1,23 +1,24 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>dmft_tools.solvers.abstractdmftsolver &mdash; solid_dmft  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=2d0451a4" />
       <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
 
   
     <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
     <link rel="canonical" href="https://triqs.github.io/solid_dmft/latest/_modules/dmft_tools/solvers/abstractdmftsolver.html" />
-  
-        <script src="../../../_static/jquery.js?v=8dae8fb0"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="../../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="../../../_static/jquery.js?v=958b65b0"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -35,9 +36,6 @@
             solid_dmft
               <img src="../../../_static/logo_no_text.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                unstable
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -432,7 +430,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Plotting-the-results:-observables">3. Plotting the results: observables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green’s-function">4. Plotting the results: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green's-function">4. Plotting the results: the Legendre Green’s function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Next-steps-to-try">5. Next steps to try</a></li>
 </ul>
 </li>
@@ -598,20 +596,20 @@
 <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">abstract DMFT solver class for solid_dmft</span>
 <span class="sd">&#39;&#39;&#39;</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">triqs.gfs</span> <span class="kn">import</span> <span class="n">MeshImTime</span><span class="p">,</span> <span class="n">MeshReTime</span><span class="p">,</span> <span class="n">MeshReFreq</span><span class="p">,</span> <span class="n">MeshLegendre</span><span class="p">,</span> <span class="n">Gf</span><span class="p">,</span> <span class="n">BlockGf</span>
-<span class="kn">from</span> <span class="nn">triqs.operators</span> <span class="kn">import</span> <span class="n">Operator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.gfs</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeshImTime</span><span class="p">,</span> <span class="n">MeshReTime</span><span class="p">,</span> <span class="n">MeshReFreq</span><span class="p">,</span> <span class="n">MeshLegendre</span><span class="p">,</span> <span class="n">Gf</span><span class="p">,</span> <span class="n">BlockGf</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.operators</span><span class="w"> </span><span class="kn">import</span> <span class="n">Operator</span>
 
 <span class="c1"># import abc</span>
-<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
 
 <span class="c1"># circular import of all the solver subclasses</span>
 
 
 <div class="viewcode-block" id="AbstractDMFTSolver">
 <a class="viewcode-back" href="../../../_ref/dmft_tools.solvers.abstractdmftsolver.AbstractDMFTSolver.html#dmft_tools.solvers.abstractdmftsolver.AbstractDMFTSolver">[docs]</a>
-<span class="k">class</span> <span class="nc">AbstractDMFTSolver</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AbstractDMFTSolver</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Abstract base class for DMFT solvers</span>
 
@@ -639,7 +637,7 @@
 
 <div class="viewcode-block" id="AbstractDMFTSolver.__init__">
 <a class="viewcode-back" href="../../../_ref/dmft_tools.solvers.abstractdmftsolver.AbstractDMFTSolver.__init__.html#dmft_tools.solvers.abstractdmftsolver.AbstractDMFTSolver.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">solver_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span> <span class="n">icrsh</span><span class="p">,</span> <span class="n">h_int</span><span class="p">,</span> <span class="n">iteration_offset</span><span class="p">,</span> <span class="n">deg_orbs_ftps</span><span class="p">,</span> <span class="n">gw_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">advanced_params</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">general_params</span> <span class="o">=</span> <span class="n">general_params</span>
@@ -673,7 +671,7 @@
 
 <div class="viewcode-block" id="AbstractDMFTSolver._init_ImFreq_objects">
 <a class="viewcode-back" href="../../../_ref/dmft_tools.solvers.abstractdmftsolver.AbstractDMFTSolver.html#dmft_tools.solvers.abstractdmftsolver.AbstractDMFTSolver._init_ImFreq_objects">[docs]</a>
-    <span class="k">def</span> <span class="nf">_init_ImFreq_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init_ImFreq_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize all ImFreq objects</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -710,7 +708,7 @@
 
 <div class="viewcode-block" id="AbstractDMFTSolver._init_ReFreq_objects">
 <a class="viewcode-back" href="../../../_ref/dmft_tools.solvers.abstractdmftsolver.AbstractDMFTSolver.html#dmft_tools.solvers.abstractdmftsolver.AbstractDMFTSolver._init_ReFreq_objects">[docs]</a>
-    <span class="k">def</span> <span class="nf">_init_ReFreq_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init_ReFreq_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize all ReFreq objects</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -748,7 +746,7 @@
 <div class="viewcode-block" id="AbstractDMFTSolver.solve">
 <a class="viewcode-back" href="../../../_ref/dmft_tools.solvers.abstractdmftsolver.AbstractDMFTSolver.solve.html#dmft_tools.solvers.abstractdmftsolver.AbstractDMFTSolver.solve">[docs]</a>
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">solve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Solve the DMFT impurity problem</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -758,7 +756,7 @@
 <div class="viewcode-block" id="AbstractDMFTSolver.postprocess">
 <a class="viewcode-back" href="../../../_ref/dmft_tools.solvers.abstractdmftsolver.AbstractDMFTSolver.postprocess.html#dmft_tools.solvers.abstractdmftsolver.AbstractDMFTSolver.postprocess">[docs]</a>
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">postprocess</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">postprocess</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Postprocess the DMFT impurity problem</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -768,7 +766,7 @@
 <div class="viewcode-block" id="AbstractDMFTSolver._gf_fit_tail_fraction">
 <a class="viewcode-back" href="../../../_ref/dmft_tools.solvers.abstractdmftsolver.AbstractDMFTSolver.html#dmft_tools.solvers.abstractdmftsolver.AbstractDMFTSolver._gf_fit_tail_fraction">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_gf_fit_tail_fraction</span><span class="p">(</span><span class="n">Gf</span><span class="p">,</span> <span class="n">fraction</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">known_moments</span><span class="o">=</span><span class="p">[]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_gf_fit_tail_fraction</span><span class="p">(</span><span class="n">Gf</span><span class="p">,</span> <span class="n">fraction</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">known_moments</span><span class="o">=</span><span class="p">[]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        fits the tail of Gf object by making a polynomial</span>
 <span class="sd">        fit of the Gf on the given fraction of the Gf mesh</span>
@@ -812,7 +810,7 @@
 <div class="viewcode-block" id="AbstractDMFTSolver._fit_tail_window">
 <a class="viewcode-back" href="../../../_ref/dmft_tools.solvers.abstractdmftsolver.AbstractDMFTSolver.html#dmft_tools.solvers.abstractdmftsolver.AbstractDMFTSolver._fit_tail_window">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_fit_tail_window</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_fit_tail_window</span><span class="p">(</span>
         <span class="n">Sigma_iw</span><span class="p">,</span> <span class="n">fit_min_n</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fit_max_n</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fit_min_w</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fit_max_w</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fit_max_moment</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fit_known_moments</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -844,7 +842,7 @@
 <span class="sd">        tail_barr : dict of arr</span>
 <span class="sd">                    fitted tail of Sigma_iw</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">triqs.gfs.gf_fnt</span> <span class="kn">import</span> <span class="n">fit_hermitian_tail_on_window</span><span class="p">,</span> <span class="n">replace_by_tail</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">triqs.gfs.gf_fnt</span><span class="w"> </span><span class="kn">import</span> <span class="n">fit_hermitian_tail_on_window</span><span class="p">,</span> <span class="n">replace_by_tail</span>
 
         <span class="c1"># Define default tail quantities</span>
         <span class="k">if</span> <span class="n">fit_min_w</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -883,7 +881,7 @@
         <span class="k">return</span> <span class="n">Sigma_fit</span><span class="p">,</span> <span class="n">tail_barr</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_make_spin_equal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Sigma</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_spin_equal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Sigma</span><span class="p">):</span>
         <span class="c1"># if not SOC than average up and down</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;magnetic&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">sum_k</span><span class="o">.</span><span class="n">SO</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">Sigma</span><span class="p">[</span><span class="s1">&#39;up_0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">Sigma</span><span class="p">[</span><span class="s1">&#39;up_0&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">Sigma</span><span class="p">[</span><span class="s1">&#39;down_0&#39;</span><span class="p">])</span>

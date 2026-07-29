@@ -1,23 +1,24 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>gw_embedding.bdft_converter &mdash; solid_dmft  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=2d0451a4" />
       <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
 
   
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
     <link rel="canonical" href="https://triqs.github.io/solid_dmft/latest/_modules/gw_embedding/bdft_converter.html" />
-  
-        <script src="../../_static/jquery.js?v=8dae8fb0"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="../../_static/jquery.js?v=958b65b0"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -35,9 +36,6 @@
             solid_dmft
               <img src="../../_static/logo_no_text.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                unstable
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -432,7 +430,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Plotting-the-results:-observables">3. Plotting the results: observables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green’s-function">4. Plotting the results: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green's-function">4. Plotting the results: the Legendre Green’s function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Next-steps-to-try">5. Next steps to try</a></li>
 </ul>
 </li>
@@ -598,29 +596,29 @@
 <span class="sd">converter from bdft output to edmft input for solid_dmft</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">scipy.constants</span> <span class="kn">import</span> <span class="n">physical_constants</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">physical_constants</span>
 
 
-<span class="kn">from</span> <span class="nn">h5</span> <span class="kn">import</span> <span class="n">HDFArchive</span>
-<span class="kn">from</span> <span class="nn">triqs.utility</span> <span class="kn">import</span> <span class="n">mpi</span>
-<span class="kn">from</span> <span class="nn">triqs.gfs</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">h5</span><span class="w"> </span><span class="kn">import</span> <span class="n">HDFArchive</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">mpi</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.gfs</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Gf</span><span class="p">,</span>
     <span class="n">BlockGf</span><span class="p">,</span>
     <span class="n">make_gf_dlr_imtime</span><span class="p">,</span>
     <span class="n">make_gf_dlr</span><span class="p">,</span>
     <span class="n">make_gf_dlr_imfreq</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">triqs.mesh</span> <span class="kn">import</span> <span class="n">MeshDLRImFreq</span><span class="p">,</span> <span class="n">MeshDLRImTime</span>
-<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.mesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeshDLRImFreq</span><span class="p">,</span> <span class="n">MeshDLRImTime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
 
-<span class="kn">from</span> <span class="nn">solid_dmft.gw_embedding.iaft</span> <span class="kn">import</span> <span class="n">IAFT</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.gw_embedding.iaft</span><span class="w"> </span><span class="kn">import</span> <span class="n">IAFT</span>
 
 <span class="n">HARTREE_EV</span> <span class="o">=</span> <span class="n">physical_constants</span><span class="p">[</span><span class="s1">&#39;Hartree energy in eV&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
 
 <div class="viewcode-block" id="_get_dlr_from_IR">
 <a class="viewcode-back" href="../../_ref/gw_embedding.bdft_converter.html#gw_embedding.bdft_converter._get_dlr_from_IR">[docs]</a>
-<span class="k">def</span> <span class="nf">_get_dlr_from_IR</span><span class="p">(</span><span class="n">Gf_ir</span><span class="p">,</span> <span class="n">ir_kernel</span><span class="p">,</span> <span class="n">mesh_dlr_iw</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_dlr_from_IR</span><span class="p">(</span><span class="n">Gf_ir</span><span class="p">,</span> <span class="n">ir_kernel</span><span class="p">,</span> <span class="n">mesh_dlr_iw</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Interpolate a given Gf from IR mesh to DLR mesh</span>
 
@@ -665,7 +663,7 @@
 
 
 
-<span class="k">def</span> <span class="nf">check_iaft_accuracy</span><span class="p">(</span><span class="n">Aw</span><span class="p">,</span> <span class="n">ir_kernel</span><span class="p">,</span> <span class="n">stats</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_iaft_accuracy</span><span class="p">(</span><span class="n">Aw</span><span class="p">,</span> <span class="n">ir_kernel</span><span class="p">,</span> <span class="n">stats</span><span class="p">,</span>
                         <span class="n">beta</span><span class="p">,</span> <span class="n">dlr_wmax</span><span class="p">,</span> <span class="n">dlr_prec</span><span class="p">,</span> <span class="n">data_name</span><span class="p">):</span>
     <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;============== DLR mesh check ==============</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Estimating accuracy of the user-defined (wmax, eps) = &#39;</span>
@@ -677,7 +675,7 @@
     <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;=================== done ===================</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">estimate_zero_moment</span><span class="p">(</span><span class="n">Aw</span><span class="p">,</span> <span class="n">iw_mesh</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">estimate_zero_moment</span><span class="p">(</span><span class="n">Aw</span><span class="p">,</span> <span class="n">iw_mesh</span><span class="p">):</span>
     <span class="n">iw_m1</span> <span class="o">=</span> <span class="n">iw_mesh</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">iw_m2</span> <span class="o">=</span> <span class="n">iw_mesh</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
     <span class="n">t</span> <span class="o">=</span> <span class="n">Aw</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">real</span> <span class="o">-</span> <span class="p">(</span><span class="n">Aw</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">Aw</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">real</span> <span class="o">*</span> <span class="n">iw_m2</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="p">(</span>
@@ -687,7 +685,7 @@
     <span class="k">return</span> <span class="n">t</span>
 
 
-<span class="k">def</span> <span class="nf">extract_t_and_delta</span><span class="p">(</span><span class="n">g_weiss_wsIab</span><span class="p">,</span> <span class="n">ir_kernel</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_t_and_delta</span><span class="p">(</span><span class="n">g_weiss_wsIab</span><span class="p">,</span> <span class="n">ir_kernel</span><span class="p">):</span>
     <span class="n">iwn_mesh_imp</span> <span class="o">=</span> <span class="n">ir_kernel</span><span class="o">.</span><span class="n">wn_mesh</span><span class="p">(</span><span class="s1">&#39;f&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="n">ir_kernel</span><span class="o">.</span><span class="n">beta</span>
 
     <span class="n">ns</span><span class="p">,</span> <span class="n">nImp</span> <span class="o">=</span> <span class="n">g_weiss_wsIab</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
@@ -712,7 +710,7 @@
     <span class="k">return</span> <span class="n">t_sIab_estimate</span><span class="p">,</span> <span class="n">delta_estimate</span>
 
 
-<span class="k">def</span> <span class="nf">read_t_and_delta</span><span class="p">(</span><span class="n">aimb_h5</span><span class="p">,</span> <span class="n">it_1e</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_t_and_delta</span><span class="p">(</span><span class="n">aimb_h5</span><span class="p">,</span> <span class="n">it_1e</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reading the analytic H_loc0 and the corresponding hybridization from aimbes h5 </span><span class="si">{</span><span class="n">aimb_h5</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
     <span class="k">with</span> <span class="n">HDFArchive</span><span class="p">(</span><span class="n">aimb_h5</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ar</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">it_1e</span><span class="p">:</span>
@@ -733,7 +731,7 @@
     <span class="k">return</span> <span class="n">t_sIab</span><span class="p">,</span> <span class="n">delta_wsIab</span>
 
 
-<span class="k">def</span> <span class="nf">tail_fit_g_weiss</span><span class="p">(</span><span class="n">g_weiss_wsIab</span><span class="p">,</span> <span class="n">ir_kernel</span><span class="p">,</span> <span class="n">gw_data</span><span class="p">,</span> <span class="n">wmax_imp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">eps_imp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">tail_fit_g_weiss</span><span class="p">(</span><span class="n">g_weiss_wsIab</span><span class="p">,</span> <span class="n">ir_kernel</span><span class="p">,</span> <span class="n">gw_data</span><span class="p">,</span> <span class="n">wmax_imp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">eps_imp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s2">&quot;Extracting H_loc0 and hybridization from tail fitting fermionic Weiss field g.&quot;</span><span class="p">)</span>
     <span class="c1"># if user-defined wmax and eps for the impurity</span>
     <span class="k">if</span> <span class="n">wmax_imp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">eps_imp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -754,10 +752,10 @@
     <span class="k">return</span> <span class="n">t_sIab</span><span class="p">,</span> <span class="n">delta_wsIab</span><span class="p">,</span> <span class="n">ir_imp_kernel</span>
 
 
-<span class="k">def</span> <span class="nf">bath_fitting</span><span class="p">(</span><span class="n">delta_wsIab</span><span class="p">,</span> <span class="n">iw_mesh</span><span class="p">,</span> <span class="n">Np</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">bath_fitting</span><span class="p">(</span><span class="n">delta_wsIab</span><span class="p">,</span> <span class="n">iw_mesh</span><span class="p">,</span> <span class="n">Np</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
     <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Bath fitting for hybridization with nbath/impurity orbital = </span><span class="si">{</span><span class="n">Np</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">adapol</span> <span class="kn">import</span> <span class="n">hybfit</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">adapol</span><span class="w"> </span><span class="kn">import</span> <span class="n">hybfit</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;bath fitting requires the adapol package (https://github.com/flatironinstitute/adapol). </span><span class="se">\n</span><span class="s2">&quot;</span>
                           <span class="s2">&quot;Please ensure that it is installed. &quot;</span><span class="p">)</span>
@@ -775,7 +773,7 @@
 
 <div class="viewcode-block" id="calc_Sigma_DC_gw">
 <a class="viewcode-back" href="../../_ref/gw_embedding.bdft_converter.html#gw_embedding.bdft_converter.calc_Sigma_DC_gw">[docs]</a>
-<span class="k">def</span> <span class="nf">calc_Sigma_DC_gw</span><span class="p">(</span><span class="n">Wloc_dlr</span><span class="p">,</span> <span class="n">Gloc_dlr</span><span class="p">,</span> <span class="n">Vloc</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_Sigma_DC_gw</span><span class="p">(</span><span class="n">Wloc_dlr</span><span class="p">,</span> <span class="n">Gloc_dlr</span><span class="p">,</span> <span class="n">Vloc</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the double counting part of the self-energy from the screened Coulomb interaction</span>
 
@@ -863,7 +861,7 @@
 
 <div class="viewcode-block" id="calc_W_from_Gloc">
 <a class="viewcode-back" href="../../_ref/gw_embedding.bdft_converter.html#gw_embedding.bdft_converter.calc_W_from_Gloc">[docs]</a>
-<span class="k">def</span> <span class="nf">calc_W_from_Gloc</span><span class="p">(</span><span class="n">Gloc_dlr</span><span class="p">,</span> <span class="n">U</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_W_from_Gloc</span><span class="p">(</span><span class="n">Gloc_dlr</span><span class="p">,</span> <span class="n">U</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate Wijkl from given constant U tensor and Gf on DLRMesh</span>
 <span class="sd">    triqs notation for Uijkl:</span>
@@ -983,7 +981,7 @@
 
 <div class="viewcode-block" id="convert_gw_output">
 <a class="viewcode-back" href="../../_ref/gw_embedding.bdft_converter.html#gw_embedding.bdft_converter.convert_gw_output">[docs]</a>
-<span class="k">def</span> <span class="nf">convert_gw_output</span><span class="p">(</span><span class="n">job_h5</span><span class="p">,</span> <span class="n">gw_h5</span><span class="p">,</span> <span class="n">dlr_wmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dlr_eps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">convert_gw_output</span><span class="p">(</span><span class="n">job_h5</span><span class="p">,</span> <span class="n">gw_h5</span><span class="p">,</span> <span class="n">dlr_wmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dlr_eps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                       <span class="n">it_1e</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">it_2e</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                       <span class="n">delta_calc_type</span><span class="o">=</span><span class="s2">&quot;tail_fit&quot;</span><span class="p">,</span> <span class="n">delta_bath_fit</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                       <span class="n">ha_ev_conv</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>

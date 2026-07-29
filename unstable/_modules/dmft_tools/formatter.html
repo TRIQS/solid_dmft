@@ -1,23 +1,24 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>dmft_tools.formatter &mdash; solid_dmft  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=2d0451a4" />
       <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
 
   
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
     <link rel="canonical" href="https://triqs.github.io/solid_dmft/latest/_modules/dmft_tools/formatter.html" />
-  
-        <script src="../../_static/jquery.js?v=8dae8fb0"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="../../_static/jquery.js?v=958b65b0"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -35,9 +36,6 @@
             solid_dmft
               <img src="../../_static/logo_no_text.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                unstable
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -432,7 +430,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Plotting-the-results:-observables">3. Plotting the results: observables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green’s-function">4. Plotting the results: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green's-function">4. Plotting the results: the Legendre Green’s function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Next-steps-to-try">5. Next steps to try</a></li>
 </ul>
 </li>
@@ -597,12 +595,12 @@
 <span class="sd">Contains formatters for things that need to be printed in DMFT calculations.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">triqs.utility.mpi</span> <span class="k">as</span> <span class="nn">mpi</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">triqs.utility.mpi</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mpi</span>
 
 <div class="viewcode-block" id="print_rotation_matrix">
 <a class="viewcode-back" href="../../_ref/dmft_tools.formatter.html#dmft_tools.formatter.print_rotation_matrix">[docs]</a>
-<span class="k">def</span> <span class="nf">print_rotation_matrix</span><span class="p">(</span><span class="n">sum_k</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">print_rotation_matrix</span><span class="p">(</span><span class="n">sum_k</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Prints the rotation matrix, real and imaginary part separately.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -622,7 +620,7 @@
 
 <div class="viewcode-block" id="print_block_sym">
 <a class="viewcode-back" href="../../_ref/dmft_tools.formatter.html#dmft_tools.formatter.print_block_sym">[docs]</a>
-<span class="k">def</span> <span class="nf">print_block_sym</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">dm</span><span class="p">,</span> <span class="n">general_params</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">print_block_sym</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">dm</span><span class="p">,</span> <span class="n">general_params</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Prints a summary of block structure finder, determination of</span>
 <span class="sd">    shell_multiplicity, local Hamiltonian, DFT density matrix.</span>
@@ -685,7 +683,7 @@
 
 
 
-<span class="k">def</span> <span class="nf">print_local_density</span><span class="p">(</span><span class="n">density</span><span class="p">,</span> <span class="n">density_pre</span><span class="p">,</span> <span class="n">density_mat</span><span class="p">,</span> <span class="n">spin_orbit</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">print_local_density</span><span class="p">(</span><span class="n">density</span><span class="p">,</span> <span class="n">density_pre</span><span class="p">,</span> <span class="n">density_mat</span><span class="p">,</span> <span class="n">spin_orbit</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
         <span class="k">return</span>
 
@@ -710,7 +708,7 @@
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;!!! WARNING !!!</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">print_summary_energetics</span><span class="p">(</span><span class="n">observables</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">print_summary_energetics</span><span class="p">(</span><span class="n">observables</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
         <span class="k">return</span>
 
@@ -723,7 +721,7 @@
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">60</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">print_summary_observables</span><span class="p">(</span><span class="n">observables</span><span class="p">,</span> <span class="n">n_inequiv_shells</span><span class="p">,</span> <span class="n">spin_block_names</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">print_summary_observables</span><span class="p">(</span><span class="n">observables</span><span class="p">,</span> <span class="n">n_inequiv_shells</span><span class="p">,</span> <span class="n">spin_block_names</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
         <span class="k">return</span>
 
@@ -743,7 +741,7 @@
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">60</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">print_summary_magnetic_occ</span><span class="p">(</span><span class="n">observables</span><span class="p">,</span> <span class="n">n_inequiv_shells</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">print_summary_magnetic_occ</span><span class="p">(</span><span class="n">observables</span><span class="p">,</span> <span class="n">n_inequiv_shells</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
         <span class="k">return</span>
 
@@ -761,7 +759,7 @@
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="o">*</span><span class="mi">60</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">print_summary_convergence</span><span class="p">(</span><span class="n">conv_obs</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">n_inequiv_shells</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">print_summary_convergence</span><span class="p">(</span><span class="n">conv_obs</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">n_inequiv_shells</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
         <span class="k">return</span>
 

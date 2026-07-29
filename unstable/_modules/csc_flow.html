@@ -1,23 +1,24 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>csc_flow &mdash; solid_dmft  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=2d0451a4" />
       <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
 
   
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
     <link rel="canonical" href="https://triqs.github.io/solid_dmft/latest/_modules/csc_flow.html" />
-  
-        <script src="../_static/jquery.js?v=8dae8fb0"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="../_static/doctools.js?v=888ff710"></script>
-        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="../_static/jquery.js?v=958b65b0"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
@@ -35,9 +36,6 @@
             solid_dmft
               <img src="../_static/logo_no_text.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                unstable
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -432,7 +430,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Plotting-the-results:-observables">3. Plotting the results: observables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green’s-function">4. Plotting the results: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green's-function">4. Plotting the results: the Legendre Green’s function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Next-steps-to-try">5. Next steps to try</a></li>
 </ul>
 </li>
@@ -597,28 +595,28 @@
 <span class="sd">contains the charge self-consistency flow control functions</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">timeit</span> <span class="kn">import</span> <span class="n">default_timer</span> <span class="k">as</span> <span class="n">timer</span>
-<span class="kn">import</span> <span class="nn">subprocess</span>
-<span class="kn">import</span> <span class="nn">shlex</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">gc</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">timeit</span><span class="w"> </span><span class="kn">import</span> <span class="n">default_timer</span> <span class="k">as</span> <span class="n">timer</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shlex</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="c1"># triqs</span>
-<span class="kn">from</span> <span class="nn">h5</span> <span class="kn">import</span> <span class="n">HDFArchive</span>
-<span class="kn">import</span> <span class="nn">triqs.utility.mpi</span> <span class="k">as</span> <span class="nn">mpi</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">h5</span><span class="w"> </span><span class="kn">import</span> <span class="n">HDFArchive</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">triqs.utility.mpi</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mpi</span>
 
-<span class="kn">from</span> <span class="nn">triqs_dftkit.wannier90</span> <span class="kn">import</span> <span class="n">Converter</span> <span class="k">as</span> <span class="n">Wannier90Converter</span>
-<span class="kn">from</span> <span class="nn">triqs_dftkit.vasp</span> <span class="kn">import</span> <span class="n">Converter</span> <span class="k">as</span> <span class="n">VaspConverter</span>
-<span class="kn">from</span> <span class="nn">triqs_dftkit.vasp.plovasp.vaspio</span> <span class="kn">import</span> <span class="n">VaspData</span>
-<span class="kn">import</span> <span class="nn">triqs_dftkit.vasp.plovasp.converter</span> <span class="k">as</span> <span class="nn">plo_converter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs_dftkit.wannier90</span><span class="w"> </span><span class="kn">import</span> <span class="n">Converter</span> <span class="k">as</span> <span class="n">Wannier90Converter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs_dftkit.vasp</span><span class="w"> </span><span class="kn">import</span> <span class="n">Converter</span> <span class="k">as</span> <span class="n">VaspConverter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs_dftkit.vasp.plovasp.vaspio</span><span class="w"> </span><span class="kn">import</span> <span class="n">VaspData</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">triqs_dftkit.vasp.plovasp.converter</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plo_converter</span>
 
 
-<span class="kn">from</span> <span class="nn">solid_dmft.dmft_cycle</span> <span class="kn">import</span> <span class="n">dmft_cycle</span>
-<span class="kn">from</span> <span class="nn">solid_dmft.dft_managers</span> <span class="kn">import</span> <span class="n">vasp_manager</span> <span class="k">as</span> <span class="n">vasp</span>
-<span class="kn">from</span> <span class="nn">solid_dmft.dft_managers</span> <span class="kn">import</span> <span class="n">qe_manager</span> <span class="k">as</span> <span class="n">qe</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.dmft_cycle</span><span class="w"> </span><span class="kn">import</span> <span class="n">dmft_cycle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.dft_managers</span><span class="w"> </span><span class="kn">import</span> <span class="n">vasp_manager</span> <span class="k">as</span> <span class="n">vasp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.dft_managers</span><span class="w"> </span><span class="kn">import</span> <span class="n">qe_manager</span> <span class="k">as</span> <span class="n">qe</span>
 
-<span class="k">def</span> <span class="nf">_run_plo_converter</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">dft_params</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_run_plo_converter</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">dft_params</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
         <span class="k">return</span>
 
@@ -634,7 +632,7 @@
     <span class="n">converter</span> <span class="o">=</span> <span class="n">VaspConverter</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;seedname&#39;</span><span class="p">])</span>
     <span class="n">converter</span><span class="o">.</span><span class="n">convert_dft_input</span><span class="p">()</span>
 
-<span class="k">def</span> <span class="nf">_run_wannier90</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">dft_params</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_run_wannier90</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">dft_params</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
         <span class="k">return</span>
 
@@ -649,7 +647,7 @@
     <span class="n">subprocess</span><span class="o">.</span><span class="n">check_call</span><span class="p">(</span><span class="n">command</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;-pp&#39;</span><span class="p">,</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;seedname&#39;</span><span class="p">]],</span> <span class="n">shell</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">subprocess</span><span class="o">.</span><span class="n">check_call</span><span class="p">(</span><span class="n">command</span> <span class="o">+</span> <span class="p">[</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;seedname&#39;</span><span class="p">]],</span> <span class="n">shell</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">_run_w90converter</span><span class="p">(</span><span class="n">seedname</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_run_w90converter</span><span class="p">(</span><span class="n">seedname</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">):</span>
     <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">seedname</span> <span class="o">+</span> <span class="s1">&#39;.win&#39;</span><span class="p">)</span>
         <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">seedname</span> <span class="o">+</span> <span class="s1">&#39;.inp&#39;</span><span class="p">)):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;*** Wannier input/converter config file not found! &#39;</span>
@@ -667,7 +665,7 @@
             <span class="k">assert</span> <span class="n">ar</span><span class="p">[</span><span class="s1">&#39;dft_input&#39;</span><span class="p">][</span><span class="s1">&#39;use_rotations&#39;</span><span class="p">],</span> <span class="s1">&#39;Creation of rot_mat failed in W90 converter&#39;</span>
     <span class="n">mpi</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
 
-<span class="k">def</span> <span class="nf">_full_qe_run</span><span class="p">(</span><span class="n">seedname</span><span class="p">,</span> <span class="n">dft_params</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_full_qe_run</span><span class="p">(</span><span class="n">seedname</span><span class="p">,</span> <span class="n">dft_params</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
     <span class="k">assert</span> <span class="n">mode</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;initial&#39;</span><span class="p">,</span> <span class="s1">&#39;restart&#39;</span><span class="p">,</span> <span class="s1">&#39;update&#39;</span><span class="p">)</span>
 
     <span class="c1"># runs a full iteration of DFT</span>
@@ -698,7 +696,7 @@
 
 <div class="viewcode-block" id="_store_dft_eigvals">
 <a class="viewcode-back" href="../_ref/csc_flow.html#csc_flow._store_dft_eigvals">[docs]</a>
-<span class="k">def</span> <span class="nf">_store_dft_eigvals</span><span class="p">(</span><span class="n">path_to_h5</span><span class="p">,</span> <span class="n">iteration</span><span class="p">,</span> <span class="n">projector_type</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_store_dft_eigvals</span><span class="p">(</span><span class="n">path_to_h5</span><span class="p">,</span> <span class="n">iteration</span><span class="p">,</span> <span class="n">projector_type</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    save the eigenvalues from LOCPROJ/wannier90 file to h5 archive</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -722,7 +720,7 @@
 
 <div class="viewcode-block" id="_full_vasp_run">
 <a class="viewcode-back" href="../_ref/csc_flow.html#csc_flow._full_vasp_run">[docs]</a>
-<span class="k">def</span> <span class="nf">_full_vasp_run</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">dft_params</span><span class="p">,</span> <span class="n">initial_run</span><span class="p">,</span> <span class="n">n_iter_dft</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sum_k</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_full_vasp_run</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">dft_params</span><span class="p">,</span> <span class="n">initial_run</span><span class="p">,</span> <span class="n">n_iter_dft</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sum_k</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Performs a complete DFT cycle in Vasp and the correct converter. If</span>
 <span class="sd">    initial_run, Vasp is starting and performing a normal scf calculation</span>
@@ -817,7 +815,7 @@
 <span class="c1"># Main CSC flow method</span>
 <div class="viewcode-block" id="csc_flow_control">
 <a class="viewcode-back" href="../_ref/csc_flow.html#csc_flow.csc_flow_control">[docs]</a>
-<span class="k">def</span> <span class="nf">csc_flow_control</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">solver_params</span><span class="p">,</span> <span class="n">dft_params</span><span class="p">,</span> <span class="n">gw_params</span><span class="p">,</span> <span class="n">advanced_params</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">csc_flow_control</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">solver_params</span><span class="p">,</span> <span class="n">dft_params</span><span class="p">,</span> <span class="n">gw_params</span><span class="p">,</span> <span class="n">advanced_params</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Function to run the csc cycle. It writes and removes the vasp.lock file to</span>
 <span class="sd">    start and stop Vasp, run the converter, run the dmft cycle and abort the job</span>

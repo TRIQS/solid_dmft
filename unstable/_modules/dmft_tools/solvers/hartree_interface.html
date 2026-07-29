@@ -1,23 +1,24 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>dmft_tools.solvers.hartree_interface &mdash; solid_dmft  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=2d0451a4" />
       <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
 
   
     <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
     <link rel="canonical" href="https://triqs.github.io/solid_dmft/latest/_modules/dmft_tools/solvers/hartree_interface.html" />
-  
-        <script src="../../../_static/jquery.js?v=8dae8fb0"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="../../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="../../../_static/jquery.js?v=958b65b0"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -35,9 +36,6 @@
             solid_dmft
               <img src="../../../_static/logo_no_text.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                unstable
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -432,7 +430,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Plotting-the-results:-observables">3. Plotting the results: observables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green’s-function">4. Plotting the results: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green's-function">4. Plotting the results: the Legendre Green’s function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Next-steps-to-try">5. Next steps to try</a></li>
 </ul>
 </li>
@@ -598,24 +596,24 @@
 <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">hartree solver class for solid_dmft</span>
 <span class="sd">&#39;&#39;&#39;</span>
-<span class="kn">from</span> <span class="nn">triqs.gfs</span> <span class="kn">import</span> <span class="n">MeshReFreq</span><span class="p">,</span> <span class="n">Gf</span>
-<span class="kn">from</span> <span class="nn">triqs.gfs.descriptors</span> <span class="kn">import</span> <span class="n">Fourier</span>
-<span class="kn">import</span> <span class="nn">triqs.utility.mpi</span> <span class="k">as</span> <span class="nn">mpi</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.gfs</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeshReFreq</span><span class="p">,</span> <span class="n">Gf</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.gfs.descriptors</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fourier</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">triqs.utility.mpi</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mpi</span>
 
 <span class="c1"># import of the abstract class</span>
-<span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools.solvers.abstractdmftsolver</span> <span class="kn">import</span> <span class="n">AbstractDMFTSolver</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.dmft_tools.solvers.abstractdmftsolver</span><span class="w"> </span><span class="kn">import</span> <span class="n">AbstractDMFTSolver</span>
 
 <span class="c1"># import triqs solver</span>
-<span class="kn">from</span> <span class="nn">triqs_hartree_fock</span> <span class="kn">import</span> <span class="n">ImpuritySolver</span> <span class="k">as</span> <span class="n">hartree_solver</span>
-<span class="kn">from</span> <span class="nn">triqs_hartree_fock.version</span> <span class="kn">import</span> <span class="n">triqs_hartree_fock_hash</span><span class="p">,</span> <span class="n">version</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs_hartree_fock</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImpuritySolver</span> <span class="k">as</span> <span class="n">hartree_solver</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs_hartree_fock.version</span><span class="w"> </span><span class="kn">import</span> <span class="n">triqs_hartree_fock_hash</span><span class="p">,</span> <span class="n">version</span>
 
 
 <div class="viewcode-block" id="HartreeInterface">
 <a class="viewcode-back" href="../../../_ref/dmft_tools.solvers.hartree_interface.HartreeInterface.html#dmft_tools.solvers.hartree_interface.HartreeInterface">[docs]</a>
-<span class="k">class</span> <span class="nc">HartreeInterface</span><span class="p">(</span><span class="n">AbstractDMFTSolver</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">HartreeInterface</span><span class="p">(</span><span class="n">AbstractDMFTSolver</span><span class="p">):</span>
 <div class="viewcode-block" id="HartreeInterface.__init__">
 <a class="viewcode-back" href="../../../_ref/dmft_tools.solvers.hartree_interface.HartreeInterface.__init__.html#dmft_tools.solvers.hartree_interface.HartreeInterface.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">solver_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span> <span class="n">icrsh</span><span class="p">,</span> <span class="n">h_int</span><span class="p">,</span> <span class="n">iteration_offset</span><span class="p">,</span> <span class="n">deg_orbs_ftps</span><span class="p">,</span> <span class="n">gw_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">advanced_params</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
         <span class="c1"># Call the base class constructor</span>
@@ -650,7 +648,7 @@
         <span class="p">)</span>
 
         <span class="c1"># Give dc information to the solver in order to customize DC calculation</span>
-        <span class="k">def</span> <span class="nf">_interface_hartree_dc</span><span class="p">(</span><span class="n">hartree_instance</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">advanced_params</span><span class="p">,</span> <span class="n">icrsh</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_interface_hartree_dc</span><span class="p">(</span><span class="n">hartree_instance</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">advanced_params</span><span class="p">,</span> <span class="n">icrsh</span><span class="p">):</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;Modifies in-place class attributes to infercace with options in solid_dmft</span>
 <span class="sd">                for the moment supports only DC-relevant parameters</span>
 
@@ -711,7 +709,7 @@
 
 <div class="viewcode-block" id="HartreeInterface._init_ReFreq_hartree">
 <a class="viewcode-back" href="../../../_ref/dmft_tools.solvers.hartree_interface.HartreeInterface.html#dmft_tools.solvers.hartree_interface.HartreeInterface._init_ReFreq_hartree">[docs]</a>
-    <span class="k">def</span> <span class="nf">_init_ReFreq_hartree</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init_ReFreq_hartree</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize all ReFreq objects</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -725,7 +723,7 @@
 
 <div class="viewcode-block" id="HartreeInterface.solve">
 <a class="viewcode-back" href="../../../_ref/dmft_tools.solvers.hartree_interface.HartreeInterface.solve.html#dmft_tools.solvers.hartree_interface.HartreeInterface.solve">[docs]</a>
-    <span class="k">def</span> <span class="nf">solve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># fill G0_freq from sum_k to solver</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">triqs_solver</span><span class="o">.</span><span class="n">G0_iw</span> <span class="o">&lt;&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">G0_freq</span>
 
@@ -742,7 +740,7 @@
 
 <div class="viewcode-block" id="HartreeInterface.postprocess">
 <a class="viewcode-back" href="../../../_ref/dmft_tools.solvers.hartree_interface.HartreeInterface.postprocess.html#dmft_tools.solvers.hartree_interface.HartreeInterface.postprocess">[docs]</a>
-    <span class="k">def</span> <span class="nf">postprocess</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">postprocess</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Organize G_freq, G_time, Sigma_freq and G_l from hartree solver</span>
 <span class="sd">        &quot;&quot;&quot;</span>

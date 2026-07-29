@@ -1,23 +1,24 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>postprocessing.maxent_sigma &mdash; solid_dmft  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=2d0451a4" />
       <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
 
   
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
     <link rel="canonical" href="https://triqs.github.io/solid_dmft/latest/_modules/postprocessing/maxent_sigma.html" />
-  
-        <script src="../../_static/jquery.js?v=8dae8fb0"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="../../_static/jquery.js?v=958b65b0"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -35,9 +36,6 @@
             solid_dmft
               <img src="../../_static/logo_no_text.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                unstable
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -432,7 +430,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Plotting-the-results:-observables">3. Plotting the results: observables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green’s-function">4. Plotting the results: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green's-function">4. Plotting the results: the Legendre Green’s function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Next-steps-to-try">5. Next steps to try</a></li>
 </ul>
 </li>
@@ -609,23 +607,23 @@
 <span class="sd">      is correct, in particular the Kramers-Kronig relation.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
-<span class="kn">from</span> <span class="nn">triqs.utility</span> <span class="kn">import</span> <span class="n">mpi</span>
-<span class="kn">from</span> <span class="nn">triqs_maxent.sigma_continuator</span> <span class="kn">import</span> <span class="n">InversionSigmaContinuator</span><span class="p">,</span> <span class="n">DirectSigmaContinuator</span>
-<span class="kn">from</span> <span class="nn">triqs_maxent.elementwise_maxent</span> <span class="kn">import</span> <span class="n">PoormanMaxEnt</span>
-<span class="kn">from</span> <span class="nn">triqs_maxent.omega_meshes</span> <span class="kn">import</span> <span class="n">HyperbolicOmegaMesh</span>
-<span class="kn">from</span> <span class="nn">triqs_maxent.alpha_meshes</span> <span class="kn">import</span> <span class="n">LogAlphaMesh</span>
-<span class="kn">from</span> <span class="nn">triqs_maxent.logtaker</span> <span class="kn">import</span> <span class="n">VerbosityFlags</span>
-<span class="kn">from</span> <span class="nn">h5</span> <span class="kn">import</span> <span class="n">HDFArchive</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">mpi</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs_maxent.sigma_continuator</span><span class="w"> </span><span class="kn">import</span> <span class="n">InversionSigmaContinuator</span><span class="p">,</span> <span class="n">DirectSigmaContinuator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs_maxent.elementwise_maxent</span><span class="w"> </span><span class="kn">import</span> <span class="n">PoormanMaxEnt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs_maxent.omega_meshes</span><span class="w"> </span><span class="kn">import</span> <span class="n">HyperbolicOmegaMesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs_maxent.alpha_meshes</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogAlphaMesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs_maxent.logtaker</span><span class="w"> </span><span class="kn">import</span> <span class="n">VerbosityFlags</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">h5</span><span class="w"> </span><span class="kn">import</span> <span class="n">HDFArchive</span>
 
 
 <div class="viewcode-block" id="_read_h5">
 <a class="viewcode-back" href="../../_ref/postprocessing.maxent_sigma.html#postprocessing.maxent_sigma._read_h5">[docs]</a>
-<span class="k">def</span> <span class="nf">_read_h5</span><span class="p">(</span><span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_read_h5</span><span class="p">(</span><span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Reads the h5 archive to get the Matsubara self energy, the double-counting potential</span>
 <span class="sd">    and the chemical potential.</span>
@@ -680,7 +678,7 @@
 
 <div class="viewcode-block" id="_create_sigma_continuator">
 <a class="viewcode-back" href="../../_ref/postprocessing.maxent_sigma.html#postprocessing.maxent_sigma._create_sigma_continuator">[docs]</a>
-<span class="k">def</span> <span class="nf">_create_sigma_continuator</span><span class="p">(</span><span class="n">sigma_iw</span><span class="p">,</span> <span class="n">dc_potential</span><span class="p">,</span> <span class="n">chemical_potential</span><span class="p">,</span> <span class="n">chemical_potential_zero</span><span class="p">,</span> <span class="n">continuator_type</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_create_sigma_continuator</span><span class="p">(</span><span class="n">sigma_iw</span><span class="p">,</span> <span class="n">dc_potential</span><span class="p">,</span> <span class="n">chemical_potential</span><span class="p">,</span> <span class="n">chemical_potential_zero</span><span class="p">,</span> <span class="n">continuator_type</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Initializes the inversion and direct sigma continuator. Returns a list of</span>
 <span class="sd">    continuators. Types of supported auxiliary Green&#39;s functions:</span>
@@ -739,7 +737,7 @@
 
 <div class="viewcode-block" id="_run_maxent">
 <a class="viewcode-back" href="../../_ref/postprocessing.maxent_sigma.html#postprocessing.maxent_sigma._run_maxent">[docs]</a>
-<span class="k">def</span> <span class="nf">_run_maxent</span><span class="p">(</span><span class="n">continuators</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">omega_min</span><span class="p">,</span> <span class="n">omega_max</span><span class="p">,</span> <span class="n">n_points_maxent</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_run_maxent</span><span class="p">(</span><span class="n">continuators</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">omega_min</span><span class="p">,</span> <span class="n">omega_max</span><span class="p">,</span> <span class="n">n_points_maxent</span><span class="p">,</span>
                 <span class="n">n_points_alpha</span><span class="p">,</span> <span class="n">analyzer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Uses maxent to continue the auxiliary Green&#39;s function obtained from the</span>
@@ -817,7 +815,7 @@
 
 <div class="viewcode-block" id="_get_sigma_omega_from_aux">
 <a class="viewcode-back" href="../../_ref/postprocessing.maxent_sigma.html#postprocessing.maxent_sigma._get_sigma_omega_from_aux">[docs]</a>
-<span class="k">def</span> <span class="nf">_get_sigma_omega_from_aux</span><span class="p">(</span><span class="n">continuators</span><span class="p">,</span> <span class="n">aux_spectral_funcs</span><span class="p">,</span> <span class="n">aux_omega_mesh</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_sigma_omega_from_aux</span><span class="p">(</span><span class="n">continuators</span><span class="p">,</span> <span class="n">aux_spectral_funcs</span><span class="p">,</span> <span class="n">aux_omega_mesh</span><span class="p">,</span>
                               <span class="n">omega_min</span><span class="p">,</span> <span class="n">omega_max</span><span class="p">,</span> <span class="n">n_points_interp</span><span class="p">,</span> <span class="n">n_points_final</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; Extracts the real-frequency self energy from the auxiliary Green&#39;s function. &quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">cont_imp</span><span class="p">,</span> <span class="n">spec_imp</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">continuators</span><span class="p">,</span> <span class="n">aux_spectral_funcs</span><span class="p">):</span>
@@ -832,7 +830,7 @@
 
 <div class="viewcode-block" id="_write_sigma_omega_to_h5">
 <a class="viewcode-back" href="../../_ref/postprocessing.maxent_sigma.html#postprocessing.maxent_sigma._write_sigma_omega_to_h5">[docs]</a>
-<span class="k">def</span> <span class="nf">_write_sigma_omega_to_h5</span><span class="p">(</span><span class="n">g_aux_w</span><span class="p">,</span> <span class="n">sigma_w</span><span class="p">,</span> <span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_write_sigma_omega_to_h5</span><span class="p">(</span><span class="n">g_aux_w</span><span class="p">,</span> <span class="n">sigma_w</span><span class="p">,</span> <span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; Writes real-frequency self energy to h5 archive. &quot;&quot;&quot;</span>
     <span class="n">h5_internal_path</span> <span class="o">=</span> <span class="s1">&#39;DMFT_results/&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;last_iter&#39;</span> <span class="k">if</span> <span class="n">iteration</span> <span class="ow">is</span> <span class="kc">None</span>
                                           <span class="k">else</span> <span class="sa">f</span><span class="s1">&#39;it_</span><span class="si">{</span><span class="n">iteration</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -846,7 +844,7 @@
 
 <div class="viewcode-block" id="main">
 <a class="viewcode-back" href="../../_ref/postprocessing.maxent_sigma.html#postprocessing.maxent_sigma.main">[docs]</a>
-<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">continuator_type</span><span class="o">=</span><span class="s1">&#39;inversion_sigmainf&#39;</span><span class="p">,</span> <span class="n">mu_zero</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">continuator_type</span><span class="o">=</span><span class="s1">&#39;inversion_sigmainf&#39;</span><span class="p">,</span> <span class="n">mu_zero</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
          <span class="n">maxent_error</span><span class="o">=</span><span class="mf">.02</span><span class="p">,</span> <span class="n">omega_min</span><span class="o">=-</span><span class="mf">12.</span><span class="p">,</span> <span class="n">omega_max</span><span class="o">=</span><span class="mf">12.</span><span class="p">,</span> <span class="n">n_points_maxent</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">n_points_alpha</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
          <span class="n">analyzer</span><span class="o">=</span><span class="s1">&#39;LineFitAnalyzer&#39;</span><span class="p">,</span> <span class="n">n_points_interp</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">n_points_final</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>

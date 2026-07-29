@@ -1,23 +1,24 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>gw_embedding.iaft &mdash; solid_dmft  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=2d0451a4" />
       <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
 
   
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
     <link rel="canonical" href="https://triqs.github.io/solid_dmft/latest/_modules/gw_embedding/iaft.html" />
-  
-        <script src="../../_static/jquery.js?v=8dae8fb0"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="../../_static/jquery.js?v=958b65b0"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -35,9 +36,6 @@
             solid_dmft
               <img src="../../_static/logo_no_text.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                unstable
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -432,7 +430,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Plotting-the-results:-observables">3. Plotting the results: observables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green’s-function">4. Plotting the results: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green's-function">4. Plotting the results: the Legendre Green’s function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Next-steps-to-try">5. Next steps to try</a></li>
 </ul>
 </li>
@@ -570,8 +568,8 @@
            <div itemprop="articleBody">
              
   <h1>Source code for gw_embedding.iaft</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Fourier transform on the imaginary axis based on IR basis and the sparse sampling technique.</span>
@@ -580,7 +578,7 @@
 
 <div class="viewcode-block" id="IAFT">
 <a class="viewcode-back" href="../../_ref/gw_embedding.iaft.IAFT.html#gw_embedding.iaft.IAFT">[docs]</a>
-<span class="k">class</span> <span class="nc">IAFT</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">IAFT</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Driver for FT on the imaginary axis.</span>
 <span class="sd">    Given inverse temperature, lambda and precision, the IAFT class evaluate the corresponding</span>
@@ -621,7 +619,7 @@
 
 <div class="viewcode-block" id="IAFT.__init__">
 <a class="viewcode-back" href="../../_ref/gw_embedding.iaft.IAFT.__init__.html#gw_embedding.iaft.IAFT.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">lmbda</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">prec</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-15</span><span class="p">,</span> <span class="n">verbal</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">lmbda</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">prec</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-15</span><span class="p">,</span> <span class="n">verbal</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param beta: float</span>
 <span class="sd">            Inverse temperature (a.u.)</span>
@@ -631,7 +629,7 @@
 <span class="sd">            Precision for IR basis</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">sparse_ir</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">sparse_ir</span>
         <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s1">&#39;sparse_ir is required for IAFT functionality. &#39;</span> <span class="s1">&#39;Install with: pip install sparse-ir[xprec]&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">beta</span> <span class="o">=</span> <span class="n">beta</span>
@@ -669,7 +667,7 @@
             <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span></div>
 
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="s1">&#39;Mesh details on the imaginary axis</span><span class="se">\n</span><span class="s1">&#39;</span>
             <span class="s1">&#39;----------------------------------</span><span class="se">\n</span><span class="s1">&#39;</span>
@@ -682,7 +680,7 @@
 
 <div class="viewcode-block" id="IAFT.wn_mesh">
 <a class="viewcode-back" href="../../_ref/gw_embedding.iaft.IAFT.wn_mesh.html#gw_embedding.iaft.IAFT.wn_mesh">[docs]</a>
-    <span class="k">def</span> <span class="nf">wn_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stats</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ir_notation</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wn_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stats</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ir_notation</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return Matsubara frequency indices.</span>
 <span class="sd">        :param stats: str</span>
@@ -704,7 +702,7 @@
 
 <div class="viewcode-block" id="IAFT.tau_to_w">
 <a class="viewcode-back" href="../../_ref/gw_embedding.iaft.IAFT.tau_to_w.html#gw_embedding.iaft.IAFT.tau_to_w">[docs]</a>
-    <span class="k">def</span> <span class="nf">tau_to_w</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ot</span><span class="p">,</span> <span class="n">stats</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tau_to_w</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ot</span><span class="p">,</span> <span class="n">stats</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Fourier transform from imaginary-time axis to Matsubara-frequency axis</span>
 <span class="sd">        :param Ot: numpy.ndarray</span>
@@ -732,7 +730,7 @@
 
 <div class="viewcode-block" id="IAFT.tau_to_w_phsym">
 <a class="viewcode-back" href="../../_ref/gw_embedding.iaft.IAFT.tau_to_w_phsym.html#gw_embedding.iaft.IAFT.tau_to_w_phsym">[docs]</a>
-    <span class="k">def</span> <span class="nf">tau_to_w_phsym</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ot</span><span class="p">,</span> <span class="n">stats</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tau_to_w_phsym</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ot</span><span class="p">,</span> <span class="n">stats</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Fourier transform from imaginary-time axis to Matsubara-frequency axis w/ particle-hole symmetry</span>
 <span class="sd">        :param Ot: numpy.ndarray</span>
@@ -769,7 +767,7 @@
 
 <div class="viewcode-block" id="IAFT.w_to_tau">
 <a class="viewcode-back" href="../../_ref/gw_embedding.iaft.IAFT.w_to_tau.html#gw_embedding.iaft.IAFT.w_to_tau">[docs]</a>
-    <span class="k">def</span> <span class="nf">w_to_tau</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ow</span><span class="p">,</span> <span class="n">stats</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">w_to_tau</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ow</span><span class="p">,</span> <span class="n">stats</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Fourier transform from Matsubara-frequency axis to imaginary-time axis.</span>
 
@@ -798,7 +796,7 @@
 
 <div class="viewcode-block" id="IAFT.w_to_tau_phsym">
 <a class="viewcode-back" href="../../_ref/gw_embedding.iaft.IAFT.w_to_tau_phsym.html#gw_embedding.iaft.IAFT.w_to_tau_phsym">[docs]</a>
-    <span class="k">def</span> <span class="nf">w_to_tau_phsym</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ow</span><span class="p">,</span> <span class="n">stats</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">w_to_tau_phsym</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ow</span><span class="p">,</span> <span class="n">stats</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Fourier transform from Matsubara-frequency axis to imaginary-time axis w/ particle-hole symmetry.</span>
 
@@ -836,7 +834,7 @@
 
 <div class="viewcode-block" id="IAFT.w_interpolate">
 <a class="viewcode-back" href="../../_ref/gw_embedding.iaft.IAFT.w_interpolate.html#gw_embedding.iaft.IAFT.w_interpolate">[docs]</a>
-    <span class="k">def</span> <span class="nf">w_interpolate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ow</span><span class="p">,</span> <span class="n">wn_mesh_interp</span><span class="p">,</span> <span class="n">stats</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ir_notation</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">w_interpolate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ow</span><span class="p">,</span> <span class="n">wn_mesh_interp</span><span class="p">,</span> <span class="n">stats</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ir_notation</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Interpolate a dynamic object to arbitrary points on the Matsubara axis.</span>
 
@@ -878,7 +876,7 @@
 
 <div class="viewcode-block" id="IAFT.w_interpolate_phsym">
 <a class="viewcode-back" href="../../_ref/gw_embedding.iaft.IAFT.w_interpolate_phsym.html#gw_embedding.iaft.IAFT.w_interpolate_phsym">[docs]</a>
-    <span class="k">def</span> <span class="nf">w_interpolate_phsym</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ow</span><span class="p">,</span> <span class="n">wn_mesh_interp</span><span class="p">,</span> <span class="n">stats</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ir_notation</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">w_interpolate_phsym</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ow</span><span class="p">,</span> <span class="n">wn_mesh_interp</span><span class="p">,</span> <span class="n">stats</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ir_notation</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Interpolate a dynamic object to arbitrary points on the Matsubara axis.</span>
 
@@ -930,7 +928,7 @@
 
 <div class="viewcode-block" id="IAFT.tau_interpolate">
 <a class="viewcode-back" href="../../_ref/gw_embedding.iaft.IAFT.tau_interpolate.html#gw_embedding.iaft.IAFT.tau_interpolate">[docs]</a>
-    <span class="k">def</span> <span class="nf">tau_interpolate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ot</span><span class="p">,</span> <span class="n">tau_mesh_interp</span><span class="p">,</span> <span class="n">stats</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tau_interpolate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ot</span><span class="p">,</span> <span class="n">tau_mesh_interp</span><span class="p">,</span> <span class="n">stats</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">         Interpolate a dynamic object to arbitrary points on the imaginary-time axis.</span>
 
@@ -964,7 +962,7 @@
 
 <div class="viewcode-block" id="IAFT.tau_interpolate_phsym">
 <a class="viewcode-back" href="../../_ref/gw_embedding.iaft.IAFT.tau_interpolate_phsym.html#gw_embedding.iaft.IAFT.tau_interpolate_phsym">[docs]</a>
-    <span class="k">def</span> <span class="nf">tau_interpolate_phsym</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ot</span><span class="p">,</span> <span class="n">tau_mesh_interp</span><span class="p">,</span> <span class="n">stats</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tau_interpolate_phsym</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ot</span><span class="p">,</span> <span class="n">tau_mesh_interp</span><span class="p">,</span> <span class="n">stats</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">         Interpolate a dynamic object to arbitrary points on the imaginary-time axis.</span>
 
@@ -1007,7 +1005,7 @@
 
 <div class="viewcode-block" id="IAFT.check_leakage">
 <a class="viewcode-back" href="../../_ref/gw_embedding.iaft.IAFT.check_leakage.html#gw_embedding.iaft.IAFT.check_leakage">[docs]</a>
-    <span class="k">def</span> <span class="nf">check_leakage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ot</span><span class="p">,</span> <span class="n">stats</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">w_input</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_leakage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ot</span><span class="p">,</span> <span class="n">stats</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">w_input</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check decay of the IR coefficients to assess the quality of IR basis for the beta and lambda.</span>
 <span class="sd">        The coefficients should decay exponentially, and the leakage is defined as:</span>

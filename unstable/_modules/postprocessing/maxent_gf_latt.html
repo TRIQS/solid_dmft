@@ -1,23 +1,24 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>postprocessing.maxent_gf_latt &mdash; solid_dmft  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=2d0451a4" />
       <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
 
   
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
     <link rel="canonical" href="https://triqs.github.io/solid_dmft/latest/_modules/postprocessing/maxent_gf_latt.html" />
-  
-        <script src="../../_static/jquery.js?v=8dae8fb0"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="../../_static/jquery.js?v=958b65b0"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -35,9 +36,6 @@
             solid_dmft
               <img src="../../_static/logo_no_text.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                unstable
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -432,7 +430,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Plotting-the-results:-observables">3. Plotting the results: observables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green’s-function">4. Plotting the results: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green's-function">4. Plotting the results: the Legendre Green’s function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Next-steps-to-try">5. Next steps to try</a></li>
 </ul>
 </li>
@@ -605,22 +603,22 @@
 <span class="sd">Author: Maximilian Merkel, Materials Theory Group, ETH Zurich, 2020 - 2022</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">triqs_maxent.tau_maxent</span> <span class="kn">import</span> <span class="n">TauMaxEnt</span>
-<span class="kn">from</span> <span class="nn">triqs_maxent.omega_meshes</span> <span class="kn">import</span> <span class="n">HyperbolicOmegaMesh</span>
-<span class="kn">from</span> <span class="nn">triqs_maxent.alpha_meshes</span> <span class="kn">import</span> <span class="n">LogAlphaMesh</span>
-<span class="kn">from</span> <span class="nn">triqs_dft_tools.sumk_dft</span> <span class="kn">import</span> <span class="n">SumkDFT</span>
-<span class="kn">from</span> <span class="nn">h5</span> <span class="kn">import</span> <span class="n">HDFArchive</span>
-<span class="kn">from</span> <span class="nn">triqs.utility</span> <span class="kn">import</span> <span class="n">mpi</span>
-<span class="kn">from</span> <span class="nn">triqs.gfs</span> <span class="kn">import</span> <span class="n">Gf</span><span class="p">,</span> <span class="n">BlockGf</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs_maxent.tau_maxent</span><span class="w"> </span><span class="kn">import</span> <span class="n">TauMaxEnt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs_maxent.omega_meshes</span><span class="w"> </span><span class="kn">import</span> <span class="n">HyperbolicOmegaMesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs_maxent.alpha_meshes</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogAlphaMesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs_dft_tools.sumk_dft</span><span class="w"> </span><span class="kn">import</span> <span class="n">SumkDFT</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">h5</span><span class="w"> </span><span class="kn">import</span> <span class="n">HDFArchive</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">mpi</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.gfs</span><span class="w"> </span><span class="kn">import</span> <span class="n">Gf</span><span class="p">,</span> <span class="n">BlockGf</span>
 
 
 <div class="viewcode-block" id="_read_h5">
 <a class="viewcode-back" href="../../_ref/postprocessing.maxent_gf_latt.html#postprocessing.maxent_gf_latt._read_h5">[docs]</a>
-<span class="k">def</span> <span class="nf">_read_h5</span><span class="p">(</span><span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_read_h5</span><span class="p">(</span><span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Reads the h5 archive to get the Matsubara self energy, the double-counting potential,</span>
 <span class="sd">    the chemical potential and the block structure.</span>
@@ -675,7 +673,7 @@
 
 <div class="viewcode-block" id="_generate_lattice_gf">
 <a class="viewcode-back" href="../../_ref/postprocessing.maxent_gf_latt.html#postprocessing.maxent_gf_latt._generate_lattice_gf">[docs]</a>
-<span class="k">def</span> <span class="nf">_generate_lattice_gf</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">sum_spins</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_generate_lattice_gf</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">sum_spins</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates the lattice GF from the SumkDFT object. If sum_spins, it</span>
 <span class="sd">    has one block &quot;total&quot;. Otherwise, the block names are the spins.</span>
@@ -710,7 +708,7 @@
 
 <div class="viewcode-block" id="_run_maxent">
 <a class="viewcode-back" href="../../_ref/postprocessing.maxent_gf_latt.html#postprocessing.maxent_gf_latt._run_maxent">[docs]</a>
-<span class="k">def</span> <span class="nf">_run_maxent</span><span class="p">(</span><span class="n">gf_lattice_iw</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">omega_min</span><span class="p">,</span> <span class="n">omega_max</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_run_maxent</span><span class="p">(</span><span class="n">gf_lattice_iw</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">omega_min</span><span class="p">,</span> <span class="n">omega_max</span><span class="p">,</span>
                 <span class="n">n_points_maxent</span><span class="p">,</span> <span class="n">n_points_alpha</span><span class="p">,</span> <span class="n">analyzer</span><span class="o">=</span><span class="s1">&#39;LineFitAnalyzer&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Runs maxent to get the spectral function from the block GF.</span>
@@ -753,7 +751,7 @@
 
 <div class="viewcode-block" id="_unpack_maxent_results">
 <a class="viewcode-back" href="../../_ref/postprocessing.maxent_gf_latt.html#postprocessing.maxent_gf_latt._unpack_maxent_results">[docs]</a>
-<span class="k">def</span> <span class="nf">_unpack_maxent_results</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">omega_mesh</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_unpack_maxent_results</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">omega_mesh</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Converts maxent result to dict with mesh and spectral function from each</span>
 <span class="sd">    analyzer.</span>
@@ -772,7 +770,7 @@
 
 <div class="viewcode-block" id="_write_spectral_function_to_h5">
 <a class="viewcode-back" href="../../_ref/postprocessing.maxent_gf_latt.html#postprocessing.maxent_gf_latt._write_spectral_function_to_h5">[docs]</a>
-<span class="k">def</span> <span class="nf">_write_spectral_function_to_h5</span><span class="p">(</span><span class="n">unpacked_results</span><span class="p">,</span> <span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_write_spectral_function_to_h5</span><span class="p">(</span><span class="n">unpacked_results</span><span class="p">,</span> <span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; Writes the mesh and the maxent result for each analyzer to h5 archive. &quot;&quot;&quot;</span>
 
     <span class="n">h5_internal_path</span> <span class="o">=</span> <span class="s1">&#39;DMFT_results/&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;last_iter&#39;</span> <span class="k">if</span> <span class="n">iteration</span> <span class="ow">is</span> <span class="kc">None</span>
@@ -785,7 +783,7 @@
 
 <div class="viewcode-block" id="main">
 <a class="viewcode-back" href="../../_ref/postprocessing.maxent_gf_latt.html#postprocessing.maxent_gf_latt.main">[docs]</a>
-<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sum_spins</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">maxent_error</span><span class="o">=</span><span class="mf">.02</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">external_path</span><span class="p">,</span> <span class="n">iteration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sum_spins</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">maxent_error</span><span class="o">=</span><span class="mf">.02</span><span class="p">,</span>
          <span class="n">n_points_maxent</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">n_points_alpha</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">omega_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">omega_max</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Main function that reads the lattice Green&#39;s function (GF) from h5,</span>
@@ -864,7 +862,7 @@
 
 <div class="viewcode-block" id="_strtobool">
 <a class="viewcode-back" href="../../_ref/postprocessing.maxent_gf_latt.html#postprocessing.maxent_gf_latt._strtobool">[docs]</a>
-<span class="k">def</span> <span class="nf">_strtobool</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_strtobool</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a string representation of truth to true (1) or false (0).</span>
 <span class="sd">    True values are &#39;y&#39;, &#39;yes&#39;, &#39;t&#39;, &#39;true&#39;, &#39;on&#39;, and &#39;1&#39;; false values</span>
 <span class="sd">    are &#39;n&#39;, &#39;no&#39;, &#39;f&#39;, &#39;false&#39;, &#39;off&#39;, and &#39;0&#39;.  Raises ValueError if</span>

@@ -27,12 +27,12 @@ dmft\_tools.solvers
     :recursive:
 
     
-    dmft_tools.solvers.abstractdmftsolver
-    dmft_tools.solvers.cthyb_interface
-    dmft_tools.solvers.ctint_interface
-    dmft_tools.solvers.ctseg_interface
-    dmft_tools.solvers.ftps_interface
-    dmft_tools.solvers.hartree_interface
-    dmft_tools.solvers.hubbardI_interface
+    abstractdmftsolver
+    cthyb_interface
+    ctint_interface
+    ctseg_interface
+    ftps_interface
+    hartree_interface
+    hubbardI_interface
 
 

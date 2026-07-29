@@ -1,23 +1,24 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>dmft_tools.solver &mdash; solid_dmft  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=2d0451a4" />
       <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
 
   
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
     <link rel="canonical" href="https://triqs.github.io/solid_dmft/latest/_modules/dmft_tools/solver.html" />
-  
-        <script src="../../_static/jquery.js?v=8dae8fb0"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="../../_static/jquery.js?v=958b65b0"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -35,9 +36,6 @@
             solid_dmft
               <img src="../../_static/logo_no_text.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                unstable
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -432,7 +430,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Plotting-the-results:-observables">3. Plotting the results: observables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green’s-function">4. Plotting the results: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green's-function">4. Plotting the results: the Legendre Green’s function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Next-steps-to-try">5. Next steps to try</a></li>
 </ul>
 </li>
@@ -595,8 +593,8 @@
 <span class="c1">################################################################################</span>
 <span class="c1"># pyright: reportUnusedExpression=false</span>
 
-<span class="kn">import</span> <span class="nn">triqs.utility.mpi</span> <span class="k">as</span> <span class="nn">mpi</span>
-<span class="kn">import</span> <span class="nn">importlib.util</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">triqs.utility.mpi</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mpi</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">importlib.util</span>
 
 
 <span class="c1"># check which modules are available and import only those ones</span>
@@ -606,39 +604,39 @@
 
 <span class="n">check_solver</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="s2">&quot;triqs_cthyb&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 <span class="k">if</span> <span class="n">check_solver</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools.solvers.cthyb_interface</span> <span class="kn">import</span> <span class="n">CTHYBInterface</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.dmft_tools.solvers.cthyb_interface</span><span class="w"> </span><span class="kn">import</span> <span class="n">CTHYBInterface</span>
     <span class="n">interfaces_dict</span><span class="p">[</span><span class="s1">&#39;cthyb&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CTHYBInterface</span>
 
 <span class="n">check_solver</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="s2">&quot;triqs_ctint&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 <span class="k">if</span> <span class="n">check_solver</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools.solvers.ctint_interface</span> <span class="kn">import</span> <span class="n">CTINTInterface</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.dmft_tools.solvers.ctint_interface</span><span class="w"> </span><span class="kn">import</span> <span class="n">CTINTInterface</span>
     <span class="n">interfaces_dict</span><span class="p">[</span><span class="s1">&#39;ctint&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CTINTInterface</span>
 
 <span class="n">check_solver</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="s2">&quot;triqs_ctseg&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 <span class="k">if</span> <span class="n">check_solver</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools.solvers.ctseg_interface</span> <span class="kn">import</span> <span class="n">CTSEGInterface</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.dmft_tools.solvers.ctseg_interface</span><span class="w"> </span><span class="kn">import</span> <span class="n">CTSEGInterface</span>
     <span class="n">interfaces_dict</span><span class="p">[</span><span class="s1">&#39;ctseg&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CTSEGInterface</span>
 
 <span class="n">check_solver</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="s2">&quot;triqs_hartree_fock&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 <span class="k">if</span> <span class="n">check_solver</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools.solvers.hartree_interface</span> <span class="kn">import</span> <span class="n">HartreeInterface</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.dmft_tools.solvers.hartree_interface</span><span class="w"> </span><span class="kn">import</span> <span class="n">HartreeInterface</span>
     <span class="n">interfaces_dict</span><span class="p">[</span><span class="s1">&#39;hartree&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HartreeInterface</span>
 
 <span class="n">check_solver</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="s2">&quot;triqs_hubbardI&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 <span class="k">if</span> <span class="n">check_solver</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools.solvers.hubbardI_interface</span> <span class="kn">import</span> <span class="n">HubbardIInterface</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.dmft_tools.solvers.hubbardI_interface</span><span class="w"> </span><span class="kn">import</span> <span class="n">HubbardIInterface</span>
     <span class="n">interfaces_dict</span><span class="p">[</span><span class="s1">&#39;hubbardI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HubbardIInterface</span>
 
 <span class="n">check_solver</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="s2">&quot;forktps&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 <span class="k">if</span> <span class="n">check_solver</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools.solvers.ftps_interface</span> <span class="kn">import</span> <span class="n">FTPSInterface</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.dmft_tools.solvers.ftps_interface</span><span class="w"> </span><span class="kn">import</span> <span class="n">FTPSInterface</span>
     <span class="n">interfaces_dict</span><span class="p">[</span><span class="s1">&#39;ftps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">FTPSInterface</span>
 
 
 <span class="c1"># generic dispatch function for the solver classes</span>
 <div class="viewcode-block" id="create_solver">
 <a class="viewcode-back" href="../../_ref/dmft_tools.solver.html#dmft_tools.solver.create_solver">[docs]</a>
-<span class="k">def</span> <span class="nf">create_solver</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">solver_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span> <span class="n">icrsh</span><span class="p">,</span> <span class="n">h_int</span><span class="p">,</span> <span class="n">iteration_offset</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_solver</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">solver_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span> <span class="n">icrsh</span><span class="p">,</span> <span class="n">h_int</span><span class="p">,</span> <span class="n">iteration_offset</span><span class="p">,</span>
                     <span class="n">deg_orbs_ftps</span><span class="p">,</span> <span class="n">gw_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">advanced_params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>

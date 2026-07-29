@@ -27,8 +27,8 @@
     :recursive:
 
     
-    dft_managers.mpi_helpers
-    dft_managers.qe_manager
-    dft_managers.vasp_manager
+    mpi_helpers
+    qe_manager
+    vasp_manager
 
 

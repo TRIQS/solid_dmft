@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../">
 <head>
@@ -5,22 +7,21 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>1. OS with QE/W90 and cthyb: SrVO3 MIT &mdash; solid_dmft  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=2d0451a4" />
       <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
 
   
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
     <link rel="canonical" href="https://triqs.github.io/solid_dmft/latest/tutorials/SVO_os_qe/tutorial.html" />
-  
-        <script src="../../_static/jquery.js?v=8dae8fb0"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-        <script defer="defer" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=default"></script>
+      <script src="../../_static/jquery.js?v=958b65b0"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=default"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -40,9 +41,6 @@
             solid_dmft
               <img src="../../_static/logo_no_text.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                unstable
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -437,7 +435,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Plotting-the-results:-observables">3. Plotting the results: observables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green’s-function">4. Plotting the results: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green's-function">4. Plotting the results: the Legendre Green’s function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Next-steps-to-try">5. Next steps to try</a></li>
 </ul>
 </li>
@@ -575,37 +573,13 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  
-<style>
-/* CSS overrides for sphinx_rtd_theme */
-
-/* 24px margin */
-.nbinput.nblast.container,
-.nboutput.nblast.container {
-    margin-bottom: 19px;  /* padding has already 5px */
-}
-
-/* ... except between code cells! */
-.nblast.container + .nbinput.container {
-    margin-top: -19px;
-}
-
-.admonition > p:before {
-    margin-right: 4px;  /* make room for the exclamation icon */
-}
-
-/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
-.math {
-    text-align: unset;
-}
-</style>
-<p><em>Disclaimer:</em></p>
+  <p><em>Disclaimer:</em></p>
 <p>Heavy calculations (~ 800 core hours): Current tutorial is best performed on an HPC facility.</p>
 <section id="1.-OS-with-QE/W90-and-cthyb:-SrVO3-MIT">
 <h1>1. OS with QE/W90 and cthyb: SrVO3 MIT<a class="headerlink" href="#1.-OS-with-QE/W90-and-cthyb:-SrVO3-MIT" title="Link to this heading"></a></h1>
 <p>Hello and welcome to the first part of the tutorial for solid_dmft. Here we will guide to set up and run your first DMFT calculations.</p>
 <p>To begin your DMFT journey we will immediately start a DMFT run on strontium vanadate (SVO). SVO is a member of a family of material known as complex perovskite oxides with 1 electron occupying the t2g manifold. Below, we show the band structure of the frontier (anti-bonding) t2g bands for SVO.</p>
-<img alt="svobands" src="../../_images/bnd_structure.png" />
+<p><img alt="svobands" src="../../_images/bnd_structure.png" /></p>
 <p>In these materials, the electrons sitting on the transition metal ions (V in this case) are fairly localized, and the fully delocalized picture of DFT is insufficient to describe their physics. DMFT accounts for the electron-electron interaction by providing a fully interacting many body correction to the DFT non-interacting problem.</p>
 <p>If you want to generate the h5 archive <code class="docutils literal notranslate"><span class="pre">svo.h5</span></code> yourself, all the necessary files are in the <code class="docutils literal notranslate"><span class="pre">./quantum_espresso_files/</span></code> folder. We used quantum espresso in this tutorial.</p>
 <hr class="docutils" />
@@ -646,7 +620,7 @@
 <p>Once the run is finished run</p>
 <p><code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">./collect_results_coarse.py</span></code></p>
 <p>The script will produce a heatmap image of the value of G(beta/2) for each pair of U and J. The darker area corresponds to an insulating state.</p>
-<img alt="coarsegrid" src="../../_images/MIT_coarse.jpg" />
+<p><img alt="coarsegrid" src="../../_images/MIT_coarse.jpg" /></p>
 <p>Do you notice anything strange? (hint: look at the bottom right corner and check the output file <code class="docutils literal notranslate"><span class="pre">observables_imp0.dat</span></code> for U = 2 J=1.0. )</p>
 <p>We have seen that for 1 electron per system U and J are competing against each other: larger J favor the metallic state. The coulomb integral U wants to repel neighbouring electrons while J would like to bring electrons together on one site,. When the latter component dominates the resulting phase is known as a charge disproportionated state which is also insulating. What is happening in the bottom right corner is that the J favors here charge disproportionation but the unit cell has a single
 site, therefore the system has trouble converging and oscillates between a high occupation and a low occupation state.</p>
@@ -656,7 +630,7 @@ site, therefore the system has trouble converging and oscillates between a high 
 <p>In order to get better resolution in terms of the diagram you can run the script <code class="docutils literal notranslate"><span class="pre">run_MIT_fine.sh</span></code> and plot the result with</p>
 <p><code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">./collect_results_fine.py</span></code></p>
 <p>The result is also visible here:</p>
-<img alt="finegrid" src="../../_images/MIT_fine.jpg" />
+<p><img alt="finegrid" src="../../_images/MIT_fine.jpg" /></p>
 </section>
 <section id="4.-Plotting-the-spectral-function">
 <h2>4. Plotting the spectral function<a class="headerlink" href="#4.-Plotting-the-spectral-function" title="Link to this heading"></a></h2>
@@ -664,7 +638,7 @@ site, therefore the system has trouble converging and oscillates between a high 
 <p><code class="docutils literal notranslate"><span class="pre">mpirun</span> <span class="pre">-n</span> <span class="pre">30</span> <span class="pre">python3</span> <span class="pre">/path_to_solid_dmft/python/solid_dmft/postprocessing/maxent_gf_imp.py</span> <span class="pre">./J0.0/U4/out/svo.h5</span></code></p>
 <p>and plot the result by running in the docker container:</p>
 <p><code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">read_spectral_function.py</span></code></p>
-<img alt="Afunc" src="../../_images/A_func_J%3D0.0_U%3D4.jpg" />
+<p><img alt="Afunc" src="../../_images/A_func_J%3D0.0_U%3D4.jpg" /></p>
 <p>Take care to edit the values of J and U in the python file. What is happing to the spectral function (density of states) as one cranks U up?</p>
 </section>
 <section id="5-Visualizing-the-MIT">
@@ -673,7 +647,7 @@ site, therefore the system has trouble converging and oscillates between a high 
 <p>Run the script <code class="docutils literal notranslate"><span class="pre">run_maxent_scan.sh</span></code>.</p>
 <p>Then collect the data:</p>
 <p><code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">read_spectral_function_transition.py</span></code></p>
-<img alt="MIT" src="../../_images/A_func_transition.jpg" />
+<p><img alt="MIT" src="../../_images/A_func_transition.jpg" /></p>
 </section>
 </section>
 

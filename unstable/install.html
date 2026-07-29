@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
@@ -5,20 +7,19 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Installation &mdash; solid_dmft  documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=2d0451a4" />
       <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
 
   
     <link rel="shortcut icon" href="_static/favicon.ico"/>
     <link rel="canonical" href="https://triqs.github.io/solid_dmft/latest/install.html" />
-  
-        <script src="_static/jquery.js?v=8dae8fb0"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="_static/jquery.js?v=958b65b0"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -38,9 +39,6 @@
             solid_dmft
               <img src="_static/logo_no_text.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                unstable
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -435,7 +433,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Plotting-the-results:-observables">3. Plotting the results: observables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green’s-function">4. Plotting the results: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green's-function">4. Plotting the results: the Legendre Green’s function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Next-steps-to-try">5. Next steps to try</a></li>
 </ul>
 </li>
@@ -572,37 +570,13 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  
-<style>
-/* CSS overrides for sphinx_rtd_theme */
-
-/* 24px margin */
-.nbinput.nblast.container,
-.nboutput.nblast.container {
-    margin-bottom: 19px;  /* padding has already 5px */
-}
-
-/* ... except between code cells! */
-.nblast.container + .nbinput.container {
-    margin-top: -19px;
-}
-
-.admonition > p:before {
-    margin-right: 4px;  /* make room for the exclamation icon */
-}
-
-/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
-.math {
-    text-align: unset;
-}
-</style>
-<section id="installation">
+  <section id="installation">
 <span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h1>
 <section id="prerequisites">
 <h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading"></a></h2>
 <ol class="arabic">
-<li><p>The <a class="reference external" href="https://triqs.github.io/triqs/latest/index.html#welcome" rel="noopener noreferrer" target="_blank" title="(in TRIQS v4.0.0)"><span class="xref std std-ref">TRIQS</span></a> library, see <a class="reference external" href="https://triqs.github.io/triqs/latest/install.html" rel="noopener noreferrer" target="_blank">TRIQS installation instruction</a>.
-In the following, we assume that <a class="reference external" href="https://triqs.github.io/triqs/latest/index.html#welcome" rel="noopener noreferrer" target="_blank" title="(in TRIQS v4.0.0)"><span class="xref std std-ref">TRIQS</span></a>, <a class="reference external" href="https://triqs.github.io/dft_tools" rel="noopener noreferrer" target="_blank">triqs/dft_tools</a>, and at least one of the impurity solvers <a class="reference external" href="https://triqs.github.io/triqs/latest/applications.html" rel="noopener noreferrer" target="_blank">available in TRIQS</a>, e.g. cthyb, HubbardI, ctseg, FTPS, or ctint is installed in the directory <code class="docutils literal notranslate"><span class="pre">path_to_triqs</span></code>. Additionally, if you want to run charge self-consistent DFT+DMFT calculations you need the <a class="reference external" href="https://triqs.github.io/dftkit" rel="noopener noreferrer" target="_blank">triqs/dftkit</a> package installed.</p></li>
+<li><p>The <a class="reference external" href="https://triqs.github.io/triqs/latest/index.html#welcome" rel="noopener noreferrer" target="_blank" title="(in TRIQS v4.0.x)"><span class="xref std std-ref">TRIQS</span></a> library, see <a class="reference external" href="https://triqs.github.io/triqs/latest/install.html" rel="noopener noreferrer" target="_blank">TRIQS installation instruction</a>.
+In the following, we assume that <a class="reference external" href="https://triqs.github.io/triqs/latest/index.html#welcome" rel="noopener noreferrer" target="_blank" title="(in TRIQS v4.0.x)"><span class="xref std std-ref">TRIQS</span></a>, <a class="reference external" href="https://triqs.github.io/dft_tools" rel="noopener noreferrer" target="_blank">triqs/dft_tools</a>, and at least one of the impurity solvers <a class="reference external" href="https://triqs.github.io/triqs/latest/applications.html" rel="noopener noreferrer" target="_blank">available in TRIQS</a>, e.g. cthyb, HubbardI, ctseg, FTPS, or ctint is installed in the directory <code class="docutils literal notranslate"><span class="pre">path_to_triqs</span></code>. Additionally, if you want to run charge self-consistent DFT+DMFT calculations you need the <a class="reference external" href="https://triqs.github.io/dftkit" rel="noopener noreferrer" target="_blank">triqs/dftkit</a> package installed.</p></li>
 <li><p>Make sure to install besides the triqs requirements also the python packages:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pip3<span class="w"> </span>install<span class="w"> </span>--user<span class="w"> </span>scipy<span class="w"> </span>numpy<span class="w"> </span>scikit-image
 </pre></div>
@@ -668,7 +642,7 @@ and serve it locally as under <cite>127.0.0.1:8000</cite>.</p>
 <section id="version-compatibility">
 <h2>Version compatibility<a class="headerlink" href="#version-compatibility" title="Link to this heading"></a></h2>
 <p>Keep in mind that the version of <code class="docutils literal notranslate"><span class="pre">solid_dmft</span></code> must be compatible with your TRIQS library version,
-see <a class="reference external" href="https://triqs.github.io/triqs/latest/versions.html#versions" rel="noopener noreferrer" target="_blank" title="(in TRIQS v4.0.0)"><span class="xref std std-ref">TRIQS website</span></a>.
+see <a class="reference external" href="https://triqs.github.io/triqs/latest/versions.html#versions" rel="noopener noreferrer" target="_blank" title="(in TRIQS v4.0.x)"><span class="xref std std-ref">TRIQS website</span></a>.
 In particular the Major Version numbers have to be the same.
 To use a particular version, go into the directory with the sources, and look at all available branches:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>solid_dmft.src<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>git<span class="w"> </span>branch<span class="w"> </span>-vv

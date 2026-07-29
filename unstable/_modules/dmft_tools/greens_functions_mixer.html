@@ -1,23 +1,24 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>dmft_tools.greens_functions_mixer &mdash; solid_dmft  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=2d0451a4" />
       <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
 
   
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
     <link rel="canonical" href="https://triqs.github.io/solid_dmft/latest/_modules/dmft_tools/greens_functions_mixer.html" />
-  
-        <script src="../../_static/jquery.js?v=8dae8fb0"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="../../_static/jquery.js?v=958b65b0"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -35,9 +36,6 @@
             solid_dmft
               <img src="../../_static/logo_no_text.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                unstable
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -432,7 +430,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Plotting-the-results:-observables">3. Plotting the results: observables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green’s-function">4. Plotting the results: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green's-function">4. Plotting the results: the Legendre Green’s function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Next-steps-to-try">5. Next steps to try</a></li>
 </ul>
 </li>
@@ -596,21 +594,21 @@
 <span class="c1">################################################################################</span>
 
 <span class="c1"># system</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="c1"># triqs</span>
-<span class="kn">import</span> <span class="nn">triqs.utility.mpi</span> <span class="k">as</span> <span class="nn">mpi</span>
-<span class="kn">from</span> <span class="nn">h5</span> <span class="kn">import</span> <span class="n">HDFArchive</span>
-<span class="kn">from</span> <span class="nn">triqs.gfs</span> <span class="kn">import</span> <span class="n">MeshImFreq</span><span class="p">,</span> <span class="n">MeshImTime</span><span class="p">,</span> <span class="n">Gf</span><span class="p">,</span> <span class="n">make_gf_from_fourier</span>
-<span class="kn">from</span> <span class="nn">triqs.gfs.descriptors</span> <span class="kn">import</span> <span class="n">Fourier</span>
-<span class="kn">from</span> <span class="nn">triqs.gfs.tools</span> <span class="kn">import</span> <span class="n">inverse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">triqs.utility.mpi</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mpi</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">h5</span><span class="w"> </span><span class="kn">import</span> <span class="n">HDFArchive</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.gfs</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeshImFreq</span><span class="p">,</span> <span class="n">MeshImTime</span><span class="p">,</span> <span class="n">Gf</span><span class="p">,</span> <span class="n">make_gf_from_fourier</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.gfs.descriptors</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fourier</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.gfs.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">inverse</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">legendre_filter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">legendre_filter</span>
 
 
 <div class="viewcode-block" id="_bgf_to_vec">
 <a class="viewcode-back" href="../../_ref/dmft_tools.greens_functions_mixer.html#dmft_tools.greens_functions_mixer._bgf_to_vec">[docs]</a>
-<span class="k">def</span> <span class="nf">_bgf_to_vec</span><span class="p">(</span><span class="n">bgf</span><span class="p">,</span> <span class="n">deg_shells</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_bgf_to_vec</span><span class="p">(</span><span class="n">bgf</span><span class="p">,</span> <span class="n">deg_shells</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    flattens a BlockGf to a 1d numpy array</span>
 <span class="sd">    if deg_shells is given, only non-deg shells are given back</span>
@@ -626,7 +624,7 @@
 
 
 
-<span class="k">def</span> <span class="nf">_vec_to_bgf</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span> <span class="n">bgf</span><span class="p">,</span> <span class="n">deg_shells</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_vec_to_bgf</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span> <span class="n">bgf</span><span class="p">,</span> <span class="n">deg_shells</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">G</span> <span class="o">=</span> <span class="n">bgf</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">deg_shells</span><span class="p">:</span>
         <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
@@ -651,7 +649,7 @@
 
 <div class="viewcode-block" id="_broyden_update">
 <a class="viewcode-back" href="../../_ref/dmft_tools.greens_functions_mixer.html#dmft_tools.greens_functions_mixer._broyden_update">[docs]</a>
-<span class="k">def</span> <span class="nf">_broyden_update</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">broyler</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">deg_shells</span><span class="p">,</span> <span class="n">G0_freq</span><span class="p">,</span> <span class="n">G0_freq_previous</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_broyden_update</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">broyler</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">deg_shells</span><span class="p">,</span> <span class="n">G0_freq</span><span class="p">,</span> <span class="n">G0_freq_previous</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    calculates the broyden update of G0 using the algorithm presented in:</span>
 <span class="sd">    doi.org/10.1103/PhysRevB.80.125125 (Rok Zitko) &amp;</span>
@@ -763,7 +761,7 @@
 
 
 
-<span class="k">def</span> <span class="nf">mix_g0</span><span class="p">(</span><span class="n">solver</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">icrsh</span><span class="p">,</span> <span class="n">archive</span><span class="p">,</span> <span class="n">G0_freq_previous</span><span class="p">,</span> <span class="n">it</span><span class="p">,</span> <span class="n">deg_shell</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">mix_g0</span><span class="p">(</span><span class="n">solver</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">icrsh</span><span class="p">,</span> <span class="n">archive</span><span class="p">,</span> <span class="n">G0_freq_previous</span><span class="p">,</span> <span class="n">it</span><span class="p">,</span> <span class="n">deg_shell</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;g0_mix_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;linear&#39;</span> <span class="ow">and</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;g0_mix&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">1.0</span><span class="p">:</span>
         <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">linear mixing G0 with previous iteration by factor </span><span class="si">{:.3f}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;g0_mix&#39;</span><span class="p">]))</span>
         <span class="n">solver</span><span class="o">.</span><span class="n">G0_freq</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;g0_mix&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">solver</span><span class="o">.</span><span class="n">G0_freq</span>
@@ -788,7 +786,7 @@
     <span class="k">return</span> <span class="n">solver</span>
 
 
-<span class="k">def</span> <span class="nf">mix_sigma</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">n_inequiv_shells</span><span class="p">,</span> <span class="n">solvers</span><span class="p">,</span> <span class="n">Sigma_freq_previous</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">mix_sigma</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">n_inequiv_shells</span><span class="p">,</span> <span class="n">solvers</span><span class="p">,</span> <span class="n">Sigma_freq_previous</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;sigma_mix&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">1.0</span> <span class="ow">and</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;mixing sigma with previous iteration by factor </span><span class="si">{:.3f}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;sigma_mix&#39;</span><span class="p">]))</span>
         <span class="k">for</span> <span class="n">icrsh</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_inequiv_shells</span><span class="p">):</span>

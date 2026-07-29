@@ -1,23 +1,24 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>dft_managers.vasp_manager &mdash; solid_dmft  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=2d0451a4" />
       <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
 
   
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
     <link rel="canonical" href="https://triqs.github.io/solid_dmft/latest/_modules/dft_managers/vasp_manager.html" />
-  
-        <script src="../../_static/jquery.js?v=8dae8fb0"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="../../_static/jquery.js?v=958b65b0"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -35,9 +36,6 @@
             solid_dmft
               <img src="../../_static/logo_no_text.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                unstable
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -432,7 +430,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Plotting-the-results:-observables">3. Plotting the results: observables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green’s-function">4. Plotting the results: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green's-function">4. Plotting the results: the Legendre Green’s function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Next-steps-to-try">5. Next steps to try</a></li>
 </ul>
 </li>
@@ -603,21 +601,21 @@
 <span class="sd">This functionality is contained in the simpler public functions.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">signal</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">signal</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">h5</span> <span class="kn">import</span> <span class="n">HDFArchive</span>
-<span class="kn">import</span> <span class="nn">triqs.utility.mpi</span> <span class="k">as</span> <span class="nn">mpi</span>
-<span class="kn">from</span> <span class="nn">h5</span> <span class="kn">import</span> <span class="n">HDFArchive</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">h5</span><span class="w"> </span><span class="kn">import</span> <span class="n">HDFArchive</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">triqs.utility.mpi</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mpi</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">h5</span><span class="w"> </span><span class="kn">import</span> <span class="n">HDFArchive</span>
 
-<span class="kn">from</span> <span class="nn">solid_dmft.dft_managers</span> <span class="kn">import</span> <span class="n">mpi_helpers</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.dft_managers</span><span class="w"> </span><span class="kn">import</span> <span class="n">mpi_helpers</span>
 
 
 <div class="viewcode-block" id="_fork_and_start_vasp">
 <a class="viewcode-back" href="../../_ref/dft_managers.vasp_manager.html#dft_managers.vasp_manager._fork_and_start_vasp">[docs]</a>
-<span class="k">def</span> <span class="nf">_fork_and_start_vasp</span><span class="p">(</span><span class="n">mpi_exe</span><span class="p">,</span> <span class="n">arguments</span><span class="p">,</span> <span class="n">env_vars</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_fork_and_start_vasp</span><span class="p">(</span><span class="n">mpi_exe</span><span class="p">,</span> <span class="n">arguments</span><span class="p">,</span> <span class="n">env_vars</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Forks a process from the master process that then calls mpi to start vasp.</span>
 <span class="sd">    The child process running VASP never leaves this function whereas the main</span>
@@ -657,7 +655,7 @@
 
 <div class="viewcode-block" id="_is_lock_file_present">
 <a class="viewcode-back" href="../../_ref/dft_managers.vasp_manager.html#dft_managers.vasp_manager._is_lock_file_present">[docs]</a>
-<span class="k">def</span> <span class="nf">_is_lock_file_present</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_lock_file_present</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Checks if the lock file &#39;vasp.lock&#39; is there, i.e. if VASP is still working.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -672,7 +670,7 @@
 
 <div class="viewcode-block" id="remove_legacy_projections_suppressed">
 <a class="viewcode-back" href="../../_ref/dft_managers.vasp_manager.html#dft_managers.vasp_manager.remove_legacy_projections_suppressed">[docs]</a>
-<span class="k">def</span> <span class="nf">remove_legacy_projections_suppressed</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">remove_legacy_projections_suppressed</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; Removes legacy file vasp.suppress_projs if present. &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s1">&#39;./vasp.suppress_projs&#39;</span><span class="p">):</span>
@@ -684,7 +682,7 @@
 
 <div class="viewcode-block" id="run_initial_scf">
 <a class="viewcode-back" href="../../_ref/dft_managers.vasp_manager.html#dft_managers.vasp_manager.run_initial_scf">[docs]</a>
-<span class="k">def</span> <span class="nf">run_initial_scf</span><span class="p">(</span><span class="n">number_cores</span><span class="p">,</span> <span class="n">vasp_command</span><span class="p">,</span> <span class="n">mpi_exe_param</span><span class="p">,</span> <span class="n">cluster_name</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_initial_scf</span><span class="p">(</span><span class="n">number_cores</span><span class="p">,</span> <span class="n">vasp_command</span><span class="p">,</span> <span class="n">mpi_exe_param</span><span class="p">,</span> <span class="n">cluster_name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Starts the VASP child process. Takes care of initializing a clean</span>
 <span class="sd">    environment for the child process. This is needed so that VASP does not</span>
@@ -743,7 +741,7 @@
 
 <div class="viewcode-block" id="run_charge_update">
 <a class="viewcode-back" href="../../_ref/dft_managers.vasp_manager.html#dft_managers.vasp_manager.run_charge_update">[docs]</a>
-<span class="k">def</span> <span class="nf">run_charge_update</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_charge_update</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Performs one step of the charge update with VASP by creating the vasp.lock</span>
 <span class="sd">    file and then waiting until it gets delete by VASP when it has finished.</span>
@@ -761,7 +759,7 @@
 
 <div class="viewcode-block" id="read_dft_energy">
 <a class="viewcode-back" href="../../_ref/dft_managers.vasp_manager.html#dft_managers.vasp_manager.read_dft_energy">[docs]</a>
-<span class="k">def</span> <span class="nf">read_dft_energy</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_dft_energy</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Reads DFT energy from the last line of Vasp&#39;s OSZICAR or from vasptriqs.h5</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -786,12 +784,12 @@
         <span class="c1"># Typical OSZICAR line: &quot;  1 F= -10.123 E0= ...&quot; -&gt; energy at index 2</span>
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
     <span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Failed to parse DFT energy from OSZICAR line: </span><span class="si">{</span><span class="n">last_nonempty_line</span><span class="si">!r}</span><span class="s1">&#39;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">err</span></div>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Failed to parse DFT energy from OSZICAR line: </span><span class="si">{</span><span class="n">last_nonempty_line</span><span class="si">!r}</span><span class="s1">&#39;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">err</span></div>
 
 
 <div class="viewcode-block" id="read_dft_iter">
 <a class="viewcode-back" href="../../_ref/dft_managers.vasp_manager.html#dft_managers.vasp_manager.read_dft_iter">[docs]</a>
-<span class="k">def</span> <span class="nf">read_dft_iter</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_dft_iter</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Reads DFT iteration number from the last line of the OSZICAR or from Vasp&#39;s vasptriqs.h5</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -815,15 +813,15 @@
         <span class="c1"># Typical OSZICAR line: &quot;  1 F= -10.123 ...&quot; -&gt; iteration at index 1</span>
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
     <span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Failed to parse DFT iteration from OSZICAR line: </span><span class="si">{</span><span class="n">last_nonempty_line</span><span class="si">!r}</span><span class="s1">&#39;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">err</span></div>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Failed to parse DFT iteration from OSZICAR line: </span><span class="si">{</span><span class="n">last_nonempty_line</span><span class="si">!r}</span><span class="s1">&#39;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">err</span></div>
 
 
 <div class="viewcode-block" id="read_irred_kpoints">
 <a class="viewcode-back" href="../../_ref/dft_managers.vasp_manager.html#dft_managers.vasp_manager.read_irred_kpoints">[docs]</a>
-<span class="k">def</span> <span class="nf">read_irred_kpoints</span><span class="p">(</span><span class="n">kpts</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_irred_kpoints</span><span class="p">(</span><span class="n">kpts</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; Reads the indices of the irreducible k-points from the OUTCAR. &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">read_outcar</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read_outcar</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
         <span class="n">has_started_reading</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">file</span><span class="p">:</span>
             <span class="k">if</span> <span class="s1">&#39;IBZKPT_HF&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
@@ -876,7 +874,7 @@
 
 <div class="viewcode-block" id="kill">
 <a class="viewcode-back" href="../../_ref/dft_managers.vasp_manager.html#dft_managers.vasp_manager.kill">[docs]</a>
-<span class="k">def</span> <span class="nf">kill</span><span class="p">(</span><span class="n">vasp_process_id</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">kill</span><span class="p">(</span><span class="n">vasp_process_id</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; Kills the VASP process. &quot;&quot;&quot;</span>
     <span class="c1"># TODO: if we kill the process in the next step, does it make a difference if we write the STOPCAR</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;STOPCAR&#39;</span><span class="p">,</span> <span class="s1">&#39;wt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f_stop</span><span class="p">:</span>

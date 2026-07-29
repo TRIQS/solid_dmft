@@ -1,23 +1,24 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>dmft_tools.initial_self_energies &mdash; solid_dmft  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=2d0451a4" />
       <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
 
   
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
     <link rel="canonical" href="https://triqs.github.io/solid_dmft/latest/_modules/dmft_tools/initial_self_energies.html" />
-  
-        <script src="../../_static/jquery.js?v=8dae8fb0"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="../../_static/jquery.js?v=958b65b0"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -35,9 +36,6 @@
             solid_dmft
               <img src="../../_static/logo_no_text.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                unstable
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -432,7 +430,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Plotting-the-results:-observables">3. Plotting the results: observables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green’s-function">4. Plotting the results: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green's-function">4. Plotting the results: the Legendre Green’s function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Next-steps-to-try">5. Next steps to try</a></li>
 </ul>
 </li>
@@ -600,18 +598,18 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="c1"># system</span>
-<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="c1"># triqs</span>
-<span class="kn">from</span> <span class="nn">h5</span> <span class="kn">import</span> <span class="n">HDFArchive</span>
-<span class="kn">import</span> <span class="nn">triqs.utility.mpi</span> <span class="k">as</span> <span class="nn">mpi</span>
-<span class="kn">from</span> <span class="nn">triqs.gfs</span> <span class="kn">import</span> <span class="n">BlockGf</span><span class="p">,</span> <span class="n">Gf</span><span class="p">,</span> <span class="n">make_gf_imfreq</span><span class="p">,</span> <span class="n">MeshDLRImFreq</span><span class="p">,</span> <span class="n">make_gf_dlr</span><span class="p">,</span> <span class="n">MeshReFreq</span>
-<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">h5</span><span class="w"> </span><span class="kn">import</span> <span class="n">HDFArchive</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">triqs.utility.mpi</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mpi</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.gfs</span><span class="w"> </span><span class="kn">import</span> <span class="n">BlockGf</span><span class="p">,</span> <span class="n">Gf</span><span class="p">,</span> <span class="n">make_gf_imfreq</span><span class="p">,</span> <span class="n">MeshDLRImFreq</span><span class="p">,</span> <span class="n">make_gf_dlr</span><span class="p">,</span> <span class="n">MeshReFreq</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
 
 <div class="viewcode-block" id="calculate_double_counting">
 <a class="viewcode-back" href="../../_ref/dmft_tools.initial_self_energies.html#dmft_tools.initial_self_energies.calculate_double_counting">[docs]</a>
-<span class="k">def</span> <span class="nf">calculate_double_counting</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">density_matrix</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">gw_params</span><span class="p">,</span> <span class="n">advanced_params</span><span class="p">,</span> <span class="n">solver_type_per_imp</span><span class="p">,</span> <span class="n">G_loc_all</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate_double_counting</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">density_matrix</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">gw_params</span><span class="p">,</span> <span class="n">advanced_params</span><span class="p">,</span> <span class="n">solver_type_per_imp</span><span class="p">,</span> <span class="n">G_loc_all</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates the double counting, including all manipulations from advanced_params.</span>
 
@@ -683,7 +681,7 @@
                           <span class="n">orb</span><span class="o">=</span><span class="n">icrsh</span><span class="p">,</span> <span class="n">use_dc_formula</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="c1"># DC calculated for dynamic interaction from AIMBES</span>
         <span class="k">elif</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;dc_type&#39;</span><span class="p">][</span><span class="n">icrsh</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;crpa_static&#39;</span><span class="p">,</span> <span class="s1">&#39;crpa_static_qp&#39;</span><span class="p">,</span> <span class="s1">&#39;crpa_dynamic&#39;</span><span class="p">):</span>
-            <span class="kn">from</span> <span class="nn">solid_dmft.gw_embedding.bdft_converter</span> <span class="kn">import</span> <span class="n">calc_Sigma_DC_gw</span><span class="p">,</span> <span class="n">calc_W_from_Gloc</span><span class="p">,</span> <span class="n">convert_gw_output</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.gw_embedding.bdft_converter</span><span class="w"> </span><span class="kn">import</span> <span class="n">calc_Sigma_DC_gw</span><span class="p">,</span> <span class="n">calc_W_from_Gloc</span><span class="p">,</span> <span class="n">convert_gw_output</span>
             <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">*** Using dynamic interactions to calculate DC ***&#39;</span><span class="p">)</span>
 
             <span class="c1"># lad GW input from h5 file</span>
@@ -850,7 +848,7 @@
 
 <div class="viewcode-block" id="_load_sigma_from_h5">
 <a class="viewcode-back" href="../../_ref/dmft_tools.initial_self_energies.html#dmft_tools.initial_self_energies._load_sigma_from_h5">[docs]</a>
-<span class="k">def</span> <span class="nf">_load_sigma_from_h5</span><span class="p">(</span><span class="n">h5_archive</span><span class="p">,</span> <span class="n">iteration</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_load_sigma_from_h5</span><span class="p">(</span><span class="n">h5_archive</span><span class="p">,</span> <span class="n">iteration</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Reads impurity self-energy for all impurities from file and returns them as a list</span>
 
@@ -899,7 +897,7 @@
 
 <div class="viewcode-block" id="_sumk_sigma_to_solver_struct">
 <a class="viewcode-back" href="../../_ref/dmft_tools.initial_self_energies.html#dmft_tools.initial_self_energies._sumk_sigma_to_solver_struct">[docs]</a>
-<span class="k">def</span> <span class="nf">_sumk_sigma_to_solver_struct</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">start_sigma</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_sumk_sigma_to_solver_struct</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">start_sigma</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extracts the local Sigma. Copied from SumkDFT.extract_G_loc, version 2.1.x.</span>
 
@@ -945,7 +943,7 @@
 
 <div class="viewcode-block" id="_set_loaded_sigma">
 <a class="viewcode-back" href="../../_ref/dmft_tools.initial_self_energies.html#dmft_tools.initial_self_energies._set_loaded_sigma">[docs]</a>
-<span class="k">def</span> <span class="nf">_set_loaded_sigma</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">loaded_sigma</span><span class="p">,</span> <span class="n">loaded_dc_imp</span><span class="p">,</span> <span class="n">general_params</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_set_loaded_sigma</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">loaded_sigma</span><span class="p">,</span> <span class="n">loaded_dc_imp</span><span class="p">,</span> <span class="n">general_params</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Adjusts for the Hartree shift when loading a self energy Sigma_freq from a</span>
 <span class="sd">    previous calculation that was run with a different U, J or double counting.</span>
@@ -1023,7 +1021,7 @@
 
 <div class="viewcode-block" id="determine_dc_and_initial_sigma">
 <a class="viewcode-back" href="../../_ref/dmft_tools.initial_self_energies.html#dmft_tools.initial_self_energies.determine_dc_and_initial_sigma">[docs]</a>
-<span class="k">def</span> <span class="nf">determine_dc_and_initial_sigma</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">gw_params</span><span class="p">,</span> <span class="n">advanced_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">determine_dc_and_initial_sigma</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">gw_params</span><span class="p">,</span> <span class="n">advanced_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span>
                                    <span class="n">archive</span><span class="p">,</span> <span class="n">iteration_offset</span><span class="p">,</span> <span class="n">G_loc_all</span><span class="p">,</span> <span class="n">solvers</span><span class="p">,</span>
                                    <span class="n">solver_type_per_imp</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>

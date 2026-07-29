@@ -27,8 +27,8 @@
     :recursive:
 
     
-    io_tools.dict_to_h5
-    io_tools.postproc_toml_dict
-    io_tools.verify_input_params
+    dict_to_h5
+    postproc_toml_dict
+    verify_input_params
 
 

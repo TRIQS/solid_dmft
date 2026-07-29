@@ -27,9 +27,9 @@
     :recursive:
 
     
-    gw_embedding.bdft_converter
-    gw_embedding.gw_flow
-    gw_embedding.iaft
-    gw_embedding.qp_evs_to_eig
+    bdft_converter
+    gw_flow
+    iaft
+    qp_evs_to_eig
 
 

@@ -1,23 +1,24 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>dmft_tools.convergence &mdash; solid_dmft  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=2d0451a4" />
       <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
 
   
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
     <link rel="canonical" href="https://triqs.github.io/solid_dmft/latest/_modules/dmft_tools/convergence.html" />
-  
-        <script src="../../_static/jquery.js?v=8dae8fb0"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="../../_static/jquery.js?v=958b65b0"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -35,9 +36,6 @@
             solid_dmft
               <img src="../../_static/logo_no_text.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                unstable
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -432,7 +430,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Plotting-the-results:-observables">3. Plotting the results: observables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green’s-function">4. Plotting the results: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green's-function">4. Plotting the results: the Legendre Green’s function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Next-steps-to-try">5. Next steps to try</a></li>
 </ul>
 </li>
@@ -597,17 +595,17 @@
 <span class="sd">contain helper functions to check convergence</span>
 <span class="sd">&#39;&#39;&#39;</span>
 <span class="c1"># system</span>
-<span class="kn">import</span> <span class="nn">os.path</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os.path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="c1"># triqs</span>
-<span class="kn">from</span> <span class="nn">h5</span> <span class="kn">import</span> <span class="n">HDFArchive</span>
-<span class="kn">from</span> <span class="nn">triqs.gfs</span> <span class="kn">import</span> <span class="n">MeshImFreq</span><span class="p">,</span> <span class="n">MeshImTime</span><span class="p">,</span> <span class="n">MeshReFreq</span><span class="p">,</span> <span class="n">BlockGf</span>
-<span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools</span> <span class="kn">import</span> <span class="n">common</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">h5</span><span class="w"> </span><span class="kn">import</span> <span class="n">HDFArchive</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.gfs</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeshImFreq</span><span class="p">,</span> <span class="n">MeshImTime</span><span class="p">,</span> <span class="n">MeshReFreq</span><span class="p">,</span> <span class="n">BlockGf</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.dmft_tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">common</span>
 
 <div class="viewcode-block" id="_generate_header">
 <a class="viewcode-back" href="../../_ref/dmft_tools.convergence.html#dmft_tools.convergence._generate_header">[docs]</a>
-<span class="k">def</span> <span class="nf">_generate_header</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_generate_header</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates the headers that are used in write_header_to_file.</span>
 <span class="sd">    Returns a dict with {file_name: header_string}</span>
@@ -635,7 +633,7 @@
 
 <div class="viewcode-block" id="write_conv">
 <a class="viewcode-back" href="../../_ref/dmft_tools.convergence.html#dmft_tools.convergence.write_conv">[docs]</a>
-<span class="k">def</span> <span class="nf">write_conv</span><span class="p">(</span><span class="n">conv_obs</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span> <span class="n">general_params</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">write_conv</span><span class="p">(</span><span class="n">conv_obs</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">,</span> <span class="n">general_params</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    writes the last entries of the conv arrays to the files</span>
 
@@ -687,7 +685,7 @@
 
 <div class="viewcode-block" id="max_G_diff">
 <a class="viewcode-back" href="../../_ref/dmft_tools.convergence.html#dmft_tools.convergence.max_G_diff">[docs]</a>
-<span class="k">def</span> <span class="nf">max_G_diff</span><span class="p">(</span><span class="n">G1</span><span class="p">,</span> <span class="n">G2</span><span class="p">,</span> <span class="n">norm_temp</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">max_G_diff</span><span class="p">(</span><span class="n">G1</span><span class="p">,</span> <span class="n">G2</span><span class="p">,</span> <span class="n">norm_temp</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    calculates difference between two block Gfs</span>
 <span class="sd">    uses numpy linalg norm on the last two indices first</span>
@@ -753,7 +751,7 @@
 
 <div class="viewcode-block" id="prep_conv_obs">
 <a class="viewcode-back" href="../../_ref/dmft_tools.convergence.html#dmft_tools.convergence.prep_conv_obs">[docs]</a>
-<span class="k">def</span> <span class="nf">prep_conv_obs</span><span class="p">(</span><span class="n">h5_archive</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">prep_conv_obs</span><span class="p">(</span><span class="n">h5_archive</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    prepares the conv arrays and files for the DMFT calculation</span>
 
@@ -796,7 +794,7 @@
 
 <div class="viewcode-block" id="prep_conv_file">
 <a class="viewcode-back" href="../../_ref/dmft_tools.convergence.html#dmft_tools.convergence.prep_conv_file">[docs]</a>
-<span class="k">def</span> <span class="nf">prep_conv_file</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">prep_conv_file</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">sum_k</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Writes the header to the conv files</span>
 
@@ -823,7 +821,7 @@
 
 <div class="viewcode-block" id="calc_convergence_quantities">
 <a class="viewcode-back" href="../../_ref/dmft_tools.convergence.html#dmft_tools.convergence.calc_convergence_quantities">[docs]</a>
-<span class="k">def</span> <span class="nf">calc_convergence_quantities</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">conv_obs</span><span class="p">,</span> <span class="n">observables</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_convergence_quantities</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">conv_obs</span><span class="p">,</span> <span class="n">observables</span><span class="p">,</span>
                                      <span class="n">solvers</span><span class="p">,</span> <span class="n">G0_old</span><span class="p">,</span> <span class="n">G_loc_all</span><span class="p">,</span> <span class="n">Sigma_freq_previous</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculations convergence quantities, i.e. the difference in observables</span>
@@ -893,7 +891,7 @@
 
 <div class="viewcode-block" id="check_convergence">
 <a class="viewcode-back" href="../../_ref/dmft_tools.convergence.html#dmft_tools.convergence.check_convergence">[docs]</a>
-<span class="k">def</span> <span class="nf">check_convergence</span><span class="p">(</span><span class="n">n_inequiv_shells</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">conv_obs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_convergence</span><span class="p">(</span><span class="n">n_inequiv_shells</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">conv_obs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    check last iteration for convergence</span>
 

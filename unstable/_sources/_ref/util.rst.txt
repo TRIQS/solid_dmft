@@ -27,7 +27,7 @@
     :recursive:
 
     
-    util.symmetrize_gamma_file
-    util.write_kslice_to_h5
+    symmetrize_gamma_file
+    write_kslice_to_h5
 
 

@@ -1,23 +1,24 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>gw_embedding.gw_flow &mdash; solid_dmft  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=2d0451a4" />
       <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
 
   
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
     <link rel="canonical" href="https://triqs.github.io/solid_dmft/latest/_modules/gw_embedding/gw_flow.html" />
-  
-        <script src="../../_static/jquery.js?v=8dae8fb0"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="../../_static/jquery.js?v=958b65b0"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -35,9 +36,6 @@
             solid_dmft
               <img src="../../_static/logo_no_text.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                unstable
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -432,7 +430,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Plotting-the-results:-observables">3. Plotting the results: observables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green’s-function">4. Plotting the results: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green's-function">4. Plotting the results: the Legendre Green’s function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Next-steps-to-try">5. Next steps to try</a></li>
 </ul>
 </li>
@@ -599,12 +597,12 @@
 <span class="sd">Module for gw flow</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">timeit</span> <span class="kn">import</span> <span class="n">default_timer</span> <span class="k">as</span> <span class="n">timer</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">timeit</span><span class="w"> </span><span class="kn">import</span> <span class="n">default_timer</span> <span class="k">as</span> <span class="n">timer</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">h5</span> <span class="kn">import</span> <span class="n">HDFArchive</span>
-<span class="kn">from</span> <span class="nn">triqs.utility</span> <span class="kn">import</span> <span class="n">mpi</span>
-<span class="kn">from</span> <span class="nn">triqs.gfs</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">h5</span><span class="w"> </span><span class="kn">import</span> <span class="n">HDFArchive</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">mpi</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.gfs</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">iOmega_n</span><span class="p">,</span>
     <span class="n">inverse</span><span class="p">,</span>
     <span class="n">fit_hermitian_tail</span><span class="p">,</span>
@@ -616,34 +614,34 @@
     <span class="n">make_gf_imtime</span><span class="p">,</span>
     <span class="n">make_gf_dlr_imfreq</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">triqs.version</span> <span class="kn">import</span> <span class="n">git_hash</span> <span class="k">as</span> <span class="n">triqs_hash</span>
-<span class="kn">from</span> <span class="nn">triqs.version</span> <span class="kn">import</span> <span class="n">version</span> <span class="k">as</span> <span class="n">triqs_version</span>
-<span class="kn">from</span> <span class="nn">triqs.mesh</span> <span class="kn">import</span> <span class="n">MeshImFreq</span>
-<span class="kn">from</span> <span class="nn">triqs.operators</span> <span class="kn">import</span> <span class="n">c_dag</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">Operator</span>
-<span class="kn">from</span> <span class="nn">triqs_dft_tools.block_structure</span> <span class="kn">import</span> <span class="n">BlockStructure</span>
-<span class="kn">from</span> <span class="nn">triqs_dft_tools.sumk_dft</span> <span class="kn">import</span> <span class="n">SumkDFT</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.version</span><span class="w"> </span><span class="kn">import</span> <span class="n">git_hash</span> <span class="k">as</span> <span class="n">triqs_hash</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.version</span><span class="w"> </span><span class="kn">import</span> <span class="n">version</span> <span class="k">as</span> <span class="n">triqs_version</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.mesh</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeshImFreq</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.operators</span><span class="w"> </span><span class="kn">import</span> <span class="n">c_dag</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">Operator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs_dft_tools.block_structure</span><span class="w"> </span><span class="kn">import</span> <span class="n">BlockStructure</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs_dft_tools.sumk_dft</span><span class="w"> </span><span class="kn">import</span> <span class="n">SumkDFT</span>
 
-<span class="kn">from</span> <span class="nn">solid_dmft.version</span> <span class="kn">import</span> <span class="n">solid_dmft_hash</span>
-<span class="kn">from</span> <span class="nn">solid_dmft.version</span> <span class="kn">import</span> <span class="n">version</span> <span class="k">as</span> <span class="n">solid_dmft_version</span>
-<span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools</span> <span class="kn">import</span> <span class="n">formatter</span>
-<span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools</span> <span class="kn">import</span> <span class="n">results_to_archive</span>
-<span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools.solver</span> <span class="kn">import</span> <span class="n">create_solver</span>
-<span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools</span> <span class="kn">import</span> <span class="n">interaction_hamiltonian</span>
-<span class="kn">from</span> <span class="nn">solid_dmft.dmft_cycle</span> <span class="kn">import</span> <span class="n">_extract_quantity_per_inequiv</span><span class="p">,</span> <span class="n">_determine_block_structure</span>
-<span class="kn">from</span> <span class="nn">solid_dmft.dmft_tools</span> <span class="kn">import</span> <span class="n">greens_functions_mixer</span> <span class="k">as</span> <span class="n">gf_mixer</span>
-<span class="kn">from</span> <span class="nn">solid_dmft.gw_embedding.bdft_converter</span> <span class="kn">import</span> <span class="n">convert_gw_output</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.version</span><span class="w"> </span><span class="kn">import</span> <span class="n">solid_dmft_hash</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.version</span><span class="w"> </span><span class="kn">import</span> <span class="n">version</span> <span class="k">as</span> <span class="n">solid_dmft_version</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.dmft_tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">formatter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.dmft_tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">results_to_archive</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.dmft_tools.solver</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_solver</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.dmft_tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">interaction_hamiltonian</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.dmft_cycle</span><span class="w"> </span><span class="kn">import</span> <span class="n">_extract_quantity_per_inequiv</span><span class="p">,</span> <span class="n">_determine_block_structure</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.dmft_tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">greens_functions_mixer</span> <span class="k">as</span> <span class="n">gf_mixer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.gw_embedding.bdft_converter</span><span class="w"> </span><span class="kn">import</span> <span class="n">convert_gw_output</span>
 
 
 <div class="viewcode-block" id="dummy_sumk">
 <a class="viewcode-back" href="../../_ref/gw_embedding.gw_flow.dummy_sumk.html#gw_embedding.gw_flow.dummy_sumk">[docs]</a>
-<span class="k">class</span> <span class="nc">dummy_sumk</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">dummy_sumk</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    create dummy sumk helper object</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="dummy_sumk.__init__">
 <a class="viewcode-back" href="../../_ref/gw_embedding.gw_flow.dummy_sumk.__init__.html#gw_embedding.gw_flow.dummy_sumk.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_inequiv_shells</span><span class="p">,</span> <span class="n">n_orb_list</span><span class="p">,</span> <span class="n">enforce_off_diag</span><span class="p">,</span> <span class="n">use_rot</span><span class="p">,</span> <span class="n">magnetic</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_inequiv_shells</span><span class="p">,</span> <span class="n">n_orb_list</span><span class="p">,</span> <span class="n">enforce_off_diag</span><span class="p">,</span> <span class="n">use_rot</span><span class="p">,</span> <span class="n">magnetic</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_inequiv_shells</span> <span class="o">=</span> <span class="n">n_inequiv_shells</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">SO</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">use_rotations</span> <span class="o">=</span> <span class="n">use_rot</span>
@@ -707,7 +705,7 @@
 
 <div class="viewcode-block" id="dummy_sumk.symm_deg_gf">
 <a class="viewcode-back" href="../../_ref/gw_embedding.gw_flow.dummy_sumk.symm_deg_gf.html#gw_embedding.gw_flow.dummy_sumk.symm_deg_gf">[docs]</a>
-    <span class="k">def</span> <span class="nf">symm_deg_gf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gf_to_symm</span><span class="p">,</span> <span class="n">ish</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">symm_deg_gf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gf_to_symm</span><span class="p">,</span> <span class="n">ish</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Averages a GF or a dict of np.ndarrays over degenerate shells.</span>
 
@@ -797,7 +795,7 @@
 
 <div class="viewcode-block" id="embedding_driver">
 <a class="viewcode-back" href="../../_ref/gw_embedding.gw_flow.html#gw_embedding.gw_flow.embedding_driver">[docs]</a>
-<span class="k">def</span> <span class="nf">embedding_driver</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">solver_params</span><span class="p">,</span> <span class="n">gw_params</span><span class="p">,</span> <span class="n">advanced_params</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">embedding_driver</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">solver_params</span><span class="p">,</span> <span class="n">gw_params</span><span class="p">,</span> <span class="n">advanced_params</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Function to run the gw embedding cycle.</span>
 

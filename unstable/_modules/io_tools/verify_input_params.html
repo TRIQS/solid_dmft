@@ -1,23 +1,24 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>io_tools.verify_input_params &mdash; solid_dmft  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=2d0451a4" />
       <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
 
   
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
     <link rel="canonical" href="https://triqs.github.io/solid_dmft/latest/_modules/io_tools/verify_input_params.html" />
-  
-        <script src="../../_static/jquery.js?v=8dae8fb0"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="../../_static/jquery.js?v=958b65b0"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -35,9 +36,6 @@
             solid_dmft
               <img src="../../_static/logo_no_text.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                unstable
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -432,7 +430,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#3.-Plotting-the-results:-observables">3. Plotting the results: observables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green’s-function">4. Plotting the results: the Legendre Green’s function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#4.-Plotting-the-results:-the-Legendre-Green's-function">4. Plotting the results: the Legendre Green’s function</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/PrNiO3_csc_vasp_plo_cthyb/tutorial.html#5.-Next-steps-to-try">5. Next steps to try</a></li>
 </ul>
 </li>
@@ -570,14 +568,14 @@
            <div itemprop="articleBody">
              
   <h1>Source code for io_tools.verify_input_params</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="n">ParamDict</span> <span class="o">=</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
 <span class="n">FullConfig</span> <span class="o">=</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="n">ParamDict</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">ParamDict</span><span class="p">]]]</span>
 
 
-<span class="k">def</span> <span class="nf">_verify_input_params_general</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="n">FullConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_verify_input_params_general</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="n">FullConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="c1"># Checks that grid parameters are specified completely</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="n">params</span><span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">][</span><span class="s1">&#39;beta&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
@@ -640,7 +638,7 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid &quot;h_int_basis&quot; = </span><span class="si">{</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;h_int_basis&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_verify_input_params_dft</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="n">FullConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_verify_input_params_dft</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="n">FullConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;dft&#39;</span><span class="p">][</span><span class="s1">&#39;dft_code&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;vasp&#39;</span><span class="p">,</span> <span class="s1">&#39;qe&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid &quot;dft.dft_code&quot; = </span><span class="si">{</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;dft&quot;</span><span class="p">][</span><span class="s2">&quot;dft_code&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
 
@@ -651,7 +649,7 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid &quot;dft.projector_type&quot; = </span><span class="si">{</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;dft&quot;</span><span class="p">][</span><span class="s2">&quot;projector_type&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_verify_input_params_solver</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="n">FullConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_verify_input_params_solver</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="n">FullConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="n">solver_params</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;solver&#39;</span><span class="p">]</span>
 
     <span class="c1"># Checks that the solver impurities index are all lists if there are multiple solvers</span>
@@ -705,16 +703,16 @@
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Only one of the options &quot;crm_dyson_solver&quot;, &quot;legendre_fit&quot;, &quot;measure_G_l&quot;, or &quot;perform_tail_fit&quot; can be set to True.&#39;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_verify_input_params_gw</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="n">FullConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_verify_input_params_gw</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="n">FullConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">pass</span>
 
-<span class="k">def</span> <span class="nf">_verify_input_params_advanced</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="n">FullConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_verify_input_params_advanced</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="n">FullConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">pass</span>
 
 
 <div class="viewcode-block" id="verify_before_dmft_cycle">
 <a class="viewcode-back" href="../../_ref/io_tools.verify_input_params.html#io_tools.verify_input_params.verify_before_dmft_cycle">[docs]</a>
-<span class="k">def</span> <span class="nf">verify_before_dmft_cycle</span><span class="p">(</span><span class="n">params</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">verify_before_dmft_cycle</span><span class="p">(</span><span class="n">params</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;All checks of params that can be done before dmft_cycle is called.&quot;&quot;&quot;</span>
     <span class="n">_verify_input_params_general</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
     <span class="n">_verify_input_params_dft</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
@@ -726,7 +724,7 @@
 
 <div class="viewcode-block" id="verify_h5_dependent">
 <a class="viewcode-back" href="../../_ref/io_tools.verify_input_params.html#io_tools.verify_input_params.verify_h5_dependent">[docs]</a>
-<span class="k">def</span> <span class="nf">verify_h5_dependent</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">solver_type_per_imp</span><span class="p">,</span> <span class="n">general_params</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">verify_h5_dependent</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">solver_type_per_imp</span><span class="p">,</span> <span class="n">general_params</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;All checks of params that depend on the h5 file content that is stored in the SumkDFT object.&quot;&quot;&quot;</span>
     <span class="c1"># Incompatabilities for SO coupling</span>
     <span class="k">if</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">SO</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;magnetic&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;afm_order&#39;</span><span class="p">]:</span>
