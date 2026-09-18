@@ -15,12 +15,78 @@
 #
 # Authors: Alexander Hampel
 
+import shutil
+import warnings
+
 import numpy as np
 
 from h5 import HDFArchive
 from solid_dmft.postprocessing import plot_correlated_bands as pcb
 
 import unittest
+
+
+def _write_bloch_basis_archive(src, dst, n_extra_bands=0, scramble_phases=True, seed=1234):
+    """
+    Rewrites a Wannier-basis archive as the equivalent Bloch-basis one.
+
+    For an isolated set of bands the Bloch-basis representation of a wannier90
+    run is fully determined by the Wannier one: the KS eigenvalues of the
+    Wannier bands are the eigenvalues of H_W(k) and the gauge matrix is the
+    corresponding eigenvector matrix V(k), so that P H P^dag = V diag(e) V^dag
+    = H_W(k). The per-band phase is left free by wannier90 as well and is
+    randomised here, which makes P(k) vary discontinuously along k.
+
+    With n_extra_bands > 0 additional decoupled bands far outside the window
+    are added, so that the number of bands exceeds the number of Wannier
+    functions as it does for a run with band disentanglement.
+    """
+
+    shutil.copyfile(src, dst)
+    rng = np.random.default_rng(seed)
+    with HDFArchive(dst, 'a') as ar:
+        dft_input = ar['dft_input']
+        hopping = dft_input['hopping']
+        n_k, n_sp, n_orb, _ = hopping.shape
+        n_bands = n_orb + n_extra_bands
+
+        hopping_bloch = np.zeros((n_k, n_sp, n_bands, n_bands), dtype=complex)
+        proj_mat_bloch = np.zeros((n_k, n_sp, dft_input['n_corr_shells'], n_orb, n_bands), dtype=complex)
+
+        for ik in range(n_k):
+            for isp in range(n_sp):
+                evals, evecs = np.linalg.eigh(hopping[ik, isp])
+                if scramble_phases:
+                    evecs = evecs * np.exp(1j * rng.uniform(0, 2 * np.pi, n_orb))[None, :]
+                hopping_bloch[ik, isp, :n_orb, :n_orb] = np.diag(evals)
+                proj_mat_bloch[ik, isp, 0, :, :n_orb] = evecs
+                if n_extra_bands > 0:
+                    hopping_bloch[ik, isp, n_orb:, n_orb:] = np.diag(
+                        20.0 + np.arange(n_extra_bands) + 0.1 * rng.standard_normal(n_extra_bands))
+
+                assert np.allclose(proj_mat_bloch[ik, isp, 0] @ hopping_bloch[ik, isp]
+                                   @ proj_mat_bloch[ik, isp, 0].conj().T, hopping[ik, isp])
+
+        dft_input['hopping'] = hopping_bloch
+        dft_input['proj_mat'] = proj_mat_bloch
+        dft_input['n_orbitals'] = np.full((n_k, n_sp), n_bands)
+        dft_input['dft_code'] = 'w90'
+
+    return dst
+
+
+class _FakeSumk:
+    """Minimal stand-in for SumkDFT for the embedding checks."""
+
+    def __init__(self, dims, hopping, proj_mat, dft_code='w90'):
+        self.corr_shells = [{'dim': dim} for dim in dims]
+        self.n_corr_shells = len(dims)
+        self.hopping = hopping
+        self.proj_mat = proj_mat
+        self.n_k = hopping.shape[0]
+        self.n_orbitals = np.full((self.n_k, 1), hopping.shape[2])
+        self.bz_weights = np.full(self.n_k, 1.0 / self.n_k)
+        self.dft_code = dft_code
 
 
 class test_convergence(unittest.TestCase):
@@ -145,6 +211,114 @@ class test_convergence(unittest.TestCase):
 
         assert np.allclose(tb_data_obj['e_mat'], emat_ref)
         assert np.allclose(alatt_k_w_obj, Akw_ref)
+
+
+    def test_bloch_basis_gives_identical_bands(self):
+        """
+        The self-energy is written into the Wannier basis of seed_hr.dat, which
+        is a k-independent index operation. Whether the archive stores H_W(k)
+        (bloch_basis=False) or the KS eigenvalues plus k-dependent projectors
+        (bloch_basis=True) only fixes the gauge the archive is written in. As
+        long as the projectors are square and unitary the two are related by a
+        unitary at every k, so A(k,w) must come out identical no matter how
+        strongly proj_mat varies along k.
+        """
+
+        _write_bloch_basis_archive('./svo_example.h5', './svo_bloch.h5')
+
+        with HDFArchive('./svo_bloch.h5', 'r') as ar:
+            proj_mat = ar['dft_input']['proj_mat'][:, 0, 0]
+        # the projectors really are k-dependent and unitary
+        assert not np.allclose(proj_mat[0], proj_mat[-1])
+        assert np.mean(np.abs(np.diff(proj_mat, axis=0))) > 0.1
+        assert np.allclose(np.einsum('kab,kcb->kac', proj_mat, proj_mat.conj()), np.eye(3))
+
+        tb_bands = {'bands_path': [('R', 'G'), ('G', 'X'), ('X', 'M'), ('M', 'G')], 'G': [0., 0., 0.],
+                    'Z': np.array([0, 0, 0.5]), 'M': [0.5, 0.5, 0.], 'R': [0.5, 0.5, 0.5],
+                    'X': [0.,  0.5, 0.], 'n_k': 50}
+
+        sigma_dict = dict(self.sigma_dict, dmft_path='./svo_bloch.h5')
+        tb_data, alatt_k_w, _ = pcb.get_dmft_bands(with_sigma='calc', add_mu_tb=True,
+                                                   orbital_order_to=self.orbital_order_to,
+                                                   **self.w90_dict, **tb_bands, **sigma_dict)
+
+        with HDFArchive('test_pcb_ref.h5', 'r') as ar:
+            emat_ref = ar['tb_emat']
+            Akw_ref = ar['Akw']
+
+        assert np.allclose(tb_data['e_mat'], emat_ref)
+        assert np.allclose(alatt_k_w, Akw_ref)
+
+    def test_bloch_basis_disentanglement_warns(self):
+        """
+        With more bands than Wannier functions the projectors are an isometry,
+        A(k,w) is the spectral function of the Wannier model rather than of the
+        DMFT lattice problem and mu was converged for a different electron
+        count. That is a caveat for the user, not a reason to refuse.
+        """
+
+        _write_bloch_basis_archive('./svo_example.h5', './svo_bloch_dis.h5', n_extra_bands=2)
+
+        tb_bands = {'bands_path': [('G', 'X')], 'G': [0., 0., 0.], 'X': [0., 0.5, 0.], 'n_k': 10}
+        sigma_dict = dict(self.sigma_dict, dmft_path='./svo_bloch_dis.h5')
+
+        with warnings.catch_warnings(record=True) as raised:
+            warnings.simplefilter('always')
+            pcb.get_dmft_bands(with_sigma='calc', add_mu_tb=True,
+                               orbital_order_to=self.orbital_order_to,
+                               **self.w90_dict, **tb_bands, **sigma_dict)
+
+        messages = [str(w.message) for w in raised]
+        assert any('disentanglement' in m for m in messages), messages
+
+    def test_sigma_embedding_default_and_explicit(self):
+
+        hopping = np.zeros((4, 1, 8, 8), dtype=complex)
+        # two well separated shells: a 5-fold one around -2 eV, a 3-fold one around +3 eV
+        hopping[:, 0, :5, :5] = np.diag([-2.4, -2.2, -2.0, -1.8, -1.6])
+        hopping[:, 0, 5:, 5:] = np.diag([2.6, 3.0, 3.4])
+        proj_mat = np.zeros((4, 1, 2, 5, 8), dtype=complex)
+        proj_mat[:, 0, 0, :5, :5] = np.eye(5)
+        proj_mat[:, 0, 1, :3, 5:] = np.eye(3)
+        sum_k = _FakeSumk([5, 3], hopping, proj_mat)
+        tb_hloc = np.einsum('k,kab->ab', np.full(4, 0.25), hopping[:, 0])
+
+        # default follows the wannier90 convention: correlated shells come first, in order
+        embedding = pcb._get_sigma_embedding(sum_k, 8)
+        assert [idx.tolist() for idx in embedding] == [[0, 1, 2, 3, 4], [5, 6, 7]]
+
+        with warnings.catch_warnings(record=True) as raised:
+            warnings.simplefilter('always')
+            pcb._check_sigma_embedding(sum_k, 8, embedding, tb_hloc=tb_hloc)
+        assert len(raised) == 0, [str(w.message) for w in raised]
+
+        # an explicit mapping that swaps the two shells must be caught by
+        # comparing the local Hamiltonians
+        swapped = pcb._get_sigma_embedding(sum_k, 8, [[3, 4, 5, 6, 7], [0, 1, 2]])
+        with warnings.catch_warnings(record=True) as raised:
+            warnings.simplefilter('always')
+            pcb._check_sigma_embedding(sum_k, 8, swapped, tb_hloc=tb_hloc, explicit_embedding=True)
+        assert any('Local Hamiltonian' in str(w.message) for w in raised)
+
+        # malformed mappings are rejected outright
+        with self.assertRaises(AssertionError):
+            pcb._get_sigma_embedding(sum_k, 8, [[0, 1], [5, 6, 7]])
+        with self.assertRaises(AssertionError):
+            pcb._get_sigma_embedding(sum_k, 8, [[0, 1, 2, 3, 4], [4, 5, 6]])
+        with self.assertRaises(AssertionError):
+            pcb._get_sigma_embedding(sum_k, 6)
+
+    def test_non_w90_archive_warns_about_orbital_order(self):
+
+        hopping = np.zeros((4, 1, 3, 3), dtype=complex)
+        proj_mat = np.zeros((4, 1, 1, 3, 3), dtype=complex)
+        proj_mat[:, 0, 0] = np.eye(3)
+        sum_k = _FakeSumk([3], hopping, proj_mat, dft_code='vasp')
+
+        with warnings.catch_warnings(record=True) as raised:
+            warnings.simplefilter('always')
+            pcb._check_sigma_embedding(sum_k, 3, pcb._get_sigma_embedding(sum_k, 3))
+        assert any('vasp' in str(w.message) for w in raised), [str(w.message) for w in raised]
 
 
 if __name__ == '__main__':
