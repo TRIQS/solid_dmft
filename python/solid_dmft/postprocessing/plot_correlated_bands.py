@@ -92,7 +92,138 @@ def print_matrix(matrix, n_orb, text):
         print((' '*4 + fmt).format(*row))
 
 
-def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, orbital_order_dmft=None, **specs):
+def _get_sigma_embedding(sum_k, n_orb, sigma_embedding=None):
+    """
+    Determines which orbitals of the n_orb tight-binding (Wannier) basis the
+    self-energy of each correlated shell is written into.
+
+    The impurity self-energy lives in the Wannier basis of the correlated
+    shells, and so does the tight-binding Hamiltonian read from seed_hr.dat.
+    Placing the former into the latter is therefore a purely k-independent
+    index operation and does not involve proj_mat. By default the wannier90
+    convention is assumed, i.e. the correlated Wannier functions come first in
+    seed_hr.dat, ordered as the correlated shells.
+
+    Parameters
+    ----------
+    sum_k : SumkDFT
+        SumkDFT object of the DMFT archive.
+    n_orb : int
+        Number of Wannier orbitals of the tight-binding model.
+    sigma_embedding : list of list of int, optional
+        Explicit mapping, one entry per correlated shell, giving the indices of
+        the tight-binding orbitals that shell occupies. Overrides the default.
+
+    Returns
+    -------
+    embedding : list of np.ndarray
+        Orbital indices per correlated shell.
+    """
+
+    dims = [sum_k.corr_shells[ish]['dim'] for ish in range(sum_k.n_corr_shells)]
+
+    if sigma_embedding is not None:
+        embedding = [np.asarray(idx, dtype=int).reshape(-1) for idx in sigma_embedding]
+        assert len(embedding) == len(dims), f'sigma_embedding must have one entry per correlated shell, ' \
+            f'got {len(embedding)} for {len(dims)} shells'
+        for ish, idx in enumerate(embedding):
+            assert idx.size == dims[ish], f'sigma_embedding[{ish}] has {idx.size} indices but correlated ' \
+                f'shell {ish} has dimension {dims[ish]}'
+            assert np.all((idx >= 0) & (idx < n_orb)), f'sigma_embedding[{ish}] contains indices outside ' \
+                f'[0, n_orb={n_orb})'
+    else:
+        assert sum(dims) <= n_orb, f'Correlated shells need {sum(dims)} orbitals but the tight-binding ' \
+            f'model has only n_orb={n_orb}. Check n_orb, or pass "sigma_embedding" explicitly.'
+        embedding = []
+        iorb = 0
+        for dim in dims:
+            embedding.append(np.arange(iorb, iorb + dim))
+            iorb += dim
+
+    flat = np.concatenate(embedding) if embedding else np.array([], dtype=int)
+    assert flat.size == np.unique(flat).size, 'Correlated shells may not share tight-binding orbitals, ' \
+        f'but the embedding {[idx.tolist() for idx in embedding]} does'
+
+    return embedding
+
+
+def _check_sigma_embedding(sum_k, n_orb, embedding, tb_hloc=None, explicit_embedding=False, tol=1e-3):
+    """
+    Sanity checks for writing the impurity self-energy into the tight-binding
+    basis. All of these warn, none of them abort: the underlying operation is
+    well defined in every case, but the result may not be the object the user
+    expects.
+
+    1. Disentanglement. If the archive was written with bloch_basis=True and an
+       outer window larger than the number of Wannier functions, the number of
+       bands exceeds n_orb. The projectors are then an isometry rather than a
+       unitary, so A(k,w) of the Wannier model is not the lattice spectral
+       function of the DMFT calculation, and mu was converged for a different
+       electron count.
+    2. Provenance. "correlated Wannier functions first" is a wannier90
+       convention. For other DFT codes the correlated basis is whatever the
+       projectors define and the tight-binding model comes from elsewhere.
+    3. Local Hamiltonian. Downfolding the archive Hamiltonian with proj_mat
+       gives the local Hamiltonian of each correlated shell in the Wannier
+       basis, in every mode: P H P^dag = U^dag eps U = H_W(k), whose k average
+       is H_W(R=0). Comparing its eigenvalues with those of the corresponding
+       block of the tight-binding H(R=0) validates the embedding. Eigenvalues
+       are used because they are invariant under the orbital order conventions
+       that differ between the archive and seed_hr.dat, and the traceless part
+       is compared because the archive Hamiltonian has the Fermi energy
+       subtracted while the tight-binding one has not.
+    """
+
+    n_bands = int(np.max(sum_k.n_orbitals))
+    if n_bands > n_orb:
+        warn(f'The DMFT archive contains {n_bands} bands but the tight-binding model has {n_orb} '
+             'orbitals, i.e. the archive was written in Bloch basis with band disentanglement. '
+             'A(k,w) is then the spectral function of the Wannier model, not the lattice spectral '
+             'function of the DMFT calculation, and mu was converged for the electron count of the '
+             'full outer window. Check the filling and correct with "mu_shift" if needed.')
+    elif n_bands < n_orb:
+        warn(f'The DMFT archive contains only {n_bands} bands but the tight-binding model has '
+             f'{n_orb} orbitals. The lattice problem solved in DMFT was therefore smaller than the '
+             'model A(k,w) is computed for. Check that n_orb matches seed_hr.dat.')
+
+    dft_code = getattr(sum_k, 'dft_code', None)
+    if isinstance(dft_code, bytes):
+        dft_code = dft_code.decode()
+    if dft_code not in ('w90', None) and not explicit_embedding:
+        warn(f'The DMFT archive was written by the "{dft_code}" converter, so the correlated orbitals '
+             'are not guaranteed to be the first orbitals of the tight-binding model. The self-energy '
+             f'is written into orbitals {[idx.tolist() for idx in embedding]}. Pass "sigma_embedding" '
+             'if that is not the intended mapping.')
+
+    if tb_hloc is None:
+        return
+
+    def _traceless_eigvals(mat):
+        return np.linalg.eigvalsh(mat - np.eye(mat.shape[0]) * np.trace(mat).real / mat.shape[0])
+
+    # spin block 0 is enough, this only validates the orbital mapping
+    hopping = sum_k.hopping
+    bz_weights = sum_k.bz_weights
+    for ish, idx in enumerate(embedding):
+        dim = sum_k.corr_shells[ish]['dim']
+        hloc_h5 = np.zeros((dim, dim), dtype=complex)
+        for ik in range(sum_k.n_k):
+            n_bands_k = sum_k.n_orbitals[ik, 0]
+            projmat = sum_k.proj_mat[ik, 0, ish, :dim, :n_bands_k]
+            hloc_h5 += bz_weights[ik] * np.dot(projmat, np.dot(hopping[ik, 0, :n_bands_k, :n_bands_k],
+                                                               projmat.conjugate().transpose()))
+        hloc_tb = tb_hloc[np.ix_(idx, idx)]
+
+        deviation = np.max(np.abs(_traceless_eigvals(hloc_h5) - _traceless_eigvals(hloc_tb)))
+        if deviation > tol:
+            warn(f'Local Hamiltonian of correlated shell {ish} from the DMFT archive and from the '
+                 f'tight-binding model disagree by {deviation:.4f} eV (crystal-field eigenvalues, '
+                 f'traceless). The self-energy is written into orbitals {idx.tolist()}, which is '
+                 'likely the wrong set or the wrong order. Pass "sigma_embedding" to fix the mapping.')
+
+
+def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, orbital_order_dmft=None,
+                     tb_hloc=None, sigma_embedding=None, **specs):
 
     if orbital_order_dmft is None:
         orbital_order_dmft = orbital_order
@@ -133,15 +264,22 @@ def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, orbital_order_dmft=
             # use add_dc function to rotate to sumk block structure and subtract the DC
             sigma_sumk = sum_k.add_dc()
 
-            assert np.allclose(sum_k.proj_mat[0], sum_k.proj_mat[-1]), 'upfolding works only when proj_mat is the same for all kpoints (wannier mode)'
+            # Sigma is now in the global (Wannier) basis of the correlated shells,
+            # which is the basis the tight-binding H(k) from seed_hr.dat lives in as
+            # well. Writing it into the n_orb Wannier basis is therefore a
+            # k-independent index operation and does not involve proj_mat: whether
+            # the archive stores the Wannier Hamiltonian (bloch_basis=False) or the
+            # KS eigenvalues plus k-dependent projectors (bloch_basis=True) only
+            # fixes the gauge the archive is written in, not the basis Sigma lives
+            # in. For n_bands == n_orb the two are related by a unitary at every k,
+            # so A(k,w) is independent of how strongly proj_mat varies along k.
+            embedding = _get_sigma_embedding(sum_k, n_orb, sigma_embedding)
+            _check_sigma_embedding(sum_k, n_orb, embedding, tb_hloc=tb_hloc,
+                                   explicit_embedding=sigma_embedding is not None)
 
-            # now upfold with proj_mat to band basis, this only works for the
-            # case where proj_mat is equal for all k points (wannier mode)
             sigma = Gf(mesh=sigma.mesh, target_shape=[n_orb, n_orb])
-            for ish in range(ar['dft_input']['n_corr_shells']):
-                sigma += sum_k.upfold(ik=0, ish=ish,
-                                      bname=spin, gf_to_upfold=sigma_sumk[ish][spin],
-                                      gf_inp=sigma)
+            for ish, idx in enumerate(embedding):
+                sigma.data[:, idx[:, None], idx[None, :]] += sigma_sumk[ish][spin].data
 
         # already subtracted
         dc = 0.0
@@ -727,6 +865,13 @@ def get_dmft_bands(n_orb, mu_tb, w90_path=None, w90_seed=None, TB_obj=None, add_
         Extra projections to be applied to the final spectral function
         per orbital and k-point. Has to match shape of final lattice Green
         function. Will be applied together with proj_on_orb if specified.
+    sigma_embedding : list of list of int, optional
+        Which orbitals of the tight-binding model each correlated shell of the
+        DMFT archive occupies, one entry per correlated shell. By default the
+        wannier90 convention is assumed, i.e. the correlated Wannier functions
+        are the first orbitals of seed_hr.dat, ordered as the correlated shells.
+        Only needed if the tight-binding model orders its orbitals differently,
+        e.g. for an archive written by a non-wannier90 converter.
 
     Returns
     -------
@@ -896,7 +1041,8 @@ def get_dmft_bands(n_orb, mu_tb, w90_path=None, w90_seed=None, TB_obj=None, add_
             mu = mu_tb + mu_shift
         # else is from dmft or memory:
         else:
-            delta_sigma, mu_dmft, freq_dict = _sigma_from_dmft(n_orb, orbital_order_to, with_sigma, **specs)
+            delta_sigma, mu_dmft, freq_dict = _sigma_from_dmft(n_orb, orbital_order_to, with_sigma,
+                                                               tb_hloc=tb.hoppings[(0, 0, 0)], **specs)
             mu = mu_dmft + mu_shift
 
         freq_dict['sigma_upfolded'] = delta_sigma
