@@ -1,5 +1,17 @@
 # Changelog
 
+## Unstable
+
+Changes on the `unstable` branch that are not part of a release yet. Rename
+this section to the version number when the next release is cut.
+
+### General
+* add the `sigma_embedding` argument to `plot_correlated_bands.get_dmft_bands`, giving the tight-binding orbitals each correlated shell occupies, for models that do not follow the wannier90 convention of the correlated orbitals coming first
+
+### fix
+* `plot_correlated_bands` no longer rejects DMFT archives converted with `bloch_basis=True`. The self-energy is written into the Wannier basis of `seed_hr.dat` directly instead of through `SumkDFT.upfold`, which embeds into the Kohn-Sham band basis and is therefore k-dependent in Bloch basis. The embedding is a k-independent index operation, so A(k,w) is unchanged no matter how strongly `proj_mat` varies along k, and results in Wannier basis are bit-identical to before
+* `plot_correlated_bands` warns instead of aborting where the result may not be what is expected: band disentanglement (`n_bands > n_orb`), where A(k,w) is the spectral function of the Wannier model rather than of the DMFT lattice problem and the chemical potential was converged for the electron count of the full outer window; an archive from a non-wannier90 converter, where the correlated orbitals need not come first; and a mismatch between the crystal-field eigenvalues of the archive and of the tight-binding H(R=0), which catches a wrong orbital mapping also in Wannier basis
+
 ## Version 4.0.0
 
 solid_dmft version 4.0.0 is a major release, compatible with TRIQS 4.0, and updated to the latest app4triqs skeleton. This release ports solid_dmft to the TRIQS 4.0 API and adds support for new HPC platforms, alongside several bug fixes.
