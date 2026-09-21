@@ -333,13 +333,11 @@ class test_convergence(unittest.TestCase):
 
     def test_bloch_basis_gives_identical_bands(self):
         """
-        The self-energy is written into the Wannier basis of seed_hr.dat, which
-        is a k-independent index operation. Whether the archive stores H_W(k)
-        (bloch_basis=False) or the KS eigenvalues plus k-dependent projectors
-        (bloch_basis=True) only fixes the gauge the archive is written in. As
-        long as the projectors are square and unitary the two are related by a
-        unitary at every k, so A(k,w) must come out identical no matter how
-        strongly proj_mat varies along k.
+        A Bloch-basis archive must reproduce the stored Wannier-basis reference
+        bit for bit. As above, the comparison between the two archives passes
+        trivially today because neither hopping nor proj_mat enters A(k,w) any
+        more; what this pins is the comparison against test_pcb_ref.h5, and that
+        no proj_mat dependence returns.
         """
 
         _write_bloch_basis_archive('./svo_example.h5', './svo_bloch.h5')
@@ -369,11 +367,13 @@ class test_convergence(unittest.TestCase):
 
     def test_bloch_basis_projected_spectral_function(self):
         """
-        The orbital projection and the band-resolved output are built from the
-        eigenvectors of the tight-binding H(k) and from Sigma in the Wannier
-        basis, neither of which depends on the gauge the archive is written in.
-        Unlike the trace, an orbital-resolved quantity is not gauge invariant in
-        general, so this is checked explicitly rather than inferred.
+        Regression guard: A(k,w) must not depend on the gauge the archive is
+        written in, for the projected and band-resolved outputs as well as for
+        the trace. Note that after the fix get_dmft_bands reads nothing from
+        hopping or proj_mat outside the warnings, so this passes trivially
+        today; it fails again the moment any proj_mat dependence comes back,
+        e.g. by returning to SumkDFT.upfold. The physics is pinned by
+        test_bloch_and_wannier_lattice_agree instead.
         """
 
         _write_bloch_basis_archive('./svo_example.h5', './svo_bloch.h5')
@@ -394,6 +394,103 @@ class test_convergence(unittest.TestCase):
             (tb_wan, alatt_wan, _), (tb_blo, alatt_blo, _) = results
             assert np.allclose(alatt_blo, alatt_wan), f'A(k,w) differs for {extra}'
             assert np.allclose(tb_blo['e_mat'], tb_wan['e_mat']), f'e_mat differs for {extra}'
+
+    def test_bloch_and_wannier_lattice_agree(self):
+        """
+        The physics claim behind accepting Bloch-basis archives: for square
+        unitary projectors the Wannier and the Kohn-Sham band description are
+        the same lattice problem in two gauges,
+
+            Tr [z - H_W(k) - Sigma]^-1 = Tr [z - eps(k) - P(k) Sigma P(k)^dag]^-1
+
+        at every k, however strongly P(k) varies. Both sides are evaluated from
+        the archives' own hopping and proj_mat on the archive k-mesh, so unlike
+        the two tests above this one is sensitive to those arrays and fails if
+        the self-energy is placed in the wrong basis.
+        """
+
+        _write_bloch_basis_archive('./svo_example.h5', './svo_bloch.h5')
+
+        with HDFArchive('./svo_example.h5', 'r') as ar:
+            h_wan = ar['dft_input']['hopping'][:, 0]
+            kpts_wan = ar['dft_input']['kpts']
+        with HDFArchive('./svo_bloch.h5', 'r') as ar:
+            h_blo = ar['dft_input']['hopping'][:, 0]
+            proj_blo = ar['dft_input']['proj_mat'][:, 0, 0]
+            kpts_blo = ar['dft_input']['kpts']
+
+        assert np.allclose(kpts_wan, kpts_blo), 'k-meshes must line up for this comparison'
+        assert not np.allclose(proj_blo[0], proj_blo[-1]), 'projectors are not k-dependent'
+
+        # the self-energy as get_dmft_bands embeds it, in the archive orbital order
+        tb_bands = {'bands_path': [('G', 'X')], 'G': [0., 0., 0.], 'X': [0., 0.5, 0.],
+                    'Z': np.array([0, 0, 0.5]), 'n_k': 5}
+        sigma_dict = dict(self.sigma_dict, orbital_order_dmft=self.orbital_order_to)
+        _, _, freq_dict = pcb.get_dmft_bands(with_sigma='calc', add_mu_tb=True,
+                                             orbital_order_to=self.orbital_order_to,
+                                             **self.w90_dict, **tb_bands, **sigma_dict)
+        sigma_w = freq_dict['sigma_upfolded']       # (n_orb, n_orb, n_w)
+
+        # an anisotropic self-energy as well, so the identity is not only tested
+        # for the isotropic one the SrVO3 archive happens to carry
+        aniso = np.zeros_like(sigma_w[:, :, :1])
+        aniso[0, 0, 0], aniso[1, 1, 0], aniso[2, 2, 0] = -0.4 + 0.2j, 0.15 - 0.05j, 0.3 - 0.35j
+
+        rng = np.random.default_rng(7)
+        sample = rng.choice(len(kpts_wan), size=25, replace=False)
+        for sigma, tag in ((sigma_w[:, :, len(sigma_w[0, 0]) // 2, None], 'archive'),
+                           (aniso, 'anisotropic')):
+            worst = 0.0
+            for ik in sample:
+                z = (0.3 + 0.1j) * np.eye(3)
+                g_wan = np.linalg.inv(z - h_wan[ik] - sigma[:, :, 0])
+                sigma_band = proj_blo[ik].conj().T @ sigma[:, :, 0] @ proj_blo[ik]
+                g_blo = np.linalg.inv(z - h_blo[ik] - sigma_band)
+                worst = max(worst, abs(np.trace(g_wan) - np.trace(g_blo)))
+            assert worst < 1e-10, f'{tag} Sigma: lattice Green functions differ by {worst:.2e}'
+
+    def test_add_spin_with_archive_sigma_is_refused(self):
+        """
+        add_spin=True builds kron(eye(2), H), so the correlated shell appears in
+        both an up and a down block, while the archive self-energy covers one
+        spin block. The embedding cannot know that and would silently leave the
+        down block non-interacting, so this has to be refused rather than
+        guessed. sigma_embedding cannot express it either, since shells may not
+        share tight-binding orbitals.
+        """
+
+        tb_bands = {'bands_path': [('R', 'G')], 'G': [0., 0., 0.], 'R': [0.5, 0.5, 0.5],
+                    'Z': np.array([0, 0, 0.5]), 'n_k': 5}
+        w90_dict = dict(self.w90_dict, add_spin=True)
+
+        with self.assertRaises(NotImplementedError):
+            pcb.get_dmft_bands(with_sigma='calc', add_mu_tb=True,
+                               orbital_order_to=self.orbital_order_to,
+                               **w90_dict, **tb_bands, **self.sigma_dict)
+
+    def test_hloc_check_tolerates_spin_polarised_weights(self):
+        """
+        The wannier90 converter halves the k-point weights for SP=1, SO=0, so
+        bz_weights sums to 0.5 and the downfolded local Hamiltonian would come
+        out at half size, making the crystal-field check fire on a correct
+        mapping.
+        """
+
+        hopping = np.zeros((4, 1, 3, 3), dtype=complex)
+        hopping[:, 0] = np.diag([-0.5, 0.0, 0.5])
+        proj_mat = np.zeros((4, 1, 1, 3, 3), dtype=complex)
+        proj_mat[:, 0, 0] = np.eye(3)
+        tb_hloc = np.diag([-0.5, 0.0, 0.5]).astype(complex)
+
+        for total_weight in (1.0, 0.5):
+            sum_k = _FakeSumk([3], hopping, proj_mat)
+            sum_k.bz_weights = np.full(4, total_weight / 4)
+            with warnings.catch_warnings(record=True) as raised:
+                warnings.simplefilter('always')
+                pcb._check_sigma_embedding(sum_k, 3, pcb._get_sigma_embedding(sum_k, 3),
+                                           tb_hloc=tb_hloc)
+            assert not any('Local Hamiltonian' in str(w.message) for w in raised), \
+                f'false alarm for bz_weights summing to {total_weight}'
 
     def test_bloch_basis_disentanglement_warns(self):
         """
