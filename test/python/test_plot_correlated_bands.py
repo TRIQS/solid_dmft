@@ -18,6 +18,9 @@
 import shutil
 import warnings
 
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 import numpy as np
 
 from h5 import HDFArchive
@@ -212,6 +215,121 @@ class test_convergence(unittest.TestCase):
         assert np.allclose(tb_data_obj['e_mat'], emat_ref)
         assert np.allclose(alatt_k_w_obj, Akw_ref)
 
+
+    def test_plot_bands_with_projection(self):
+        """
+        plot_bands colours the tight-binding bands with the orbital character it
+        reads from tb_data['proj_nuk'], and draws them from tb_data['e_mat'],
+        which has to be the eigenvalue matrix. Both have to survive an orbital
+        projection, also when no self-energy is given at all, in which case the
+        projection affects nothing else.
+        """
+
+        tb_bands = {'bands_path': [('R', 'G'), ('G', 'X')], 'G': [0., 0., 0.],
+                    'Z': np.array([0, 0, 0.5]), 'R': [0.5, 0.5, 0.5],
+                    'X': [0.,  0.5, 0.], 'n_k': 30}
+
+        # no self-energy: get_dmft_bands returns alatt_k_w = None and the
+        # projection only feeds the band colouring
+        tb_data, alatt_k_w, freq_dict = pcb.get_dmft_bands(orbital_order_to=self.orbital_order_to,
+                                                           proj_on_orb=[0, 1], eta=0.01,
+                                                           **self.w90_dict, **tb_bands)
+        assert alatt_k_w is None
+        assert isinstance(tb_data['proj_nuk'], np.ndarray), 'orbital character missing from tb_data'
+        assert tb_data['proj_nuk'].shape == (3, tb_data['e_mat'].shape[2])
+        # orbital character of a complete set of bands sums to one per band
+        full = pcb.get_dmft_bands(orbital_order_to=self.orbital_order_to, proj_on_orb=[0, 1, 2],
+                                  eta=0.01, **self.w90_dict, **tb_bands)[0]
+        assert np.allclose(full['proj_nuk'], 1.0)
+
+        fig, ax = plt.subplots()
+        try:
+            pcb.plot_bands(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb=3, tb=True,
+                           alatt=False, colorscheme_bands='coolwarm')
+        finally:
+            plt.close(fig)
+
+        # and the same with a self-energy, where alatt is plotted on top
+        sigma_dict = dict(self.sigma_dict)
+        tb_data, alatt_k_w, freq_dict = pcb.get_dmft_bands(with_sigma='calc', add_mu_tb=True,
+                                                           orbital_order_to=self.orbital_order_to,
+                                                           proj_on_orb=[0, 1],
+                                                           **self.w90_dict, **tb_bands, **sigma_dict)
+        assert isinstance(tb_data['proj_nuk'], np.ndarray)
+        fig, ax = plt.subplots()
+        try:
+            pcb.plot_bands(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb=3, tb=True,
+                           alatt=True, colorscheme_bands='coolwarm',
+                           colorscheme_alatt='magma')
+        finally:
+            plt.close(fig)
+
+    def test_orbital_projection_is_exact(self):
+        """
+        An orbital projection is a mask on the diagonal of the lattice Green
+        function in the Wannier basis, so summing the projections over all
+        orbitals has to reproduce the orbital-resolved spectral function exactly.
+
+        Going through the band basis instead weights the band-resolved spectral
+        function with the orbital character |<orb|band>|^2, which drops the
+        off-diagonal band components of G. That is exact only for an orbital
+        independent self-energy, which is why the SVO archive used by the other
+        tests cannot detect the difference: its Sigma is isotropic to 1e-14.
+        Both conventions give the same trace.
+        """
+
+        tb_bands = {'bands_path': [('R', 'G'), ('G', 'X')], 'G': [0., 0., 0.],
+                    'Z': np.array([0, 0, 0.5]), 'R': [0.5, 0.5, 0.5],
+                    'X': [0.,  0.5, 0.], 'n_k': 30}
+        model = {'with_sigma': 'model', 'Sigma_0': [0., 0., 0.], 'Sigma_Z': [0.9, 0.5, 0.3],
+                 'mu_dmft': 0.0, 'eta': 0.03}
+
+        def run(**extra):
+            return pcb.get_dmft_bands(orbital_order_to=self.orbital_order_to, **self.w90_dict,
+                                      **tb_bands, **model, w_mesh={'window': [-1., 1.], 'n_w': 301},
+                                      **extra)[1]
+
+        alatt_orb = run(trace=False)     # -1/pi Im G_orb,orb in the Wannier basis
+        alatt_trace = run()
+
+        projected = np.stack([run(proj_on_orb=[orb]) for orb in range(3)], axis=-1)
+        assert np.allclose(projected, alatt_orb), 'orbital projection is not the orbital-resolved A'
+        assert np.allclose(run(proj_on_orb=[0, 1]), alatt_orb[:, :, [0, 1]].sum(-1))
+
+        # the band-character weighting is still reachable and still sums to the trace,
+        # but differs substantially for an orbital dependent self-energy
+        band_char = np.stack([run(proj_on_orb=[orb], band_basis=True) for orb in range(3)], axis=-1)
+        assert np.allclose(band_char.sum(-1), alatt_trace)
+        assert np.allclose(projected.sum(-1), alatt_trace)
+        assert np.max(np.abs(band_char - alatt_orb)) > 1.0, 'expected the two conventions to differ here'
+
+        # same for the Fermi slice, which goes through _calc_kslice. A static
+        # orbital dependent shift is needed here, because the Fermi liquid
+        # self-energy vanishes at w=0 when Sigma_0 is zero.
+        kslice = {'bands_path': [('Y', 'G'), ('G', 'X')], 'Y': np.array([0.5, 0., 0.]),
+                  'G': [0., 0., 0.], 'X': [0., 0.5, 0.], 'n_k': 20}
+        slice_model = dict(model, Sigma_0=[0.4, -0.3, 0.1], eta=0.05)
+
+        def run_slice(**extra):
+            return pcb.get_dmft_bands(fermi_slice=True, orbital_order_to=self.orbital_order_to,
+                                      **self.w90_dict, **kslice, **slice_model,
+                                      w_mesh={'window': [-0.5, 0.5], 'n_w': 201}, **extra)[1]
+
+        slice_total = run_slice()
+        slice_proj = [run_slice(proj_on_orb=[orb]) for orb in range(3)]
+        slice_band = [run_slice(proj_on_orb=[orb], band_basis=True) for orb in range(3)]
+        assert np.allclose(sum(slice_proj), slice_total)
+        assert np.allclose(sum(slice_band), slice_total)
+        assert max(np.max(np.abs(a - b)) for a, b in zip(slice_proj, slice_band)) > 0.1
+
+        # fat-band data for plot_bands must still come back in the band basis
+        tb_data, _, _ = pcb.get_dmft_bands(orbital_order_to=self.orbital_order_to, **self.w90_dict,
+                                           **tb_bands, **model, w_mesh={'window': [-1., 1.], 'n_w': 301},
+                                           proj_on_orb=[0, 1])
+        e_mat = tb_data['e_mat']
+        assert tb_data['e_vecs'] is not None
+        offdiag = e_mat - np.stack([np.diag(np.diag(e_mat[:, :, ik])) for ik in range(e_mat.shape[2])], axis=-1)
+        assert np.allclose(offdiag, 0.0), 'returned e_mat is not diagonal, plot_bands needs eigenvalues'
 
     def test_bloch_basis_gives_identical_bands(self):
         """
