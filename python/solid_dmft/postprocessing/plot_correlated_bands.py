@@ -172,6 +172,13 @@ def _check_sigma_embedding(sum_k, n_orb, embedding, tb_hloc=None, explicit_embed
        that differ between the archive and seed_hr.dat, and the traceless part
        is compared because the archive Hamiltonian has the Fermi energy
        subtracted while the tight-binding one has not.
+
+       What this cannot see, by construction: a wrong order within a shell,
+       since eigenvalues are sorted, and a wrong set of orbitals when both the
+       selected and the correct block are internally degenerate, since the
+       traceless eigenvalues are then zero on both sides. Cubic t2g and eg
+       shells are exactly that case. It is a guard against a grossly wrong
+       mapping, not a proof that the mapping is right.
     """
 
     n_bands = int(np.max(sum_k.n_orbitals))
@@ -182,9 +189,11 @@ def _check_sigma_embedding(sum_k, n_orb, embedding, tb_hloc=None, explicit_embed
              'function of the DMFT calculation, and mu was converged for the electron count of the '
              'full outer window. Check the filling and correct with "mu_shift" if needed.')
     elif n_bands < n_orb:
-        warn(f'The DMFT archive contains only {n_bands} bands but the tight-binding model has '
-             f'{n_orb} orbitals. The lattice problem solved in DMFT was therefore smaller than the '
-             'model A(k,w) is computed for. Check that n_orb matches seed_hr.dat.')
+        warn(f'The DMFT archive contains {n_bands} bands but the tight-binding model has '
+             f'{n_orb} orbitals, so the lattice problem solved in DMFT was smaller than the model '
+             'A(k,w) is computed for. That is intended when only part of the tight-binding model '
+             'is correlated, but the chemical potential of the DMFT calculation then does not in '
+             'general reproduce the filling of the larger model.')
 
     dft_code = getattr(sum_k, 'dft_code', None)
     if isinstance(dft_code, bytes):
@@ -203,7 +212,10 @@ def _check_sigma_embedding(sum_k, n_orb, embedding, tb_hloc=None, explicit_embed
 
     # spin block 0 is enough, this only validates the orbital mapping
     hopping = sum_k.hopping
-    bz_weights = sum_k.bz_weights
+    # the wannier90 converter halves the k-point weights for SP=1, SO=0, so they
+    # do not sum to one and the local Hamiltonian would come out scaled
+    bz_weights = np.asarray(sum_k.bz_weights, dtype=float)
+    bz_weights = bz_weights / np.sum(bz_weights)
     for ish, idx in enumerate(embedding):
         dim = sum_k.corr_shells[ish]['dim']
         hloc_h5 = np.zeros((dim, dim), dtype=complex)
@@ -219,11 +231,12 @@ def _check_sigma_embedding(sum_k, n_orb, embedding, tb_hloc=None, explicit_embed
             warn(f'Local Hamiltonian of correlated shell {ish} from the DMFT archive and from the '
                  f'tight-binding model disagree by {deviation:.4f} eV (crystal-field eigenvalues, '
                  f'traceless). The self-energy is written into orbitals {idx.tolist()}, which is '
-                 'likely the wrong set or the wrong order. Pass "sigma_embedding" to fix the mapping.')
+                 'likely the wrong set of tight-binding orbitals. Pass "sigma_embedding" to fix '
+                 'the mapping.')
 
 
 def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, orbital_order_dmft=None,
-                     tb_hloc=None, sigma_embedding=None, **specs):
+                     tb_hloc=None, sigma_embedding=None, add_spin=False, **specs):
 
     if orbital_order_dmft is None:
         orbital_order_dmft = orbital_order
@@ -273,6 +286,14 @@ def _sigma_from_dmft(n_orb, orbital_order, with_sigma, spin, orbital_order_dmft=
             # fixes the gauge the archive is written in, not the basis Sigma lives
             # in. For n_bands == n_orb the two are related by a unitary at every k,
             # so A(k,w) is independent of how strongly proj_mat varies along k.
+            if add_spin:
+                raise NotImplementedError(
+                    'add_spin=True doubles the tight-binding orbitals into an up and a down '
+                    f'block (n_orb={n_orb}), but the self-energy read from the archive covers '
+                    'one spin block only and "sigma_embedding" cannot express writing a '
+                    'correlated shell into both blocks. Construct the spin-doubled self-energy '
+                    'yourself and pass it as with_sigma=<BlockGf>, or plot without add_spin.')
+
             embedding = _get_sigma_embedding(sum_k, n_orb, sigma_embedding)
             _check_sigma_embedding(sum_k, n_orb, embedding, tb_hloc=tb_hloc,
                                    explicit_embedding=sigma_embedding is not None)
@@ -827,7 +848,7 @@ def plot_kslice(fig, ax, alatt_k_w, tb_data, freq_dict, n_orb, tb_dict, tb=True,
 def get_dmft_bands(n_orb, mu_tb, w90_path=None, w90_seed=None, TB_obj=None, add_spin=False, add_lambda=None, add_local=None,
                    with_sigma=None, fermi_slice=False, qp_bands=False, orbital_order_to=None,
                    add_mu_tb=False, band_basis=False, proj_on_orb=None, trace=True, eta=0.0,
-                   mu_shift=0.0, proj_nuk=None, **specs):
+                   mu_shift=0.0, proj_nuk=None, sigma_embedding=None, **specs):
     '''
     Extract tight-binding from given w90 seed_hr.dat and seed.wout files or alternatively given TB_obj, and then extract from
     given solid_dmft calculation the self-energy and construct the spectral function A(k,w) on
@@ -888,7 +909,11 @@ def get_dmft_bands(n_orb, mu_tb, w90_path=None, w90_seed=None, TB_obj=None, add_
         wannier90 convention is assumed, i.e. the correlated Wannier functions
         are the first orbitals of seed_hr.dat, ordered as the correlated shells.
         Only needed if the tight-binding model orders its orbitals differently,
-        e.g. for an archive written by a non-wannier90 converter.
+        e.g. for an archive written by a non-wannier90 converter. The indices
+        refer to the orbital order of the DMFT archive, i.e. orbital_order_dmft,
+        which is the basis the self-energy is written into before it is rotated
+        to orbital_order_to. Note that proj_on_orb indexes orbital_order_to
+        instead.
 
     Returns
     -------
@@ -1091,7 +1116,9 @@ def get_dmft_bands(n_orb, mu_tb, w90_path=None, w90_seed=None, TB_obj=None, add_
         # else is from dmft or memory:
         else:
             delta_sigma, mu_dmft, freq_dict = _sigma_from_dmft(n_orb, orbital_order_to, with_sigma,
-                                                               tb_hloc=tb.hoppings[(0, 0, 0)], **specs)
+                                                               tb_hloc=tb.hoppings[(0, 0, 0)],
+                                                               sigma_embedding=sigma_embedding,
+                                                               add_spin=add_spin, **specs)
             mu = mu_dmft + mu_shift
 
         freq_dict['sigma_upfolded'] = delta_sigma
