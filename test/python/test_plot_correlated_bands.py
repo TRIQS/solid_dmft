@@ -249,6 +249,34 @@ class test_convergence(unittest.TestCase):
         assert np.allclose(tb_data['e_mat'], emat_ref)
         assert np.allclose(alatt_k_w, Akw_ref)
 
+    def test_bloch_basis_projected_spectral_function(self):
+        """
+        The orbital projection and the band-resolved output are built from the
+        eigenvectors of the tight-binding H(k) and from Sigma in the Wannier
+        basis, neither of which depends on the gauge the archive is written in.
+        Unlike the trace, an orbital-resolved quantity is not gauge invariant in
+        general, so this is checked explicitly rather than inferred.
+        """
+
+        _write_bloch_basis_archive('./svo_example.h5', './svo_bloch.h5')
+
+        tb_bands = {'bands_path': [('R', 'G'), ('G', 'X')], 'G': [0., 0., 0.],
+                    'Z': np.array([0, 0, 0.5]), 'R': [0.5, 0.5, 0.5],
+                    'X': [0.,  0.5, 0.], 'n_k': 30}
+
+        for extra in ({'proj_on_orb': [0, 1]}, {'proj_on_orb': [2]},
+                      {'trace': False}, {'band_basis': True}):
+            results = []
+            for archive in ('./svo_example.h5', './svo_bloch.h5'):
+                sigma_dict = dict(self.sigma_dict, dmft_path=archive)
+                results.append(pcb.get_dmft_bands(with_sigma='calc', add_mu_tb=True,
+                                                  orbital_order_to=self.orbital_order_to,
+                                                  **self.w90_dict, **tb_bands, **sigma_dict,
+                                                  **extra))
+            (tb_wan, alatt_wan, _), (tb_blo, alatt_blo, _) = results
+            assert np.allclose(alatt_blo, alatt_wan), f'A(k,w) differs for {extra}'
+            assert np.allclose(tb_blo['e_mat'], tb_wan['e_mat']), f'e_mat differs for {extra}'
+
     def test_bloch_basis_disentanglement_warns(self):
         """
         With more bands than Wannier functions the projectors are an isometry,
