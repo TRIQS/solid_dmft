@@ -23,11 +23,13 @@ Prerequisites
 Installation via pip
 --------------------
 
-You can install the latest solid_dmft release simply via pip (PyPi):
-```
-pip install solid_dmft
-```
-However, please make sure that you have a valid TRIQS and TRIQS/DFTTools installation matching the version of solid_dmft. Furthermore, you need at least one of the supported DMFT impurity solvers installed to use solid_dmft. 
+You can install the latest solid_dmft release simply via pip (PyPI)::
+
+     pip install solid_dmft
+
+However, please make sure that you have a valid TRIQS and TRIQS/DFTTools installation matching the version of solid_dmft. Furthermore, you need at least one of the supported DMFT impurity solvers installed to use solid_dmft.
+
+See also `pypi.org/project/solid_dmft <https://pypi.org/project/solid_dmft/>`_.
 
 Manual installation via CMake
 -----------------------------

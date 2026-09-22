@@ -392,6 +392,8 @@
 <li class="toctree-l4 current"><a class="current reference internal" href="#">postprocessing.plot_correlated_bands</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="#postprocessing.plot_correlated_bands._calc_alatt"><code class="docutils literal notranslate"><span class="pre">_calc_alatt()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="#postprocessing.plot_correlated_bands._calc_kslice"><code class="docutils literal notranslate"><span class="pre">_calc_kslice()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#postprocessing.plot_correlated_bands._check_sigma_embedding"><code class="docutils literal notranslate"><span class="pre">_check_sigma_embedding()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#postprocessing.plot_correlated_bands._get_sigma_embedding"><code class="docutils literal notranslate"><span class="pre">_get_sigma_embedding()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="#postprocessing.plot_correlated_bands.get_dmft_bands"><code class="docutils literal notranslate"><span class="pre">get_dmft_bands()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="#postprocessing.plot_correlated_bands.get_tb_bands"><code class="docutils literal notranslate"><span class="pre">get_tb_bands()</span></code></a></li>
 </ul>
@@ -486,57 +488,63 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../ChangeLog.html">Changelog</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-4-0-0">Version 4.0.0</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-4-0-1">Version 4.0.1</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#general">General</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#test">test</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#fix">fix</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-4-0-0">Version 4.0.0</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id1">General</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id2">fix</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#doc">doc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#build">build</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-3-3-5">Version 3.3.5</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id1">fix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id3">fix</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#feat">feat</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id2">doc</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id3">build</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id4">doc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id5">build</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-3-3-4">Version 3.3.4</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id4">fix</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id5">doc</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#test">test</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id6">build</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id7">fix</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id8">build</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id6">fix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id7">doc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id8">test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id9">build</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id10">fix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id11">build</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-3-3-2">Version 3.3.2</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id9">doc</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id10">fix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id12">doc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id13">fix</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-3-3-1">Version 3.3.1</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id11">fix</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id12">feat</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id13">build</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id14">fix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id15">feat</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id16">build</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-3-3-0">Version 3.3.0</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id14">General</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id17">General</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#new-toml-input-parser">new toml input parser</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id15">doc</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id16">build</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id18">doc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#id19">build</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../ChangeLog.html#other-fixes">other fixes</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-3-2-3">Version 3.2.3</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-3-2-1">Version 3.2.1</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-3-2-0">Version 3.2.0</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#id17">General</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#id18">fix</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#id19">build</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#id20">feat</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#id21">doc</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#id22">test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#id20">General</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#id21">fix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#id22">build</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#id23">feat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#id24">doc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#id25">test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-3-1-5">Version 3.1.5</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-3-1-4">Version 3.1.4</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-3-1-3">Version 3.1.3</a></li>
@@ -609,7 +617,7 @@ either calculating the bandstructure or Fermi slice.</p>
 - make proper use of rot_mat from DFT_Tools (atm it assumed that wannier_hr and Sigma are written in the same basis)</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="postprocessing.plot_correlated_bands._calc_alatt">
-<span class="sig-prename descclassname"><span class="pre">postprocessing.plot_correlated_bands.</span></span><span class="sig-name descname"><span class="pre">_calc_alatt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_orb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_mat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qp_bands</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_vecs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proj_nuk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">freq_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/postprocessing/plot_correlated_bands.html#_calc_alatt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#postprocessing.plot_correlated_bands._calc_alatt" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">postprocessing.plot_correlated_bands.</span></span><span class="sig-name descname"><span class="pre">_calc_alatt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_orb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_mat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qp_bands</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_vecs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proj_nuk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proj_orb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">freq_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/postprocessing/plot_correlated_bands.html#_calc_alatt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#postprocessing.plot_correlated_bands._calc_alatt" title="Link to this definition"></a></dt>
 <dd><p>calculate slice of lattice spectral function for given TB dispersion / e_mat and self-energy</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -617,6 +625,10 @@ either calculating the bandstructure or Fermi slice.</p>
 <dt><strong>n_orb</strong><span class="classifier">int</span></dt><dd><p>number of Wannier orbitals</p>
 </dd>
 <dt><strong>proj_nuk</strong><span class="classifier">optinal, 2D numpy array (n_orb, n_k)</span></dt><dd><p>projections to be applied on A(k,w) in band basis. Only works when band_basis=True</p>
+</dd>
+<dt><strong>proj_orb</strong><span class="classifier">optional, 1D numpy array (n_orb)</span></dt><dd><p>projections to be applied on A(k,w) in the Wannier orbital basis. In
+contrast to proj_nuk this is exact, because A(k,w) is diagonal in the
+same basis the projection is defined in, and no band basis is needed</p>
 </dd>
 </dl>
 </dd>
@@ -631,7 +643,7 @@ either calculating the bandstructure or Fermi slice.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="postprocessing.plot_correlated_bands._calc_kslice">
-<span class="sig-prename descclassname"><span class="pre">postprocessing.plot_correlated_bands.</span></span><span class="sig-name descname"><span class="pre">_calc_kslice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_orb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_mat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qp_bands</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_vecs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proj_nuk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">freq_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/postprocessing/plot_correlated_bands.html#_calc_kslice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#postprocessing.plot_correlated_bands._calc_kslice" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">postprocessing.plot_correlated_bands.</span></span><span class="sig-name descname"><span class="pre">_calc_kslice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_orb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_mat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qp_bands</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_vecs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proj_nuk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proj_orb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">freq_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/postprocessing/plot_correlated_bands.html#_calc_kslice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#postprocessing.plot_correlated_bands._calc_kslice" title="Link to this definition"></a></dt>
 <dd><p>calculate lattice spectral function for given TB dispersion / e_mat and self-energy</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -639,6 +651,9 @@ either calculating the bandstructure or Fermi slice.</p>
 <dt><strong>n_orb</strong><span class="classifier">int</span></dt><dd><p>number of Wannier orbitals</p>
 </dd>
 <dt><strong>proj_nuk</strong><span class="classifier">optinal, 2D numpy array (n_orb, n_k)</span></dt><dd><p>projections to be applied on A(k,w) in band basis. Only works when band_basis=True</p>
+</dd>
+<dt><strong>proj_orb</strong><span class="classifier">optional, 1D numpy array (n_orb)</span></dt><dd><p>projections to be applied on A(k,w) in the Wannier orbital basis, exact
+and without going through the band basis</p>
 </dd>
 </dl>
 </dd>
@@ -652,8 +667,76 @@ either calculating the bandstructure or Fermi slice.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="postprocessing.plot_correlated_bands._check_sigma_embedding">
+<span class="sig-prename descclassname"><span class="pre">postprocessing.plot_correlated_bands.</span></span><span class="sig-name descname"><span class="pre">_check_sigma_embedding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sum_k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_orb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tb_hloc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">explicit_embedding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/postprocessing/plot_correlated_bands.html#_check_sigma_embedding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#postprocessing.plot_correlated_bands._check_sigma_embedding" title="Link to this definition"></a></dt>
+<dd><p>Sanity checks for writing the impurity self-energy into the tight-binding
+basis. All of these warn, none of them abort: the underlying operation is
+well defined in every case, but the result may not be the object the user
+expects.</p>
+<ol class="arabic">
+<li><p>Disentanglement. If the archive was written with bloch_basis=True and an
+outer window larger than the number of Wannier functions, the number of
+bands exceeds n_orb. The projectors are then an isometry rather than a
+unitary, so A(k,w) of the Wannier model is not the lattice spectral
+function of the DMFT calculation, and mu was converged for a different
+electron count.</p></li>
+<li><p>Provenance. “correlated Wannier functions first” is a wannier90
+convention. For other DFT codes the correlated basis is whatever the
+projectors define and the tight-binding model comes from elsewhere.</p></li>
+<li><p>Local Hamiltonian. Downfolding the archive Hamiltonian with proj_mat
+gives the local Hamiltonian of each correlated shell in the Wannier
+basis, in every mode: P H P^dag = U^dag eps U = H_W(k), whose k average
+is H_W(R=0). Comparing its eigenvalues with those of the corresponding
+block of the tight-binding H(R=0) validates the embedding. Eigenvalues
+are used because they are invariant under the orbital order conventions
+that differ between the archive and seed_hr.dat, and the traceless part
+is compared because the archive Hamiltonian has the Fermi energy
+subtracted while the tight-binding one has not.</p>
+<p>What this cannot see, by construction: a wrong order within a shell,
+since eigenvalues are sorted, and a wrong set of orbitals when both the
+selected and the correct block are internally degenerate, since the
+traceless eigenvalues are then zero on both sides. Cubic t2g and eg
+shells are exactly that case. It is a guard against a grossly wrong
+mapping, not a proof that the mapping is right.</p>
+</li>
+</ol>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="postprocessing.plot_correlated_bands._get_sigma_embedding">
+<span class="sig-prename descclassname"><span class="pre">postprocessing.plot_correlated_bands.</span></span><span class="sig-name descname"><span class="pre">_get_sigma_embedding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sum_k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_orb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_embedding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/postprocessing/plot_correlated_bands.html#_get_sigma_embedding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#postprocessing.plot_correlated_bands._get_sigma_embedding" title="Link to this definition"></a></dt>
+<dd><p>Determines which orbitals of the n_orb tight-binding (Wannier) basis the
+self-energy of each correlated shell is written into.</p>
+<p>The impurity self-energy lives in the Wannier basis of the correlated
+shells, and so does the tight-binding Hamiltonian read from seed_hr.dat.
+Placing the former into the latter is therefore a purely k-independent
+index operation and does not involve proj_mat. By default the wannier90
+convention is assumed, i.e. the correlated Wannier functions come first in
+seed_hr.dat, ordered as the correlated shells.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>sum_k</strong><span class="classifier">SumkDFT</span></dt><dd><p>SumkDFT object of the DMFT archive.</p>
+</dd>
+<dt><strong>n_orb</strong><span class="classifier">int</span></dt><dd><p>Number of Wannier orbitals of the tight-binding model.</p>
+</dd>
+<dt><strong>sigma_embedding</strong><span class="classifier">list of list of int, optional</span></dt><dd><p>Explicit mapping, one entry per correlated shell, giving the indices of
+the tight-binding orbitals that shell occupies. Overrides the default.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>embedding</strong><span class="classifier">list of np.ndarray</span></dt><dd><p>Orbital indices per correlated shell.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="postprocessing.plot_correlated_bands.get_dmft_bands">
-<span class="sig-prename descclassname"><span class="pre">postprocessing.plot_correlated_bands.</span></span><span class="sig-name descname"><span class="pre">get_dmft_bands</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_orb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_tb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w90_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w90_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">TB_obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_spin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_lambda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_local</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fermi_slice</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qp_bands</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orbital_order_to</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_mu_tb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">band_basis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proj_on_orb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proj_nuk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">specs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/postprocessing/plot_correlated_bands.html#get_dmft_bands"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#postprocessing.plot_correlated_bands.get_dmft_bands" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">postprocessing.plot_correlated_bands.</span></span><span class="sig-name descname"><span class="pre">get_dmft_bands</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_orb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_tb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w90_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w90_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">TB_obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_spin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_lambda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_local</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fermi_slice</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qp_bands</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orbital_order_to</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_mu_tb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">band_basis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proj_on_orb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proj_nuk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_embedding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">specs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/postprocessing/plot_correlated_bands.html#get_dmft_bands"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#postprocessing.plot_correlated_bands.get_dmft_bands" title="Link to this definition"></a></dt>
 <dd><p>Extract tight-binding from given w90 seed_hr.dat and seed.wout files or alternatively given TB_obj, and then extract from
 given solid_dmft calculation the self-energy and construct the spectral function A(k,w) on
 given k-path.</p>
@@ -686,7 +769,13 @@ to be given sigma_dict containing information about the self-energy</p>
 set to True if DMFT calculation was performed with DFT fermi subtracted.</p>
 </dd>
 <dt><strong>proj_on_orb</strong><span class="classifier">int or list of int, default=None</span></dt><dd><p>orbital projections to be made for the spectral function and TB bands
-the integer refer to the orbitals read</p>
+the integer refer to the orbitals read. The projection is taken on the
+diagonal of the lattice Green function in the Wannier orbital basis and
+is therefore exact. Passing band_basis=True instead weights the
+band-resolved spectral function with the orbital character
+<a href="#id1"><span class="problematic" id="id2">|</span></a>&lt;orb|band&gt;|^2, which is the usual fat-band picture but differs from the
+orbital-resolved spectral function whenever the self-energy is orbital
+dependent. Both give the same trace.</p>
 </dd>
 <dt><strong>trace</strong><span class="classifier">bool, default=True</span></dt><dd><p>Return trace over orbitals for spectral function. For special
 post-processing purposes this can be set to False giving the returned
@@ -700,6 +789,17 @@ if with_sigma=None it has to be provided !=0.0</p>
 <dt><strong>proj_nuk</strong><span class="classifier">numpy array, default [None]</span></dt><dd><p>Extra projections to be applied to the final spectral function
 per orbital and k-point. Has to match shape of final lattice Green
 function. Will be applied together with proj_on_orb if specified.</p>
+</dd>
+<dt><strong>sigma_embedding</strong><span class="classifier">list of list of int, optional</span></dt><dd><p>Which orbitals of the tight-binding model each correlated shell of the
+DMFT archive occupies, one entry per correlated shell. By default the
+wannier90 convention is assumed, i.e. the correlated Wannier functions
+are the first orbitals of seed_hr.dat, ordered as the correlated shells.
+Only needed if the tight-binding model orders its orbitals differently,
+e.g. for an archive written by a non-wannier90 converter. The indices
+refer to the orbital order of the DMFT archive, i.e. orbital_order_dmft,
+which is the basis the self-energy is written into before it is rotated
+to orbital_order_to. Note that proj_on_orb indexes orbital_order_to
+instead.</p>
 </dd>
 </dl>
 </dd>
