@@ -1,12 +1,21 @@
 # Changelog
 
-## Unstable
+## Version 4.0.1
 
-Changes on the `unstable` branch that are not part of a release yet. Rename
-this section to the version number when the next release is cut.
+solid_dmft version 4.0.1 is a patch release on top of 4.0.0.
+
+Note that it changes the output of `plot_correlated_bands` for orbital
+projections: `proj_on_orb` now returns the orbital-resolved spectral function
+instead of the band-resolved one weighted by orbital character. Figures made
+with 4.0.0 that used `proj_on_orb` together with an orbital dependent
+self-energy will therefore look different, and the previous behaviour is still
+available via `band_basis=True`. The trace over orbitals is unchanged.
 
 ### General
 * add the `sigma_embedding` argument to `plot_correlated_bands.get_dmft_bands`, giving the tight-binding orbitals each correlated shell occupies, for models that do not follow the wannier90 convention of the correlated orbitals coming first
+
+### test
+* regenerate `ref_restart.h5` for the block order changed by h5 PR#45 (`up_*` now before `down_*`), which made `restart_svo_hubbardI_basic` fail with "block name up_0 does not match down_0". Values are unchanged, only the block order flips
 
 ### fix
 * `plot_correlated_bands`: `proj_on_orb` now returns the orbital-resolved spectral function, i.e. the masked diagonal of the lattice Green function in the Wannier basis, which is exact. It previously weighted the band-resolved spectral function with the orbital character `|<orb|band>|^2`, which drops the off-diagonal band components of the Green function and is only exact for an orbital independent self-energy; for an orbital dependent one the weight was misdistributed between orbitals by up to 66% of the peak of A(k,w) in a SrVO3 test. The trace was and is unaffected. Pass `band_basis=True` to get the orbital-character weighting back, and note that the tight-binding bands returned for fat-band plots are unchanged
