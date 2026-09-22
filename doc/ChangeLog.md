@@ -1,9 +1,15 @@
 # Changelog
 
-## Unstable
+## Version 4.0.1
 
-Changes on the `unstable` branch that are not part of a release yet. Rename
-this section to the version number when the next release is cut.
+solid_dmft version 4.0.1 is a patch release on top of 4.0.0.
+
+Note that it changes the output of `plot_correlated_bands` for orbital
+projections: `proj_on_orb` now returns the orbital-resolved spectral function
+instead of the band-resolved one weighted by orbital character. Figures made
+with 4.0.0 that used `proj_on_orb` together with an orbital dependent
+self-energy will therefore look different, and the previous behaviour is still
+available via `band_basis=True`. The trace over orbitals is unchanged.
 
 ### General
 * add the `sigma_embedding` argument to `plot_correlated_bands.get_dmft_bands`, giving the tight-binding orbitals each correlated shell occupies, for models that do not follow the wannier90 convention of the correlated orbitals coming first
