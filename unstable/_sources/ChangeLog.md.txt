@@ -1,5 +1,18 @@
 # Changelog
 
+## Unstable
+
+Changes on the `unstable` branch that are not part of a release yet. Rename
+this section to the version number when the next release is cut.
+
+### General
+* add the `sigma_embedding` argument to `plot_correlated_bands.get_dmft_bands`, giving the tight-binding orbitals each correlated shell occupies, for models that do not follow the wannier90 convention of the correlated orbitals coming first
+
+### fix
+* `plot_correlated_bands`: `proj_on_orb` now returns the orbital-resolved spectral function, i.e. the masked diagonal of the lattice Green function in the Wannier basis, which is exact. It previously weighted the band-resolved spectral function with the orbital character `|<orb|band>|^2`, which drops the off-diagonal band components of the Green function and is only exact for an orbital independent self-energy; for an orbital dependent one the weight was misdistributed between orbitals by up to 66% of the peak of A(k,w) in a SrVO3 test. The trace was and is unaffected. Pass `band_basis=True` to get the orbital-character weighting back, and note that the tight-binding bands returned for fat-band plots are unchanged
+* `plot_correlated_bands` no longer rejects DMFT archives converted with `bloch_basis=True`. The self-energy is written into the Wannier basis of `seed_hr.dat` directly instead of through `SumkDFT.upfold`, which embeds into the Kohn-Sham band basis and is therefore k-dependent in Bloch basis. The embedding is a k-independent index operation, so A(k,w) is unchanged no matter how strongly `proj_mat` varies along k, and results in Wannier basis are bit-identical to before
+* `plot_correlated_bands` warns instead of aborting where the result may not be what is expected: band disentanglement (`n_bands > n_orb`), where A(k,w) is the spectral function of the Wannier model rather than of the DMFT lattice problem and the chemical potential was converged for the electron count of the full outer window; an archive from a non-wannier90 converter, where the correlated orbitals need not come first; and a mismatch between the crystal-field eigenvalues of the archive and of the tight-binding H(R=0), which catches a grossly wrong orbital mapping also in Wannier basis. Being eigenvalue based, that last check cannot see a wrong order within a shell, nor a wrong set of orbitals when both the selected and the correct block are internally degenerate. `add_spin=True` together with a self-energy read from the archive is refused rather than guessed, since the correlated shell then appears in both spin blocks
+
 ## Version 4.0.0
 
 solid_dmft version 4.0.0 is a major release, compatible with TRIQS 4.0, and updated to the latest app4triqs skeleton. This release ports solid_dmft to the TRIQS 4.0 API and adds support for new HPC platforms, alongside several bug fixes.
