@@ -96,7 +96,7 @@ ENV CPATH=/triqs/include:${CPATH} \
     CTEST_PARALLEL_LEVEL=${NCORES} \
     TRIQS_ROOT=/triqs
 
-RUN cd /source && git clone -b unstable --depth 1 https://github.com/flatironinstitute/clair.git \
+RUN cd /source && git clone -b 0.9.x --depth 1 https://github.com/flatironinstitute/clair.git \
     && cd clair && mkdir -p build && cd build \
     && CXXFLAGS="" cmake ../ -DCMAKE_INSTALL_PREFIX=/triqs \
          -DCMAKE_C_COMPILER=$CLANG_CC \
@@ -104,7 +104,7 @@ RUN cd /source && git clone -b unstable --depth 1 https://github.com/flatironins
          -DBuild_Tests=OFF \
     && make -j$NCORES && make install
 
-RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/triqs \
+RUN cd /source && git clone -b 4.0.x --depth 1 https://github.com/TRIQS/triqs \
     && cd triqs && mkdir -p build && cd build \
     && cmake ../ -DCMAKE_INSTALL_PREFIX=/triqs \
          -DCMAKE_C_COMPILER=$CC \
@@ -112,7 +112,7 @@ RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/triqs
     && make -j$NCORES && ctest -j$NCORES && make install
 
 # dftkit (required by dft_tools)
-RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/dftkit.git \
+RUN cd /source && git clone -b 4.0.x --depth 1 https://github.com/TRIQS/dftkit.git \
     && cd dftkit && mkdir -p build && cd build \
     && cmake ../ \
          -DCMAKE_C_COMPILER=$CC \
@@ -120,7 +120,7 @@ RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/dftki
     && make -j$NCORES && ctest -j$NCORES && make install
 
 # dft_tools
-RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/dft_tools.git \
+RUN cd /source && git clone -b 4.0.x --depth 1 https://github.com/TRIQS/dft_tools.git \
     && cd dft_tools && mkdir -p build && cd build \
     && cmake ../ \
          -DCMAKE_C_COMPILER=$CC \
@@ -128,31 +128,31 @@ RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/dft_t
     && make -j$NCORES && ctest -j$NCORES && make install
 
 # cthyb
-RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/cthyb.git \
+RUN cd /source && git clone -b 4.0.x --depth 1 https://github.com/TRIQS/cthyb.git \
     && cd cthyb && mkdir -p build && cd build \
     && cmake ../ \
     && make -j$NCORES && ctest -j$NCORES && make install
 
 # ctseg
-RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/ctseg.git \
+RUN cd /source && git clone -b 4.0.x --depth 1 https://github.com/TRIQS/ctseg.git \
     && cd ctseg && mkdir -p build && cd build \
     && cmake ../ \
     && make -j$NCORES && ctest -j$NCORES && make install
 
 # hubbardI
-RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hubbardI.git \
+RUN cd /source && git clone -b 4.0.x --depth 1 https://github.com/TRIQS/hubbardI.git \
     && cd hubbardI && mkdir -p build && cd build \
     && cmake ../ \
     && make -j$NCORES && ctest -j$NCORES && make install
 
 # Hartree-Fock solver
-RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/hartree_fock.git \
+RUN cd /source && git clone -b 4.0.x --depth 1 https://github.com/TRIQS/hartree_fock.git \
     && cd hartree_fock && mkdir -p build && cd build \
     && cmake ../ \
     && make -j$NCORES && ctest -j$NCORES && make install
 
 # maxent needed for doc build
-RUN cd /source && git clone -b unstable --depth 1 https://github.com/TRIQS/maxent.git \
+RUN cd /source && git clone -b 4.0.x --depth 1 https://github.com/TRIQS/maxent.git \
     && cd maxent && mkdir -p build && cd build \
     && cmake ../ \
     && make -j$NCORES && ctest -j$NCORES && make install
