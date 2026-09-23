@@ -214,11 +214,13 @@
 </ul>
 </li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">dmft_tools.initial_self_energies</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#dmft_tools.initial_self_energies._dc_orb_shift_per_shell"><code class="docutils literal notranslate"><span class="pre">_dc_orb_shift_per_shell()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="#dmft_tools.initial_self_energies._load_sigma_from_h5"><code class="docutils literal notranslate"><span class="pre">_load_sigma_from_h5()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="#dmft_tools.initial_self_energies._set_loaded_sigma"><code class="docutils literal notranslate"><span class="pre">_set_loaded_sigma()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="#dmft_tools.initial_self_energies._sumk_sigma_to_solver_struct"><code class="docutils literal notranslate"><span class="pre">_sumk_sigma_to_solver_struct()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="#dmft_tools.initial_self_energies.calculate_double_counting"><code class="docutils literal notranslate"><span class="pre">calculate_double_counting()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="#dmft_tools.initial_self_energies.determine_dc_and_initial_sigma"><code class="docutils literal notranslate"><span class="pre">determine_dc_and_initial_sigma()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#dmft_tools.initial_self_energies.split_deg_shells_by_orb_shift"><code class="docutils literal notranslate"><span class="pre">split_deg_shells_by_orb_shift()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="dmft_tools.interaction_hamiltonian.html">dmft_tools.interaction_hamiltonian</a><ul>
@@ -611,6 +613,12 @@
 <p>Contains all functions related to determining the double counting and the
 initial self-energy.</p>
 <dl class="py function">
+<dt class="sig sig-object py" id="dmft_tools.initial_self_energies._dc_orb_shift_per_shell">
+<span class="sig-prename descclassname"><span class="pre">dmft_tools.initial_self_energies.</span></span><span class="sig-name descname"><span class="pre">_dc_orb_shift_per_shell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sum_k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dc_orb_shift</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dmft_tools/initial_self_energies.html#_dc_orb_shift_per_shell"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dmft_tools.initial_self_energies._dc_orb_shift_per_shell" title="Link to this definition"></a></dt>
+<dd><p>Splits the flat dc_orb_shift input into one array per inequivalent shell</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="dmft_tools.initial_self_energies._load_sigma_from_h5">
 <span class="sig-prename descclassname"><span class="pre">dmft_tools.initial_self_energies.</span></span><span class="sig-name descname"><span class="pre">_load_sigma_from_h5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">h5_archive</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iteration</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dmft_tools/initial_self_energies.html#_load_sigma_from_h5"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dmft_tools.initial_self_energies._load_sigma_from_h5" title="Link to this definition"></a></dt>
 <dd><p>Reads impurity self-energy for all impurities from file and returns them as a list</p>
@@ -769,6 +777,17 @@ starting the calculation from the DFT Green’s function.</p></li>
 </dl>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dmft_tools.initial_self_energies.split_deg_shells_by_orb_shift">
+<span class="sig-prename descclassname"><span class="pre">dmft_tools.initial_self_energies.</span></span><span class="sig-name descname"><span class="pre">split_deg_shells_by_orb_shift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sum_k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">advanced_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dmft_tools/initial_self_energies.html#split_deg_shells_by_orb_shift"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dmft_tools.initial_self_energies.split_deg_shells_by_orb_shift" title="Link to this definition"></a></dt>
+<dd><p>Lifts the degeneracies of the solver blocks that dc_orb_shift breaks.</p>
+<p>The degenerate blocks are found from the DFT density matrix, before the shift
+is applied. Symmetrizing G0 over orbitals that are shifted differently would
+average the shift out of G0 while it stays in the impurity levels. Blocks
+remain degenerate only if their orbitals are shifted by the same amounts, so
+up and down stay together in a paramagnetic calculation.</p>
 </dd></dl>
 
 </section>
