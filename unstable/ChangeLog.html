@@ -211,11 +211,13 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.initial_self_energies.html">dmft_tools.initial_self_energies</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="_ref/dmft_tools.initial_self_energies.html#dmft_tools.initial_self_energies._dc_orb_shift_per_shell"><code class="docutils literal notranslate"><span class="pre">_dc_orb_shift_per_shell()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="_ref/dmft_tools.initial_self_energies.html#dmft_tools.initial_self_energies._load_sigma_from_h5"><code class="docutils literal notranslate"><span class="pre">_load_sigma_from_h5()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="_ref/dmft_tools.initial_self_energies.html#dmft_tools.initial_self_energies._set_loaded_sigma"><code class="docutils literal notranslate"><span class="pre">_set_loaded_sigma()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="_ref/dmft_tools.initial_self_energies.html#dmft_tools.initial_self_energies._sumk_sigma_to_solver_struct"><code class="docutils literal notranslate"><span class="pre">_sumk_sigma_to_solver_struct()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="_ref/dmft_tools.initial_self_energies.html#dmft_tools.initial_self_energies.calculate_double_counting"><code class="docutils literal notranslate"><span class="pre">calculate_double_counting()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="_ref/dmft_tools.initial_self_energies.html#dmft_tools.initial_self_energies.determine_dc_and_initial_sigma"><code class="docutils literal notranslate"><span class="pre">determine_dc_and_initial_sigma()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="_ref/dmft_tools.initial_self_energies.html#dmft_tools.initial_self_energies.split_deg_shells_by_orb_shift"><code class="docutils literal notranslate"><span class="pre">split_deg_shells_by_orb_shift()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="_ref/dmft_tools.interaction_hamiltonian.html">dmft_tools.interaction_hamiltonian</a><ul>
@@ -487,6 +489,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#unstable">Unstable</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#general">General</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#test">test</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#fix">fix</a></li>
 </ul>
 </li>
@@ -507,40 +510,40 @@
 <li class="toctree-l2"><a class="reference internal" href="#version-3-3-4">Version 3.3.4</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#id6">fix</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#id7">doc</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#test">test</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id8">build</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id9">fix</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id10">build</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id8">test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id9">build</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id10">fix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id11">build</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#version-3-3-2">Version 3.3.2</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id11">doc</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id12">fix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id12">doc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id13">fix</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#version-3-3-1">Version 3.3.1</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id13">fix</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id14">feat</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id15">build</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id14">fix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id15">feat</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id16">build</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#version-3-3-0">Version 3.3.0</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id16">General</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id17">General</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#new-toml-input-parser">new toml input parser</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id17">doc</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id18">build</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id18">doc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id19">build</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#other-fixes">other fixes</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#version-3-2-3">Version 3.2.3</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-3-2-1">Version 3.2.1</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-3-2-0">Version 3.2.0</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id19">General</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id20">fix</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id21">build</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id22">feat</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id23">doc</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id24">test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id20">General</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id21">fix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id22">build</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id23">feat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id24">doc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id25">test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-3-1-5">Version 3.1.5</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-3-1-4">Version 3.1.4</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-3-1-3">Version 3.1.3</a></li>
@@ -582,15 +585,25 @@
 <h2>Unstable<a class="headerlink" href="#unstable" title="Link to this heading"></a></h2>
 <p>Changes on the <code class="docutils literal notranslate"><span class="pre">unstable</span></code> branch that are not part of a release yet. Rename
 this section to the version number when the next release is cut.</p>
+<p>Note that calculations using <code class="docutils literal notranslate"><span class="pre">dc_orb_shift</span></code> on orbitals that are degenerate in
+DFT give different results than with 4.0.0, since the orbital dependent part of
+the shift was previously averaged out of the impurity problem, see the fix below.</p>
 <section id="general">
 <h3>General<a class="headerlink" href="#general" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>add the <code class="docutils literal notranslate"><span class="pre">sigma_embedding</span></code> argument to <code class="docutils literal notranslate"><span class="pre">plot_correlated_bands.get_dmft_bands</span></code>, giving the tight-binding orbitals each correlated shell occupies, for models that do not follow the wannier90 convention of the correlated orbitals coming first</p></li>
 </ul>
 </section>
+<section id="test">
+<h3>test<a class="headerlink" href="#test" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">svo_cthyb_basic_tf</span></code> now checks that the hybridization function passed to the solver is negative, which catches the <code class="docutils literal notranslate"><span class="pre">dc_orb_shift</span></code> bug below. The test only checked that the run completes, and had been passing intermittently with an average sign of about 1e-2 since the input was added in #74</p></li>
+</ul>
+</section>
 <section id="fix">
 <h3>fix<a class="headerlink" href="#fix" title="Link to this heading"></a></h3>
 <ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">dc_orb_shift</span></code> no longer gets averaged out by the orbital symmetrization. The degenerate solver blocks are found from the DFT density matrix before the shift is applied, so orbitals that are shifted differently were still symmetrized: G0 lost the orbital dependent part of the shift while the impurity levels kept it. With <code class="docutils literal notranslate"><span class="pre">delta_interface</span> <span class="pre">=</span> <span class="pre">true</span></code> this put spikes of the wrong sign (of order 10 for shifts of 0.1 eV) into Delta(tau) at tau=0 and beta and gave cthyb an average sign of about 1e-2; with <code class="docutils literal notranslate"><span class="pre">delta_interface</span> <span class="pre">=</span> <span class="pre">false</span></code> the impurity problem silently did not see the orbital dependent part of the shift. Blocks now stay degenerate only if their orbitals are shifted by the same amounts, so up and down remain degenerate in a paramagnetic calculation</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">plot_correlated_bands</span></code>: <code class="docutils literal notranslate"><span class="pre">proj_on_orb</span></code> now returns the orbital-resolved spectral function, i.e. the masked diagonal of the lattice Green function in the Wannier basis, which is exact. It previously weighted the band-resolved spectral function with the orbital character <code class="docutils literal notranslate"><span class="pre">|&lt;orb|band&gt;|^2</span></code>, which drops the off-diagonal band components of the Green function and is only exact for an orbital independent self-energy; for an orbital dependent one the weight was misdistributed between orbitals by up to 66% of the peak of A(k,w) in a SrVO3 test. The trace was and is unaffected. Pass <code class="docutils literal notranslate"><span class="pre">band_basis=True</span></code> to get the orbital-character weighting back, and note that the tight-binding bands returned for fat-band plots are unchanged</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">plot_correlated_bands</span></code> no longer rejects DMFT archives converted with <code class="docutils literal notranslate"><span class="pre">bloch_basis=True</span></code>. The self-energy is written into the Wannier basis of <code class="docutils literal notranslate"><span class="pre">seed_hr.dat</span></code> directly instead of through <code class="docutils literal notranslate"><span class="pre">SumkDFT.upfold</span></code>, which embeds into the Kohn-Sham band basis and is therefore k-dependent in Bloch basis. The embedding is a k-independent index operation, so A(k,w) is unchanged no matter how strongly <code class="docutils literal notranslate"><span class="pre">proj_mat</span></code> varies along k, and results in Wannier basis are bit-identical to before</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">plot_correlated_bands</span></code> warns instead of aborting where the result may not be what is expected: band disentanglement (<code class="docutils literal notranslate"><span class="pre">n_bands</span> <span class="pre">&gt;</span> <span class="pre">n_orb</span></code>), where A(k,w) is the spectral function of the Wannier model rather than of the DMFT lattice problem and the chemical potential was converged for the electron count of the full outer window; an archive from a non-wannier90 converter, where the correlated orbitals need not come first; and a mismatch between the crystal-field eigenvalues of the archive and of the tight-binding H(R=0), which catches a grossly wrong orbital mapping also in Wannier basis. Being eigenvalue based, that last check cannot see a wrong order within a shell, nor a wrong set of orbitals when both the selected and the correct block are internally degenerate. <code class="docutils literal notranslate"><span class="pre">add_spin=True</span></code> together with a self-energy read from the archive is refused rather than guessed, since the correlated shell then appears in both spin blocks</p></li>
@@ -695,14 +708,14 @@ this section to the version number when the next release is cut.</p>
 <li><p>change name of config.toml to dmft_config.toml in NNO afm tutorial</p></li>
 </ul>
 </section>
-<section id="test">
-<h3>test<a class="headerlink" href="#test" title="Link to this heading"></a></h3>
+<section id="id8">
+<h3>test<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>add missing test for afm order and cthyb for better test coverage</p></li>
 </ul>
 </section>
-<section id="id8">
-<h3>build<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<section id="id9">
+<h3>build<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>update GitHub Actions dependencies (actions/checkout from 5 to 6)</p></li>
 <li><p>merge dev app4triqs updates</p></li>
@@ -710,8 +723,8 @@ this section to the version number when the next release is cut.</p>
 <p>We thank all contributors: Alexander Hampel</p>
 <p>solid_dmft version 3.3.3 is a minor patch release that fixes a few small bugs:</p>
 </section>
-<section id="id9">
-<h3>fix<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<section id="id10">
+<h3>fix<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>missing imports in _ctseg_postprocessing</p></li>
 <li><p>magnetic calc enforced if h_field set</p></li>
@@ -720,8 +733,8 @@ this section to the version number when the next release is cut.</p>
 <li><p>add LCO ctseg test</p></li>
 </ul>
 </section>
-<section id="id10">
-<h3>build<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<section id="id11">
+<h3>build<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>add ctseg to docker images for testing</p></li>
 </ul>
@@ -731,14 +744,14 @@ this section to the version number when the next release is cut.</p>
 <section id="version-3-3-2">
 <h2>Version 3.3.2<a class="headerlink" href="#version-3-3-2" title="Link to this heading"></a></h2>
 <p>solid_dmft version 3.3.2 is a minor patch release that fixes a few small bugs and improves documentation:</p>
-<section id="id11">
-<h3>doc<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<section id="id12">
+<h3>doc<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>update Ce2O3 tutorials input file</p></li>
 </ul>
 </section>
-<section id="id12">
-<h3>fix<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<section id="id13">
+<h3>fix<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>wrong error message for tail treatment in cthyb</p></li>
 <li><p>pcb projection on orb feat for Fermi surfaces in TB only mode was not giving correct results</p></li>
@@ -751,8 +764,8 @@ this section to the version number when the next release is cut.</p>
 <section id="version-3-3-1">
 <h2>Version 3.3.1<a class="headerlink" href="#version-3-3-1" title="Link to this heading"></a></h2>
 <p>solid_dmft version 3.3.1 is a minor release that fixes bugs in the new triqs/ctseg interface and improves the interface to GW:</p>
-<section id="id13">
-<h3>fix<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<section id="id14">
+<h3>fix<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>small bug in dc initialization</p></li>
 <li><p>dynamic U tensor corrections</p></li>
@@ -761,16 +774,16 @@ this section to the version number when the next release is cut.</p>
 <li><p>ctseg hartree_shift rename in triqs</p></li>
 </ul>
 </section>
-<section id="id14">
-<h3>feat<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<section id="id15">
+<h3>feat<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>add print of avg order for ctseg</p></li>
 <li><p>use symmetric meshes for DLR</p></li>
 <li><p>fix delta_interface in ctseg</p></li>
 </ul>
 </section>
-<section id="id15">
-<h3>build<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<section id="id16">
+<h3>build<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>add missing default.toml to pypi packaging</p></li>
 </ul>
@@ -796,8 +809,8 @@ from G_tau:   “crm_dyson_solver=true” and dlr_wmax and dlr_eps (see <a class
 </ul>
 <p>We thank all contributors: Sophie Beck, Thomas Hahn, Alexander Hampel, Henri Menke, Maximilian Merkel, and Nils Wentzell</p>
 <p>Find below an itemized list of changes in this release.</p>
-<section id="id16">
-<h3>General<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
+<section id="id17">
+<h3>General<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>merge dev GW embedding (includes other fixes as well) (#78)</p></li>
 <li><p>pass gw params to all methods</p></li>
@@ -851,16 +864,16 @@ from G_tau:   “crm_dyson_solver=true” and dlr_wmax and dlr_eps (see <a class
 <li><p>Updated the documentation of the input parameters</p></li>
 </ul>
 </section>
-<section id="id17">
-<h3>doc<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
+<section id="id18">
+<h3>doc<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>add comment that proj in postprocessing is only correct for diag A(k,w)</p></li>
 <li><p>update NNO magnetic tutorial</p></li>
 <li><p>fix Vasp CSC tutorial for PNO after CSC fixes</p></li>
 </ul>
 </section>
-<section id="id18">
-<h3>build<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
+<section id="id19">
+<h3>build<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>add new tests for CRM Dyson solver (requires triqs 3.3)</p></li>
 <li><p>add new GW embedding tests that run optionally with -DTest_GW_embedding=ON</p></li>
@@ -928,8 +941,8 @@ from G_tau:   “crm_dyson_solver=true” and dlr_wmax and dlr_eps (see <a class
 <p>We thank all contributors: Sophie Beck, Alberto Carta, Alexander Hampel, Max Merkel, Harrison LaBollita, Nils Wentzell</p>
 <p>Find below an itemized list of changes in this release.</p>
 </section>
-<section id="id19">
-<h2>General<a class="headerlink" href="#id19" title="Link to this heading"></a></h2>
+<section id="id20">
+<h2>General<a class="headerlink" href="#id20" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>fix SzSz measurement in triqs unstable</p></li>
 <li><p>Updated mpich VASP5 docker file to include HF solver</p></li>
@@ -972,8 +985,8 @@ from G_tau:   “crm_dyson_solver=true” and dlr_wmax and dlr_eps (see <a class
 <li><p>Made the way mesh is stored in maxent_gf_latt consistent with maxent_gf_imp</p></li>
 </ul>
 </section>
-<section id="id20">
-<h2>fix<a class="headerlink" href="#id20" title="Link to this heading"></a></h2>
+<section id="id21">
+<h2>fix<a class="headerlink" href="#id21" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>fix deg shells in magnetic calculations</p></li>
 <li><p>fix parameter n_orb in hint construction</p></li>
@@ -989,8 +1002,8 @@ from G_tau:   “crm_dyson_solver=true” and dlr_wmax and dlr_eps (see <a class
 <li><p>h_int uses now n_orb instead of orb_names</p></li>
 </ul>
 </section>
-<section id="id21">
-<h2>build<a class="headerlink" href="#id21" title="Link to this heading"></a></h2>
+<section id="id22">
+<h2>build<a class="headerlink" href="#id22" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>adapt jenkins CI files</p></li>
 <li><p>simplify docker image</p></li>
@@ -999,8 +1012,8 @@ from G_tau:   “crm_dyson_solver=true” and dlr_wmax and dlr_eps (see <a class
 <li><p>Updated docker file to ubuntu 22</p></li>
 </ul>
 </section>
-<section id="id22">
-<h2>feat<a class="headerlink" href="#id22" title="Link to this heading"></a></h2>
+<section id="id23">
+<h2>feat<a class="headerlink" href="#id23" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>enable MPI for maxent_gf_imp post-processing routines</p></li>
 <li><p>add possibility to specify Uprime in Kanamori interaction</p></li>
@@ -1009,15 +1022,15 @@ from G_tau:   “crm_dyson_solver=true” and dlr_wmax and dlr_eps (see <a class
 <li><p>add Ntot interaction</p></li>
 </ul>
 </section>
-<section id="id23">
-<h2>doc<a class="headerlink" href="#id23" title="Link to this heading"></a></h2>
+<section id="id24">
+<h2>doc<a class="headerlink" href="#id24" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Added observables documentation for DMFT output</p></li>
 <li><p>Updated tutorial svo one-shot</p></li>
 </ul>
 </section>
-<section id="id24">
-<h2>test<a class="headerlink" href="#id24" title="Link to this heading"></a></h2>
+<section id="id25">
+<h2>test<a class="headerlink" href="#id25" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>fix tests after Hartree additions</p></li>
 <li><p>add Hartree Solver test</p></li>

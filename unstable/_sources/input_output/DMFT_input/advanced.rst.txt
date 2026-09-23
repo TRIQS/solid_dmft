@@ -42,7 +42,8 @@ Advanced parameters, do not modify the default value unless you know what you ar
  
             **type** = list of float;  **default**  = None
 
-        extra potential shift per orbital per impurity added to the DC
+        extra potential shift per orbital per impurity added to the DC.
+        Solver blocks whose orbitals are shifted differently are not treated as degenerate.
 
 .. admonition:: dc_J 
  	:class: intag  
