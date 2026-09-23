@@ -15,6 +15,7 @@ available via `band_basis=True`. The trace over orbitals is unchanged.
 * add the `sigma_embedding` argument to `plot_correlated_bands.get_dmft_bands`, giving the tight-binding orbitals each correlated shell occupies, for models that do not follow the wannier90 convention of the correlated orbitals coming first
 
 ### test
+* raise `n_cycles_tot` in `svo_cthyb_basic_tf` from 1e+4 to 4e+4. At the lower setting the self-energy was noisy enough that the run intermittently died inside the chemical potential search, on the tail fit of the lattice Green function in triqs' `density()` ("High frequency moments have an error greater than 1e-2") or on cthyb's `is_gf_hermitian` assertion. Note that pinning `random_seed` does not make such a test reproducible, see TRIQS/cthyb#193
 * regenerate `ref_restart.h5` for the block order changed by h5 PR#45 (`up_*` now before `down_*`), which made `restart_svo_hubbardI_basic` fail with "block name up_0 does not match down_0". Values are unchanged, only the block order flips
 
 ### fix
