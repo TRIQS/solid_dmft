@@ -211,11 +211,13 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.initial_self_energies.html">dmft_tools.initial_self_energies</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../_ref/dmft_tools.initial_self_energies.html#dmft_tools.initial_self_energies._dc_orb_shift_per_shell"><code class="docutils literal notranslate"><span class="pre">_dc_orb_shift_per_shell()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../_ref/dmft_tools.initial_self_energies.html#dmft_tools.initial_self_energies._load_sigma_from_h5"><code class="docutils literal notranslate"><span class="pre">_load_sigma_from_h5()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../_ref/dmft_tools.initial_self_energies.html#dmft_tools.initial_self_energies._set_loaded_sigma"><code class="docutils literal notranslate"><span class="pre">_set_loaded_sigma()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../_ref/dmft_tools.initial_self_energies.html#dmft_tools.initial_self_energies._sumk_sigma_to_solver_struct"><code class="docutils literal notranslate"><span class="pre">_sumk_sigma_to_solver_struct()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../_ref/dmft_tools.initial_self_energies.html#dmft_tools.initial_self_energies.calculate_double_counting"><code class="docutils literal notranslate"><span class="pre">calculate_double_counting()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../_ref/dmft_tools.initial_self_energies.html#dmft_tools.initial_self_energies.determine_dc_and_initial_sigma"><code class="docutils literal notranslate"><span class="pre">determine_dc_and_initial_sigma()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../_ref/dmft_tools.initial_self_energies.html#dmft_tools.initial_self_energies.split_deg_shells_by_orb_shift"><code class="docutils literal notranslate"><span class="pre">split_deg_shells_by_orb_shift()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.interaction_hamiltonian.html">dmft_tools.interaction_hamiltonian</a><ul>
@@ -833,15 +835,7 @@
         <span class="k">if</span> <span class="s1">&#39;Hartree&#39;</span> <span class="ow">in</span> <span class="n">solver_type_per_imp</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;dc_orb_shift not implemented in presence of Hartree solver&#39;</span><span class="p">)</span>
         <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;adding an extra orbital dependent shift per impurity&#39;</span><span class="p">)</span>
-        <span class="n">tot_norb</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">dc_orb_shift</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">dc_orb_shift_orig</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">advanced_params</span><span class="p">[</span><span class="s1">&#39;dc_orb_shift&#39;</span><span class="p">])</span>
-        <span class="k">for</span> <span class="n">icrsh</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">):</span>
-            <span class="n">tot_norb</span> <span class="o">+=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">corr_shells</span><span class="p">[</span><span class="n">icrsh</span><span class="p">][</span><span class="s1">&#39;dim&#39;</span><span class="p">]</span>
-            <span class="n">dc_orb_shift</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dc_orb_shift_orig</span><span class="p">[:</span><span class="n">sum_k</span><span class="o">.</span><span class="n">corr_shells</span><span class="p">[</span><span class="n">icrsh</span><span class="p">][</span><span class="s1">&#39;dim&#39;</span><span class="p">]])</span>
-            <span class="k">del</span> <span class="n">dc_orb_shift_orig</span><span class="p">[:</span><span class="n">sum_k</span><span class="o">.</span><span class="n">corr_shells</span><span class="p">[</span><span class="n">icrsh</span><span class="p">][</span><span class="s1">&#39;dim&#39;</span><span class="p">]]</span>
-
-        <span class="n">dc_orb_shift</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dc_orb_shift</span><span class="p">)</span>
+        <span class="n">dc_orb_shift</span> <span class="o">=</span> <span class="n">_dc_orb_shift_per_shell</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">advanced_params</span><span class="p">[</span><span class="s1">&#39;dc_orb_shift&#39;</span><span class="p">])</span>
         <span class="n">dc</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">icrsh</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">):</span>
             <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;shift on imp </span><span class="si">{</span><span class="n">icrsh</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">dc_orb_shift</span><span class="p">[</span><span class="n">icrsh</span><span class="p">,:]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -851,6 +845,56 @@
 
         <span class="k">for</span> <span class="n">ish</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_corr_shells</span><span class="p">):</span>
             <span class="n">sum_k</span><span class="o">.</span><span class="n">dc_imp</span><span class="p">[</span><span class="n">ish</span><span class="p">]</span> <span class="o">=</span> <span class="n">dc</span><span class="p">[</span><span class="n">sum_k</span><span class="o">.</span><span class="n">corr_to_inequiv</span><span class="p">[</span><span class="n">ish</span><span class="p">]]</span>
+
+    <span class="k">return</span> <span class="n">sum_k</span></div>
+
+
+
+<div class="viewcode-block" id="_dc_orb_shift_per_shell">
+<a class="viewcode-back" href="../../_ref/dmft_tools.initial_self_energies.html#dmft_tools.initial_self_energies._dc_orb_shift_per_shell">[docs]</a>
+<span class="k">def</span> <span class="nf">_dc_orb_shift_per_shell</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">dc_orb_shift</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Splits the flat dc_orb_shift input into one array per inequivalent shell &quot;&quot;&quot;</span>
+    <span class="n">dc_orb_shift</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">dc_orb_shift</span><span class="p">)</span>
+    <span class="n">per_shell</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">icrsh</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">n_inequiv_shells</span><span class="p">):</span>
+        <span class="n">dim</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">corr_shells</span><span class="p">[</span><span class="n">icrsh</span><span class="p">][</span><span class="s1">&#39;dim&#39;</span><span class="p">]</span>
+        <span class="n">per_shell</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dc_orb_shift</span><span class="p">[:</span><span class="n">dim</span><span class="p">]))</span>
+        <span class="k">del</span> <span class="n">dc_orb_shift</span><span class="p">[:</span><span class="n">dim</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">per_shell</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="split_deg_shells_by_orb_shift">
+<a class="viewcode-back" href="../../_ref/dmft_tools.initial_self_energies.html#dmft_tools.initial_self_energies.split_deg_shells_by_orb_shift">[docs]</a>
+<span class="k">def</span> <span class="nf">split_deg_shells_by_orb_shift</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">advanced_params</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Lifts the degeneracies of the solver blocks that dc_orb_shift breaks.</span>
+
+<span class="sd">    The degenerate blocks are found from the DFT density matrix, before the shift</span>
+<span class="sd">    is applied. Symmetrizing G0 over orbitals that are shifted differently would</span>
+<span class="sd">    average the shift out of G0 while it stays in the impurity levels. Blocks</span>
+<span class="sd">    remain degenerate only if their orbitals are shifted by the same amounts, so</span>
+<span class="sd">    up and down stay together in a paramagnetic calculation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">advanced_params</span><span class="p">[</span><span class="s1">&#39;dc_orb_shift&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">sum_k</span>
+
+    <span class="n">dc_orb_shift</span> <span class="o">=</span> <span class="n">_dc_orb_shift_per_shell</span><span class="p">(</span><span class="n">sum_k</span><span class="p">,</span> <span class="n">advanced_params</span><span class="p">[</span><span class="s1">&#39;dc_orb_shift&#39;</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">icrsh</span><span class="p">,</span> <span class="n">deg_shells_site</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sum_k</span><span class="o">.</span><span class="n">block_structure</span><span class="o">.</span><span class="n">deg_shells</span><span class="p">):</span>
+        <span class="n">solver_to_sumk</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">block_structure</span><span class="o">.</span><span class="n">solver_to_sumk</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span>
+        <span class="n">block_dims</span> <span class="o">=</span> <span class="n">sum_k</span><span class="o">.</span><span class="n">block_structure</span><span class="o">.</span><span class="n">gf_struct_solver_dict</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span>
+        <span class="n">new_deg_shells_site</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">deg_blocks</span> <span class="ow">in</span> <span class="n">deg_shells_site</span><span class="p">:</span>
+            <span class="c1"># blocks per tuple of shifts of their orbitals</span>
+            <span class="n">by_shift</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">deg_blocks</span><span class="p">:</span>
+                <span class="n">shifts</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">dc_orb_shift</span><span class="p">[</span><span class="n">icrsh</span><span class="p">][</span><span class="n">solver_to_sumk</span><span class="p">[(</span><span class="n">block</span><span class="p">,</span> <span class="n">i</span><span class="p">)][</span><span class="mi">1</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">block_dims</span><span class="p">[</span><span class="n">block</span><span class="p">]))</span>
+                <span class="n">by_shift</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">shifts</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">blocks</span> <span class="ow">in</span> <span class="n">by_shift</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="c1"># general format: keep the transformation of each block</span>
+                    <span class="n">new_deg_shells_site</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="n">b</span><span class="p">:</span> <span class="n">deg_blocks</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">}</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">deg_blocks</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="n">blocks</span><span class="p">)</span>
+        <span class="n">sum_k</span><span class="o">.</span><span class="n">block_structure</span><span class="o">.</span><span class="n">deg_shells</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_deg_shells_site</span>
 
     <span class="k">return</span> <span class="n">sum_k</span></div>
 
