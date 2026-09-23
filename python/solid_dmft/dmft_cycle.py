@@ -488,6 +488,8 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
                 sum_k.block_structure.corr_to_inequiv = ar['dft_input/corr_to_inequiv']
         sum_k.block_structure = mpi.bcast(sum_k.block_structure)
 
+    sum_k = initial_sigma.split_deg_shells_by_orb_shift(sum_k, advanced_params)
+
     # Determination of shell_multiplicity
     shell_multiplicity = [sum_k.corr_to_inequiv.count(icrsh) for icrsh in range(sum_k.n_inequiv_shells)]
 

@@ -251,15 +251,7 @@ def calculate_double_counting(sum_k, density_matrix, general_params, gw_params, 
         if 'Hartree' in solver_type_per_imp:
             raise NotImplementedError('dc_orb_shift not implemented in presence of Hartree solver')
         mpi.report('adding an extra orbital dependent shift per impurity')
-        tot_norb = 0
-        dc_orb_shift = []
-        dc_orb_shift_orig = deepcopy(advanced_params['dc_orb_shift'])
-        for icrsh in range(sum_k.n_inequiv_shells):
-            tot_norb += sum_k.corr_shells[icrsh]['dim']
-            dc_orb_shift.append(dc_orb_shift_orig[:sum_k.corr_shells[icrsh]['dim']])
-            del dc_orb_shift_orig[:sum_k.corr_shells[icrsh]['dim']]
-
-        dc_orb_shift = np.array(dc_orb_shift)
+        dc_orb_shift = _dc_orb_shift_per_shell(sum_k, advanced_params['dc_orb_shift'])
         dc = []
         for icrsh in range(sum_k.n_inequiv_shells):
             mpi.report(f'shift on imp {icrsh}: {dc_orb_shift[icrsh,:]}')
@@ -269,6 +261,50 @@ def calculate_double_counting(sum_k, density_matrix, general_params, gw_params, 
 
         for ish in range(sum_k.n_corr_shells):
             sum_k.dc_imp[ish] = dc[sum_k.corr_to_inequiv[ish]]
+
+    return sum_k
+
+
+def _dc_orb_shift_per_shell(sum_k, dc_orb_shift):
+    """ Splits the flat dc_orb_shift input into one array per inequivalent shell """
+    dc_orb_shift = list(dc_orb_shift)
+    per_shell = []
+    for icrsh in range(sum_k.n_inequiv_shells):
+        dim = sum_k.corr_shells[icrsh]['dim']
+        per_shell.append(np.array(dc_orb_shift[:dim]))
+        del dc_orb_shift[:dim]
+    return np.array(per_shell)
+
+
+def split_deg_shells_by_orb_shift(sum_k, advanced_params):
+    """
+    Lifts the degeneracies of the solver blocks that dc_orb_shift breaks.
+
+    The degenerate blocks are found from the DFT density matrix, before the shift
+    is applied. Symmetrizing G0 over orbitals that are shifted differently would
+    average the shift out of G0 while it stays in the impurity levels. Blocks
+    remain degenerate only if their orbitals are shifted by the same amounts, so
+    up and down stay together in a paramagnetic calculation.
+    """
+    if advanced_params['dc_orb_shift'] is None:
+        return sum_k
+
+    dc_orb_shift = _dc_orb_shift_per_shell(sum_k, advanced_params['dc_orb_shift'])
+    for icrsh, deg_shells_site in enumerate(sum_k.block_structure.deg_shells):
+        solver_to_sumk = sum_k.block_structure.solver_to_sumk[icrsh]
+        block_dims = sum_k.block_structure.gf_struct_solver_dict[icrsh]
+        new_deg_shells_site = []
+        for deg_blocks in deg_shells_site:
+            # blocks per tuple of shifts of their orbitals
+            by_shift = {}
+            for block in deg_blocks:
+                shifts = tuple(dc_orb_shift[icrsh][solver_to_sumk[(block, i)][1]] for i in range(block_dims[block]))
+                by_shift.setdefault(shifts, []).append(block)
+            for blocks in by_shift.values():
+                if len(blocks) > 1:
+                    # general format: keep the transformation of each block
+                    new_deg_shells_site.append({b: deg_blocks[b] for b in blocks} if isinstance(deg_blocks, dict) else blocks)
+        sum_k.block_structure.deg_shells[icrsh] = new_deg_shells_site
 
     return sum_k
 

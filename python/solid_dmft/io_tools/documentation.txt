@@ -552,7 +552,8 @@ dc_fixed_value : float, default = None
 dc_nominal : bool, default = False
         TODO: write
 dc_orb_shift : list of float, default = None
-        extra potential shift per orbital per impurity added to the DC
+        extra potential shift per orbital per impurity added to the DC.
+        Solver blocks whose orbitals are shifted differently are not treated as degenerate.
 dc_J :  float or list of float, default = general.J
         J values for DC determination. If only one value is given, the same J is assumed for all impurities
 dc_U :  float or list of float, default = general.U
