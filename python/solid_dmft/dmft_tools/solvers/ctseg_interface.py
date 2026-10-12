@@ -322,6 +322,7 @@ class CTSEGInterface(AbstractDMFTSolver):
 
                 # Sigma = F G^{-1} as a matrix product within each block
                 self.Sigma_freq << self.F_freq * inverse(self.G_freq)
+                self.Sigma_freq << make_hermitian(self.Sigma_freq)
 
             # without any degenerate shells we run the minimization for all blocks
             self.Sigma_freq, tail = self._fit_tail_window(
@@ -350,6 +351,7 @@ class CTSEGInterface(AbstractDMFTSolver):
 
             # Sigma = F G^{-1} as a matrix product within each block
             self.Sigma_freq << self.F_freq * inverse(self.G_freq)
+            self.Sigma_freq << make_hermitian(self.Sigma_freq)
 
         # should this be moved to abstract class?
         elif self.solver_params['crm_dyson_solver']:
