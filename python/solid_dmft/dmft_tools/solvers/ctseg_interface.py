@@ -320,9 +320,8 @@ class CTSEGInterface(AbstractDMFTSolver):
                 for i, bl in enumerate(self.F_freq.indices):
                     self.F_freq[bl] << Fourier(self.triqs_solver.results.F_tau[bl], F_known_moments[i])
 
-                for block, fw in self.F_freq:
-                    for iw in fw.mesh:
-                        self.Sigma_freq[block][iw] = self.F_freq[block][iw] / self.G_freq[block][iw]
+                # Sigma = F G^{-1} as a matrix product within each block
+                self.Sigma_freq << self.F_freq * inverse(self.G_freq)
 
             # without any degenerate shells we run the minimization for all blocks
             self.Sigma_freq, tail = self._fit_tail_window(
@@ -349,9 +348,8 @@ class CTSEGInterface(AbstractDMFTSolver):
             for i, bl in enumerate(self.F_freq.indices):
                 self.F_freq[bl] << Fourier(self.triqs_solver.results.F_tau[bl], F_known_moments[i])
 
-            for block, fw in self.F_freq:
-                for iw in fw.mesh:
-                    self.Sigma_freq[block][iw] = self.F_freq[block][iw] / self.G_freq[block][iw]
+            # Sigma = F G^{-1} as a matrix product within each block
+            self.Sigma_freq << self.F_freq * inverse(self.G_freq)
 
         # should this be moved to abstract class?
         elif self.solver_params['crm_dyson_solver']:
