@@ -120,7 +120,7 @@ def extract_t_and_delta(g_weiss_wsIab, ir_kernel):
     for n, g in enumerate(g_weiss_wsIab):
         for s in range(ns):
             for I in range(nImp):
-                weiss_tmp[n, s, I] = 1j * iwn_mesh_imp[n] - np.linalg.inv(g[s, I])
+                weiss_tmp[n, s, I] = 1j * iwn_mesh_imp[n] * np.eye(g.shape[-1]) - np.linalg.inv(g[s, I])
 
     t_sIab_estimate = estimate_zero_moment(weiss_tmp, iwn_mesh_imp)
 
