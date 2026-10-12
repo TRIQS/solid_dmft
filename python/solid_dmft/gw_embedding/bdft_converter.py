@@ -130,7 +130,7 @@ def extract_t_and_delta(g_weiss_wsIab, ir_kernel):
     for n in range(delta_estimate.shape[0]):
         for s in range(ns):
             for I in range(nImp):
-                g_weiss_inv = np.linalg.inv(g_weiss_wsIab[n, 0, 0])
+                g_weiss_inv = np.linalg.inv(g_weiss_wsIab[n, s, I])
                 delta_estimate[n, s, I] = 1j * iwn_mesh_imp[n] * np.eye(nbnd) - t_sIab_estimate[s, I] - g_weiss_inv
     ir_kernel.check_leakage(delta_estimate, 'f', 'delta_estimate', w_input=True)
 
