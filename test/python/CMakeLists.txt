@@ -122,8 +122,11 @@ foreach(test ${restart_integration_test})
 
   set_property(TEST restart_${test} APPEND PROPERTY ENVIRONMENT PYTHONPATH=${PROJECT_BINARY_DIR}/python:$ENV{PYTHONPATH})
   set_property(TEST restart_${test} PROPERTY PROCESSORS ${TEST_NUM_PROC})
+  # restarts from the output of ${test}, in the same directory
+  set_property(TEST restart_${test} APPEND PROPERTY DEPENDS ${test})
 endforeach()
-set_property(TEST maxent_${test} APPEND PROPERTY DEPENDS "svo_hubbardI_basic")
+# maxent_svo_hubbardI_basic reads and writes svo_hubbardI_basic/out/inp.h5 too
+set_property(TEST restart_svo_hubbardI_basic APPEND PROPERTY DEPENDS maxent_svo_hubbardI_basic)
 
 # ------------------------------#
 
