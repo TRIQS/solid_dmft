@@ -177,6 +177,54 @@ class AbstractDMFTSolver(ABC):
         pass
 
     @staticmethod
+    def _crm_dyson_solver(G0_dlr_iw, G_dlr, Sigma_moments, deg_shells):
+        """
+        Self-energy of every block from the CRM Dyson solver
+
+        Each degenerate shell is minimized once, for its first block, and the
+        result is copied to the other blocks of the shell. Blocks that are in
+        no degenerate shell are minimized individually.
+
+        Parameters
+        ----------
+        G0_dlr_iw : BlockGf on MeshDLRImFreq
+            non-interacting impurity Green's function
+        G_dlr : BlockGf on MeshDLR
+            interacting impurity Green's function
+        Sigma_moments : dict of np.ndarray
+            high-frequency moments of Sigma per block, ``[Sigma_0, (Sigma_1)]``
+        deg_shells : list
+            degenerate shells of block names, i.e. ``sum_k.deg_shells[ish]``
+
+        Returns
+        -------
+        Sigma_dlr : BlockGf on MeshDLRImFreq
+            self-energy without the constant ``Sigma_moments[block][0]``
+        """
+        from triqs.gfs.dlr_crm_dyson_solver import minimize_dyson
+
+        source = {}
+        for shell in deg_shells:
+            first = next(iter(shell))
+            for block in shell:
+                source[block] = first
+
+        Sigma_dlr = G0_dlr_iw.copy()
+        Sigma_dlr.zero()
+        for block, _ in Sigma_dlr:
+            if source.get(block, block) == block:
+                np.random.seed(85281)
+                print('Minimizing Dyson via CRM for Σ[block]:', block)
+                Sigma_dlr[block], _, _ = minimize_dyson(
+                    G0_dlr=G0_dlr_iw[block], G_dlr=G_dlr[block], Sigma_moments=Sigma_moments[block]
+                )
+        for block, _ in Sigma_dlr:
+            if source.get(block, block) != block:
+                print(f'Copying result from first block of deg list to {block}')
+                Sigma_dlr[block] << Sigma_dlr[source[block]]
+        return Sigma_dlr
+
+    @staticmethod
     def _gf_fit_tail_fraction(Gf, fraction=0.4, replace=None, known_moments=[]):
         """
         fits the tail of Gf object by making a polynomial
