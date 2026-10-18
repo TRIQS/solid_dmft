@@ -13,6 +13,7 @@ the shift was previously averaged out of the impurity problem, see the fix below
 * add the `sigma_embedding` argument to `plot_correlated_bands.get_dmft_bands`, giving the tight-binding orbitals each correlated shell occupies, for models that do not follow the wannier90 convention of the correlated orbitals coming first
 
 ### test
+* `restart_svo_hubbardI_basic` now runs after `svo_hubbardI_basic` and `maxent_svo_hubbardI_basic`. It had no test dependency, so under `ctest -j` it could run in the same directory at the same time as the run it restarts from, and fail or hang
 * `svo_cthyb_basic_tf` now checks that the hybridization function passed to the solver is negative, which catches the `dc_orb_shift` bug below. The test only checked that the run completes, and had been passing intermittently with an average sign of about 1e-2 since the input was added in #74
 
 ### fix
