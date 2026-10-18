@@ -10,6 +10,9 @@ solid_dmft version 3.3.6 is a patch release that fixes the CRM Dyson solver for 
 * cthyb and ctseg solvers: the CRM Dyson solver (`crm_dyson_solver = true`) now returns the self-energy of every block. Without degenerate shells the minimized self-energy was discarded, so cthyb returned only the Hartree shift Sigma_0 and ctseg kept the self-energy of the previous step; with degenerate shells, blocks that are in no shell were skipped in the same way. Fully degenerate calculations such as paramagnetic SrVO3 were not affected. Calculations using the CRM self-energy with cthyb also need a cthyb that computes the first self-energy moment with the matrix product Sigma_0 Sigma_0 (TRIQS/cthyb#196); the element-wise square used before is wrong whenever Sigma_0 has off-diagonal elements
 * hubbardI solver: `G_moments` is computed from the full local Hamiltonian, the impurity levels included. Only the interaction was passed before, so `G_moments[2]` lacked the impurity levels. It is only written to the archive and not used in the DMFT cycle
 
+### test
+* `restart_svo_hubbardI_basic` now runs after `svo_hubbardI_basic` and `maxent_svo_hubbardI_basic`. It had no test dependency, so under `ctest -j` it could run in the same directory at the same time as the run it restarts from, and fail or hang
+
 ## Version 3.3.5
 
 solid_dmft version 3.3.5 is a minor patch release that fixes several bugs and adds small features:
