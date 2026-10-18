@@ -27,6 +27,8 @@
 hubbardI solver class for solid_dmft
 '''
 from triqs.gfs import MeshReFreq, Gf, make_hermitian
+from triqs.operators import c, c_dag
+from triqs.atom_diag import AtomDiagReal
 
 # import of the abstract class
 from solid_dmft.dmft_tools.solvers.abstractdmftsolver import AbstractDMFTSolver
@@ -109,8 +111,17 @@ class HubbardIInterface(AbstractDMFTSolver):
                 self.density_matrix, self.h_loc_diagonalization, self.sum_k.gf_struct_solver_list[self.icrsh], self.h_int
             )
             self.Sigma_Hartree = {bl: sigma_bl[0] for bl, sigma_bl in self.Sigma_moments.items()}
+            # impurity levels as extracted by hubbardI from G0_iw; a real
+            # AtomDiag only accepts operators with real coefficients
+            is_real = isinstance(self.h_loc_diagonalization, AtomDiagReal)
+            h_imp = 1.0 * self.h_int
+            for block, block_size in self.sum_k.gf_struct_solver_list[self.icrsh]:
+                eal = self.triqs_solver.eal[block].real if is_real else self.triqs_solver.eal[block]
+                for i in range(block_size):
+                    for j in range(block_size):
+                        h_imp += eal[i, j] * c_dag(block, i) * c(block, j)
             self.G_moments = green_high_frequency_moments(
-                self.density_matrix, self.h_loc_diagonalization, self.sum_k.gf_struct_solver_list[self.icrsh], self.h_int
+                self.density_matrix, self.h_loc_diagonalization, self.sum_k.gf_struct_solver_list[self.icrsh], h_imp
             )
             self.orbital_occupations = orbital_occupations(
                 self.density_matrix, self.sum_k.gf_struct_solver_list[self.icrsh], self.h_loc_diagonalization
