@@ -356,8 +356,6 @@ class CTSEGInterface(AbstractDMFTSolver):
         # should this be moved to abstract class?
         elif self.solver_params['crm_dyson_solver']:
             mpi.report('Self-energy post-processing algorithm: crm dyson solver')
-            from triqs.gfs.dlr_crm_dyson_solver import minimize_dyson
-
             mpi.report('\nCRM Dyson solver to extract Σ impurity\n')
             # fit QMC G_tau to DLR
             if mpi.is_master_node():
@@ -388,30 +386,12 @@ class CTSEGInterface(AbstractDMFTSolver):
                 G_iw = make_gf_imfreq(G_dlr, n_iw=self.general_params['n_iw'])
                 Sigma_iw = inverse(G0_iw) - inverse(G_iw)
 
-                # minimize dyson for the first entry of each deg shell
-                self.Sigma_dlr = self.sum_k.block_structure.create_gf(ish=self.icrsh, gf_function=Gf, mesh=mesh_dlr_iw, space='solver')
-                # without any degenerate shells we run the minimization for all blocks
-                if self.sum_k.deg_shells[self.icrsh] == []:
-                    for block, gf in self.Sigma_dlr:
-                        np.random.seed(85281)
-                        print('Minimizing Dyson via CRM for Σ[block]:', block)
-                        gf, _, _ = minimize_dyson(G0_dlr=G0_dlr_iw[block], G_dlr=G_dlr[block], Sigma_moments=self.Sigma_moments[block])
-                else:
-                    for deg_shell in self.sum_k.deg_shells[self.icrsh]:
-                        for i, block in enumerate(deg_shell):
-                            if i == 0:
-                                np.random.seed(85281)
-                                print('Minimizing Dyson via CRM for Σ[block]:', block)
-                                self.Sigma_dlr[block], _, _ = minimize_dyson(
-                                    G0_dlr=G0_dlr_iw[block], G_dlr=G_dlr[block], Sigma_moments=self.Sigma_moments[block]
-                                )
-                                sol_block = block
-                            else:
-                                print(f'Copying result from first block of deg list to {block}')
-                                self.Sigma_dlr[block] << self.Sigma_dlr[sol_block]
-
-                            self.Sigma_freq[block] = make_gf_imfreq(self.Sigma_dlr[block], n_iw=self.general_params['n_iw'])
-                            self.Sigma_freq[block] += self.Sigma_moments[block][0]
+                self.Sigma_dlr = self._crm_dyson_solver(
+                    G0_dlr_iw, G_dlr, self.Sigma_moments, self.sum_k.deg_shells[self.icrsh]
+                )
+                for block, _ in self.Sigma_dlr:
+                    self.Sigma_freq[block] = make_gf_imfreq(self.Sigma_dlr[block], n_iw=self.general_params['n_iw'])
+                    self.Sigma_freq[block] += self.Sigma_moments[block][0]
 
                 self.G_freq = inverse(inverse(self.G0_freq) - self.Sigma_freq)
                 print('\n')
