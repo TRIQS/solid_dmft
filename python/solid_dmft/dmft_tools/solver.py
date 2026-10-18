@@ -64,6 +64,54 @@ def get_n_orbitals(sum_k):
 
     return n_orbitals
 
+def _crm_dyson_solver(G0_dlr_iw, G_dlr, Sigma_moments, deg_shells):
+    """
+    Self-energy of every block from the CRM Dyson solver
+
+    Each degenerate shell is minimized once, for its first block, and the
+    result is copied to the other blocks of the shell. Blocks that are in
+    no degenerate shell are minimized individually.
+
+    Parameters
+    ----------
+    G0_dlr_iw : BlockGf on MeshDLRImFreq
+        non-interacting impurity Green's function
+    G_dlr : BlockGf on MeshDLR
+        interacting impurity Green's function
+    Sigma_moments : dict of np.ndarray
+        high-frequency moments of Sigma per block, ``[Sigma_0, (Sigma_1)]``
+    deg_shells : list
+        degenerate shells of block names, i.e. ``sum_k.deg_shells[ish]``
+
+    Returns
+    -------
+    Sigma_dlr : BlockGf on MeshDLRImFreq
+        self-energy without the constant ``Sigma_moments[block][0]``
+    """
+    from triqs.gf.dlr_crm_dyson_solver import minimize_dyson
+
+    source = {}
+    for shell in deg_shells:
+        first = next(iter(shell))
+        for block in shell:
+            source[block] = first
+
+    Sigma_dlr = G0_dlr_iw.copy()
+    Sigma_dlr.zero()
+    for block, _ in Sigma_dlr:
+        if source.get(block, block) == block:
+            np.random.seed(85281)
+            print('Minimizing Dyson via CRM for Σ[block]:', block)
+            Sigma_dlr[block], _, _ = minimize_dyson(G0_dlr=G0_dlr_iw[block],
+                                                    G_dlr=G_dlr[block],
+                                                    Sigma_moments=Sigma_moments[block]
+                                                    )
+    for block, _ in Sigma_dlr:
+        if source.get(block, block) != block:
+            print(f'Copying result from first block of deg list to {block}')
+            Sigma_dlr[block] << Sigma_dlr[source[block]]
+    return Sigma_dlr
+
 def _gf_fit_tail_fraction(Gf, fraction=0.4, replace=None, known_moments=[]):
     """
     fits the tail of Gf object by making a polynomial
@@ -1087,8 +1135,6 @@ class SolverStructure:
                 # if tailfit has been used replace Sigma with the tail fitted Sigma from cthyb
                 self.Sigma_freq << self.triqs_solver.Sigma_iw
             elif self.solver_params['crm_dyson_solver']:
-                from triqs.gf.dlr_crm_dyson_solver import minimize_dyson
-
                 mpi.report('\nCRM Dyson solver to extract Σ impurity\n')
                 # fit QMC G_tau to DLR
                 if mpi.is_master_node():
@@ -1115,33 +1161,8 @@ class SolverStructure:
                         mom[0] = self.triqs_solver.Sigma_Hartree[block]
                         mom[1] = first_mom[block]
 
-                    # minimize dyson for the first entry of each deg shell
-                    self.Sigma_dlr = self.sum_k.block_structure.create_gf(ish=self.icrsh, gf_function=Gf, mesh=mesh_dlr_iw, space='solver')
-                    # without any degenerate shells we run the minimization for all blocks
-                    if self.sum_k.deg_shells[self.icrsh] == []:
-                        for block, gf in self.Sigma_dlr:
-                            np.random.seed(85281)
-                            print('Minimizing Dyson via CRM for Σ[block]:', block)
-                            gf, _, _ = minimize_dyson(G0_dlr=G0_dlr_iw[block],
-                                                      G_dlr=G_dlr[block],
-                                                      Sigma_moments=self.triqs_solver.Sigma_moments[block]
-                                                      )
-                    else:
-                        for deg_shell in self.sum_k.deg_shells[self.icrsh]:
-                            for i, block in enumerate(deg_shell):
-                                if i == 0:
-                                    np.random.seed(85281)
-                                    print('Minimizing Dyson via CRM for Σ[block]:', block)
-                                    self.Sigma_dlr[block], _, _ = minimize_dyson(G0_dlr=G0_dlr_iw[block],
-                                                                                 G_dlr=G_dlr[block],
-                                                                                 Sigma_moments=self.triqs_solver.Sigma_moments[block]
-                                                                                 )
-                                    sol_block = block
-                                else:
-                                    self.Sigma_dlr[block] << self.Sigma_dlr[sol_block]
-
-                                    print(f'Copying result from first block of deg list to {block}')
-                    print('\n')
+                    self.Sigma_dlr = _crm_dyson_solver(G0_dlr_iw, G_dlr, self.triqs_solver.Sigma_moments,
+                                                       self.sum_k.deg_shells[self.icrsh])
 
                     self.Sigma_freq = make_gf_imfreq(self.Sigma_dlr, n_iw=self.general_params['n_iw'])
                     for block, gf in self.Sigma_freq:
@@ -1496,8 +1517,6 @@ class SolverStructure:
             self.G_freq << mpi.bcast(self.G_freq)
 
         elif self.solver_params['crm_dyson_solver']:
-            from triqs.gf.dlr_crm_dyson_solver import minimize_dyson
-
             mpi.report('\nCRM Dyson solver to extract Σ impurity\n')
             self.Sigma_Hartree = {}
             # fit QMC G_tau to DLR
@@ -1521,45 +1540,18 @@ class SolverStructure:
                 G_iw = make_gf_imfreq(G_dlr, n_iw=self.general_params['n_iw'])
                 Sigma_iw = inverse(G0_iw) - inverse(G_iw)
 
-                # minimize dyson for the first entry of each deg shell
-                self.Sigma_dlr = self.sum_k.block_structure.create_gf(ish=self.icrsh, gf_function=Gf, mesh=mesh_dlr_iw, space='solver')
-                # without any degenerate shells we run the minimization for all blocks
                 _, tail = _fit_tail_window(Sigma_iw,
                                         fit_min_n=self.solver_params['fit_min_n'],
                                         fit_max_n=self.solver_params['fit_max_n'],
                                         fit_min_w=self.solver_params['fit_min_w'],
                                         fit_max_w=self.solver_params['fit_max_w'],
                                         fit_max_moment=self.solver_params['fit_max_moment'],)
-                if self.sum_k.deg_shells[self.icrsh] == []:
-                    for block, gf in self.Sigma_dlr:
-                        # tail, err = Sigma_iw[block].fit_hermitian_tail()
-                        self.Sigma_Hartree[block] = tail[block][0]
-                        np.random.seed(85281)
-                        print('Minimizing Dyson via CRM for Σ[block]:', block)
-                        gf, _, _ = minimize_dyson(G0_dlr=G0_dlr_iw[block],
-                                                  G_dlr=G_dlr[block],
-                                                  Sigma_moments=tail[block][0:1]
-                                                    )
-                else:
-                    for deg_shell in self.sum_k.deg_shells[self.icrsh]:
-                        for i, block in enumerate(deg_shell):
-                            if i == 0:
-                                # tail, err = Sigma_iw[block].fit_hermitian_tail()
-                                self.Sigma_Hartree[block] = tail[block][0]
-                                np.random.seed(85281)
-                                print('Minimizing Dyson via CRM for Σ[block]:', block)
-                                self.Sigma_dlr[block], _, _ = minimize_dyson(G0_dlr=G0_dlr_iw[block],
-                                                                    G_dlr=G_dlr[block],
-                                                                    Sigma_moments=tail[block][0:1]
-                                                                    )
-                                sol_block = block
-                            else:
-                                print(f'Copying result from first block of deg list to {block}')
-                                self.Sigma_dlr[block] << self.Sigma_dlr[sol_block]
-                                self.Sigma_Hartree[block] = tail[block][0]
-
-                            self.Sigma_freq[block] = make_gf_imfreq(self.Sigma_dlr[block], n_iw=self.general_params['n_iw'])
-                            self.Sigma_freq[block] += tail[block][0]
+                Sigma_moments = {block: tail[block][0:1] for block, _ in G0_dlr_iw}
+                self.Sigma_dlr = _crm_dyson_solver(G0_dlr_iw, G_dlr, Sigma_moments, self.sum_k.deg_shells[self.icrsh])
+                for block, _ in self.Sigma_dlr:
+                    self.Sigma_Hartree[block] = tail[block][0]
+                    self.Sigma_freq[block] = make_gf_imfreq(self.Sigma_dlr[block], n_iw=self.general_params['n_iw'])
+                    self.Sigma_freq[block] += tail[block][0]
                 print('\n')
 
 
