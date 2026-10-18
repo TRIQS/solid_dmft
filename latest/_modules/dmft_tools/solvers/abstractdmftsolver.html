@@ -775,6 +775,57 @@
         <span class="k">pass</span></div>
 
 
+<div class="viewcode-block" id="AbstractDMFTSolver._crm_dyson_solver">
+<a class="viewcode-back" href="../../../_ref/dmft_tools.solvers.abstractdmftsolver.AbstractDMFTSolver.html#dmft_tools.solvers.abstractdmftsolver.AbstractDMFTSolver._crm_dyson_solver">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_crm_dyson_solver</span><span class="p">(</span><span class="n">G0_dlr_iw</span><span class="p">,</span> <span class="n">G_dlr</span><span class="p">,</span> <span class="n">Sigma_moments</span><span class="p">,</span> <span class="n">deg_shells</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Self-energy of every block from the CRM Dyson solver</span>
+
+<span class="sd">        Each degenerate shell is minimized once, for its first block, and the</span>
+<span class="sd">        result is copied to the other blocks of the shell. Blocks that are in</span>
+<span class="sd">        no degenerate shell are minimized individually.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        G0_dlr_iw : BlockGf on MeshDLRImFreq</span>
+<span class="sd">            non-interacting impurity Green&#39;s function</span>
+<span class="sd">        G_dlr : BlockGf on MeshDLR</span>
+<span class="sd">            interacting impurity Green&#39;s function</span>
+<span class="sd">        Sigma_moments : dict of np.ndarray</span>
+<span class="sd">            high-frequency moments of Sigma per block, ``[Sigma_0, (Sigma_1)]``</span>
+<span class="sd">        deg_shells : list</span>
+<span class="sd">            degenerate shells of block names, i.e. ``sum_k.deg_shells[ish]``</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Sigma_dlr : BlockGf on MeshDLRImFreq</span>
+<span class="sd">            self-energy without the constant ``Sigma_moments[block][0]``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">triqs.gfs.dlr_crm_dyson_solver</span> <span class="kn">import</span> <span class="n">minimize_dyson</span>
+
+        <span class="n">source</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">shell</span> <span class="ow">in</span> <span class="n">deg_shells</span><span class="p">:</span>
+            <span class="n">first</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">shell</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">shell</span><span class="p">:</span>
+                <span class="n">source</span><span class="p">[</span><span class="n">block</span><span class="p">]</span> <span class="o">=</span> <span class="n">first</span>
+
+        <span class="n">Sigma_dlr</span> <span class="o">=</span> <span class="n">G0_dlr_iw</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">Sigma_dlr</span><span class="o">.</span><span class="n">zero</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">block</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">Sigma_dlr</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">source</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span> <span class="o">==</span> <span class="n">block</span><span class="p">:</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">85281</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Minimizing Dyson via CRM for Σ[block]:&#39;</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span>
+                <span class="n">Sigma_dlr</span><span class="p">[</span><span class="n">block</span><span class="p">],</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">minimize_dyson</span><span class="p">(</span>
+                    <span class="n">G0_dlr</span><span class="o">=</span><span class="n">G0_dlr_iw</span><span class="p">[</span><span class="n">block</span><span class="p">],</span> <span class="n">G_dlr</span><span class="o">=</span><span class="n">G_dlr</span><span class="p">[</span><span class="n">block</span><span class="p">],</span> <span class="n">Sigma_moments</span><span class="o">=</span><span class="n">Sigma_moments</span><span class="p">[</span><span class="n">block</span><span class="p">]</span>
+                <span class="p">)</span>
+        <span class="k">for</span> <span class="n">block</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">Sigma_dlr</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">source</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span> <span class="o">!=</span> <span class="n">block</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Copying result from first block of deg list to </span><span class="si">{</span><span class="n">block</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">Sigma_dlr</span><span class="p">[</span><span class="n">block</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="n">Sigma_dlr</span><span class="p">[</span><span class="n">source</span><span class="p">[</span><span class="n">block</span><span class="p">]]</span>
+        <span class="k">return</span> <span class="n">Sigma_dlr</span></div>
+
+
 <div class="viewcode-block" id="AbstractDMFTSolver._gf_fit_tail_fraction">
 <a class="viewcode-back" href="../../../_ref/dmft_tools.solvers.abstractdmftsolver.AbstractDMFTSolver.html#dmft_tools.solvers.abstractdmftsolver.AbstractDMFTSolver._gf_fit_tail_fraction">[docs]</a>
     <span class="nd">@staticmethod</span>

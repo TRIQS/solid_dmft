@@ -624,6 +624,35 @@
 
 <dl class="py method">
 <dt class="sig sig-object py">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_crm_dyson_solver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G0_dlr_iw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">G_dlr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Sigma_moments</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg_shells</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Self-energy of every block from the CRM Dyson solver</p>
+<p>Each degenerate shell is minimized once, for its first block, and the
+result is copied to the other blocks of the shell. Blocks that are in
+no degenerate shell are minimized individually.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>G0_dlr_iw</strong><span class="classifier">BlockGf on MeshDLRImFreq</span></dt><dd><p>non-interacting impurity Green’s function</p>
+</dd>
+<dt><strong>G_dlr</strong><span class="classifier">BlockGf on MeshDLR</span></dt><dd><p>interacting impurity Green’s function</p>
+</dd>
+<dt><strong>Sigma_moments</strong><span class="classifier">dict of np.ndarray</span></dt><dd><p>high-frequency moments of Sigma per block, <code class="docutils literal notranslate"><span class="pre">[Sigma_0,</span> <span class="pre">(Sigma_1)]</span></code></p>
+</dd>
+<dt><strong>deg_shells</strong><span class="classifier">list</span></dt><dd><p>degenerate shells of block names, i.e. <code class="docutils literal notranslate"><span class="pre">sum_k.deg_shells[ish]</span></code></p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>Sigma_dlr</strong><span class="classifier">BlockGf on MeshDLRImFreq</span></dt><dd><p>self-energy without the constant <code class="docutils literal notranslate"><span class="pre">Sigma_moments[block][0]</span></code></p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_fit_tail_window</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Sigma_iw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_min_n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_max_n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_min_w</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_max_w</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_max_moment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_known_moments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Fit a high frequency 1/(iw)^n expansion of Sigma_iw
 and replace the high frequency part with the fitted high frequency expansion.</p>
