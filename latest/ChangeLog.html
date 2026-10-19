@@ -628,6 +628,7 @@ shift was previously averaged out of the impurity problem, see the fix below.</p
 <section id="test">
 <h3>test<a class="headerlink" href="#test" title="Link to this heading"></a></h3>
 <ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">restart_svo_hubbardI_basic</span></code> now runs after <code class="docutils literal notranslate"><span class="pre">svo_hubbardI_basic</span></code> and <code class="docutils literal notranslate"><span class="pre">maxent_svo_hubbardI_basic</span></code>. It had no test dependency, so under <code class="docutils literal notranslate"><span class="pre">ctest</span> <span class="pre">-j</span></code> it could run in the same directory at the same time as the run it restarts from, and fail or hang</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">svo_cthyb_basic_tf</span></code> now checks that the hybridization function passed to the solver is negative, which catches the <code class="docutils literal notranslate"><span class="pre">dc_orb_shift</span></code> bug below. The test only checked that the run completes, and had been passing intermittently with an average sign of about 1e-2 since the input was added in #74</p></li>
 </ul>
 </section>
