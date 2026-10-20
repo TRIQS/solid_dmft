@@ -495,10 +495,11 @@
 <span id="id1"></span><h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading"></a></h1>
 <section id="version-3-3-6">
 <h2>Version 3.3.6<a class="headerlink" href="#version-3-3-6" title="Link to this heading"></a></h2>
-<p>solid_dmft version 3.3.6 is a patch release that fixes the CRM Dyson solver for calculations without fully degenerate blocks.</p>
+<p>solid_dmft version 3.3.6 is a patch release that fixes the CRM Dyson solver for calculations without fully degenerate blocks and the ctseg improved-estimator self-energy for blocks with off-diagonal elements.</p>
 <section id="fix">
 <h3>fix<a class="headerlink" href="#fix" title="Link to this heading"></a></h3>
 <ul class="simple">
+<li><p>ctseg solver: the improved-estimator self-energy is now computed as the matrix product Sigma = F G^-1 within each block, and made hermitian. The element-wise division used before was wrong for blocks with off-diagonal elements; diagonal (1x1 block) calculations change only at the level of the QMC noise, see #147</p></li>
 <li><p>cthyb and ctseg solvers: the CRM Dyson solver (<code class="docutils literal notranslate"><span class="pre">crm_dyson_solver</span> <span class="pre">=</span> <span class="pre">true</span></code>) now returns the self-energy of every block. Without degenerate shells the minimized self-energy was discarded, so cthyb returned only the Hartree shift Sigma_0 and ctseg kept the self-energy of the previous step; with degenerate shells, blocks that are in no shell were skipped in the same way. Fully degenerate calculations such as paramagnetic SrVO3 were not affected. Calculations using the CRM self-energy with cthyb also need a cthyb that computes the first self-energy moment with the matrix product Sigma_0 Sigma_0 (TRIQS/cthyb#196); the element-wise square used before is wrong whenever Sigma_0 has off-diagonal elements</p></li>
 <li><p>hubbardI solver: <code class="docutils literal notranslate"><span class="pre">G_moments</span></code> is computed from the full local Hamiltonian, the impurity levels included. Only the interaction was passed before, so <code class="docutils literal notranslate"><span class="pre">G_moments[2]</span></code> lacked the impurity levels. It is only written to the archive and not used in the DMFT cycle</p></li>
 </ul>
