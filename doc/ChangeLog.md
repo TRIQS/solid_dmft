@@ -4,9 +4,10 @@
 
 ## Version 3.3.6
 
-solid_dmft version 3.3.6 is a patch release that fixes the CRM Dyson solver for calculations without fully degenerate blocks.
+solid_dmft version 3.3.6 is a patch release that fixes the CRM Dyson solver for calculations without fully degenerate blocks and the ctseg improved-estimator self-energy for blocks with off-diagonal elements.
 
 ### fix
+* ctseg solver: the improved-estimator self-energy is now computed as the matrix product Sigma = F G^-1 within each block, and made hermitian. The element-wise division used before was wrong for blocks with off-diagonal elements; diagonal (1x1 block) calculations change only at the level of the QMC noise, see #147
 * cthyb and ctseg solvers: the CRM Dyson solver (`crm_dyson_solver = true`) now returns the self-energy of every block. Without degenerate shells the minimized self-energy was discarded, so cthyb returned only the Hartree shift Sigma_0 and ctseg kept the self-energy of the previous step; with degenerate shells, blocks that are in no shell were skipped in the same way. Fully degenerate calculations such as paramagnetic SrVO3 were not affected. Calculations using the CRM self-energy with cthyb also need a cthyb that computes the first self-energy moment with the matrix product Sigma_0 Sigma_0 (TRIQS/cthyb#196); the element-wise square used before is wrong whenever Sigma_0 has off-diagonal elements
 * hubbardI solver: `G_moments` is computed from the full local Hamiltonian, the impurity levels included. Only the interaction was passed before, so `G_moments[2]` lacked the impurity levels. It is only written to the archive and not used in the DMFT cycle
 

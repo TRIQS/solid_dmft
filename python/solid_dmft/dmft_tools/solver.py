@@ -1486,9 +1486,9 @@ class SolverStructure:
 
             self.F_freq << mpi.bcast(self.F_freq)
             self.G_freq << mpi.bcast(self.G_freq)
-            for block, fw in self.F_freq:
-                for iw in fw.mesh:
-                    self.Sigma_freq[block][iw] = self.F_freq[block][iw] / self.G_freq[block][iw]
+            # Sigma = F G^{-1} as a matrix product within each block
+            self.Sigma_freq << self.F_freq * inverse(self.G_freq)
+            self.Sigma_freq << make_hermitian(self.Sigma_freq)
         elif self.solver_params['perform_tail_fit']:
             if not self.solver_params['improved_estimator']:
                 mpi.report('Self-energy post-processing algorithm: tail fitting with analytic static impurity self-energy')
@@ -1504,9 +1504,9 @@ class SolverStructure:
                 for i, bl in enumerate(self.F_freq.indices):
                     self.F_freq[bl] << Fourier(self.triqs_solver.results.F_tau[bl], F_known_moments[i])
 
-                for block, fw in self.F_freq:
-                    for iw in fw.mesh:
-                        self.Sigma_freq[block][iw] = self.F_freq[block][iw] / self.G_freq[block][iw]
+                # Sigma = F G^{-1} as a matrix product within each block
+                self.Sigma_freq << self.F_freq * inverse(self.G_freq)
+                self.Sigma_freq << make_hermitian(self.Sigma_freq)
 
             # without any degenerate shells we run the minimization for all blocks
             if mpi.is_master_node():
