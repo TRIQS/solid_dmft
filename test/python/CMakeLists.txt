@@ -12,6 +12,7 @@ set(basic_tests
     test_plot_correlated_bands
     test_respack_sfo
     test_crm_dyson_solver
+    test_greens_functions_mixer
     )
 
   # copy input files for PCB test from documentation tutorial
