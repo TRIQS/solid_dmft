@@ -36,41 +36,36 @@ from triqs.gfs.tools import inverse
 from . import legendre_filter
 
 
+def _mixed_blocks(bgf, deg_shells):
+    """
+    groups of block names whose first entry is stored in the Broyden vector;
+    the other entries of a group are copies of the first. Blocks that are in
+    no degenerate shell form a group of their own.
+    """
+    groups = [list(deg_block) for deg_block in deg_shells] if deg_shells else []
+    in_shell = {bl for group in groups for bl in group}
+    groups += [[bl] for bl in bgf.indices if bl not in in_shell]
+    return groups
+
+
 def _bgf_to_vec(bgf, deg_shells=None):
     """
     flattens a BlockGf to a 1d numpy array
-    if deg_shells is given, only non-deg shells are given back
+    if deg_shells is given, only the first block of each degenerate shell is stored
     """
-    if deg_shells:
-        deg_vecs = []
-        for deg_block in deg_shells:
-            deg_vecs.append(bgf[deg_block[0]])
-        vec = np.hstack([gf.data.flatten() for gf in deg_vecs])
-    else:
-        vec = np.hstack([bgf[bl].data.flatten() for bl in bgf.indices])
-    return vec
+    return np.hstack([bgf[group[0]].data.flatten() for group in _mixed_blocks(bgf, deg_shells)])
 
 
 def _vec_to_bgf(vec, bgf, deg_shells=None):
     G = bgf.copy()
-    if deg_shells:
-        start = 0
-        for deg_block in deg_shells:
-            # only the first element was stored in numpy vec
-            bl = deg_block[0]
-            points = len([w.value for w in G[bl].mesh]) * np.prod(list(G[bl].target_shape))
-            end = start+points
-            G[bl].data[:,:,:] = vec[start:end].reshape(G[bl].data.shape)
-            start = end
-            for other_blocks in deg_block[1:]:
-                G[other_blocks] << G[bl]
-    else:
-        start = 0
-        for i, bl in enumerate(G.indices):
-            points = len([w.value for w in G[bl].mesh]) * np.prod(list(G[bl].target_shape))
-            end = start+points
-            G[bl].data[:,:,:] = vec[start:end].reshape(G[bl].data.shape)
-            start = end
+    start = 0
+    for group in _mixed_blocks(G, deg_shells):
+        bl = group[0]
+        end = start + G[bl].data.size
+        G[bl].data[...] = vec[start:end].reshape(G[bl].data.shape)
+        start = end
+        for other_block in group[1:]:
+            G[other_block] << G[bl]
     return G
 
 
