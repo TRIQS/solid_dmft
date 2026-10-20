@@ -685,7 +685,7 @@ def _dmft_step(sum_k, solvers, it, general_params, solver_params, gw_params,
         # mixing of G0 if wanted from the second iteration on
         if it > 1:
             solvers[icrsh] = gf_mixer.mix_g0(solvers[icrsh], general_params, icrsh, archive,
-                                             G0_freq_previous[icrsh], it, sum_k.deg_shells[icrsh])
+                                             G0_freq_previous[icrsh], sum_k.deg_shells[icrsh])
 
         if isinstance(sum_k.mesh, MeshImFreq):
             solvers[icrsh].G0_freq << make_hermitian(solvers[icrsh].G0_freq)

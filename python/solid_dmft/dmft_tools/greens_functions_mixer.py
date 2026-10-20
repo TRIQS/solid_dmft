@@ -69,7 +69,7 @@ def _vec_to_bgf(vec, bgf, deg_shells=None):
     return G
 
 
-def _broyden_update(it, broyler, general_params, deg_shells, G0_freq, G0_freq_previous):
+def _broyden_update(broyler, general_params, deg_shells, G0_freq, G0_freq_previous):
     """
     calculates the broyden update of G0 using the algorithm presented in:
     doi.org/10.1103/PhysRevB.80.125125 (Rok Zitko) &
@@ -80,10 +80,9 @@ def _broyden_update(it, broyler, general_params, deg_shells, G0_freq, G0_freq_pr
 
     Parameters
     ----------
-    it : int
-        iteration number
     broyler: dict
-        dict containing the broyden variables
+        dict containing the broyden variables; an empty history starts a new
+        Broyden sequence with a linear mixing step
     general_paramters: general params dict
 
     Returns
@@ -103,9 +102,8 @@ def _broyden_update(it, broyler, general_params, deg_shells, G0_freq, G0_freq_pr
         G0 = G0_freq.copy()
         G0_prev = G0_freq_previous.copy()
 
-    # if this is the first time broyden update is called (it==2)
-    # store init G0 first
-    if it == 2:
+    # empty history: store the initial G0 first
+    if not broyler['V']:
         # V holds the G0 as 1d numpy vectors
         broyler['V'].append(_bgf_to_vec(G0_prev, deg_shells))
         # F = dmft_step_G0 - V[-1]
@@ -122,9 +120,6 @@ def _broyden_update(it, broyler, general_params, deg_shells, G0_freq, G0_freq_pr
         dim = broyler['V'][0].shape[0]
         broyden_vec = np.zeros(dim,dtype='complex')
 
-        # define m as it-1-1 (last minus for idx starting at 0)
-        m = it-2
-
         # update broyden input params
         broyler['F'].append(_bgf_to_vec(G0, deg_shells)-broyler['V'][-1])
         norm_F = np.linalg.norm(broyler['F'][-1]-broyler['F'][-2])
@@ -133,6 +128,7 @@ def _broyden_update(it, broyler, general_params, deg_shells, G0_freq, G0_freq_pr
         broyler['dF'].append( (broyler['F'][-1]-broyler['F'][-2])/norm_F )
         # dV the normed difference between the two last input G0
         broyler['dV'].append( (broyler['V'][-1] - broyler['V'][-2])/norm_F )
+        m = len(broyler['dF'])
 
         # now build broyden correction vector
 
@@ -180,7 +176,7 @@ def _broyden_update(it, broyler, general_params, deg_shells, G0_freq, G0_freq_pr
     return G0_broyden_update, broyler
 
 
-def mix_g0(solver, general_params, icrsh, archive, G0_freq_previous, it, deg_shell):
+def mix_g0(solver, general_params, icrsh, archive, G0_freq_previous, deg_shell):
     if general_params['g0_mix_type'] == 'linear' and general_params['g0_mix'] < 1.0:
         mpi.report('\nlinear mixing G0 with previous iteration by factor {:.3f}\n'.format(general_params['g0_mix']))
         solver.G0_freq << (general_params['g0_mix'] * solver.G0_freq
@@ -193,7 +189,7 @@ def mix_g0(solver, general_params, icrsh, archive, G0_freq_previous, it, deg_she
             with HDFArchive(archive, 'a') as ar:
                 broyler = ar['DMFT_results']['broyler']
                 # calculate the next G0 via broyden scheme
-                G0_broyden_update, broyler[icrsh] = _broyden_update(it, broyler[icrsh], general_params,
+                G0_broyden_update, broyler[icrsh] = _broyden_update(broyler[icrsh], general_params,
                                                                     deg_shell, solver.G0_freq,
                                                                     G0_freq_previous)
                 # store broyden update to h5 archive
