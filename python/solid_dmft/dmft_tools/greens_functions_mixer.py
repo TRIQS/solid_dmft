@@ -44,9 +44,9 @@ def _bgf_to_vec(bgf, deg_shells=None):
         deg_vecs = []
         for deg_block in deg_shells:
             deg_vecs.append(bgf[deg_block[0]])
-        vec = np.hstack(gf.data.flatten() for gf in deg_vecs)
+        vec = np.hstack([gf.data.flatten() for gf in deg_vecs])
     else:
-        vec = np.hstack(bgf[bl].data.flatten() for bl in bgf.indices)
+        vec = np.hstack([bgf[bl].data.flatten() for bl in bgf.indices])
     return vec
 
 
