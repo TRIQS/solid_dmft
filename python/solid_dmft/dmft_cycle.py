@@ -397,11 +397,10 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
     else:
         E_kin_dft = None
 
-    # Broyden history: initialized if missing, and in CSC calculations
-    # restarted in every DMFT cycle, i.e. after every DFT update
+    # check for previous broyden data oterhwise initialize it:
     if mpi.is_master_node() and  general_params['g0_mix_type'] == 'broyden':
         with HDFArchive(archive, 'a') as ar:
-            if 'broyler' not in ar['DMFT_results'] or general_params['csc']:
+            if 'broyler' not in ar['DMFT_results']:
                 ar['DMFT_results']['broyler'] = [{'mu' : [],'V': [], 'dV': [], 'F': [], 'dF': []}
                                                       for _ in range(sum_k.n_inequiv_shells)]
 
