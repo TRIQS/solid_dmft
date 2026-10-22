@@ -4,14 +4,16 @@
 
 ## Version 3.3.6
 
-solid_dmft version 3.3.6 is a patch release that fixes the CRM Dyson solver for calculations without fully degenerate blocks and the ctseg improved-estimator self-energy for blocks with off-diagonal elements.
+solid_dmft version 3.3.6 is a patch release that fixes the CRM Dyson solver for calculations without fully degenerate blocks, the ctseg improved-estimator self-energy for blocks with off-diagonal elements, and Broyden mixing of G0.
 
 ### fix
+* Broyden mixing of G0 (`g0_mix_type = 'broyden'`) works again and mixes every block. It aborted in the second iteration with numpy >= 1.24 (`np.hstack` of a generator); blocks that are in no degenerate shell were left unmixed whenever other blocks were degenerate; and a first Broyden step at any iteration other than the second, e.g. after a restart that switches to Broyden mixing, failed with an IndexError
 * ctseg solver: the improved-estimator self-energy is now computed as the matrix product Sigma = F G^-1 within each block, and made hermitian. The element-wise division used before was wrong for blocks with off-diagonal elements; diagonal (1x1 block) calculations change only at the level of the QMC noise, see #147
 * cthyb and ctseg solvers: the CRM Dyson solver (`crm_dyson_solver = true`) now returns the self-energy of every block. Without degenerate shells the minimized self-energy was discarded, so cthyb returned only the Hartree shift Sigma_0 and ctseg kept the self-energy of the previous step; with degenerate shells, blocks that are in no shell were skipped in the same way. Fully degenerate calculations such as paramagnetic SrVO3 were not affected. Calculations using the CRM self-energy with cthyb also need a cthyb that computes the first self-energy moment with the matrix product Sigma_0 Sigma_0 (TRIQS/cthyb#196); the element-wise square used before is wrong whenever Sigma_0 has off-diagonal elements
 * hubbardI solver: `G_moments` is computed from the full local Hamiltonian, the impurity levels included. Only the interaction was passed before, so `G_moments[2]` lacked the impurity levels. It is only written to the archive and not used in the DMFT cycle
 
 ### test
+* new unit test `test_greens_functions_mixer`: Broyden mixing of G0 on a model fixed-point problem, checked step by step against an independent implementation of Johnson's scheme, with and without degenerate shells and a truncated history
 * `restart_svo_hubbardI_basic` now runs after `svo_hubbardI_basic` and `maxent_svo_hubbardI_basic`. It had no test dependency, so under `ctest -j` it could run in the same directory at the same time as the run it restarts from, and fail or hang
 
 ## Version 3.3.5
