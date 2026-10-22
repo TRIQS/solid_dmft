@@ -206,6 +206,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.greens_functions_mixer.html">dmft_tools.greens_functions_mixer</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../_ref/dmft_tools.greens_functions_mixer.html#dmft_tools.greens_functions_mixer._bgf_to_vec"><code class="docutils literal notranslate"><span class="pre">_bgf_to_vec()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../_ref/dmft_tools.greens_functions_mixer.html#dmft_tools.greens_functions_mixer._broyden_update"><code class="docutils literal notranslate"><span class="pre">_broyden_update()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../_ref/dmft_tools.greens_functions_mixer.html#dmft_tools.greens_functions_mixer._mixed_blocks"><code class="docutils literal notranslate"><span class="pre">_mixed_blocks()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.initial_self_energies.html">dmft_tools.initial_self_energies</a><ul>
@@ -616,50 +617,48 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">legendre_filter</span>
 
 
+<div class="viewcode-block" id="_mixed_blocks">
+<a class="viewcode-back" href="../../_ref/dmft_tools.greens_functions_mixer.html#dmft_tools.greens_functions_mixer._mixed_blocks">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_mixed_blocks</span><span class="p">(</span><span class="n">bgf</span><span class="p">,</span> <span class="n">deg_shells</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    groups of block names whose first entry is stored in the Broyden vector;</span>
+<span class="sd">    the other entries of a group are copies of the first. Blocks that are in</span>
+<span class="sd">    no degenerate shell form a group of their own.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">groups</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">deg_block</span><span class="p">)</span> <span class="k">for</span> <span class="n">deg_block</span> <span class="ow">in</span> <span class="n">deg_shells</span><span class="p">]</span> <span class="k">if</span> <span class="n">deg_shells</span> <span class="k">else</span> <span class="p">[]</span>
+    <span class="n">in_shell</span> <span class="o">=</span> <span class="p">{</span><span class="n">bl</span> <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">groups</span> <span class="k">for</span> <span class="n">bl</span> <span class="ow">in</span> <span class="n">group</span><span class="p">}</span>
+    <span class="n">groups</span> <span class="o">+=</span> <span class="p">[[</span><span class="n">bl</span><span class="p">]</span> <span class="k">for</span> <span class="n">bl</span> <span class="ow">in</span> <span class="n">bgf</span><span class="o">.</span><span class="n">indices</span> <span class="k">if</span> <span class="n">bl</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">in_shell</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">groups</span></div>
+
+
+
 <div class="viewcode-block" id="_bgf_to_vec">
 <a class="viewcode-back" href="../../_ref/dmft_tools.greens_functions_mixer.html#dmft_tools.greens_functions_mixer._bgf_to_vec">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">_bgf_to_vec</span><span class="p">(</span><span class="n">bgf</span><span class="p">,</span> <span class="n">deg_shells</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    flattens a BlockGf to a 1d numpy array</span>
-<span class="sd">    if deg_shells is given, only non-deg shells are given back</span>
+<span class="sd">    if deg_shells is given, only the first block of each degenerate shell is stored</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">deg_shells</span><span class="p">:</span>
-        <span class="n">deg_vecs</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">deg_block</span> <span class="ow">in</span> <span class="n">deg_shells</span><span class="p">:</span>
-            <span class="n">deg_vecs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bgf</span><span class="p">[</span><span class="n">deg_block</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
-        <span class="n">vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">gf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="k">for</span> <span class="n">gf</span> <span class="ow">in</span> <span class="n">deg_vecs</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">bgf</span><span class="p">[</span><span class="n">bl</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="k">for</span> <span class="n">bl</span> <span class="ow">in</span> <span class="n">bgf</span><span class="o">.</span><span class="n">indices</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">vec</span></div>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">bgf</span><span class="p">[</span><span class="n">group</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">_mixed_blocks</span><span class="p">(</span><span class="n">bgf</span><span class="p">,</span> <span class="n">deg_shells</span><span class="p">)])</span></div>
 
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_vec_to_bgf</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span> <span class="n">bgf</span><span class="p">,</span> <span class="n">deg_shells</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">G</span> <span class="o">=</span> <span class="n">bgf</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">deg_shells</span><span class="p">:</span>
-        <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">deg_block</span> <span class="ow">in</span> <span class="n">deg_shells</span><span class="p">:</span>
-            <span class="c1"># only the first element was stored in numpy vec</span>
-            <span class="n">bl</span> <span class="o">=</span> <span class="n">deg_block</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">points</span> <span class="o">=</span> <span class="nb">len</span><span class="p">([</span><span class="n">w</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">G</span><span class="p">[</span><span class="n">bl</span><span class="p">]</span><span class="o">.</span><span class="n">mesh</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">G</span><span class="p">[</span><span class="n">bl</span><span class="p">]</span><span class="o">.</span><span class="n">target_shape</span><span class="p">))</span>
-            <span class="n">end</span> <span class="o">=</span> <span class="n">start</span><span class="o">+</span><span class="n">points</span>
-            <span class="n">G</span><span class="p">[</span><span class="n">bl</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[:,:,:]</span> <span class="o">=</span> <span class="n">vec</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">G</span><span class="p">[</span><span class="n">bl</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-            <span class="n">start</span> <span class="o">=</span> <span class="n">end</span>
-            <span class="k">for</span> <span class="n">other_blocks</span> <span class="ow">in</span> <span class="n">deg_block</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
-                <span class="n">G</span><span class="p">[</span><span class="n">other_blocks</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="n">G</span><span class="p">[</span><span class="n">bl</span><span class="p">]</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">bl</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">indices</span><span class="p">):</span>
-            <span class="n">points</span> <span class="o">=</span> <span class="nb">len</span><span class="p">([</span><span class="n">w</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">G</span><span class="p">[</span><span class="n">bl</span><span class="p">]</span><span class="o">.</span><span class="n">mesh</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">G</span><span class="p">[</span><span class="n">bl</span><span class="p">]</span><span class="o">.</span><span class="n">target_shape</span><span class="p">))</span>
-            <span class="n">end</span> <span class="o">=</span> <span class="n">start</span><span class="o">+</span><span class="n">points</span>
-            <span class="n">G</span><span class="p">[</span><span class="n">bl</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[:,:,:]</span> <span class="o">=</span> <span class="n">vec</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">G</span><span class="p">[</span><span class="n">bl</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-            <span class="n">start</span> <span class="o">=</span> <span class="n">end</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">_mixed_blocks</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">deg_shells</span><span class="p">):</span>
+        <span class="n">bl</span> <span class="o">=</span> <span class="n">group</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="n">G</span><span class="p">[</span><span class="n">bl</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">size</span>
+        <span class="n">G</span><span class="p">[</span><span class="n">bl</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">vec</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">G</span><span class="p">[</span><span class="n">bl</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">end</span>
+        <span class="k">for</span> <span class="n">other_block</span> <span class="ow">in</span> <span class="n">group</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">G</span><span class="p">[</span><span class="n">other_block</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="n">G</span><span class="p">[</span><span class="n">bl</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">G</span>
 
 
 <div class="viewcode-block" id="_broyden_update">
 <a class="viewcode-back" href="../../_ref/dmft_tools.greens_functions_mixer.html#dmft_tools.greens_functions_mixer._broyden_update">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">_broyden_update</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">broyler</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">deg_shells</span><span class="p">,</span> <span class="n">G0_freq</span><span class="p">,</span> <span class="n">G0_freq_previous</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_broyden_update</span><span class="p">(</span><span class="n">broyler</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">deg_shells</span><span class="p">,</span> <span class="n">G0_freq</span><span class="p">,</span> <span class="n">G0_freq_previous</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    calculates the broyden update of G0 using the algorithm presented in:</span>
 <span class="sd">    doi.org/10.1103/PhysRevB.80.125125 (Rok Zitko) &amp;</span>
@@ -670,10 +669,9 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    it : int</span>
-<span class="sd">        iteration number</span>
 <span class="sd">    broyler: dict</span>
-<span class="sd">        dict containing the broyden variables</span>
+<span class="sd">        dict containing the broyden variables; an empty history starts a new</span>
+<span class="sd">        Broyden sequence with a linear mixing step</span>
 <span class="sd">    general_paramters: general params dict</span>
 
 <span class="sd">    Returns</span>
@@ -693,9 +691,8 @@
         <span class="n">G0</span> <span class="o">=</span> <span class="n">G0_freq</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">G0_prev</span> <span class="o">=</span> <span class="n">G0_freq_previous</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-    <span class="c1"># if this is the first time broyden update is called (it==2)</span>
-    <span class="c1"># store init G0 first</span>
-    <span class="k">if</span> <span class="n">it</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="c1"># empty history: store the initial G0 first</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">broyler</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">]:</span>
         <span class="c1"># V holds the G0 as 1d numpy vectors</span>
         <span class="n">broyler</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_bgf_to_vec</span><span class="p">(</span><span class="n">G0_prev</span><span class="p">,</span> <span class="n">deg_shells</span><span class="p">))</span>
         <span class="c1"># F = dmft_step_G0 - V[-1]</span>
@@ -712,9 +709,6 @@
         <span class="n">dim</span> <span class="o">=</span> <span class="n">broyler</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">broyden_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;complex&#39;</span><span class="p">)</span>
 
-        <span class="c1"># define m as it-1-1 (last minus for idx starting at 0)</span>
-        <span class="n">m</span> <span class="o">=</span> <span class="n">it</span><span class="o">-</span><span class="mi">2</span>
-
         <span class="c1"># update broyden input params</span>
         <span class="n">broyler</span><span class="p">[</span><span class="s1">&#39;F&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_bgf_to_vec</span><span class="p">(</span><span class="n">G0</span><span class="p">,</span> <span class="n">deg_shells</span><span class="p">)</span><span class="o">-</span><span class="n">broyler</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
         <span class="n">norm_F</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">broyler</span><span class="p">[</span><span class="s1">&#39;F&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">broyler</span><span class="p">[</span><span class="s1">&#39;F&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
@@ -723,6 +717,7 @@
         <span class="n">broyler</span><span class="p">[</span><span class="s1">&#39;dF&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">(</span><span class="n">broyler</span><span class="p">[</span><span class="s1">&#39;F&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">broyler</span><span class="p">[</span><span class="s1">&#39;F&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span><span class="o">/</span><span class="n">norm_F</span> <span class="p">)</span>
         <span class="c1"># dV the normed difference between the two last input G0</span>
         <span class="n">broyler</span><span class="p">[</span><span class="s1">&#39;dV&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">(</span><span class="n">broyler</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">broyler</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span><span class="o">/</span><span class="n">norm_F</span> <span class="p">)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">broyler</span><span class="p">[</span><span class="s1">&#39;dF&#39;</span><span class="p">])</span>
 
         <span class="c1"># now build broyden correction vector</span>
 
@@ -771,7 +766,7 @@
 
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">mix_g0</span><span class="p">(</span><span class="n">solver</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">icrsh</span><span class="p">,</span> <span class="n">archive</span><span class="p">,</span> <span class="n">G0_freq_previous</span><span class="p">,</span> <span class="n">it</span><span class="p">,</span> <span class="n">deg_shell</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">mix_g0</span><span class="p">(</span><span class="n">solver</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">icrsh</span><span class="p">,</span> <span class="n">archive</span><span class="p">,</span> <span class="n">G0_freq_previous</span><span class="p">,</span> <span class="n">deg_shell</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;g0_mix_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;linear&#39;</span> <span class="ow">and</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;g0_mix&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">1.0</span><span class="p">:</span>
         <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">linear mixing G0 with previous iteration by factor </span><span class="si">{:.3f}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;g0_mix&#39;</span><span class="p">]))</span>
         <span class="n">solver</span><span class="o">.</span><span class="n">G0_freq</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;g0_mix&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">solver</span><span class="o">.</span><span class="n">G0_freq</span>
@@ -784,7 +779,7 @@
             <span class="k">with</span> <span class="n">HDFArchive</span><span class="p">(</span><span class="n">archive</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ar</span><span class="p">:</span>
                 <span class="n">broyler</span> <span class="o">=</span> <span class="n">ar</span><span class="p">[</span><span class="s1">&#39;DMFT_results&#39;</span><span class="p">][</span><span class="s1">&#39;broyler&#39;</span><span class="p">]</span>
                 <span class="c1"># calculate the next G0 via broyden scheme</span>
-                <span class="n">G0_broyden_update</span><span class="p">,</span> <span class="n">broyler</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span> <span class="o">=</span> <span class="n">_broyden_update</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">broyler</span><span class="p">[</span><span class="n">icrsh</span><span class="p">],</span> <span class="n">general_params</span><span class="p">,</span>
+                <span class="n">G0_broyden_update</span><span class="p">,</span> <span class="n">broyler</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span> <span class="o">=</span> <span class="n">_broyden_update</span><span class="p">(</span><span class="n">broyler</span><span class="p">[</span><span class="n">icrsh</span><span class="p">],</span> <span class="n">general_params</span><span class="p">,</span>
                                                                     <span class="n">deg_shell</span><span class="p">,</span> <span class="n">solver</span><span class="o">.</span><span class="n">G0_freq</span><span class="p">,</span>
                                                                     <span class="n">G0_freq_previous</span><span class="p">)</span>
                 <span class="c1"># store broyden update to h5 archive</span>
