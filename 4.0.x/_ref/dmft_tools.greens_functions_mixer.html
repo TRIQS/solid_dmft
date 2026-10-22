@@ -211,6 +211,7 @@
 <li class="toctree-l4 current"><a class="current reference internal" href="#">dmft_tools.greens_functions_mixer</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="#dmft_tools.greens_functions_mixer._bgf_to_vec"><code class="docutils literal notranslate"><span class="pre">_bgf_to_vec()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="#dmft_tools.greens_functions_mixer._broyden_update"><code class="docutils literal notranslate"><span class="pre">_broyden_update()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#dmft_tools.greens_functions_mixer._mixed_blocks"><code class="docutils literal notranslate"><span class="pre">_mixed_blocks()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="dmft_tools.initial_self_energies.html">dmft_tools.initial_self_energies</a><ul>
@@ -614,12 +615,12 @@
 <dt class="sig sig-object py" id="dmft_tools.greens_functions_mixer._bgf_to_vec">
 <span class="sig-prename descclassname"><span class="pre">dmft_tools.greens_functions_mixer.</span></span><span class="sig-name descname"><span class="pre">_bgf_to_vec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bgf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg_shells</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dmft_tools/greens_functions_mixer.html#_bgf_to_vec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dmft_tools.greens_functions_mixer._bgf_to_vec" title="Link to this definition"></a></dt>
 <dd><p>flattens a BlockGf to a 1d numpy array
-if deg_shells is given, only non-deg shells are given back</p>
+if deg_shells is given, only the first block of each degenerate shell is stored</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="dmft_tools.greens_functions_mixer._broyden_update">
-<span class="sig-prename descclassname"><span class="pre">dmft_tools.greens_functions_mixer.</span></span><span class="sig-name descname"><span class="pre">_broyden_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">it</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">broyler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">general_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg_shells</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">G0_freq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">G0_freq_previous</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dmft_tools/greens_functions_mixer.html#_broyden_update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dmft_tools.greens_functions_mixer._broyden_update" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">dmft_tools.greens_functions_mixer.</span></span><span class="sig-name descname"><span class="pre">_broyden_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">broyler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">general_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg_shells</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">G0_freq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">G0_freq_previous</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dmft_tools/greens_functions_mixer.html#_broyden_update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dmft_tools.greens_functions_mixer._broyden_update" title="Link to this definition"></a></dt>
 <dd><p>calculates the broyden update of G0 using the algorithm presented in:
 doi.org/10.1103/PhysRevB.80.125125 (Rok Zitko) &amp;
 doi.org/10.1103/PhysRevB.38.12807 (D.D. Johnson)</p>
@@ -628,9 +629,8 @@ where dmft_step gives back the normal defined G0=inverse(Gloc^-1 - Sigma)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>it</strong><span class="classifier">int</span></dt><dd><p>iteration number</p>
-</dd>
-<dt><strong>broyler: dict</strong></dt><dd><p>dict containing the broyden variables</p>
+<dt><strong>broyler: dict</strong></dt><dd><p>dict containing the broyden variables; an empty history starts a new
+Broyden sequence with a linear mixing step</p>
 </dd>
 <dt><strong>general_paramters: general params dict</strong></dt><dd></dd>
 </dl>
@@ -638,6 +638,14 @@ where dmft_step gives back the normal defined G0=inverse(Gloc^-1 - Sigma)</p>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"></dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dmft_tools.greens_functions_mixer._mixed_blocks">
+<span class="sig-prename descclassname"><span class="pre">dmft_tools.greens_functions_mixer.</span></span><span class="sig-name descname"><span class="pre">_mixed_blocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bgf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg_shells</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dmft_tools/greens_functions_mixer.html#_mixed_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dmft_tools.greens_functions_mixer._mixed_blocks" title="Link to this definition"></a></dt>
+<dd><p>groups of block names whose first entry is stored in the Broyden vector;
+the other entries of a group are copies of the first. Blocks that are in
+no degenerate shell form a group of their own.</p>
 </dd></dl>
 
 </section>
