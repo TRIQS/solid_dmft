@@ -10,9 +10,11 @@ DFT give different results than with 4.0.0, since the orbital dependent part of
 the shift was previously averaged out of the impurity problem, see the fix below.
 
 ### General
+* mixing is set with the general keys `mix_quantity` (`'G0'` or `'Sigma'`), `mix_type` (`'linear'` or `'broyden'`) and `mix_greed`. Sigma can now also be mixed with Broyden; G0 and Sigma keep separate Broyden histories (`DMFT_results/broyler_G0`, `broyler_Sigma`). `g0_mix`, `g0_mix_type` and `sigma_mix` are deprecated: they still work and are mapped to the new keys with a `FutureWarning`. A G0 Broyden history in an archive from an earlier version is not picked up on restart, so the first mixing step after the restart is linear. Based on the design of #73 by Alberto Carta
 * add the `sigma_embedding` argument to `plot_correlated_bands.get_dmft_bands`, giving the tight-binding orbitals each correlated shell occupies, for models that do not follow the wannier90 convention of the correlated orbitals coming first
 
 ### test
+* new unit test `test_mixing_params` for the mixing keys and the mapping of the deprecated ones; `test_greens_functions_mixer` also covers `mix_gf` for G0 and Sigma, with separate Broyden histories per quantity and shell
 * new unit test `test_greens_functions_mixer`: Broyden mixing of G0 on a model fixed-point problem, checked step by step against an independent implementation of Johnson's scheme, with and without degenerate shells and a truncated history
 * `restart_svo_hubbardI_basic` now runs after `svo_hubbardI_basic` and `maxent_svo_hubbardI_basic`. It had no test dependency, so under `ctest -j` it could run in the same directory at the same time as the run it restarts from, and fail or hang
 * `svo_cthyb_basic_tf` now checks that the hybridization function passed to the solver is negative, which catches the `dc_orb_shift` bug below. The test only checked that the run completes, and had been passing intermittently with an average sign of about 1e-2 since the input was added in #74
