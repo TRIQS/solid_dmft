@@ -12,7 +12,8 @@ U = 2.50
 J = 0.50
 beta = 40
 
-g0_mix = 0.95
+mix_quantity = "G0"
+mix_greed = 0.95
 n_iter_dmft_first = 4
 n_iter_dmft_per = 2
 n_iter_dmft = 26
