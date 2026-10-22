@@ -137,40 +137,51 @@ def _broyden_update(broyler, alpha, broy_max_it, deg_shells, gf_out, gf_in):
     return gf_update, broyler
 
 
-def mix_g0(solver, general_params, icrsh, archive, G0_freq_previous, deg_shell):
-    if general_params['g0_mix_type'] == 'linear' and general_params['g0_mix'] < 1.0:
-        mpi.report('\nlinear mixing G0 with previous iteration by factor {:.3f}\n'.format(general_params['g0_mix']))
-        solver.G0_freq << (general_params['g0_mix'] * solver.G0_freq
-                                   + (1-general_params['g0_mix']) * G0_freq_previous)
-    elif general_params['g0_mix_type'] == 'broyden':
-        mpi.report('\nbroyden mixing G0 with previous iteration with alpha {:.3f}'.format(general_params['g0_mix']))
+def init_broyden_history(archive, quantity, n_inequiv_shells):
+    """
+    creates an empty Broyden history DMFT_results/broyler_<quantity> with one
+    entry per inequivalent shell in the h5 archive, unless it exists already.
+    Call on the master node only.
+    """
+    key = 'broyler_' + quantity
+    with HDFArchive(archive, 'a') as ar:
+        if key not in ar['DMFT_results']:
+            ar['DMFT_results'][key] = [{'V': [], 'dV': [], 'F': [], 'dF': []}
+                                       for _ in range(n_inequiv_shells)]
+
+
+def mix_gf(gf_out, gf_in, general_params, quantity, icrsh, archive, deg_shells):
+    """
+    mixes the output gf_out = dmft_step(gf_in) of quantity 'G0' or 'Sigma' with
+    the input gf_in of the same step, according to general_params['mix_type']
+    and general_params['mix_greed']. Broyden mixing reads and writes the history
+    of quantity and shell icrsh in the h5 archive (see init_broyden_history).
+
+    Returns
+    -------
+    BlockGf
+        the next input, the same on all MPI ranks
+    """
+    mix_type = general_params['mix_type']
+    mix_greed = general_params['mix_greed']
+    mixed = gf_out.copy()
+
+    if mix_type == 'linear':
+        if mix_greed < 1.0:
+            mpi.report(f'\nlinear mixing {quantity} with previous iteration by factor {mix_greed:.3f}\n')
+            mixed << mix_greed * gf_out + (1 - mix_greed) * gf_in
+    elif mix_type == 'broyden':
+        mpi.report(f'\nbroyden mixing {quantity} with previous iteration with alpha {mix_greed:.3f}')
         mpi.report('\n############\n!!!! WARNING !!!! broyden mixing is still in early testing stage ! Use with caution.\n############\n')
-        # TODO implement broyden mixing for Sigma
         if mpi.is_master_node():
+            key = 'broyler_' + quantity
             with HDFArchive(archive, 'a') as ar:
-                broyler = ar['DMFT_results']['broyler']
-                # calculate the next G0 via broyden scheme
-                G0_broyden_update, broyler[icrsh] = _broyden_update(broyler[icrsh], general_params['g0_mix'],
-                                                                    general_params['broy_max_it'],
-                                                                    deg_shell, solver.G0_freq,
-                                                                    G0_freq_previous)
-                # store broyden update to h5 archive
-                ar['DMFT_results']['broyler'] = broyler
-                solver.G0_freq << G0_broyden_update
+                broyler = ar['DMFT_results'][key]
+                mixed, broyler[icrsh] = _broyden_update(broyler[icrsh], mix_greed, general_params['broy_max_it'],
+                                                        deg_shells, gf_out, gf_in)
+                ar['DMFT_results'][key] = broyler
+    else:
+        raise ValueError(f'Invalid mix_type "{mix_type}".')
 
-        solver.G0_freq << mpi.bcast(solver.G0_freq)
-
-    return solver
-
-
-def mix_sigma(general_params, n_inequiv_shells, solvers, Sigma_freq_previous):
-    if general_params['sigma_mix'] < 1.0 and mpi.is_master_node():
-        print('mixing sigma with previous iteration by factor {:.3f}\n'.format(general_params['sigma_mix']))
-        for icrsh in range(n_inequiv_shells):
-            solvers[icrsh].Sigma_freq << (general_params['sigma_mix'] * solvers[icrsh].Sigma_freq
-                                        + (1-general_params['sigma_mix']) * Sigma_freq_previous[icrsh])
-
-    for icrsh in range(n_inequiv_shells):
-        solvers[icrsh].Sigma_freq << mpi.bcast(solvers[icrsh].Sigma_freq)
-
-    return solvers
+    mixed << mpi.bcast(mixed)
+    return mixed

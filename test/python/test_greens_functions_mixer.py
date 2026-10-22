@@ -1,16 +1,19 @@
 #!/usr/bin/env python
-# Broyden mixing of G0 (greens_functions_mixer._broyden_update) on a model
-# fixed-point problem G0 = (iw - H - lam G0)^-1, without any solver. Every
+# Broyden mixing (greens_functions_mixer._broyden_update and mix_gf) on a
+# model fixed-point problem G0 = (iw - H - lam G0)^-1, without any solver. Every
 # update is compared with an independent implementation of the modified
 # Broyden scheme of D. D. Johnson, PRB 38, 12807 (1988), with w_0 = 0.01
 # and all weights w_n = 1.
 
 import contextlib
 import io
+import os
+import tempfile
 import unittest
 
 import numpy as np
 
+from h5 import HDFArchive
 from triqs.gfs import Gf, BlockGf, MeshImFreq
 from solid_dmft.dmft_tools import greens_functions_mixer as gf_mixer
 
@@ -114,6 +117,63 @@ class TestBroydenG0Mixing(unittest.TestCase):
         G0, broyler = broyden_update(broyler, 0.3, -1,
                                      None, dmft_step(G0), G0)
         self.assertEqual((len(broyler['V']), len(broyler['F']), len(broyler['dF'])), (3, 2, 1))
+
+
+class TestMixGf(unittest.TestCase):
+    """mix_gf, the entry point used in the DMFT cycle for G0 and Sigma"""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.archive = os.path.join(self.tmp.name, 'mix.h5')
+        with HDFArchive(self.archive, 'w') as ar:
+            ar.create_group('DMFT_results')
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def mix(self, gf_out, gf_in, quantity, mix_type, mix_greed, icrsh=0, deg_shells=None):
+        params = {'mix_type': mix_type, 'mix_greed': mix_greed, 'broy_max_it': -1}
+        with contextlib.redirect_stdout(io.StringIO()):
+            return gf_mixer.mix_gf(gf_out, gf_in, params, quantity, icrsh, self.archive, deg_shells)
+
+    def test_linear(self):
+        for quantity in ('G0', 'Sigma'):
+            mixed = self.mix(new_bgf(3.0), new_bgf(1.0), quantity, 'linear', 0.25)
+            for bl in H:
+                np.testing.assert_allclose(mixed[bl].data, 1.5, atol=1e-15)
+            # mix_greed = 1 returns the output unchanged
+            mixed = self.mix(new_bgf(3.0), new_bgf(1.0), quantity, 'linear', 1.0)
+            for bl in H:
+                np.testing.assert_array_equal(mixed[bl].data, 3.0)
+
+    def test_broyden_histories_per_quantity_and_shell(self):
+        # G0 of two shells and Sigma, interleaved in one archive, must each give
+        # the same sequence as a standalone Broyden run
+        for quantity in ('G0', 'Sigma'):
+            gf_mixer.init_broyden_history(self.archive, quantity, n_inequiv_shells=2)
+        runs = {('G0', 0): 0.5, ('G0', 1): 0.3, ('Sigma', 0): 0.7}
+        V_in = {key: new_bgf(0.1 * (i + 1)) for i, key in enumerate(runs)}
+        ref_hist = {key: empty_history() for key in runs}
+        ref_in = {key: V_in[key].copy() for key in runs}
+        for _ in range(6):
+            for (quantity, icrsh), alpha in runs.items():
+                key = (quantity, icrsh)
+                V_in[key] = self.mix(dmft_step(V_in[key]), V_in[key], quantity, 'broyden', alpha, icrsh=icrsh)
+                ref_in[key], ref_hist[key] = broyden_update(ref_hist[key], alpha, -1, None,
+                                                            dmft_step(ref_in[key]), ref_in[key])
+                for bl in H:
+                    np.testing.assert_allclose(V_in[key][bl].data, ref_in[key][bl].data, rtol=0, atol=1e-14)
+        with HDFArchive(self.archive, 'r') as ar:
+            self.assertEqual([len(h['V']) for h in ar['DMFT_results']['broyler_G0']], [7, 7])
+            self.assertEqual(len(ar['DMFT_results']['broyler_Sigma'][0]['V']), 7)
+            self.assertEqual(len(ar['DMFT_results']['broyler_Sigma'][1]['V']), 0)
+
+    def test_init_keeps_existing_history(self):
+        gf_mixer.init_broyden_history(self.archive, 'Sigma', n_inequiv_shells=1)
+        self.mix(new_bgf(3.0), new_bgf(1.0), 'Sigma', 'broyden', 0.5)
+        gf_mixer.init_broyden_history(self.archive, 'Sigma', n_inequiv_shells=1)
+        with HDFArchive(self.archive, 'r') as ar:
+            self.assertEqual(len(ar['DMFT_results']['broyler_Sigma'][0]['V']), 2)
 
 
 if __name__ == '__main__':

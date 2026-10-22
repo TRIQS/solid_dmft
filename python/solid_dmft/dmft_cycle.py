@@ -397,12 +397,9 @@ def dmft_cycle(general_params, solver_params, advanced_params, dft_params,
     else:
         E_kin_dft = None
 
-    # check for previous broyden data oterhwise initialize it:
-    if mpi.is_master_node() and  general_params['g0_mix_type'] == 'broyden':
-        with HDFArchive(archive, 'a') as ar:
-            if 'broyler' not in ar['DMFT_results']:
-                ar['DMFT_results']['broyler'] = [{'mu' : [],'V': [], 'dV': [], 'F': [], 'dF': []}
-                                                      for _ in range(sum_k.n_inequiv_shells)]
+    # check for previous broyden data otherwise initialize it:
+    if mpi.is_master_node() and general_params['mix_type'] == 'broyden':
+        gf_mixer.init_broyden_history(archive, general_params['mix_quantity'], sum_k.n_inequiv_shells)
 
     # Generates a rotation matrix to change the basis
     if general_params['set_rot'] is not None:
@@ -683,9 +680,9 @@ def _dmft_step(sum_k, solvers, it, general_params, solver_params, gw_params,
         solvers[icrsh].G0_freq << inverse(solvers[icrsh].Sigma_freq + inverse(solvers[icrsh].G_freq))
 
         # mixing of G0 if wanted from the second iteration on
-        if it > 1:
-            solvers[icrsh] = gf_mixer.mix_g0(solvers[icrsh], general_params, icrsh, archive,
-                                             G0_freq_previous[icrsh], sum_k.deg_shells[icrsh])
+        if it > 1 and general_params['mix_quantity'] == 'G0':
+            solvers[icrsh].G0_freq << gf_mixer.mix_gf(solvers[icrsh].G0_freq, G0_freq_previous[icrsh], general_params,
+                                                      'G0', icrsh, archive, sum_k.deg_shells[icrsh])
 
         if isinstance(sum_k.mesh, MeshImFreq):
             solvers[icrsh].G0_freq << make_hermitian(solvers[icrsh].G0_freq)
@@ -792,7 +789,13 @@ def _dmft_step(sum_k, solvers, it, general_params, solver_params, gw_params,
         print('\n *** Post-processing the solver output ***')
         print('Total charge of all correlated shells : {:.6f}\n'.format(density_tot))
 
-    solvers = gf_mixer.mix_sigma(general_params, sum_k.n_inequiv_shells, solvers, Sigma_freq_previous)
+    for icrsh in range(sum_k.n_inequiv_shells):
+        if general_params['mix_quantity'] == 'Sigma':
+            solvers[icrsh].Sigma_freq << gf_mixer.mix_gf(solvers[icrsh].Sigma_freq, Sigma_freq_previous[icrsh],
+                                                         general_params, 'Sigma', icrsh, archive,
+                                                         sum_k.deg_shells[icrsh])
+        else:
+            solvers[icrsh].Sigma_freq << mpi.bcast(solvers[icrsh].Sigma_freq)
 
     # calculate new DC
     # for the hartree solver the DC potential will be formally set to zero as it is already present in the Sigma
