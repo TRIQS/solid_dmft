@@ -62,7 +62,6 @@ def johnson_step(V, F, dF, dV, alpha, n_hist):
 class TestBroydenG0Mixing(unittest.TestCase):
 
     def run_broyden(self, n_it, alpha, broy_max_it, deg_shells):
-        params = {'g0_mix': alpha, 'broy_max_it': broy_max_it}
         broyler = empty_history()
         G0 = new_bgf()
         for bl, g in G0:
@@ -76,7 +75,7 @@ class TestBroydenG0Mixing(unittest.TestCase):
                 G0 = G0_out
                 continue
             n_before = len(broyler['V'])
-            G0, broyler = broyden_update(broyler, params, deg_shells, G0_out, G0)
+            G0, broyler = broyden_update(broyler, alpha, broy_max_it, deg_shells, G0_out, G0)
             # V[-1] of this step from the history the step had available
             V, F, dF, dV = (broyler[k] for k in ('V', 'F', 'dF', 'dV'))
             n_avail = len(dF) if broy_max_it == -1 else min(len(dF), broy_max_it - 1)
@@ -99,7 +98,7 @@ class TestBroydenG0Mixing(unittest.TestCase):
 
     def test_block_outside_deg_shells_is_mixed(self):
         # first step is linear mixing: 0.5 * 3 + 0.5 * 1 = 2 in every block
-        G0, _ = broyden_update(empty_history(), {'g0_mix': 0.5, 'broy_max_it': -1},
+        G0, _ = broyden_update(empty_history(), 0.5, -1,
                                [['a1', 'a2']], new_bgf(3.0), new_bgf(1.0))
         for bl in H:
             np.testing.assert_allclose(G0[bl].data, 2.0, atol=1e-15, err_msg=bl)
@@ -107,12 +106,12 @@ class TestBroydenG0Mixing(unittest.TestCase):
     def test_empty_history_starts_with_linear_step(self):
         # an archive without history, at any iteration, starts a new sequence
         broyler = empty_history()
-        G0, broyler = broyden_update(broyler, {'g0_mix': 0.3, 'broy_max_it': -1},
+        G0, broyler = broyden_update(broyler, 0.3, -1,
                                      None, new_bgf(2.0), new_bgf(1.0))
         for bl in H:
             np.testing.assert_allclose(G0[bl].data, 1.3, atol=1e-15, err_msg=bl)
         self.assertEqual((len(broyler['V']), len(broyler['F']), len(broyler['dF'])), (2, 1, 0))
-        G0, broyler = broyden_update(broyler, {'g0_mix': 0.3, 'broy_max_it': -1},
+        G0, broyler = broyden_update(broyler, 0.3, -1,
                                      None, dmft_step(G0), G0)
         self.assertEqual((len(broyler['V']), len(broyler['F']), len(broyler['dF'])), (3, 2, 1))
 
