@@ -29,11 +29,6 @@ import numpy as np
 # triqs
 import triqs.utility.mpi as mpi
 from h5 import HDFArchive
-from triqs.gfs import MeshImFreq, MeshImTime, Gf, make_gf_from_fourier
-from triqs.gfs.descriptors import Fourier
-from triqs.gfs.tools import inverse
-
-from . import legendre_filter
 
 
 def _mixed_blocks(bgf, deg_shells):
@@ -69,146 +64,124 @@ def _vec_to_bgf(vec, bgf, deg_shells=None):
     return G
 
 
-def _broyden_update(broyler, general_params, deg_shells, G0_freq, G0_freq_previous):
+def _broyden_update(broyler, alpha, broy_max_it, deg_shells, gf_out, gf_in):
     """
-    calculates the broyden update of G0 using the algorithm presented in:
-    doi.org/10.1103/PhysRevB.80.125125 (Rok Zitko) &
-    doi.org/10.1103/PhysRevB.38.12807 (D.D. Johnson)
-
-    optimize function to find roots: F(G0)=dmft_step(G0) - G0 = 0
-    where dmft_step gives back the normal defined G0=inverse(Gloc^-1 - Sigma)
+    modified Broyden update of a BlockGf, D. D. Johnson, PRB 38, 12807 (1988),
+    see also R. Zitko, PRB 80, 125125 (2009), with w_0 = 0.01 and all weights 1.
+    It solves F(V) = dmft_step(V) - V = 0 for V = G0 or Sigma.
 
     Parameters
     ----------
-    broyler: dict
-        dict containing the broyden variables; an empty history starts a new
-        Broyden sequence with a linear mixing step
-    general_paramters: general params dict
+    broyler : dict
+        Broyden history with the lists 'V', 'F', 'dV', 'dF' of 1d vectors;
+        updated in place. An empty history starts a new sequence with a
+        linear mixing step.
+    alpha : float
+        mixing parameter of the linear part
+    broy_max_it : int
+        the last broy_max_it-1 differences are used; -1 uses all of them
+    deg_shells : list of list of str
+        degenerate blocks, only the first block of each shell is mixed
+    gf_out : BlockGf
+        dmft_step(V) of the last input V
+    gf_in : BlockGf
+        last input V, only used to start a new history
 
     Returns
     -------
+    gf_update : BlockGf
+        next input V
+    broyler : dict
+        updated history
     """
-    alpha = general_params['g0_mix']
-    # hard code w_0
     w_0 = 0.01
 
-    G0_broyden_update = G0_freq.copy()
-
-    # build here leg compression
-    if type(G0_freq.mesh) is MeshImFreq and 'n_l' in general_params:
-        G0 = legendre_filter.apply(make_gf_from_fourier(G0_freq), order=general_params['n_l'] )
-        G0_prev = legendre_filter.apply(make_gf_from_fourier(G0_freq_previous), order=general_params['n_l'] )
-    else:
-        G0 = G0_freq.copy()
-        G0_prev = G0_freq_previous.copy()
-
-    # empty history: store the initial G0 first
     if not broyler['V']:
-        # V holds the G0 as 1d numpy vectors
-        broyler['V'].append(_bgf_to_vec(G0_prev, deg_shells))
-        # F = dmft_step_G0 - V[-1]
-        broyler['F'].append(_bgf_to_vec(G0, deg_shells)-broyler['V'][-1])
-        # for the second iteration the broyden vec corresponds to simple linear mixing with alpha
-        broyden_vec = np.zeros(broyler['V'][0].shape[0],dtype='complex')
-
-    # for all other iteration calc V_mp1 = V[-1] + alpha * F[-1] - broyden_vec
-    # broyden vec is sum(n=1 to it-1) gamma_m_n U^n
-    # gamma_m_n = sum(k=1 to it-1)  c_k^m beta_k_n^m
-    # gamma_m_n is a number for each iteration and U^n is of dim G0 for each iteration
+        broyler['V'].append(_bgf_to_vec(gf_in, deg_shells))
+        broyler['F'].append(_bgf_to_vec(gf_out, deg_shells) - broyler['V'][-1])
+        broyden_vec = np.zeros(broyler['V'][0].shape[0], dtype=complex)
     else:
-        # get size of broyden update vector
-        dim = broyler['V'][0].shape[0]
-        broyden_vec = np.zeros(dim,dtype='complex')
+        broyden_vec = np.zeros(broyler['V'][0].shape[0], dtype=complex)
 
-        # update broyden input params
-        broyler['F'].append(_bgf_to_vec(G0, deg_shells)-broyler['V'][-1])
-        norm_F = np.linalg.norm(broyler['F'][-1]-broyler['F'][-2])
+        broyler['F'].append(_bgf_to_vec(gf_out, deg_shells) - broyler['V'][-1])
+        norm_F = np.linalg.norm(broyler['F'][-1] - broyler['F'][-2])
         print('broyden norm: {:.3f}'.format(norm_F))
-        # dF is normed differences between last two functions
-        broyler['dF'].append( (broyler['F'][-1]-broyler['F'][-2])/norm_F )
-        # dV the normed difference between the two last input G0
-        broyler['dV'].append( (broyler['V'][-1] - broyler['V'][-2])/norm_F )
+        broyler['dF'].append((broyler['F'][-1] - broyler['F'][-2]) / norm_F)
+        broyler['dV'].append((broyler['V'][-1] - broyler['V'][-2]) / norm_F)
         m = len(broyler['dF'])
 
-        # now build broyden correction vector
-
-        #only keep last m iterations
-        mem_iter = general_params['broy_max_it']-1
         start = 0
-        mat_dim = m
-        if m > mem_iter and not general_params['broy_max_it'] == -1:
-            for n in range(0, m-mem_iter):
-                start += 1
-                mat_dim -= 1
+        if broy_max_it != -1 and m > broy_max_it - 1:
+            start = m - (broy_max_it - 1)
+        mat_dim = m - start
 
-        # first create beta_m
-        A = np.zeros((mat_dim,mat_dim),dtype='complex')
-        gamma = np.zeros(mat_dim,dtype='complex')
-        for k_i in range(start,m):
-            for n_i in range(start,m):
-                A[k_i-start,n_i-start] = np.dot(broyler['dF'][n_i].conjugate().transpose(),broyler['dF'][k_i])
+        A = np.zeros((mat_dim, mat_dim), dtype=complex)
+        gamma = np.zeros(mat_dim, dtype=complex)
+        for k_i in range(start, m):
+            for n_i in range(start, m):
+                A[k_i-start, n_i-start] = np.dot(broyler['dF'][n_i].conjugate(), broyler['dF'][k_i])
                 if n_i == k_i:
-                    A[k_i-start,n_i-start] += w_0**2
+                    A[k_i-start, n_i-start] += w_0**2
         beta_m = np.linalg.inv(A)
-        for n_i in range(start,m):
+        for n_i in range(start, m):
             U_n = alpha * broyler['dF'][n_i] + broyler['dV'][n_i]
-
-            # construct gamma
-            for k_i in range(start,m):
-                c_k = np.dot(broyler['dF'][k_i].conjugate().transpose(),broyler['F'][-1])
-                gamma[n_i-start] += c_k*beta_m[k_i-start,n_i-start]
+            for k_i in range(start, m):
+                c_k = np.dot(broyler['dF'][k_i].conjugate(), broyler['F'][-1])
+                gamma[n_i-start] += c_k * beta_m[k_i-start, n_i-start]
             broyden_vec += gamma[n_i-start] * U_n
 
-    # update input G0
-    V_mp1 = broyler['V'][-1] + alpha * broyler['F'][-1] - broyden_vec
-    broyler['V'].append(V_mp1)
+    broyler['V'].append(broyler['V'][-1] + alpha * broyler['F'][-1] - broyden_vec)
 
-    # convert Gl back to G0_freq
-    if type(G0_freq.mesh) is MeshImFreq and 'n_l' in general_params:
-        G0_l_update = _vec_to_bgf(broyler['V'][-1], G0, deg_shells)
-        for block, g in G0_l_update:
-            g.enforce_discontinuity(np.identity(g.target_shape[0]))
-            G0_broyden_update[block].set_from_legendre(g)
-
-    else:
-        G0_broyden_update << _vec_to_bgf(broyler['V'][-1], G0, deg_shells)
-
-    return G0_broyden_update, broyler
+    gf_update = gf_out.copy()
+    gf_update << _vec_to_bgf(broyler['V'][-1], gf_out, deg_shells)
+    return gf_update, broyler
 
 
-def mix_g0(solver, general_params, icrsh, archive, G0_freq_previous, deg_shell):
-    if general_params['g0_mix_type'] == 'linear' and general_params['g0_mix'] < 1.0:
-        mpi.report('\nlinear mixing G0 with previous iteration by factor {:.3f}\n'.format(general_params['g0_mix']))
-        solver.G0_freq << (general_params['g0_mix'] * solver.G0_freq
-                                   + (1-general_params['g0_mix']) * G0_freq_previous)
-    elif general_params['g0_mix_type'] == 'broyden':
-        mpi.report('\nbroyden mixing G0 with previous iteration with alpha {:.3f}'.format(general_params['g0_mix']))
+def init_broyden_history(archive, quantity, n_inequiv_shells):
+    """
+    creates an empty Broyden history DMFT_results/broyler_<quantity> with one
+    entry per inequivalent shell in the h5 archive, unless it exists already.
+    Call on the master node only.
+    """
+    key = 'broyler_' + quantity
+    with HDFArchive(archive, 'a') as ar:
+        if key not in ar['DMFT_results']:
+            ar['DMFT_results'][key] = [{'V': [], 'dV': [], 'F': [], 'dF': []}
+                                       for _ in range(n_inequiv_shells)]
+
+
+def mix_gf(gf_out, gf_in, general_params, quantity, icrsh, archive, deg_shells):
+    """
+    mixes the output gf_out = dmft_step(gf_in) of quantity 'G0' or 'Sigma' with
+    the input gf_in of the same step, according to general_params['mix_type']
+    and general_params['mix_greed']. Broyden mixing reads and writes the history
+    of quantity and shell icrsh in the h5 archive (see init_broyden_history).
+
+    Returns
+    -------
+    BlockGf
+        the next input, the same on all MPI ranks
+    """
+    mix_type = general_params['mix_type']
+    mix_greed = general_params['mix_greed']
+    mixed = gf_out.copy()
+
+    if mix_type == 'linear':
+        if mix_greed < 1.0:
+            mpi.report(f'\nlinear mixing {quantity} with previous iteration by factor {mix_greed:.3f}\n')
+            mixed << mix_greed * gf_out + (1 - mix_greed) * gf_in
+    elif mix_type == 'broyden':
+        mpi.report(f'\nbroyden mixing {quantity} with previous iteration with alpha {mix_greed:.3f}')
         mpi.report('\n############\n!!!! WARNING !!!! broyden mixing is still in early testing stage ! Use with caution.\n############\n')
-        # TODO implement broyden mixing for Sigma
         if mpi.is_master_node():
+            key = 'broyler_' + quantity
             with HDFArchive(archive, 'a') as ar:
-                broyler = ar['DMFT_results']['broyler']
-                # calculate the next G0 via broyden scheme
-                G0_broyden_update, broyler[icrsh] = _broyden_update(broyler[icrsh], general_params,
-                                                                    deg_shell, solver.G0_freq,
-                                                                    G0_freq_previous)
-                # store broyden update to h5 archive
-                ar['DMFT_results']['broyler'] = broyler
-                solver.G0_freq << G0_broyden_update
+                broyler = ar['DMFT_results'][key]
+                mixed, broyler[icrsh] = _broyden_update(broyler[icrsh], mix_greed, general_params['broy_max_it'],
+                                                        deg_shells, gf_out, gf_in)
+                ar['DMFT_results'][key] = broyler
+    else:
+        raise ValueError(f'Invalid mix_type "{mix_type}".')
 
-        solver.G0_freq << mpi.bcast(solver.G0_freq)
-
-    return solver
-
-
-def mix_sigma(general_params, n_inequiv_shells, solvers, Sigma_freq_previous):
-    if general_params['sigma_mix'] < 1.0 and mpi.is_master_node():
-        print('mixing sigma with previous iteration by factor {:.3f}\n'.format(general_params['sigma_mix']))
-        for icrsh in range(n_inequiv_shells):
-            solvers[icrsh].Sigma_freq << (general_params['sigma_mix'] * solvers[icrsh].Sigma_freq
-                                        + (1-general_params['sigma_mix']) * Sigma_freq_previous[icrsh])
-
-    for icrsh in range(n_inequiv_shells):
-        solvers[icrsh].Sigma_freq << mpi.bcast(solvers[icrsh].Sigma_freq)
-
-    return solvers
+    mixed << mpi.bcast(mixed)
+    return mixed

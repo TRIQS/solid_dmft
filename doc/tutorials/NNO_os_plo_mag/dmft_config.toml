@@ -24,7 +24,8 @@ afm_order = true
 
 n_iter_dmft = 14
 
-g0_mix = 0.9
+mix_quantity = "G0"
+mix_greed = 0.9
 
 dc_type = 0
 dc = true

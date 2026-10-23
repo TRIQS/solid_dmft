@@ -13,6 +13,7 @@ set(basic_tests
     test_respack_sfo
     test_crm_dyson_solver
     test_greens_functions_mixer
+    test_mixing_params
     )
 
   # copy input files for PCB test from documentation tutorial

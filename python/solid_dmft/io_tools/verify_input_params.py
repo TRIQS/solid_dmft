@@ -1,8 +1,67 @@
 from typing import Any, Dict, List, Union
+import warnings
 import numpy as np
 
 ParamDict = Dict[str, Any]
 FullConfig = Dict[str, Union[ParamDict, List[ParamDict]]]
+
+
+def _resolve_mixing_params(params: FullConfig) -> None:
+    """
+    Maps the deprecated keys g0_mix, g0_mix_type and sigma_mix to mix_quantity,
+    mix_type and mix_greed, and fills in the defaults mix_type = 'linear' and
+    mix_greed = 1.0. Modifies params in place.
+    """
+    general = params['general']
+    old_keys = [key for key in ('g0_mix', 'g0_mix_type', 'sigma_mix') if general[key] is not None]
+    new_keys = [key for key in ('mix_quantity', 'mix_type', 'mix_greed') if general[key] is not None]
+
+    if old_keys:
+        if new_keys:
+            raise ValueError(f'Mixing is specified both with the deprecated keys {old_keys} and with {new_keys}. '
+                             'Use only "mix_quantity", "mix_type" and "mix_greed".')
+        g0_active = general['g0_mix_type'] == 'broyden' or (general['g0_mix'] is not None and general['g0_mix'] < 1.0)
+        sigma_active = general['sigma_mix'] is not None and general['sigma_mix'] < 1.0
+        if g0_active and sigma_active:
+            raise ValueError('You shall not use Sigma and G0 mixing together!')
+        if g0_active:
+            general['mix_quantity'] = 'G0'
+            general['mix_type'] = general['g0_mix_type'] if general['g0_mix_type'] is not None else 'linear'
+            general['mix_greed'] = general['g0_mix'] if general['g0_mix'] is not None else 1.0
+        elif sigma_active:
+            general['mix_quantity'] = 'Sigma'
+            general['mix_type'] = 'linear'
+            general['mix_greed'] = general['sigma_mix']
+        replacement = ', '.join(f'{key} = {general[key]!r}' for key in ('mix_quantity', 'mix_type', 'mix_greed')
+                                if general[key] is not None) or 'nothing (no mixing)'
+        warnings.warn(f'The general parameters {old_keys} are deprecated and will be removed. '
+                      f'They are interpreted as {replacement}.', FutureWarning)
+        for key in ('g0_mix', 'g0_mix_type', 'sigma_mix'):
+            general[key] = None
+
+    if general['mix_type'] is None:
+        general['mix_type'] = 'linear'
+    if general['mix_greed'] is None:
+        general['mix_greed'] = 1.0
+
+
+def _verify_mixing_params(params: FullConfig) -> None:
+    general = params['general']
+    if general['mix_quantity'] not in (None, 'G0', 'Sigma'):
+        raise ValueError(f'Invalid "mix_quantity" = {general["mix_quantity"]}, allowed are "G0" and "Sigma".')
+    if general['mix_type'] not in ('linear', 'broyden'):
+        raise ValueError(f'Invalid "mix_type" = {general["mix_type"]}, allowed are "linear" and "broyden".')
+    if general['mix_type'] == 'linear' and not 0.0 <= general['mix_greed'] <= 1.0:
+        raise ValueError(f'"mix_greed" = {general["mix_greed"]} must be in [0, 1] for linear mixing.')
+    if general['mix_type'] == 'broyden' and not general['mix_greed'] > 0.0:
+        raise ValueError(f'"mix_greed" = {general["mix_greed"]} must be positive for Broyden mixing.')
+    if general['mix_quantity'] is None and (general['mix_type'] == 'broyden' or general['mix_greed'] < 1.0):
+        raise ValueError('"mix_type" or "mix_greed" is set, but "mix_quantity" is not. '
+                         'Set "mix_quantity" to "G0" or "Sigma".')
+    if general['broy_max_it'] != -1 and general['broy_max_it'] < 1:
+        raise ValueError(f'"broy_max_it" = {general["broy_max_it"]} must be -1 or at least 1.')
+    if general['gw_embedding'] and (general['mix_quantity'] == 'G0' or general['mix_type'] == 'broyden'):
+        raise ValueError('GW embedding supports only linear mixing of Sigma.')
 
 
 def _verify_input_params_general(params: FullConfig) -> None:
@@ -20,10 +79,6 @@ def _verify_input_params_general(params: FullConfig) -> None:
         and (params['general']['eta'] is None or params['general']['n_w'] is None or params['general']['w_range'] is None)
     ):
         raise ValueError('Real-frequency grid chosen, specify "eta", "n_w", and "w_range".')
-
-    # warning if sigma mixing is used, remove in future versions
-    if params['general']['sigma_mix'] < 1.0 and params['general']['g0_mix'] < 1.0:
-        raise ValueError('You shall not use Sigma and G0 mixing together!')
 
     if params['general']['calc_energies'] and any(entry['type'] == 'ftps' for entry in params['solver']):
         raise ValueError('"calc_energies" is not valid for solver of type = "ftps"')
@@ -55,8 +110,7 @@ def _verify_input_params_general(params: FullConfig) -> None:
     else:
         raise ValueError('Invalid "h_int_type" input type. String or list expected.')
 
-    if params['general']['g0_mix_type'] not in ('linear', 'broyden'):
-        raise ValueError(f'Invalid "g0_mix_type" = {params["general"]["g0_mix_type"]}.')
+    _verify_mixing_params(params)
 
     if params['general']['calc_mu_method'] not in ('dichotomy', 'newton', 'brent'):
         raise ValueError(f'Invalid "calc_mu_method" = {params["general"]["calc_mu_method"]}.')
@@ -141,7 +195,8 @@ def _verify_input_params_advanced(params: FullConfig) -> None:
 
 
 def verify_before_dmft_cycle(params):
-    """All checks of params that can be done before dmft_cycle is called."""
+    """Maps deprecated keys and runs all checks of params that can be done before dmft_cycle is called."""
+    _resolve_mixing_params(params)
     _verify_input_params_general(params)
     _verify_input_params_dft(params)
     _verify_input_params_solver(params)

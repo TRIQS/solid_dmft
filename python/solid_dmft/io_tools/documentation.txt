@@ -11,7 +11,8 @@ block_threshold : float, default = 1e-5
         threshold for finding block structures in the input data (off-diag yes or no)
 broy_max_it : int, default = -1
         maximum number of iteration to be considered for broyden mixing.
-        Only used if general.g0_mix_type='broyden'.
+        Only used if general.mix_type='broyden'.
+        The last broy_max_it-1 differences are kept, -1 keeps all of them.
         1 corresponds to simple linear mixing
 calc_energies : bool, default = False
         Calculate the energies explicitly within the dmft loop and write them to the observables file.
@@ -60,14 +61,10 @@ fixed_mu_value : float, default = None
         If given, the chemical potential remains fixed in calculations
 g0_conv_crit : float, default = -1.0
         stop the calculation if sum_w 1/(w^0.6) ||G0-G0_prev|| is smaller than threshold
-g0_mix : float, default = 1.0
-        Mixing the weiss field G0 with previous iteration G0 for better convergency. 1.0 means no mixing.
-        Setting g0_mix to 0.0 with linear mixing can be used for statistic sampling when
-        restarting a calculation
-g0_mix_type : string, default = 'linear'
-        which type of mixing is used. Possible values are:
-        linear: linear mixing
-        broyden: broyden mixing
+g0_mix : float, default = None
+        deprecated, use mix_quantity = 'G0' and mix_greed
+g0_mix_type : string, default = None
+        deprecated, use mix_quantity = 'G0' and mix_type
 gimp_conv_crit : float, default = -1.0
         stop the calculation if  sum_w 1/(w^0.6) ||Gimp-Gloc|| is smaller than threshold
 gw_embedding : bool, default = False
@@ -120,6 +117,22 @@ magmom : list of float, default = None
 magnetic : bool, default = False
         are we doing a magnetic calculations? If yes put magnetic to True.
         Not implemented for CSC calculations
+mix_greed : float, default = 1.0
+        mixing parameter. For linear mixing the next input is
+        mix_greed * output + (1 - mix_greed) * previous input, so 1.0 means no mixing;
+        0.0 can be used for statistic sampling when restarting a calculation.
+        For Broyden mixing it is the weight alpha of the linear part and must be positive.
+mix_quantity : string, default = None
+        quantity that is mixed with its value of the previous iteration for better convergence:
+        'G0': the Weiss field, from the second iteration on
+        'Sigma': the impurity self-energy. Careful: Sigma mixing can break orbital symmetries.
+        None: no mixing
+mix_type : string, default = 'linear'
+        which type of mixing is used. Possible values are:
+        linear: linear mixing
+        broyden: modified Broyden mixing, D. D. Johnson, PRB 38, 12807 (1988); see broy_max_it.
+        G0 and Sigma keep separate Broyden histories in the h5 archive.
+        GW embedding supports only linear mixing of Sigma.
 mu_gap_gb2_threshold : float, default = None
         Threshold of the absolute of the lattice GF at tau=beta/2 for use
         of MaxEnt's lattice spectral function to put the chemical potential
@@ -184,9 +197,8 @@ set_rot : string, default = None
         * 'hloc': use the DFT local Hamiltonian hloc_dft for diagonalization
 sigma_conv_crit : float, default = -1.0
         stop the calculation if sum_w 1/(w^0.6) ||Sigma-Sigma_prev|| is smaller than threshold
-sigma_mix : float, default = 1.0
-        careful: Sigma mixing can break orbital symmetries, use G0 mixing.
-        mixing sigma with previous iteration sigma for better convergency. 1.0 means no mixing
+sigma_mix : float, default = None
+        deprecated, use mix_quantity = 'Sigma' and mix_greed
 store_solver : bool, default = False
         whether to store the whole solver object under DMFT_input in h5 archive
 U : float or list of float, mandatory

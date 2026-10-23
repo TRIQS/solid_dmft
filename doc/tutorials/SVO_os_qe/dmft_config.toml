@@ -21,7 +21,6 @@ dc = true
 dc_dmft = false
 
 calc_energies = false
-sigma_mix = 1.0
 
 h5_save_freq = 2
 

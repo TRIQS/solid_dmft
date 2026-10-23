@@ -24,7 +24,8 @@ dc = true
 dc_dmft = false
 
 calc_energies = true
-sigma_mix = 0.9
+mix_quantity = "Sigma"
+mix_greed = 0.9
 
 h5_save_freq = 5
 load_sigma = false

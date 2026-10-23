@@ -21,8 +21,6 @@ J = 0.46
 beta = 10
 prec_mu = 0.1
 
-sigma_mix = 1.0
-g0_mix = 1.0
 dc_type = 0
 dc = true
 dc_dmft = true
