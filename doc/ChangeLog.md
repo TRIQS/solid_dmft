@@ -10,7 +10,7 @@ DFT give different results than with 4.0.0, since the orbital dependent part of
 the shift was previously averaged out of the impurity problem, see the fix below.
 
 ### General
-* mixing is set with the general keys `mix_quantity` (`'G0'` or `'Sigma'`), `mix_type` (`'linear'` or `'broyden'`) and `mix_greed`. Sigma can now also be mixed with Broyden; G0 and Sigma keep separate Broyden histories (`DMFT_results/broyler_G0`, `broyler_Sigma`). `g0_mix`, `g0_mix_type` and `sigma_mix` are deprecated: they still work and are mapped to the new keys with a `FutureWarning`. A G0 Broyden history in an archive from an earlier version is not picked up on restart, so the first mixing step after the restart is linear. Based on the design of #73 by Alberto Carta
+* mixing is set with the general keys `mix_quantity` (`'G0'` or `'Sigma'`), `mix_type` (`'linear'` or `'broyden'`) and `mix_greed`. Sigma can now also be mixed with Broyden; G0 and Sigma keep separate Broyden histories (`DMFT_results/broyler_G0`, `broyler_Sigma`). `g0_mix`, `g0_mix_type` and `sigma_mix` are deprecated: they still work and are mapped to the new keys with a `FutureWarning`. A G0 Broyden history in an archive from an earlier version is not picked up on restart, so the first mixing step after the restart is linear. GW embedding (`gw_embedding = true`) supports only linear Sigma mixing and now stops with an error for G0 or Broyden mixing; a `g0_mix < 1` there was silently ignored before. Based on the design of #73 by Alberto Carta
 * add the `sigma_embedding` argument to `plot_correlated_bands.get_dmft_bands`, giving the tight-binding orbitals each correlated shell occupies, for models that do not follow the wannier90 convention of the correlated orbitals coming first
 
 ### test
