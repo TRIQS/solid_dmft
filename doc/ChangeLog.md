@@ -10,6 +10,7 @@ DFT give different results than with 4.0.0, since the orbital dependent part of
 the shift was previously averaged out of the impurity problem, see the fix below.
 
 ### General
+* ctseg interface: the first high-frequency moment of the impurity self-energy is computed from the measured state histogram (`measure_state_hist = true`, the default) with ctseg's `sigma_first_moment_from_state_hist` (TRIQS/ctseg#35) and used as a known moment, next to the Hartree shift, in the tail fit and the CRM Dyson solver, as the cthyb interface does with the density matrix. Only for static density-density interactions; otherwise, or with an older ctseg, only the Hartree shift is known, as before
 * add the `sigma_embedding` argument to `plot_correlated_bands.get_dmft_bands`, giving the tight-binding orbitals each correlated shell occupies, for models that do not follow the wannier90 convention of the correlated orbitals coming first
 
 ### test
