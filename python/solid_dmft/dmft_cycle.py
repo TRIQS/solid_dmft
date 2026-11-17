@@ -682,8 +682,13 @@ def _dmft_step(sum_k, solvers, it, general_params, solver_params, gw_params,
         # dyson equation to extract G0_freq, using Hermitian symmetry
         solvers[icrsh].G0_freq << inverse(solvers[icrsh].Sigma_freq + inverse(solvers[icrsh].G_freq))
 
-        # mixing of G0 if wanted from the second iteration on
-        if it > 1:
+        # solvers that take Delta(tau) instead of G0 as input
+        delta_interface = ((solver_type_per_imp[icrsh] == 'cthyb' and solvers[icrsh].solver_params['delta_interface'])
+                           or solver_type_per_imp[icrsh] == 'ctseg')
+
+        # mixing of G0 if wanted from the second iteration on; for the delta interface the
+        # hybridization is mixed instead, see below
+        if it > 1 and not delta_interface:
             solvers[icrsh] = gf_mixer.mix_g0(solvers[icrsh], general_params, icrsh, archive,
                                              G0_freq_previous[icrsh], sum_k.deg_shells[icrsh])
 
@@ -691,16 +696,25 @@ def _dmft_step(sum_k, solvers, it, general_params, solver_params, gw_params,
             solvers[icrsh].G0_freq << make_hermitian(solvers[icrsh].G0_freq)
         sum_k.symm_deg_gf(solvers[icrsh].G0_freq, ish=icrsh)
 
-        if ((solver_type_per_imp[icrsh] == 'cthyb' and solvers[icrsh].solver_params['delta_interface'])
-                or solver_type_per_imp[icrsh] == 'ctseg'):
+        if delta_interface:
             mpi.report('\n Using the delta interface for passing Delta(tau) and Hloc0 directly to the solver.')
              # prepare solver input
             sumk_eal = sum_k.eff_atomic_levels()[icrsh]
             solver_eal = sum_k.block_structure.convert_matrix(sumk_eal, space_from='sumk', ish_from=sum_k.inequiv_to_corr[icrsh])
-            # fill Delta_time from Delta_freq sum_k to solver
-            # for name, g0 in self.G0_freq:
             for name, g0 in solvers[icrsh].G0_freq:
                 solvers[icrsh].Delta_freq[name] << iOmega_n - inverse(g0) - solver_eal[name]
+
+            # mixing of the hybridization if wanted from the second iteration on. G0 is rebuilt
+            # from the mixed Delta, so that it stays the Weiss field of the solver input
+            if it > 1:
+                solvers[icrsh] = gf_mixer.mix_delta(solvers[icrsh], general_params, icrsh, archive,
+                                                    G0_freq_previous[icrsh], sum_k.deg_shells[icrsh])
+                sum_k.symm_deg_gf(solvers[icrsh].Delta_freq, ish=icrsh)
+                for name, delta in solvers[icrsh].Delta_freq:
+                    solvers[icrsh].G0_freq[name] << inverse(iOmega_n - solver_eal[name] - delta)
+
+            # fill Delta_time from Delta_freq sum_k to solver
+            for name, g0 in solvers[icrsh].G0_freq:
                 known_moments = make_zero_tail(solvers[icrsh].Delta_freq[name], 1)
                 tail, err = fit_hermitian_tail(solvers[icrsh].Delta_freq[name], known_moments)
                 # without SOC delta_tau needs to be real
