@@ -29,7 +29,7 @@ import numpy as np
 # triqs
 import triqs.utility.mpi as mpi
 from h5 import HDFArchive
-from triqs.gfs import MeshImFreq, MeshImTime, Gf, make_gf_from_fourier
+from triqs.gfs import MeshImFreq, MeshImTime, Gf, make_gf_from_fourier, iOmega_n, fit_hermitian_tail
 from triqs.gfs.descriptors import Fourier
 from triqs.gfs.tools import inverse
 
@@ -69,7 +69,7 @@ def _vec_to_bgf(vec, bgf, deg_shells=None):
     return G
 
 
-def _broyden_update(broyler, general_params, deg_shells, G0_freq, G0_freq_previous):
+def _broyden_update(broyler, general_params, deg_shells, G0_freq, G0_freq_previous, use_legendre=True):
     """
     calculates the broyden update of G0 using the algorithm presented in:
     doi.org/10.1103/PhysRevB.80.125125 (Rok Zitko) &
@@ -84,6 +84,9 @@ def _broyden_update(broyler, general_params, deg_shells, G0_freq, G0_freq_previo
         dict containing the broyden variables; an empty history starts a new
         Broyden sequence with a linear mixing step
     general_paramters: general params dict
+    use_legendre: bool
+        compress with Legendre polynomials if general_params has n_l. Needs the unit
+        discontinuity of a Green's function, so it is off for the hybridization.
 
     Returns
     -------
@@ -95,7 +98,7 @@ def _broyden_update(broyler, general_params, deg_shells, G0_freq, G0_freq_previo
     G0_broyden_update = G0_freq.copy()
 
     # build here leg compression
-    if type(G0_freq.mesh) is MeshImFreq and 'n_l' in general_params:
+    if use_legendre and type(G0_freq.mesh) is MeshImFreq and 'n_l' in general_params:
         G0 = legendre_filter.apply(make_gf_from_fourier(G0_freq), order=general_params['n_l'] )
         G0_prev = legendre_filter.apply(make_gf_from_fourier(G0_freq_previous), order=general_params['n_l'] )
     else:
@@ -164,7 +167,7 @@ def _broyden_update(broyler, general_params, deg_shells, G0_freq, G0_freq_previo
     broyler['V'].append(V_mp1)
 
     # convert Gl back to G0_freq
-    if type(G0_freq.mesh) is MeshImFreq and 'n_l' in general_params:
+    if use_legendre and type(G0_freq.mesh) is MeshImFreq and 'n_l' in general_params:
         G0_l_update = _vec_to_bgf(broyler['V'][-1], G0, deg_shells)
         for block, g in G0_l_update:
             g.enforce_discontinuity(np.identity(g.target_shape[0]))
@@ -212,3 +215,53 @@ def mix_sigma(general_params, n_inequiv_shells, solvers, Sigma_freq_previous):
         solvers[icrsh].Sigma_freq << mpi.bcast(solvers[icrsh].Sigma_freq)
 
     return solvers
+
+
+def _delta_from_g0(G0_freq):
+    """
+    Hybridization of a Weiss field G0 = (iw - eps - Delta)^-1, i.e. iw - G0^-1 without its
+    static part eps. The static part is taken from a fit of the high-frequency tail, so the
+    local levels the Weiss field was built with need not be known (e.g. after a restart).
+    """
+    Delta_freq = G0_freq.copy()
+    for block, g0 in G0_freq:
+        Delta_freq[block] << iOmega_n - inverse(g0)
+        tail, _ = fit_hermitian_tail(Delta_freq[block])
+        Delta_freq[block] << Delta_freq[block] - tail[0]
+    return Delta_freq
+
+
+def mix_delta(solver, general_params, icrsh, archive, G0_freq_previous, deg_shell):
+    """
+    Mixing for solvers that take the hybridization Delta(tau) as input (ctseg, cthyb with
+    delta_interface): mix solver.Delta_freq with the hybridization of the previous Weiss field,
+    controlled by g0_mix / g0_mix_type as for the G0 mixing.
+
+    Mixing G0 itself is not suited for these solvers: the Weiss fields of two iterations are built
+    with different local levels (the chemical potential changes), and Delta = iw - G0^-1 - eps
+    with the current levels eps then keeps a static part, which the Fourier transform to
+    Delta(tau) cannot represent. The resulting Delta(tau) oscillates and changes sign, i.e. the
+    solver runs into a sign problem. The mixture of two hybridizations stays causal instead.
+    """
+    if general_params['g0_mix_type'] == 'linear' and general_params['g0_mix'] < 1.0:
+        mpi.report('\nlinear mixing of the hybridization Delta with previous iteration by factor {:.3f}\n'.format(general_params['g0_mix']))
+        Delta_freq_previous = _delta_from_g0(G0_freq_previous)
+        solver.Delta_freq << (general_params['g0_mix'] * solver.Delta_freq
+                              + (1-general_params['g0_mix']) * Delta_freq_previous)
+    elif general_params['g0_mix_type'] == 'broyden':
+        mpi.report('\nbroyden mixing of the hybridization Delta with previous iteration with alpha {:.3f}'.format(general_params['g0_mix']))
+        mpi.report('\n############\n!!!! WARNING !!!! broyden mixing is still in early testing stage ! Use with caution.\n############\n')
+        Delta_freq_previous = _delta_from_g0(G0_freq_previous)
+        if mpi.is_master_node():
+            with HDFArchive(archive, 'a') as ar:
+                broyler = ar['DMFT_results']['broyler']
+                Delta_broyden_update, broyler[icrsh] = _broyden_update(broyler[icrsh], general_params,
+                                                                       deg_shell, solver.Delta_freq,
+                                                                       Delta_freq_previous, use_legendre=False)
+                ar['DMFT_results']['broyler'] = broyler
+                solver.Delta_freq << Delta_broyden_update
+
+        solver.Delta_freq << mpi.bcast(solver.Delta_freq)
+
+    return solver
+
