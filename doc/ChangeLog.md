@@ -10,9 +10,18 @@ DFT give different results than with 4.0.0, since the orbital dependent part of
 the shift was previously averaged out of the impurity problem, see the fix below.
 
 ### General
+* new `solid_dmft --params [section] [key]`: lists the input parameters with type, the default used by the code and the description from the documentation; `--solver-type <type>` restricts the `[solver]` keys to one solver type, `--json` gives machine-readable output
+* new `solid_dmft --check [config]`: reads the config file, fills in the defaults and runs the input checks without starting a calculation, prints the resolved config, and suggests close matches for unknown sections, keys and solver types. Exits non-zero for an invalid config. `solid_dmft [config]` runs the calculation as before
+* `general.n_iter_dmft` is marked mandatory in `default.toml`, as already documented; a config without it fails at the same stage as before, now with the generic message for missing mandatory keys
+* `io_tools/documentation.txt` is installed with the package, since `--params` reads it
 * add the `sigma_embedding` argument to `plot_correlated_bands.get_dmft_bands`, giving the tight-binding orbitals each correlated shell occupies, for models that do not follow the wannier90 convention of the correlated orbitals coming first
 
+### doc
+* input documentation now matches `default.toml`: `gw.it_1`/`gw.it_2` renamed to the keys the code reads, `gw.it_1e`/`gw.it_2e`; `gw.delta_calc_type` and `gw.delta_bath_fit` documented; corrected defaults of `solver.imag_threshold` (cthyb, 1e-8), `solver.measure_pert_order` and `solver.measure_state_hist` (ctseg, true) and `solver.measure_density_matrix` (hubbardI, true); `general.U` and `general.J` documented with their actual default None instead of as mandatory; `dft.dft_code`, `dft.n_cores`, `solver.dmrg_tw` and `solver.tw` (ftps) state their defaults in the parsable format
+
 ### test
+* new unit test `test_documentation_consistency`: fails if `io_tools/documentation.txt` and `io_tools/default.toml` disagree on the keys of any section or solver type, on a default, on mandatory keys, or if a documented type does not fit the default
+* new unit test `test_params_cli` for `solid_dmft --params` and `--check`
 * new unit test `test_greens_functions_mixer`: Broyden mixing of G0 on a model fixed-point problem, checked step by step against an independent implementation of Johnson's scheme, with and without degenerate shells and a truncated history
 * `restart_svo_hubbardI_basic` now runs after `svo_hubbardI_basic` and `maxent_svo_hubbardI_basic`. It had no test dependency, so under `ctest -j` it could run in the same directory at the same time as the run it restarts from, and fail or hang
 * `svo_cthyb_basic_tf` now checks that the hybridization function passed to the solver is negative, which catches the `dc_orb_shift` bug below. The test only checked that the run completes, and had been passing intermittently with an average sign of about 1e-2 since the input was added in #74
