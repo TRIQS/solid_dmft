@@ -14,6 +14,7 @@ set(basic_tests
     test_crm_dyson_solver
     test_greens_functions_mixer
     test_documentation_consistency
+    test_params_cli
     )
 
   # copy input files for PCB test from documentation tutorial

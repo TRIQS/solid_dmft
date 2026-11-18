@@ -25,6 +25,13 @@
 
 import sys
 import time
+
+from solid_dmft.io_tools import params_cli
+
+# --params and --check do no MPI work; triqs.utility.mpi would print to stdout on import
+if params_cli.is_cli_call(sys.argv):
+    sys.exit(params_cli.main(sys.argv[1:]))
+
 # triqs
 import triqs.utility.mpi as mpi
 
