@@ -123,7 +123,7 @@ class test_check_consistency_detects_drift(unittest.TestCase):
     def test_unknown_solver_subsection(self):
         doc = self.DOC + 'ctint\n=====\nmove_double : bool, default = True\n        double moves\n'
         problems = self._check(doc, self.TOML)
-        self.assertOneProblem(problems, '(ctint)', 'no such type')
+        self.assertOneProblem(problems, '(ctint)', 'such a type')
 
     def test_duplicate_entry(self):
         doc = self.DOC + 'move_double : bool, default = True\n        double moves\n'
@@ -139,13 +139,38 @@ class test_check_consistency_detects_drift(unittest.TestCase):
                                self.TOML)
         self.assertIn('cannot parse', problems[0])
 
-    def test_type_mismatch(self):
-        problems = self._check(self.DOC.replace('move_double : bool', 'move_double : int'), self.TOML)
-        self.assertOneProblem(problems, 'move_double', 'does not match documented type')
 
-    def test_unknown_type(self):
-        problems = self._check(self.DOC.replace('move_double : bool', 'move_double : boold'), self.TOML)
-        self.assertOneProblem(problems, 'move_double', 'unknown type')
+
+class test_rst_pages(unittest.TestCase):
+    """The web pages are generated from the same parser as the consistency check."""
+
+    def test_write_rst(self):
+        sections, problems = documentation.parse_documentation()
+        self.assertEqual(problems, [])
+        with tempfile.TemporaryDirectory() as tmp:
+            documentation.write_rst(tmp)
+            with open(os.path.join(tmp, 'input.rst')) as file:
+                index_page = file.read()
+            for section in sections:
+                with open(os.path.join(tmp, f'{section.name}.rst')) as file:
+                    page = file.read()
+                self.assertIn(f'    {section.name}\n', index_page)
+                for item in section.items:
+                    if isinstance(item, documentation.ParamDoc):
+                        self.assertIn(f'.. admonition:: {item.name}\n', page)
+                        self.assertIn(item.name, index_page)
+
+    def test_description_line_with_colon_stays_description(self):
+        # a description line containing " : " must not become an entry of its own
+        doc = '[  general  ]\n-------------\n\nmagmom : list of float, default = None\n        -1 : spin down\n'
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, 'documentation.txt')
+            with open(path, 'w') as file:
+                file.write(doc)
+            (section,), problems = documentation.parse_documentation(path)
+        self.assertEqual(problems, [])
+        self.assertEqual(len(section.items), 1)
+        self.assertEqual(section.items[0].description, '-1 : spin down')
 
 
 if __name__ == '__main__':

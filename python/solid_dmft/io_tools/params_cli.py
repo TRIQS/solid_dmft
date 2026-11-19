@@ -13,7 +13,6 @@ triqs.utility.mpi writes to stdout, which would break the --json output.
 
 import argparse
 import copy
-import difflib
 import json
 import sys
 
@@ -22,19 +21,12 @@ try:
 except ImportError:
     import tomli as tomllib
 
-from solid_dmft.io_tools import documentation, postproc_toml_dict, verify_input_params
+from solid_dmft.io_tools import documentation, postproc_toml_dict as pp, verify_input_params
 
 
 def is_cli_call(argv):
     """True if argv asks for one of the modes here. A plain ``solid_dmft [config]`` runs the calculation."""
     return any(arg.startswith('-') for arg in argv[1:])
-
-
-def _did_you_mean(word, candidates):
-    matches = difflib.get_close_matches(word, list(candidates), n=3, cutoff=0.6)
-    if not matches:
-        return ''
-    return ', did you mean ' + ' or '.join(f'"{m}"' for m in matches) + '?'
 
 
 def _format_value(value):
@@ -75,9 +67,9 @@ def _print_params(params):
 
 def params_mode(selection, solver_type=None, as_json=False):
     """Prints the parameters selected by [section] [key]. Returns the exit code."""
-    defaults = documentation.load_defaults()
+    defaults = pp.load_default_config()
     sections = list(defaults)
-    solver_types = [entry['type'] for entry in defaults['solver']]
+    solver_types = [entry[pp.MATCH_KEY['solver']] for entry in defaults['solver']]
 
     if len(selection) > 2:
         print('error: --params takes at most a section and a key', file=sys.stderr)
@@ -93,10 +85,10 @@ def params_mode(selection, solver_type=None, as_json=False):
             key = selection[0]
 
     if section is not None and section not in sections:
-        print(f'error: unknown section "{section}"' + _did_you_mean(section, sections), file=sys.stderr)
+        print(f'error: unknown section "{section}"' + pp.did_you_mean(section, sections), file=sys.stderr)
         return 1
     if solver_type is not None and solver_type not in solver_types:
-        print(f'error: unknown solver type "{solver_type}"' + _did_you_mean(solver_type, solver_types),
+        print(f'error: unknown solver type "{solver_type}"' + pp.did_you_mean(solver_type, solver_types),
               file=sys.stderr)
         return 1
 
@@ -108,7 +100,7 @@ def params_mode(selection, solver_type=None, as_json=False):
             where += f' for solver type "{solver_type}"'
         elsewhere = sorted({p['section'] for p in documentation.list_params(key=key)})
         hint = f' ("{key}" is in {", ".join(f"[{s}]" for s in elsewhere)})' if elsewhere else ''
-        print(f'error: unknown parameter "{key}"{where}' + _did_you_mean(key, candidates) + hint, file=sys.stderr)
+        print(f'error: unknown parameter "{key}"{where}' + pp.did_you_mean(key, candidates) + hint, file=sys.stderr)
         return 1
 
     if as_json:
@@ -116,58 +108,6 @@ def params_mode(selection, solver_type=None, as_json=False):
     else:
         _print_params(params)
     return 0
-
-
-def _unknown_entries(params, defaults):
-    """
-    Errors for unknown sections, solver types and keys, all at once and with
-    suggestions. merge_config_with_default stops at the first one and suggests nothing.
-    """
-    errors = []
-    listed = documentation.LISTED_SECTIONS
-    keys_per_section = {name: set(sec) for name, sec in defaults.items() if name not in listed}
-    solver_keys = {entry['type']: set(entry) for entry in defaults['solver']}
-
-    def other_places(key, own):
-        places = [f'[{name}]' for name, keys in keys_per_section.items() if key in keys and name != own]
-        places += [f'[solver] type = "{t}"' for t, keys in solver_keys.items() if key in keys and t != own]
-        return f' ("{key}" is valid in {", ".join(places)})' if places else ''
-
-    for section_name, section in params.items():
-        if section_name not in defaults:
-            errors.append(f'unknown section [{section_name}]' + _did_you_mean(section_name, defaults))
-            continue
-        if section_name in listed:
-            match_key = listed[section_name]
-            entries = section if isinstance(section, list) else [section]
-            for entry in entries:
-                if not isinstance(entry, dict):
-                    errors.append(f'[{section_name}] must be a table or a list of tables')
-                    continue
-                if match_key not in entry:
-                    errors.append(f'[{section_name}] "{match_key}" is mandatory, one of '
-                                  + ', '.join(f'"{t}"' for t in solver_keys))
-                    continue
-                solver_type = entry[match_key]
-                if solver_type not in solver_keys:
-                    errors.append(f'[{section_name}] unknown {match_key} = "{solver_type}"'
-                                  + _did_you_mean(str(solver_type), solver_keys))
-                    continue
-                for key in entry:
-                    if key not in solver_keys[solver_type]:
-                        errors.append(f'[{section_name}] unknown key "{key}" for {match_key} = "{solver_type}"'
-                                      + _did_you_mean(key, solver_keys[solver_type])
-                                      + other_places(key, solver_type))
-        else:
-            if not isinstance(section, dict):
-                errors.append(f'[{section_name}] must be a table')
-                continue
-            for key in section:
-                if key not in keys_per_section[section_name]:
-                    errors.append(f'[{section_name}] unknown key "{key}"'
-                                  + _did_you_mean(key, keys_per_section[section_name])
-                                  + other_places(key, section_name))
-    return errors
 
 
 def check_config(config_file):
@@ -186,14 +126,13 @@ def check_config(config_file):
     except (OSError, tomllib.TOMLDecodeError) as error:
         return None, [f'cannot read {config_file}: {error}']
 
-    defaults = documentation.load_defaults()
-    errors = _unknown_entries(params, defaults)
+    defaults = pp.load_default_config()
+    errors = pp.find_unknown_entries(params, defaults)
     if errors:
         return None, errors
 
     try:
-        full_params = postproc_toml_dict.merge_config_with_default(copy.deepcopy(params), defaults,
-                                                                   documentation.LISTED_SECTIONS)
+        full_params = pp.merge_config_with_default(copy.deepcopy(params), defaults, pp.MATCH_KEY)
         verify_input_params.verify_before_dmft_cycle(full_params)
     except (ValueError, TypeError, KeyError, IndexError) as error:
         return None, [str(error)]

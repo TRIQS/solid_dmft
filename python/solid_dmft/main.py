@@ -56,13 +56,10 @@ def run_dmft(params, config_file_name=None):
 
     # Reads in default params file and merges with params
     full_params = None
-    default_config_name = os.path.join(os.path.dirname(__file__),
-                                       'io_tools', 'default.toml')
     if mpi.is_master_node():
-        with open(default_config_name, 'rb') as file:
-            default_params = tomllib.load(file)
+        default_params = postproc_toml_dict.load_default_config()
         full_params = postproc_toml_dict.merge_config_with_default(params, default_params,
-                                                                   {'solver': 'type'})
+                                                                   postproc_toml_dict.MATCH_KEY)
         verify_input_params.verify_before_dmft_cycle(full_params)
     full_params = mpi.bcast(full_params)
 

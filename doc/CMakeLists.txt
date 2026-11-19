@@ -22,10 +22,10 @@ endif()
 
 # Sphinx has internal caching, always run it
 add_custom_target(${PROJECT_NAME}_docs_sphinx ALL)
+# rst pages of the input parameters, generated from io_tools/documentation.txt
 add_custom_command(
   TARGET ${PROJECT_NAME}_docs_sphinx POST_BUILD
-  COMMAND bash generate_doc_from_comments.sh
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/input_output/DMFT_input
+  COMMAND PYTHONPATH=${PROJECT_BINARY_DIR}/python:$ENV{PYTHONPATH} ${TRIQS_PYTHON_EXECUTABLE} -m solid_dmft.io_tools.documentation ${CMAKE_CURRENT_SOURCE_DIR}/input_output/DMFT_input
 )
 add_custom_command(
   TARGET ${PROJECT_NAME}_docs_sphinx POST_BUILD

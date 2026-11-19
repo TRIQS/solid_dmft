@@ -1,4 +1,5 @@
 from solid_dmft.io_tools.postproc_toml_dict import merge_config_with_default, _apply_default_values, _verify_restrictions_on_default_and_config, _resolve_references
+from solid_dmft.io_tools import postproc_toml_dict
 
 import unittest
 
@@ -165,6 +166,20 @@ class test_postproc_toml_dict(unittest.TestCase):
         }
         with self.assertRaises(ValueError):
             _apply_default_values(config, default, {'section2': 'match'})
+
+    def test_find_unknown_entries_reports_all_with_suggestions(self):
+        cfg_def = {'general': {'beta': 1.0, 'n_iw': 10}, 'dft': {'n_cores': 1},
+                   'solver': [{'type': 'a', 'n_cycles': 1}, {'type': 'b', 'n_l': 2}]}
+        cfg_inp = {'general': {'betta': 2.0, 'n_cores': 4}, 'solver': {'type': 'a', 'n_cycle': 5, 'n_l': 3}}
+        errors = postproc_toml_dict.find_unknown_entries(cfg_inp, cfg_def, {'solver': 'type'})
+        self.assertEqual(len(errors), 4, errors)
+        self.assertIn('did you mean "beta"', errors[0])
+        self.assertIn('valid in [dft]', errors[1])
+        self.assertIn('did you mean "n_cycles"', errors[2])
+        self.assertIn('valid in [solver] type = "b"', errors[3])
+        with self.assertRaises(ValueError) as context:
+            postproc_toml_dict.merge_config_with_default(cfg_inp, cfg_def, {'solver': 'type'})
+        self.assertIn('did you mean "beta"', str(context.exception))
 
 if __name__ == '__main__':
     unittest.main()
