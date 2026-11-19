@@ -41,28 +41,25 @@ try:
 except ImportError:
     import tomli as tomllib
 
-# triqs
-import triqs.utility.mpi as mpi
-
 # own modules
-from solid_dmft.dmft_cycle import dmft_cycle
-from solid_dmft.csc_flow import csc_flow_control
-from solid_dmft.io_tools import postproc_toml_dict, verify_input_params
+from solid_dmft.io_tools import params_cli, postproc_toml_dict, verify_input_params
 
 def run_dmft(params, config_file_name=None):
+    # imported here so that --params and --check neither need MPI nor print the triqs banner
+    import triqs.utility.mpi as mpi
+    from solid_dmft.dmft_cycle import dmft_cycle
+    from solid_dmft.csc_flow import csc_flow_control
+
     # timing information
     if mpi.is_master_node():
         global_start = timer()
 
     # Reads in default params file and merges with params
     full_params = None
-    default_config_name = os.path.join(os.path.dirname(__file__),
-                                       'io_tools', 'default.toml')
     if mpi.is_master_node():
-        with open(default_config_name, 'rb') as file:
-            default_params = tomllib.load(file)
+        default_params = postproc_toml_dict.load_default_config()
         full_params = postproc_toml_dict.merge_config_with_default(params, default_params,
-                                                                   {'solver': 'type'})
+                                                                   postproc_toml_dict.MATCH_KEY)
         verify_input_params.verify_before_dmft_cycle(full_params)
     full_params = mpi.bcast(full_params)
 
@@ -152,6 +149,11 @@ def run_dmft(params, config_file_name=None):
 
 def main(argv=sys.argv):
     """The main function for one-shot and charge-self-consistent calculations"""
+    if params_cli.is_cli_call(argv):
+        sys.exit(params_cli.main(argv[1:]))
+
+    import triqs.utility.mpi as mpi
+
     config_file_name = str(argv[1]) if len(argv) > 1 else 'dmft_config.toml'
 
     params = None

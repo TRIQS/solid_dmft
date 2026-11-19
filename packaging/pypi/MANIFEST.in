@@ -11,5 +11,6 @@ prune bin
 prune build
 
 global-include default.toml
+global-include documentation.txt
 
 global-exclude .clang-format .clang-tidy .dockerignore .gitignore CMakeLists.txt Jenkinsfile
