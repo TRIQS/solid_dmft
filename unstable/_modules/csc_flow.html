@@ -137,6 +137,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../documentation.html#module-reference-manual">Module reference manual</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../_ref/csc_flow.html">csc_flow</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/csc_flow.html#csc_flow._convert_kpoints_opt_bands"><code class="docutils literal notranslate"><span class="pre">_convert_kpoints_opt_bands()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../_ref/csc_flow.html#csc_flow._full_vasp_run"><code class="docutils literal notranslate"><span class="pre">_full_vasp_run()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../_ref/csc_flow.html#csc_flow._store_dft_eigvals"><code class="docutils literal notranslate"><span class="pre">_store_dft_eigvals()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../_ref/csc_flow.html#csc_flow.csc_flow_control"><code class="docutils literal notranslate"><span class="pre">csc_flow_control()</span></code></a></li>
@@ -166,6 +167,7 @@
 <li class="toctree-l5"><a class="reference internal" href="../_ref/dft_managers.vasp_manager.html#dft_managers.vasp_manager.remove_legacy_projections_suppressed"><code class="docutils literal notranslate"><span class="pre">remove_legacy_projections_suppressed()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../_ref/dft_managers.vasp_manager.html#dft_managers.vasp_manager.run_charge_update"><code class="docutils literal notranslate"><span class="pre">run_charge_update()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../_ref/dft_managers.vasp_manager.html#dft_managers.vasp_manager.run_initial_scf"><code class="docutils literal notranslate"><span class="pre">run_initial_scf()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../_ref/dft_managers.vasp_manager.html#dft_managers.vasp_manager.stop"><code class="docutils literal notranslate"><span class="pre">stop()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -627,6 +629,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.dmft_cycle</span><span class="w"> </span><span class="kn">import</span> <span class="n">dmft_cycle</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.dft_managers</span><span class="w"> </span><span class="kn">import</span> <span class="n">vasp_manager</span> <span class="k">as</span> <span class="n">vasp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.dft_managers</span><span class="w"> </span><span class="kn">import</span> <span class="n">mpi_helpers</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">solid_dmft.dft_managers</span><span class="w"> </span><span class="kn">import</span> <span class="n">qe_manager</span> <span class="k">as</span> <span class="n">qe</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_run_plo_converter</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">dft_params</span><span class="p">):</span>
@@ -644,6 +647,26 @@
     <span class="c1"># Writes new H(k) to h5 archive</span>
     <span class="n">converter</span> <span class="o">=</span> <span class="n">VaspConverter</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;seedname&#39;</span><span class="p">])</span>
     <span class="n">converter</span><span class="o">.</span><span class="n">convert_dft_input</span><span class="p">()</span>
+
+<div class="viewcode-block" id="_convert_kpoints_opt_bands">
+<a class="viewcode-back" href="../_ref/csc_flow.html#csc_flow._convert_kpoints_opt_bands">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_convert_kpoints_opt_bands</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">dft_params</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts the KPOINTS_OPT bands and projectors that VASP computes when it stops, i.e. with the</span>
+<span class="sd">    converged DFT+DMFT density, into dft_bands_input of the archive (for spectral functions A(k, w)).</span>
+<span class="sd">    Does nothing if there is no KPOINTS_OPT data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">()</span> <span class="ow">or</span> <span class="n">dft_params</span><span class="p">[</span><span class="s1">&#39;projector_type&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;plo&#39;</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s1">&#39;vaspout.h5&#39;</span><span class="p">):</span>
+        <span class="k">return</span>
+    <span class="k">with</span> <span class="n">HDFArchive</span><span class="p">(</span><span class="s1">&#39;vaspout.h5&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">archive</span><span class="p">:</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">archive</span><span class="p">[</span><span class="s1">&#39;results&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;electron_eigenvalues_kpoints_opt&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">results</span> <span class="ow">or</span> <span class="s1">&#39;locproj_opt&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+            <span class="k">return</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;  solid_dmft: converting the KPOINTS_OPT bands of the final density to dft_bands_input</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">converter</span> <span class="o">=</span> <span class="n">VaspConverter</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;seedname&#39;</span><span class="p">])</span>
+    <span class="n">converter</span><span class="o">.</span><span class="n">convert_bands_input</span><span class="p">(</span><span class="n">cfg_filename</span><span class="o">=</span><span class="n">dft_params</span><span class="p">[</span><span class="s1">&#39;plo_cfg&#39;</span><span class="p">])</span></div>
+
+
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_run_wannier90</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">dft_params</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
@@ -964,10 +987,15 @@
         <span class="k">del</span> <span class="n">sum_k</span>
         <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
 
-    <span class="c1"># Kills background VASP process for clean end</span>
+    <span class="c1"># Stops the background VASP process, letting it write CHGCAR and WAVECAR</span>
     <span class="k">if</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">()</span> <span class="ow">and</span> <span class="n">dft_params</span><span class="p">[</span><span class="s1">&#39;dft_code&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;vasp&#39;</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;  solid_dmft: Stopping VASP</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">vasp</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="n">vasp_process_id</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="n">vasp</span><span class="o">.</span><span class="n">stop</span><span class="p">(</span><span class="n">vasp_process_id</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;  solid_dmft: VASP stopped, CHGCAR and WAVECAR written</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">_convert_kpoints_opt_bands</span><span class="p">(</span><span class="n">general_params</span><span class="p">,</span> <span class="n">dft_params</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">dft_params</span><span class="p">[</span><span class="s1">&#39;dft_code&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;vasp&#39;</span><span class="p">:</span>
+        <span class="c1"># the other ranks must not busy-wait on the cores VASP uses for its last update</span>
+        <span class="n">mpi_helpers</span><span class="o">.</span><span class="n">poll_barrier</span><span class="p">(</span><span class="n">mpi</span><span class="o">.</span><span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span><span class="p">)</span></div>
 
 </pre></div>
 
