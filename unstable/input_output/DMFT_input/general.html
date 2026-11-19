@@ -209,7 +209,9 @@
 <li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.greens_functions_mixer.html">dmft_tools.greens_functions_mixer</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../_ref/dmft_tools.greens_functions_mixer.html#dmft_tools.greens_functions_mixer._bgf_to_vec"><code class="docutils literal notranslate"><span class="pre">_bgf_to_vec()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../_ref/dmft_tools.greens_functions_mixer.html#dmft_tools.greens_functions_mixer._broyden_update"><code class="docutils literal notranslate"><span class="pre">_broyden_update()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../_ref/dmft_tools.greens_functions_mixer.html#dmft_tools.greens_functions_mixer._delta_from_g0"><code class="docutils literal notranslate"><span class="pre">_delta_from_g0()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../_ref/dmft_tools.greens_functions_mixer.html#dmft_tools.greens_functions_mixer._mixed_blocks"><code class="docutils literal notranslate"><span class="pre">_mixed_blocks()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../_ref/dmft_tools.greens_functions_mixer.html#dmft_tools.greens_functions_mixer.mix_delta"><code class="docutils literal notranslate"><span class="pre">mix_delta()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.initial_self_energies.html">dmft_tools.initial_self_energies</a><ul>
@@ -733,6 +735,9 @@ i.e., general.beta is None, and for the real-frequency solvers</p>
 <div><p><strong>type</strong> = float;  <strong>default</strong>  = 1.0</p>
 </div></blockquote>
 <p>Mixing the weiss field G0 with previous iteration G0 for better convergency. 1.0 means no mixing.
+For solvers that take the hybridization Delta(tau) as input (ctseg, cthyb with
+delta_interface) the hybridization is mixed instead of G0, which keeps Delta(tau) causal
+when the chemical potential changes between iterations.
 Setting g0_mix to 0.0 with linear mixing can be used for statistic sampling when
 restarting a calculation</p>
 </div>

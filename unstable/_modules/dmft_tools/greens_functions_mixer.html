@@ -206,7 +206,9 @@
 <li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.greens_functions_mixer.html">dmft_tools.greens_functions_mixer</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../_ref/dmft_tools.greens_functions_mixer.html#dmft_tools.greens_functions_mixer._bgf_to_vec"><code class="docutils literal notranslate"><span class="pre">_bgf_to_vec()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../_ref/dmft_tools.greens_functions_mixer.html#dmft_tools.greens_functions_mixer._broyden_update"><code class="docutils literal notranslate"><span class="pre">_broyden_update()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../_ref/dmft_tools.greens_functions_mixer.html#dmft_tools.greens_functions_mixer._delta_from_g0"><code class="docutils literal notranslate"><span class="pre">_delta_from_g0()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../_ref/dmft_tools.greens_functions_mixer.html#dmft_tools.greens_functions_mixer._mixed_blocks"><code class="docutils literal notranslate"><span class="pre">_mixed_blocks()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../_ref/dmft_tools.greens_functions_mixer.html#dmft_tools.greens_functions_mixer.mix_delta"><code class="docutils literal notranslate"><span class="pre">mix_delta()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../_ref/dmft_tools.initial_self_energies.html">dmft_tools.initial_self_energies</a><ul>
@@ -610,7 +612,7 @@
 <span class="c1"># triqs</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">triqs.utility.mpi</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mpi</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">h5</span><span class="w"> </span><span class="kn">import</span> <span class="n">HDFArchive</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.gfs</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeshImFreq</span><span class="p">,</span> <span class="n">MeshImTime</span><span class="p">,</span> <span class="n">Gf</span><span class="p">,</span> <span class="n">make_gf_from_fourier</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.gfs</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeshImFreq</span><span class="p">,</span> <span class="n">MeshImTime</span><span class="p">,</span> <span class="n">Gf</span><span class="p">,</span> <span class="n">make_gf_from_fourier</span><span class="p">,</span> <span class="n">iOmega_n</span><span class="p">,</span> <span class="n">fit_hermitian_tail</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">triqs.gfs.descriptors</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fourier</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">triqs.gfs.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">inverse</span>
 
@@ -658,7 +660,7 @@
 
 <div class="viewcode-block" id="_broyden_update">
 <a class="viewcode-back" href="../../_ref/dmft_tools.greens_functions_mixer.html#dmft_tools.greens_functions_mixer._broyden_update">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">_broyden_update</span><span class="p">(</span><span class="n">broyler</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">deg_shells</span><span class="p">,</span> <span class="n">G0_freq</span><span class="p">,</span> <span class="n">G0_freq_previous</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_broyden_update</span><span class="p">(</span><span class="n">broyler</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">deg_shells</span><span class="p">,</span> <span class="n">G0_freq</span><span class="p">,</span> <span class="n">G0_freq_previous</span><span class="p">,</span> <span class="n">use_legendre</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    calculates the broyden update of G0 using the algorithm presented in:</span>
 <span class="sd">    doi.org/10.1103/PhysRevB.80.125125 (Rok Zitko) &amp;</span>
@@ -673,6 +675,9 @@
 <span class="sd">        dict containing the broyden variables; an empty history starts a new</span>
 <span class="sd">        Broyden sequence with a linear mixing step</span>
 <span class="sd">    general_paramters: general params dict</span>
+<span class="sd">    use_legendre: bool</span>
+<span class="sd">        compress with Legendre polynomials if general_params has n_l. Needs the unit</span>
+<span class="sd">        discontinuity of a Green&#39;s function, so it is off for the hybridization.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -684,7 +689,7 @@
     <span class="n">G0_broyden_update</span> <span class="o">=</span> <span class="n">G0_freq</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
     <span class="c1"># build here leg compression</span>
-    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">G0_freq</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span> <span class="ow">is</span> <span class="n">MeshImFreq</span> <span class="ow">and</span> <span class="s1">&#39;n_l&#39;</span> <span class="ow">in</span> <span class="n">general_params</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">use_legendre</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">G0_freq</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span> <span class="ow">is</span> <span class="n">MeshImFreq</span> <span class="ow">and</span> <span class="s1">&#39;n_l&#39;</span> <span class="ow">in</span> <span class="n">general_params</span><span class="p">:</span>
         <span class="n">G0</span> <span class="o">=</span> <span class="n">legendre_filter</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">make_gf_from_fourier</span><span class="p">(</span><span class="n">G0_freq</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;n_l&#39;</span><span class="p">]</span> <span class="p">)</span>
         <span class="n">G0_prev</span> <span class="o">=</span> <span class="n">legendre_filter</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">make_gf_from_fourier</span><span class="p">(</span><span class="n">G0_freq_previous</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;n_l&#39;</span><span class="p">]</span> <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -753,7 +758,7 @@
     <span class="n">broyler</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">V_mp1</span><span class="p">)</span>
 
     <span class="c1"># convert Gl back to G0_freq</span>
-    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">G0_freq</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span> <span class="ow">is</span> <span class="n">MeshImFreq</span> <span class="ow">and</span> <span class="s1">&#39;n_l&#39;</span> <span class="ow">in</span> <span class="n">general_params</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">use_legendre</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">G0_freq</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span> <span class="ow">is</span> <span class="n">MeshImFreq</span> <span class="ow">and</span> <span class="s1">&#39;n_l&#39;</span> <span class="ow">in</span> <span class="n">general_params</span><span class="p">:</span>
         <span class="n">G0_l_update</span> <span class="o">=</span> <span class="n">_vec_to_bgf</span><span class="p">(</span><span class="n">broyler</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">G0</span><span class="p">,</span> <span class="n">deg_shells</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">block</span><span class="p">,</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">G0_l_update</span><span class="p">:</span>
             <span class="n">g</span><span class="o">.</span><span class="n">enforce_discontinuity</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">target_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
@@ -802,6 +807,62 @@
         <span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">Sigma_freq</span> <span class="o">&lt;&lt;</span> <span class="n">mpi</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">solvers</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span><span class="o">.</span><span class="n">Sigma_freq</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">solvers</span>
+
+
+<div class="viewcode-block" id="_delta_from_g0">
+<a class="viewcode-back" href="../../_ref/dmft_tools.greens_functions_mixer.html#dmft_tools.greens_functions_mixer._delta_from_g0">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_delta_from_g0</span><span class="p">(</span><span class="n">G0_freq</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Hybridization of a Weiss field G0 = (iw - eps - Delta)^-1, i.e. iw - G0^-1 without its</span>
+<span class="sd">    static part eps. The static part is taken from a fit of the high-frequency tail, so the</span>
+<span class="sd">    local levels the Weiss field was built with need not be known (e.g. after a restart).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Delta_freq</span> <span class="o">=</span> <span class="n">G0_freq</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">block</span><span class="p">,</span> <span class="n">g0</span> <span class="ow">in</span> <span class="n">G0_freq</span><span class="p">:</span>
+        <span class="n">Delta_freq</span><span class="p">[</span><span class="n">block</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="n">iOmega_n</span> <span class="o">-</span> <span class="n">inverse</span><span class="p">(</span><span class="n">g0</span><span class="p">)</span>
+        <span class="n">tail</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">fit_hermitian_tail</span><span class="p">(</span><span class="n">Delta_freq</span><span class="p">[</span><span class="n">block</span><span class="p">])</span>
+        <span class="n">Delta_freq</span><span class="p">[</span><span class="n">block</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="n">Delta_freq</span><span class="p">[</span><span class="n">block</span><span class="p">]</span> <span class="o">-</span> <span class="n">tail</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">Delta_freq</span></div>
+
+
+
+<div class="viewcode-block" id="mix_delta">
+<a class="viewcode-back" href="../../_ref/dmft_tools.greens_functions_mixer.html#dmft_tools.greens_functions_mixer.mix_delta">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">mix_delta</span><span class="p">(</span><span class="n">solver</span><span class="p">,</span> <span class="n">general_params</span><span class="p">,</span> <span class="n">icrsh</span><span class="p">,</span> <span class="n">archive</span><span class="p">,</span> <span class="n">G0_freq_previous</span><span class="p">,</span> <span class="n">deg_shell</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Mixing for solvers that take the hybridization Delta(tau) as input (ctseg, cthyb with</span>
+<span class="sd">    delta_interface): mix solver.Delta_freq with the hybridization of the previous Weiss field,</span>
+<span class="sd">    controlled by g0_mix / g0_mix_type as for the G0 mixing.</span>
+
+<span class="sd">    Mixing G0 itself is not suited for these solvers: the Weiss fields of two iterations are built</span>
+<span class="sd">    with different local levels (the chemical potential changes), and Delta = iw - G0^-1 - eps</span>
+<span class="sd">    with the current levels eps then keeps a static part, which the Fourier transform to</span>
+<span class="sd">    Delta(tau) cannot represent. The resulting Delta(tau) oscillates and changes sign, i.e. the</span>
+<span class="sd">    solver runs into a sign problem. The mixture of two hybridizations stays causal instead.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;g0_mix_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;linear&#39;</span> <span class="ow">and</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;g0_mix&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">1.0</span><span class="p">:</span>
+        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">linear mixing of the hybridization Delta with previous iteration by factor </span><span class="si">{:.3f}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;g0_mix&#39;</span><span class="p">]))</span>
+        <span class="n">Delta_freq_previous</span> <span class="o">=</span> <span class="n">_delta_from_g0</span><span class="p">(</span><span class="n">G0_freq_previous</span><span class="p">)</span>
+        <span class="n">solver</span><span class="o">.</span><span class="n">Delta_freq</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;g0_mix&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">solver</span><span class="o">.</span><span class="n">Delta_freq</span>
+                              <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;g0_mix&#39;</span><span class="p">])</span> <span class="o">*</span> <span class="n">Delta_freq_previous</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;g0_mix_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;broyden&#39;</span><span class="p">:</span>
+        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">broyden mixing of the hybridization Delta with previous iteration with alpha </span><span class="si">{:.3f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">general_params</span><span class="p">[</span><span class="s1">&#39;g0_mix&#39;</span><span class="p">]))</span>
+        <span class="n">mpi</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">############</span><span class="se">\n</span><span class="s1">!!!! WARNING !!!! broyden mixing is still in early testing stage ! Use with caution.</span><span class="se">\n</span><span class="s1">############</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">Delta_freq_previous</span> <span class="o">=</span> <span class="n">_delta_from_g0</span><span class="p">(</span><span class="n">G0_freq_previous</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mpi</span><span class="o">.</span><span class="n">is_master_node</span><span class="p">():</span>
+            <span class="k">with</span> <span class="n">HDFArchive</span><span class="p">(</span><span class="n">archive</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ar</span><span class="p">:</span>
+                <span class="n">broyler</span> <span class="o">=</span> <span class="n">ar</span><span class="p">[</span><span class="s1">&#39;DMFT_results&#39;</span><span class="p">][</span><span class="s1">&#39;broyler&#39;</span><span class="p">]</span>
+                <span class="n">Delta_broyden_update</span><span class="p">,</span> <span class="n">broyler</span><span class="p">[</span><span class="n">icrsh</span><span class="p">]</span> <span class="o">=</span> <span class="n">_broyden_update</span><span class="p">(</span><span class="n">broyler</span><span class="p">[</span><span class="n">icrsh</span><span class="p">],</span> <span class="n">general_params</span><span class="p">,</span>
+                                                                       <span class="n">deg_shell</span><span class="p">,</span> <span class="n">solver</span><span class="o">.</span><span class="n">Delta_freq</span><span class="p">,</span>
+                                                                       <span class="n">Delta_freq_previous</span><span class="p">,</span> <span class="n">use_legendre</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="n">ar</span><span class="p">[</span><span class="s1">&#39;DMFT_results&#39;</span><span class="p">][</span><span class="s1">&#39;broyler&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">broyler</span>
+                <span class="n">solver</span><span class="o">.</span><span class="n">Delta_freq</span> <span class="o">&lt;&lt;</span> <span class="n">Delta_broyden_update</span>
+
+        <span class="n">solver</span><span class="o">.</span><span class="n">Delta_freq</span> <span class="o">&lt;&lt;</span> <span class="n">mpi</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="n">solver</span><span class="o">.</span><span class="n">Delta_freq</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">solver</span></div>
+
+
 </pre></div>
 
            </div>
