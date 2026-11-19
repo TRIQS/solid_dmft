@@ -14,6 +14,7 @@ set(basic_tests
     test_crm_dyson_solver
     test_greens_functions_mixer
     test_delta_mixing
+    test_vasp_stop
     )
 
   # copy input files for PCB test from documentation tutorial
