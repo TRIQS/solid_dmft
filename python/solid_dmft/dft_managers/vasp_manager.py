@@ -278,9 +278,37 @@ def read_irred_kpoints(kpts):
     return mpi.bcast(irred_indices)
 
 
+def stop(vasp_process_id, timeout=600):
+    """
+    Stops the VASP process at the end of a calculation such that VASP writes its final output.
+
+    VASP only writes CHGCAR and WAVECAR when it leaves its electronic loop regularly. In the CSC
+    loop it waits for vasp.lock before every charge update, so it is released once more after the
+    STOPCAR is written: VASP then performs one last update, reads LABORT and exits. The CHGCAR
+    holds the DFT+DMFT charge density, which is needed to restart or to compute bands with
+    ICHARG = 11. Falls back to SIGTERM if VASP does not exit within the timeout (in s).
+
+    Returns True if VASP exited by itself.
+    """
+    with open('STOPCAR', 'wt') as f_stop:
+        f_stop.write('LABORT = .TRUE.\n')
+    open('./vasp.lock', 'a').close()
+
+    start_time = time.time()
+    while time.time() - start_time < timeout:
+        pid, _ = os.waitpid(vasp_process_id, os.WNOHANG)
+        if pid != 0:
+            return True
+        time.sleep(1)
+
+    print(f'  solid_dmft: VASP did not stop within {timeout} s, killing it. CHGCAR may not be up to date.', flush=True)
+    os.kill(vasp_process_id, signal.SIGTERM)
+    os.waitpid(vasp_process_id, 0)
+    return False
+
+
 def kill(vasp_process_id):
-    """ Kills the VASP process. """
-    # TODO: if we kill the process in the next step, does it make a difference if we write the STOPCAR
+    """ Kills the VASP process and aborts, after an error. Use stop() for a regular end. """
     with open('STOPCAR', 'wt') as f_stop:
         f_stop.write('LABORT = .TRUE.\n')
     os.kill(vasp_process_id, signal.SIGTERM)

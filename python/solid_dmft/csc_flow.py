@@ -44,6 +44,7 @@ import triqs_dftkit.vasp.plovasp.converter as plo_converter
 
 from solid_dmft.dmft_cycle import dmft_cycle
 from solid_dmft.dft_managers import vasp_manager as vasp
+from solid_dmft.dft_managers import mpi_helpers
 from solid_dmft.dft_managers import qe_manager as qe
 
 def _run_plo_converter(general_params, dft_params):
@@ -61,6 +62,23 @@ def _run_plo_converter(general_params, dft_params):
     # Writes new H(k) to h5 archive
     converter = VaspConverter(filename=general_params['seedname'])
     converter.convert_dft_input()
+
+def _convert_kpoints_opt_bands(general_params, dft_params):
+    """
+    Converts the KPOINTS_OPT bands and projectors that VASP computes when it stops, i.e. with the
+    converged DFT+DMFT density, into dft_bands_input of the archive (for spectral functions A(k, w)).
+    Does nothing if there is no KPOINTS_OPT data.
+    """
+    if not mpi.is_master_node() or dft_params['projector_type'] != 'plo' or not os.path.isfile('vaspout.h5'):
+        return
+    with HDFArchive('vaspout.h5', 'r') as archive:
+        results = archive['results']
+        if 'electron_eigenvalues_kpoints_opt' not in results or 'locproj_opt' not in results:
+            return
+    print('  solid_dmft: converting the KPOINTS_OPT bands of the final density to dft_bands_input\n', flush=True)
+    converter = VaspConverter(filename=general_params['seedname'])
+    converter.convert_bands_input(cfg_filename=dft_params['plo_cfg'])
+
 
 def _run_wannier90(general_params, dft_params):
     if not mpi.is_master_node():
@@ -373,7 +391,12 @@ def csc_flow_control(general_params, solver_params, dft_params, gw_params, advan
         del sum_k
         gc.collect()
 
-    # Kills background VASP process for clean end
+    # Stops the background VASP process, letting it write CHGCAR and WAVECAR
     if mpi.is_master_node() and dft_params['dft_code'] == 'vasp':
         print('  solid_dmft: Stopping VASP\n', flush=True)
-        vasp.kill(vasp_process_id)
+        if vasp.stop(vasp_process_id):
+            print('  solid_dmft: VASP stopped, CHGCAR and WAVECAR written\n', flush=True)
+            _convert_kpoints_opt_bands(general_params, dft_params)
+    if dft_params['dft_code'] == 'vasp':
+        # the other ranks must not busy-wait on the cores VASP uses for its last update
+        mpi_helpers.poll_barrier(mpi.MPI.COMM_WORLD)
