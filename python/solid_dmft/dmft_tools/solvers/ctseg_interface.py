@@ -50,6 +50,10 @@ from solid_dmft.dmft_tools import common
 # import triqs solver
 from triqs_ctseg import Solver as ctseg_solver
 from triqs_ctseg.version import triqs_ctseg_hash, version
+try:
+    from triqs_ctseg.postprocessing import sigma_first_moment_from_state_hist
+except ImportError:
+    sigma_first_moment_from_state_hist = None
 
 
 class CTSEGInterface(AbstractDMFTSolver):
@@ -277,9 +281,24 @@ class CTSEGInterface(AbstractDMFTSolver):
             # use degenerate shell information to symmetrize
             self.sum_k.symm_deg_gf(self.Sigma_Hartree, ish=self.icrsh)
 
+            # first moment from the measured state histogram, so that the tail fit
+            # only has to determine the higher moments
+            # (needs a ctseg with sigma_first_moment_from_state_hist; static density-density only)
+            Sigma_first = None
+            if (sigma_first_moment_from_state_hist is not None and self.solver_params['measure_state_hist']
+                    and self.general_params['h_int_type'][self.icrsh] != 'dyn_density_density'):
+                Sigma_first = sigma_first_moment_from_state_hist(
+                    self.triqs_solver.results.state_hist, self.h_int, self.sum_k.gf_struct_solver_list[self.icrsh]
+                )
+                self.sum_k.symm_deg_gf(Sigma_first, ish=self.icrsh)
+                mpi.report('First moment of the impurity self-energy from the state histogram (diagonal):')
+                for block, mom in Sigma_first.items():
+                    mpi.report(f'  {block}: {np.diag(mom).round(4)}')
+
             # create moments array from this
             for block, hf_val in self.Sigma_Hartree.items():
-                self.Sigma_moments[block] = np.array([hf_val])
+                moments = [hf_val] if Sigma_first is None else [hf_val, Sigma_first[block]]
+                self.Sigma_moments[block] = np.array(moments)
 
         self.Sigma_Hartree = mpi.bcast(self.Sigma_Hartree)
         self.Sigma_moments = mpi.bcast(self.Sigma_moments)
